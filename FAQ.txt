@@ -1,0 +1,136 @@
+OPEN LOCATION CODE FREQUENTLY ASKED QUESTIONS
+
+Q: What is Open Location Code for?
+A: Open Location Code provides short codes that people can use to refer to
+locations, when street addresses don't exist, aren't known or aren't suitable.
+
+Q: What are the specific aims?
+A: The aims are to have codes that are shorter and easier to use than
+latitude and longitude coordinates. The codes should be short enough that
+people can remember them and communicate them in speech or in writing. The
+codes should work offline, should not include words and should not require
+setting up. It should be possible to tell if two codes are close to each
+other by looking at them.
+
+Q: Where do we expect Open Location Codes to be useful?
+A: More than half the world's urban dwellers live on streets that don't have
+formal names. We expect these codes will be mostly used by people in areas
+lacking street addresses, but could also be used in areas that are mapped
+but where street name data is not widely available or where both formal and
+informal names exist.
+
+Q: Should cities stop naming streets?
+A: No! Street naming provides numerous benefits, including cementing a sense
+of identity for residents and connecting them to their community. Based on
+the World Banks experience, though, street naming projects typically take in
+the order of one to two years (depending on the size of the city), and cost
+approximately $5USD per addressed building. The advantage of Open Location
+Codes is that they are available now to anyone with access to a computer or
+smartphone.
+
+Q: Are there uses for Open Location Codes in well-mapped countries?
+A: Yes, for example Switzerland has villages where multiple streets have the
+same name. The UK has some homes that are identified by names, rather than
+by street numbers. Venice and Japan both have block-based addresses, rather
+than street name based. In addition, there are locations where people wish
+to meet but the best street address is not useful - for example, a picnic
+spot within a park, a mountain hut or a ski lift.
+
+Q: How does Open Location Code differ from latitude and longitude?
+A: Latitude and longitude are two signed numbers. They have different
+ranges, and the order matters. For five decimal places, roughly 10 meter
+accuracy, latitude and longitude require between 15 and 20 text characters
+("0.39122, 9.45225" to "-43.95134,-176.55053"). Latitude and longitude
+express a point location, and there is no universally accepted way to
+provide a location of something that is not a point, such as a football
+field, park or lake.
+
+The problem of poor or no addresses has existed for ever, and cheap GPS
+devices for at least 15 years, and yet latitude and longitude coordinates
+are still not widely used by people to specify destinations. We think that
+this shows latitude and longitude are just too complicated for normal use.
+
+Q: Why don't Open Location Codes include altitude?
+A: We didn't want to append it as a suffix or bury it in the code because we
+want to be able to truncate the codes reliably. We also didn't want to
+unnecessarily extend the length of codes for what we expect to be a minority
+of cases. Altitude is more useful to people as a floor number, but there are
+different ways of numbering building floors depending on local custom.
+
+In summary, we couldn't think of a way that was better than specifying the
+code and allowing people to just say "3rd floor".
+
+Q: Why do Open Location Codes use two algorithms?
+A: The first algorithm provides codes that can be visually compared and
+sorted. This is used until the code is 10 characters long, with a resolution
+of 1/8000th of a degree, approximately 14 meters. This will often be
+sufficient, but in some cases of high density buildings this will be too
+large. Continuing with this algorithm adds two more characters for a
+resolution of 70 centimeters.
+
+We want to keep the length of the codes low to make them easier to remember
+and use. We didn't feel that the resolution was necessary, and so the second
+algorithm is used to refine the code with just a single character, with a
+resolution of 1/40000 x 1/32000 of a degree (approximately 3.5 x 2.8 meters).
+
+If we had based the entire code on the second algorithm, we would have codes
+that would not be reliably visually comparable or sortable by proximity.
+
+Q: Why is Open Location Code based on latin characters?
+A: We are aware that many of the countries where Open Location Codes will be
+most useful use non-Latin character sets, such as Arabic, Chinese, Cyrillic,
+Thai, Vietnamese, etc. We selected Latin characters as the most common
+second-choice character set in these locations.
+
+We considered defining alternative Open Location Code alphabets in each
+character set, but this would result in codes that would be unusable to
+visitors to that region.
+
+Q: Why doesn't Open Location Code include a checksum?
+A: One of the aims is to make the codes short to enable their everyday use,
+in writing and speech. We felt that adding checksums when codes are being
+communicated between computers is unnecessary, and adding checksums when
+codes are being communicated between people reduces the usability and will
+mostly be worked around ("We're meeting in Miami in an hour? But we're in
+Hyderabad!") because users will realise that a code cannot possibly be
+correct. It's analogous to someone using the wrong suburb name today - it
+happens, people are able to deal with it.
+
+Q: Why do Open Location Codes look like something fell on my keyboard?
+A: We wanted something that wasn't linked to a single culture, so word-based
+codes were out. That meant that the codes would be essentially a number, but
+we used letters as well as digits to raise the number base and shorten the
+codes, to make them easier to remember. After we eliminated some letters and
+digits to avoid spelling words and to remove easily confused pairs, we got
+the current set of symbols. One disadvantage of the symbol set is that it is
+noncontiguous, although it is difficult to see how we could change that
+without violating any of the aims.
+
+Q: What coordinate system does Open Location Code use?
+A: Open Location Codes should be based on WGS84, since this is the datum
+used by GPS and is how coordinates on smartphone devices are made available.
+There is nothing to prevent coordinates using other datums being used, but
+when decoded by someone who expects them to be WGS84, it may result in a
+different location.
+
+Q: Why do Open Location Code areas distort at high latitudes?
+A: Open Location Codes are a function of latitude and longitude. As
+longitude lines converge on the north and south poles the areas become
+narrower and narrower. At the equator codes are square, but at about 60
+degrees latitude, the codes are only half as wide.
+
+Q: Are there any discontinuities in the codes?
+A: Yes, codes on either side of the 180 longitude line will be very
+different, even though they may be very close together. Apart from some
+islands in the Fiji group, there are almost no affected inhabited areas, and
+we feel this is acceptable. The other discontinuities are at the poles, but
+as these do not have large permanent populations we don't expect significant
+use of Open Location Codes here.
+
+Q: What about continental drift?
+A: Most tectonic plates are moving at rates of 1-5cm per year. With the 10
+character Open Location Codes representing 14x14 meter boxes, codes should
+be valid for many years. Even the more accurate 11 character codes should
+not require updating for 30-50 years. But even if they do, the worst result
+is that someone using a code will find themselves at the home or building
+next door.

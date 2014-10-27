@@ -1,0 +1,235 @@
+<!--
+ Copyright 2014 Google Inc. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="Description" content="">
+  <title>Open Location Code Example</title>
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCP3yO0nubZ8vCiyK-ZF-XEJ7VQWe6wVIM&libraries=geometry">
+  </script>
+  <script type="text/javascript" src="openlocationcode.js"></script>
+  <script type="text/javascript" src="examples.js"></script>
+  <link href='examples.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <div id="content">
+    <div id="map-canvas" class="map_frame" ></div>
+    <div id="messageBox">
+      <h1>Convert location to OLC Code</h1>
+      <p>
+        Open Location Codes use a grid to encode the location. Each step is
+        identified by two letters or numbers, that give the row and column
+        number within the grid.
+      </p>
+      <p>
+        OLC codes don't just represent a position, they represent the entire
+        area of the grid cell.
+      </p>
+      <p>
+        Clicking on the map will show how the location is encoded into an
+        Open Location Code.
+      </p>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+
+    /** The Google Maps map object. */
+    var map;
+
+    var olcGrids = [];
+
+    var clickMarker = null;
+
+    /** Click lat/lng */
+    var clickLatLng = null;
+
+    /*
+      Handle clicks on the map. Computes the standard and refined Open Location Codes for
+      the clicked location, and displays polygons and messages.
+    */
+    function mapClickHandler(event) {
+      clickLatLng = event.latLng;
+      describeCode(2);
+    }
+
+    /**
+      * Draw the grid, highlight the row and column of the marker,
+      * and display a message box explaining the current code.
+      */
+    function describeCode(codeLen) {
+      clearPolygons();
+      clearTextLabels();
+      for (var i = 0; i < olcGrids.length; i++) {
+        olcGrids[i].clear();
+      }
+      olcGrids = [];
+
+      // Work out the length of the parent code, and of the next code.
+      // Codes increase in steps of two until after the code has 10 digits.
+      var parentLen = codeLen - 2;
+      var nextLen = codeLen + 2;
+      if (codeLen == 10) {
+        nextLen = codeLen +1;
+      }
+      if (codeLen > 10) {
+        parentLen = codeLen - 1;
+      }
+
+      // Work out the parent code, and display it on the map.
+      var parentCode = '';
+      if (codeLen > 2) {
+        parentCode = OpenLocationCode.encode(clickLatLng.lat(), clickLatLng.lng(), parentLen);
+        var parentArea = OpenLocationCode.decode(parentCode);
+        var bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(parentArea.latitudeLo, parentArea.longitudeLo),
+            new google.maps.LatLng(parentArea.latitudeHi, parentArea.longitudeHi));
+        map.fitBounds(bounds);
+      }
+
+      // Get the current OLC code for the passed length, and get the area of the code.
+      var currentCode = OpenLocationCode.encode(clickLatLng.lat(), clickLatLng.lng(), codeLen);
+      var codeArea = OpenLocationCode.decode(currentCode);
+      var height = google.maps.geometry.spherical.computeDistanceBetween(
+          new google.maps.LatLng(codeArea.latitudeLo, codeArea.longitudeLo),
+          new google.maps.LatLng(codeArea.latitudeHi, codeArea.longitudeLo));
+      height = Math.round(height * 10) / 10;
+      var width = google.maps.geometry.spherical.computeDistanceBetween(
+          new google.maps.LatLng(codeArea.latitudeLo, codeArea.longitudeLo),
+          new google.maps.LatLng(codeArea.latitudeLo, codeArea.longitudeHi));
+      width = Math.round(width * 10) / 10;
+
+      // Shade the row.
+      var bounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(codeArea.latitudeLo, -180),
+          new google.maps.LatLng(codeArea.latitudeHi, 180));
+      var poly = new google.maps.Rectangle({
+          map: map,
+          bounds: bounds,
+          strokeWeight: 0,
+          fillColor: '#e51c23',
+          fillOpacity: 0.3,
+          clickable: false
+      });
+      polygons.push(poly);
+      // Shade the column.
+      var bounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(-90, codeArea.longitudeLo),
+          new google.maps.LatLng(90, codeArea.longitudeHi));
+      var poly = new google.maps.Rectangle({
+          map: map,
+          bounds: bounds,
+          strokeWeight: 0,
+          fillColor: '#e51c23',
+          fillOpacity: 0.3,
+          clickable: false
+      });
+      polygons.push(poly);
+      // Shade the OLC code area.
+      var bounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(codeArea.latitudeLo, codeArea.longitudeLo),
+          new google.maps.LatLng(codeArea.latitudeHi, codeArea.longitudeHi));
+      var poly = new google.maps.Rectangle({
+          map: map,
+          bounds: bounds,
+          strokeWeight: 0,
+          fillColor: '#e51c23',
+          fillOpacity: 0.75,
+          clickable: false
+      });
+      polygons.push(poly);
+
+      // Get the current message box and remove it. Then create a new one.
+      // This works around a bug in some browsers where resizing it leaves
+      // screen artefacts.
+      var messageBox = document.getElementById('messageBox');
+      messageBox.parentNode.removeChild(messageBox);
+      messageBox = document.createElement('DIV');
+      messageBox.id = 'messageBox';
+      var html = '';
+      if (codeLen <= 10) {
+        html += '<button class="button" style="float:right;" ' +
+            'onclick="describeCode(' + nextLen + ');">' +
+            '<span class="button_label">Next</span></button>';
+      }
+      if (codeLen > 2) {
+        html += '<button class="button" style="float:right;" ' +
+            'onclick="describeCode(' + parentLen + ');">' +
+            '<span class="button_label">Back</span></button>';
+      }
+      html += '<br/>';
+      if (codeLen <= 10) {
+        olcGrids.push(new OlcStandardGrid(parentCode, '#546e7a', map));
+        var row = currentCode.substr(currentCode.length - 2).charAt(0);
+        var col = currentCode.substr(currentCode.length - 2).charAt(1);
+        html += '<p>The cell containing the marker is in row <em>' + row + '</em> ' +
+            'and column <em>' + col + '</em>, making its OLC code ' +
+            '<em>' + currentCode + '</em>.</p>';
+      } else {
+        olcGrids.push(new OlcRefinedGrid(parentCode, '#546e7a', map));
+        html += '<p>These OLC codes are probably accurate enough for most street ' +
+            'addresses, but there will be places that need more accuracy.</p>' +
+            '<p>Another step would increase the accuracy, but would add two ' +
+            'more letters or numbers to the code. We want to keep the codes ' +
+            'as short as possible, so instead of using a 20x20 grid, ' +
+            'we divide the area into a 4x5 grid instead. Now we can use just ' +
+            'a single letter or number to refine the area.</p>' +
+            '<p>The cell where the marker is has the reference ' +
+            '<em>' + currentCode.substr(currentCode.length - 1) + '</em>' +
+            ', making its OLC code <em>' + currentCode + '</em>.</p>';
+      }
+      html += '<p class="note_p">(The area containing the marker is ' + height +
+          ' meters tall, and ' + width + ' meters wide.)</p>';
+      if (parentCode != '') {
+        html += '<p class="note_p">The cell containing the grid has the OLC code ' +
+            '<em>' + parentCode + '</em>.</p>';
+      }
+      messageBox.innerHTML = html;
+      document.getElementById('content').appendChild(messageBox);
+
+      if (clickMarker != null) {
+        clickMarker.setMap(null);
+      }
+      clickMarker = new google.maps.Marker({
+          position: clickLatLng,
+          map: map,
+          title: 'Location',
+          zIndex: 1000
+      });
+    }
+  </script>
+
+  <script type="text/javascript">
+    // What to do when the page loads.
+    google.maps.event.addDomListener(window, 'load', function() {
+      // Create the map object.
+      map = new google.maps.Map(
+          document.getElementById('map-canvas'),
+          {center: new google.maps.LatLng(47.365561, 8.52494),
+           zoom: 1,
+           mapTypeId: google.maps.MapTypeId.ROADMAP,
+           scaleControl: true});
+      map.setTilt(0);
+      // Add an event listener to display OLC boxes around clicks.
+      google.maps.event.addListener(map, 'click', mapClickHandler);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!--
+ Copyright 2014 Google Inc. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="Description" content="">
+  <title>Open Location Code Example</title>
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCP3yO0nubZ8vCiyK-ZF-XEJ7VQWe6wVIM&libraries=geometry">
+  </script>
+  <script type="text/javascript" src="openlocationcode.js"></script>
+  <script type="text/javascript" src="examples.js"></script>
+  <link href='examples.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <div id="content">
+    <div id="map-canvas" class="map_frame" ></div>
+    <div id="messageBox">
+      <div id="message_header">
+        <h1>Shortening OLC codes</h1>
+        <p>
+          OLC codes are a bit like an address - if you know that they are near
+          something, you can drop some of the characters.
+        </p>
+        <p>
+          Click on the map to see the steps in shortening a code. Or enter the
+          final part of a code and a place below to see how the original code
+          is recovered.
+        </p>
+      </div>
+      <div id="form_container">
+        <form onsubmit="processCode();" action="javascript:void(0)">
+          <input id="code_fragment" class="text_input" placeholder="Enter part of an OLC code">
+          <input id="address" class="text_input" placeholder="Enter a place e.g., Zurich">
+          <button class="button"><span class="button_label">Go</span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+
+    /** The Google Maps map object. */
+    var map;
+
+    /** The Google Maps geocoder. */
+    var geocoder;
+
+    /** Show the location of the geocoded place. */
+    var placeMarker;
+
+    /** The OLC code for the click location. */
+    var olcCode;
+
+    /** The code fragment when expanding. */
+    var codeFragment;
+
+    /** The address information for the click location. */
+    var localityAddress;
+
+    /*
+      Handle clicks on the map. Computes the standard and refined Open Location Codes for
+      the clicked location.
+    */
+    function mapClickHandler(event) {
+      clearPolygons();
+
+      olcCode = OpenLocationCode.encode(event.latLng.lat(), event.latLng.lng());
+      zoomTo(olcCode);
+      polygons.push(displayOlcArea(map, olcCode));
+
+      var messageHeader = document.getElementById('message_header');
+      messageHeader.innerHTML = '<p>The code for this location is <em>' + olcCode + '</em>' +
+          '<p>Shortening it to something more convenient, means we also need an address. ' +
+          'So, we first use the ' +
+          '<a href="https://developers.google.com/maps/documentation/javascript/">Google Maps API</a>' +
+          ' to get a reasonable address for this ' +
+          'location.</p>' +
+          '<button class="button" style="float:right;" onclick="reverseGeocodeOLC();">' +
+          '<span class="button_label">Next</span></button><br/>';
+      // While working through this, don't display the form.
+      document.getElementById('form_container').style.display = 'none';
+    }
+
+    /**
+      * Using Google Maps API, do a reverse geocode on the center of the OLC
+      * code. NB runs async.
+      */
+    function reverseGeocodeOLC() {
+      var codeArea = OpenLocationCode.decode(olcCode);
+
+      // Call the geocoder to shorten the code.
+      geocodeLatLng(codeArea.latitudeCenter, codeArea.longitudeCenter, olcCode,
+          // Callback function to geocode the address and shorten the code.
+          function(code, address) {
+              localityAddress = address;
+              var messageHeader = document.getElementById('message_header');
+              messageHeader.innerHTML = '<p>The address information from Google is: <em>' +
+                  localityAddress + '</em>' +
+                  '<p>Now we use the ' +
+                  '<a href="https://developers.google.com/maps/documentation/javascript/">Google Maps API</a>' +
+                  ' to convert that address ' +
+                  'to a latitude and longitude that we will use to shorten the code.</p>' +
+                  '<p>Because the address doesn\'t include street names or numbers, ' +
+                  'it won\'t be located at the same place as the OLC code.</p>' +
+                  '<button class="button" style="float:right;" onclick="shortenOLCbyAddress();">' +
+                  '<span class="button_label">Next</span></button>';
+          });
+    }
+
+    /**
+      * Geocodes the address to a point and shortens the OLC code.
+      */
+    function shortenOLCbyAddress() {
+      geocodeAddress(olcCode, localityAddress,
+          function(code, address, lat, lng) {
+            /* Here is where the magic happens. We have the full code and we
+             * have the lat,lng from geocoding the address information.
+             * Using the OpenLocationCode.shortenBy4() function, we can try to
+             * shorten the OLC code using this location.
+             */
+            var shortCode = OpenLocationCode.shortenBy4(code, lat, lng);
+            var messageHeader = document.getElementById('message_header');
+            if (shortCode != olcCode) {
+              messageHeader.innerHTML = '<p>Using the entered address ' +
+                  'the OLC code (<em>' + olcCode + '</em>) can be shortened ' +
+                  'to <em>' + shortCode + '</em>.</p>' +
+                  '<p>It is possible that you can edit the address to be ' +
+                  'shorter, and still be able to recover the original code.</p>' +
+                  '<p>You might even be able to find a better, closer address. ' +
+                  'Note that this doesn\'t have to be a town or city, it could be ' +
+                  'a prominent landmark or natural feature.</p>';
+              document.getElementById('code_fragment').value = shortCode;
+              document.getElementById('address').value = address;
+            } else {
+              messageHeader.innerHTML = '<p>Using the address, the OLC code can ' +
+                  'not be shortened, probably because the address geocodes to ' +
+                  'more than 50 kilometers away.</p>';
+            }
+            document.getElementById('form_container').style.display = 'block';
+          });
+    }
+
+    /**
+      * Check the entered code is valid, and display an appropriate message.
+      */
+    function processCode() {
+      clearPolygons();
+      codeFragment = document.getElementById('code_fragment').value;
+      address = document.getElementById('address').value;
+      var messageHeader = document.getElementById('message_header');
+      if (codeFragment.length > 7) {
+        messageHeader.innerHTML = '<p>The code, <em>' + codeFragment + '</em>, ' +
+            'is too long. Short codes are a maximum of seven characters long.</p>';
+        return;
+      }
+      if (!OpenLocationCode.isValid(codeFragment)) {
+        messageHeader.innerHTML = '<p>The code, <em>' + codeFragment + '</em>, ' +
+            'is not a valid part of an OLC code.</p>';
+        return;
+      }
+      document.getElementById('form_container').style.display = 'none';
+      messageHeader.innerHTML = '<p>The first step is to work out the location ' +
+          'of the address. To do this, we are using the ' +
+          '<a href="https://developers.google.com/maps/documentation/javascript/">Google Maps API</a>' +
+          ' geocoding service.</p>' +
+          '<p>Once we have the location, we can use that to recover the original OLC code.</p>' +
+          '<button class="button" style="float:right;" onclick="geocodeEnteredAddress();">' +
+          '<span class="button_label">Next</span></button>';
+    }
+
+    function geocodeEnteredAddress() {
+      document.getElementById('form_container').style.display = 'block';
+      var codeFragment = document.getElementById('code_fragment').value;
+      var address = document.getElementById('address').value;
+      var messageHeader = document.getElementById('message_header');
+      geocodeAddress(codeFragment, address,
+          function(codeFragment, address, lat, lng) {
+            if (placeMarker != null) {
+              placeMarker.setMap(null);
+            }
+            placeMarker = new google.maps.Marker({
+                position: new google.maps.LatLng(lat, lng),
+                map: map,
+                title: address
+            });
+
+console.log('Trying to extend ' + codeFragment);
+            try {
+              var fullCode = OpenLocationCode.recoverNearest(
+                  codeFragment, lat, lng);
+            } catch (e) {
+              messageHeader.innerHTML = '<p>The code, <em>' + codeFragment + '</em>, ' +
+                  'is not a valid part of an OLC code.</p>';
+              return;
+            }
+console.log('zooming to the full code ' + fullCode);
+
+            zoomTo(fullCode);
+            polygons.push(displayOlcArea(map, fullCode));
+
+            messageHeader.innerHTML = '<p>The location that the address ' +
+                'information geocodes to is indicated with a marker (you ' +
+                'might have to zoom out to see it). Using that location ' +
+                'the OLC code can be extended to <em>' + fullCode + '</em>.</p>' +
+                '<p>It is possible that you can edit the address to be ' +
+                'shorter, and still be able to recover the original code.</p>' +
+                '<p>You might even be able to find a better, closer address. ' +
+                'Note that this doesn\'t have to be a town or city, it could be ' +
+                'a prominent landmark or natural feature.</p>';
+          });
+    }
+  </script>
+
+  <script type="text/javascript">
+    // What to do when the page loads.
+    google.maps.event.addDomListener(window, 'load', function() {
+      // Create the map object.
+      map = new google.maps.Map(
+          document.getElementById('map-canvas'),
+          {center: new google.maps.LatLng(47.365561, 8.52494),
+           zoom: 1,
+           mapTypeId: google.maps.MapTypeId.ROADMAP,
+           scaleControl: true});
+      map.setTilt(0);
+      // Add an event listener to display OLC boxes around clicks.
+      google.maps.event.addListener(map, 'click', mapClickHandler);
+      // Get the geocoder.
+      geocoder = new google.maps.Geocoder();
+    });
+  </script>
+</body>
+</html>

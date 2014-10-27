@@ -1,0 +1,125 @@
+<!--
+ Copyright 2014 Google Inc. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="Description" content="">
+  <title>Open Location Code Example</title>
+  <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCP3yO0nubZ8vCiyK-ZF-XEJ7VQWe6wVIM&libraries=geometry">
+  </script>
+  <script type="text/javascript" src="openlocationcode.js"></script>
+  <script type="text/javascript" src="examples.js"></script>
+  <link href='examples.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  <div id="content">
+    <div id="map-canvas" class="map_frame" ></div>
+    <div id="messageBox">
+      <div id="message_header">
+      <h1>Discover or enter OLC codes</h1>
+      <p>
+        Clicking on the map will display the standard and refined accuracy
+        OLC codes. Or you can enter a code in the text box below.
+      </p>
+      </div>
+      <form onsubmit="processCode();" action="javascript:void(0)">
+        <input id="code_input" class="text_input" placeholder="Enter OLC code">
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+
+    /** The Google Maps map object. */
+    var map;
+
+    /*
+      Handle clicks on the map. Computes the standard and refined Open Location Codes for
+      the clicked location.
+    */
+    function mapClickHandler(event) {
+      clearPolygons();
+
+      var standardCode = OpenLocationCode.encode(event.latLng.lat(), event.latLng.lng());
+      var refinedCode = OpenLocationCode.encode(event.latLng.lat(), event.latLng.lng(), 11);
+
+      var messageHeader = document.getElementById('message_header');
+      messageHeader.innerHTML = '<p>The standard OLC code is <em>' + standardCode +
+          '</em> and is the lightly shaded area.</p><p>The refined, more accurate code ' +
+          'is <em>' + refinedCode + '</em> and is the heavier shaded area.';
+
+      zoomTo(standardCode);
+      polygons.push(displayOlcArea(map, standardCode));
+      polygons.push(displayOlcArea(map, refinedCode));
+    }
+
+    /**
+      * Check the entered code is valid, and display an appropriate message.
+      */
+    function processCode() {
+      clearPolygons();
+      var code = document.getElementById('code_input').value;
+      var messageHeader = document.getElementById('message_header');
+      if (!OpenLocationCode.isValid(code)) {
+        messageHeader.innerHTML = '<p>The specified code, <em>' + code + '</em>, ' +
+            'is not a valid OLC code.</p>';
+        return;
+      }
+      if (!OpenLocationCode.isFull(code)) {
+        messageHeader.innerHTML = '<p>The specified code, <em>' + code + '</em>, ' +
+            'is not a valid, full OLC code.</p>';
+        return;
+      }
+      zoomTo(code);
+      polygons.push(displayOlcArea(map, code));
+
+      var codeArea = OpenLocationCode.decode(code);
+      var height = google.maps.geometry.spherical.computeDistanceBetween(
+          new google.maps.LatLng(codeArea.latitudeLo, codeArea.longitudeLo),
+          new google.maps.LatLng(codeArea.latitudeHi, codeArea.longitudeLo));
+      height = Math.round(height * 10) / 10;
+      var width = google.maps.geometry.spherical.computeDistanceBetween(
+          new google.maps.LatLng(codeArea.latitudeLo, codeArea.longitudeLo),
+          new google.maps.LatLng(codeArea.latitudeLo, codeArea.longitudeHi));
+      width = Math.round(width * 10) / 10;
+
+      messageHeader.innerHTML = '<p>The specified code, <em>' +
+          formatCode(code) + '</em>, ' + 'is ' + height + ' meters tall, and ' +
+          width + ' meters wide.</p>';
+    }
+  </script>
+
+  <script type="text/javascript">
+    // What to do when the page loads.
+    google.maps.event.addDomListener(window, 'load', function() {
+      // Create the map object.
+      map = new google.maps.Map(
+          document.getElementById('map-canvas'),
+          {center: new google.maps.LatLng(47.365561, 8.52494),
+           zoom: 1,
+           mapTypeId: google.maps.MapTypeId.ROADMAP,
+           scaleControl: true});
+      map.setTilt(0);
+      // Add an event listener to display OLC boxes around clicks.
+      google.maps.event.addListener(map, 'click', mapClickHandler);
+    });
+  </script>
+</body>
+</html>

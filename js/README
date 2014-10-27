@@ -1,0 +1,10 @@
+This is the Javascript implementation of the Open Location Code API.
+
+The library file is openlocationcode.js.
+
+Unit tests are included and can be executed by loading test.html in a
+browser.
+
+Example web pages illustrating converting map clicks to Open Location Codes,
+and using Googles Maps API to extend place codes to full codes are in
+example1.html and example2.html.

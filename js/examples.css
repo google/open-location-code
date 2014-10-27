@@ -1,0 +1,87 @@
+
+/*
+  Styles used by examples.
+*/
+.map_label {
+  font-weight: 300;
+  font-family: Roboto,arial,sans-serif;
+  color: #37474f;
+  font-size: 12pt;
+  background-color: #e0e0e0;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 2px;
+}
+#content {
+  height: 100%;
+  width: 100%;
+}
+#messageBox {
+  position: absolute;
+  top: 30px;
+  left: 100px;
+  max-height: 80%;
+  width: 30%;
+  z-index: 100;
+  background: white;
+  border: 1px solid #888;
+  overflow-y: auto;
+  padding: 10px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+.text_input {
+  border: 1px solid #eeeeee;
+  padding: 5px;
+  font-size: 100%;
+  color: inherit;
+  width: 100%;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.button {
+  padding: 5px;
+  background-color: #5677fc;
+  border: none;
+  min-width: 100px;
+}
+.button_label {
+  font-weight: bold;
+  font-size: 120%;
+  font-family: Roboto,arial,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: white;
+  opacity: 0.87;
+}
+.note_p {
+  font-size: 80%;
+}
+.map_frame {
+  width: 100%;
+  height: 100%;
+}
+em {
+  font-weight: bold;
+  font-style: normal;
+}
+h1 {
+  font-size: 200%;
+  font-weight: 300;
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
+}
+input {
+  font-weight: 300;
+  font-family: Roboto,arial,sans-serif;
+}
+body, html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  font-weight: 300;
+  font-family: Roboto,arial,sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
