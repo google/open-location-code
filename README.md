@@ -1,10 +1,25 @@
 Open Location Code
+==================
 
 Open Location Codes are a way of encoding location into a form that is
 easier to use than latitude and longitude.
 
 They are designed to be used as a replacement for street addresses, especially
 in places where buildings aren't numbered or streets aren't named.
+
+Links
+-----
+ * [Open Location Code definition](https://github.com/google/open-location-code/blob/master/docs/OLCStandard.pdf)
+ * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/blob/master/docs/Comparison.pdf)
+
+Mailing Lists
+-------------
+
+ * Discussion: [open-location-code](https://groups.google.com/forum/#!forum/open-location-code)
+
+
+Overview
+--------
 
 Open Location Codes have some interesting features, summarised below:
 
@@ -21,6 +36,7 @@ There are no data tables to lookup or online services required. The
 algorithm is publicly available and can be used without restriction.
 
 Description
+-----------
 
 Codes are made up of a sequence of characters chosen from a set of 20. The
 characters in the code alternate between latitude and longitude. The first
@@ -76,6 +92,7 @@ the recovered characters:
   SSSSSSS -> RRRR.SSSSSSS
 
 Example Code
+------------
 
 The subdirectories contain sample implementations and tests for different
 languages. Each implementation provides the following functions:
@@ -95,5 +112,3 @@ Decode a code to it's coordinates - low, high and center;
 Shorten a full code relative to a location;
 
 Extend a short code relative to a location.
-
-
