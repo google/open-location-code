@@ -7,24 +7,9 @@ easier to use than latitude and longitude.
 They are designed to be used as a replacement for street addresses, especially
 in places where buildings aren't numbered or streets aren't named.
 
-Links
------
- * [Open Location Code definition](https://github.com/google/open-location-code/blob/master/docs/OLCStandard.pdf)
- * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/blob/master/docs/Comparison.pdf)
-
-Mailing Lists
--------------
-
- * Discussion: [open-location-code](https://groups.google.com/forum/#!forum/open-location-code)
-
-
-Overview
---------
-
-Open Location Codes have some interesting features, summarised below:
-
-Codes represent an area, not a point. As characters are added to a code,
-the area shrinks, so a long code is more accurate than a short code.
+Open Location Codes represent an area, not a point. As characters are added
+to a code, the area shrinks, so a long code is more accurate than a short
+code.
 
 Codes that are similar are located closer together than codes that are
 different.
@@ -34,6 +19,13 @@ to a location completely offline.
 
 There are no data tables to lookup or online services required. The
 algorithm is publicly available and can be used without restriction.
+
+Links
+-----
+ * [Demonstration site](http://plus.codes/)
+ * [Mailing list](https://groups.google.com/forum/#!forum/open-location-code)
+ * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/blob/master/docs/comparison.adoc)
+ * [Open Location Code definition](https://github.com/google/open-location-code/blob/master/docs/olc_definition.adoc)
 
 Description
 -----------
@@ -86,10 +78,11 @@ location. This does not need to be the same as the location used to shorten the
 code, but it does need to be nearby. The short codes will be modified according
 to the following pattern, where S represents the supplied characters, and R are
 the recovered characters:
-  SSSS    -> RRRR.RRSSSS
-  SSSSS   -> RRRR.RRSSSSS
-  SSSSSS  -> RRRR.SSSSSS
-  SSSSSSS -> RRRR.SSSSSSS
+
+ * SSSS    -> RRRR.RRSSSS
+ * SSSSS   -> RRRR.RRSSSSS
+ * SSSSSS  -> RRRR.SSSSSS
+ * SSSSSSS -> RRRR.SSSSSSS
 
 Example Code
 ------------
@@ -97,18 +90,12 @@ Example Code
 The subdirectories contain sample implementations and tests for different
 languages. Each implementation provides the following functions:
 
-Test an code to see if it is a valid sequence;
-
-Test an code to see if it is a valid full code. Not all valid sequences
-are valid full codes;
-
-Encode a latitude and longitude to a standard accuracy (14 meter by 14
-meter) code;
-
-Encode a latitude and longitude to any length code;
-
-Decode a code to it's coordinates - low, high and center;
-
-Shorten a full code relative to a location;
-
-Extend a short code relative to a location.
+ * Test an code to see if it is a valid sequence
+ * Test an code to see if it is a valid full code. Not all valid sequences
+are valid full codes
+ * Encode a latitude and longitude to a standard accuracy (14 meter by 14
+meter) code
+ * Encode a latitude and longitude to any length code
+ * Decode a code to it's coordinates - low, high and center
+ * Shorten a full code relative to a location
+ * Extend a short code relative to a location.
