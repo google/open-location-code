@@ -194,7 +194,7 @@ direction from one code to another to be determined visually, and for codes
 to be truncated, resulting in a larger area.
 
 [[fig_olc_area]]
-.Figure Comparing areas of four and six character Open Location Codes
+.Comparing areas of four and six character Open Location Codes
 image::images/code_areas.png[width=400,height=350,align="center"]
 
 The large rectangle in <<fig_olc_area>> is the Open Location Code +8FVC (1
