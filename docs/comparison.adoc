@@ -222,11 +222,33 @@ Maidenhead Locator System codes are based on an interleaving of latitude and
 longitude, and so are truncatable, and nearby locations have similar codes.
 It is only formally defined to a length of 8 characters.
 
+== What3Words
+
+link:http://www.what3words.com[What3Words] adopts the approach of explicitly
+using words in order to be easier for consumers to remember and communicate. 
+It is available in more than 20 natural languages (English, Russian, Mandarin, 
+Thai, ...)
+
+The world is chopped into 3x3 meter squares, each square is assigned a three 
+word combination via a propriatary algorythm. Homophones like "bear" and "bare"
+are intentionally excluded. There is intentionally no hierarchy to the words. 
+Similar words (example: "car" and "cars") are spread across the globe so that 
+mistakes are immediately obvious, for example 
+link:http://w3w.co/banana.rabbit.monkey["banana rabbit monkey"] 
+is a location in Argentina, 
+link:http://w3w.co/banana.monkey.rabbit["banana monkey rabbit"] is in Russia.
+Shorter words are assigned to areas with higher population. 
+
+The algorithm to convert from w3w code to/from long,lat is available offline 
+via an SDK.
+
+Consumers or brands have the option to purchase a "OneWord", a single word they 
+can assign to a location of their choosing and change over time.
+
 == Web-based services
 
 There are a variety of web-based services that have recently been created,
-such as link:http://www.mydoorhandle.com[MyDoorHandle],
-link:http://www.what3words.com[What3Words] and link:http://www.zip.pr[Zippr].
+such as link:http://www.mydoorhandle.com[MyDoorHandle] and link:http://www.zip.pr[Zippr].
 
 These sites provide a code that when entered on their site or used in a URL
 brings up a web page displaying the location. That much is similar to e.g.,
@@ -236,10 +258,6 @@ someone applies for them.
 The codes may be pseudo-randomly generated and so nearby places may have
 completely different codes. It may be possible for multiple people to apply
 for codes for the same location and for different codes to be generated.
-
-Making a mistake with a code may simply display somewhere else - for
-example, on What3Words, "banana rabbit monkey" is a location in Argentina,
-"banana monkey rabbit" is in Russia.
 
 Some services charge money either for granting a code, for resolving codes
 or for allowing users to select their own short code.
