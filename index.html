@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Open Location Code : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Open Location Code</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/google/open-location-code">View on GitHub</a>
+
+          <h1 id="project_title">Open Location Code</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/google/open-location-code/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/google/open-location-code/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>Open Location Codes are a way of encoding location into a form that is
+easier to use than latitude and longitude. They are designed to be used 
+like street addresses, especially in places where buildings aren't numbered 
+or streets aren't named.</p>
+
+<h2>
+<a name="stop-giving-directions" class="anchor" href="#stop-giving-directions"><span class="octicon octicon-link"></span></a>Stop giving directions</h2>
+
+<p>Instead of giving people complicated directions, just give them a short code 
+that tells them exactly where you want them to go. They can enter it in their
+phone, laptop, computer, and get the exact location. They don't even need to
+be online!</p>
+
+<p>We have a <a href="http://plus.codes">demo site</a> that you can use to find out the code
+for a place, or you can enter a code and find out where it is. (You can use this site
+from a mobile phone, and even use it offline.)</p>
+
+<h2>
+<a name="im-a-business-can-i-use-the-codes" class="anchor" href="#im-a-business-can-i-use-the-codes"><span class="octicon octicon-link"></span></a>I'm a business, can I use the codes?</h2>
+
+<p>Of course. The codes are free to get and free to decode. We've got software
+libraries on our Github site, and example web pages. If you need help, you can
+contact the <a href="https://groups.google.com/forum/#!forum/open-location-code">mailing list</a>.</p>
+
+<h2>
+<a name="thats-so-cool-can-i-help" class="anchor" href="#thats-so-cool-can-i-help"><span class="octicon octicon-link"></span></a>That's so cool! Can I help?</h2>
+
+<p>Yes! We are working on implementations in other languages, but if you'd like
+to do an implementation, contact the <a href="https://groups.google.com/forum/#!forum/open-location-code">mailing list</a>
+and see if anyone else is already working on the language.</p>
+
+<p>Alternatively, if you know someone who would be interested, let them know.</p>
+
+<h2>
+<a name="why-didnt-you-just-use-x" class="anchor" href="#why-didnt-you-just-use-x"><span class="octicon octicon-link"></span></a>Why didn't you just use X?</h2>
+
+<p>The first thing we did was to work out what attributes of addresses were useful.
+Once we had that list, we looked at a lot of existing location coding methods to
+see how well they matched our list. Once we'd done that, we decided that it was worth
+to at least define a new one, and then see if it was well received.</p>
+
+<p>The other methods were mostly designed with different ideas in mind, and
+so this isn't a criticism of them.</p>
+
+<h2>
+<a name="what-makes-open-location-codes-different" class="anchor" href="#what-makes-open-location-codes-different"><span class="octicon octicon-link"></span></a>What makes Open Location Codes different?</h2>
+
+<ul>
+<li>The codes aren't case sensitive and don't include easily confused characters. We've selected the
+characters to make it difficult to impossible to spell words in any language.</li>
+<li>Codes are generated from latitude and longitude, so they already exist for everywhere. Nobody has to
+set them up or pay for them. Each place has only one code.</li>
+<li>Codes that are similar are located closer together than codes that are different.</li>
+<li>Open Location Codes represent an area, not a point.</li>
+<li>The size of the area depends on the length of the code. Long codes are more accurate than short
+codes.</li>
+<li>Dropping characters from the end of a code gives you a larger area that contained the original code.</li>
+<li>Codes are 10 or 11 characters long (<em>+8FMG.P9FW6M</em>), but if you're in the local area (within 50km),
+the leading four characters of the code can be omitted (<em>+P9FW6M</em>) making the codes even shorter.</li>
+<li>The short code can be used together with a place name (like <em>+P9FW6M Pisa, Italy</em>).</li>
+</ul>
+
+<h2>
+<a name="point-me-to-the-info" class="anchor" href="#point-me-to-the-info"><span class="octicon octicon-link"></span></a>Point me to the info!</h2>
+
+<ul>
+<li><a href="http://plus.codes/">Demonstration site</a></li>
+<li><a href="https://groups.google.com/forum/#!forum/open-location-code">Mailing list</a></li>
+<li><a href="https://github.com/google/open-location-code/blob/master/docs/comparison.adoc">Comparison of existing location encoding systems</a></li>
+<li><a href="https://github.com/google/open-location-code/blob/master/docs/olc_definition.adoc">Open Location Code definition</a></li>
+</ul>
+
+<h2>
+<a name="authors" class="anchor" href="#authors"><span class="octicon octicon-link"></span></a>Authors</h2>
+
+<p>The main author is Doug Rinckes (<a href="https://github.com/drinckes" class="user-mention">@drinckes</a>), with the help of lots of colleagues including:</p>
+
+<ul>
+<li>Philipp Bunge</li>
+<li>Aner Ben-Artzi</li>
+<li>Jarda Bengl</li>
+<li>Prasenit Phukan</li>
+<li>Sacha van Ginhoven</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Open Location Code maintained by <a href="https://github.com/google">google</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-55279196-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
