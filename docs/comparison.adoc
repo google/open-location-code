@@ -78,7 +78,8 @@ can generate codes that include words ("DRUGGED"), almost words ("ZUR1CH")
 and profanity. It also includes some easily confused characters, such as
 both "8" and "B".
 
-Geohash codes are points. Truncating a code changes the location.
+Geohash codes represent areas. Truncating a code reduces the precision, expanding
+the area with the expanded area containing the original point.
 
 The length of a Geohash code depends on the number of decimal places of the
 coordinates. This can result in two codes, near each other, having differing
@@ -93,7 +94,7 @@ along them .
 
 A single location can have more than one code, depending on the input
 values, and multiple different codes can decode to the same value. For
-example, "c216ne", "c216ne4" and "c216new" (and others) all decode to the
+example, "c216ne4" and "c216new" (and others) all decode to the
 same coordinates (45.37 -121.7).
 
 == Geohash-36
