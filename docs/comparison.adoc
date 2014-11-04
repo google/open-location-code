@@ -18,6 +18,10 @@ explains the attributes that we feel are important to such an encoding
 system, and evaluates a number of existing encoding systems against the
 requirements.
 
+NOTE: This document is based on a comparison of the systems at early 2014,
+to provide background to the design of Open Location Codes. Subsequent changes
+to the included encoding systems will not necessarily be included.
+
 == Desired Attributes
 
 We spent some time debating what attributes a location code should have. The
