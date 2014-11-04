@@ -236,11 +236,16 @@ link:http://www.what3words.com[What3Words] and link:http://www.zip.pr[Zippr].
 These sites provide a code that when entered on their site or used in a URL
 brings up a web page displaying the location. That much is similar to e.g.,
 Geohash, but in contrast to Geohash, codes for a place may not exist until
-someone applies for them.
+someone applies for them. Codes usually represent a point.
 
 The codes may be pseudo-randomly generated and so nearby places may have
 completely different codes. It may be possible for multiple people to apply
 for codes for the same location and for different codes to be generated.
+
+What3words codes use three words to represent 3x3 meter squares. Codes have 
+been assigned for all locations on the earth using a proprietary algorithm.
+Single words can be purchased ("OneWord"). In late 2014 an offline SDK was
+announced, although this does not support purchased OneWords.
 
 Making a mistake with a code may simply display somewhere else - for
 example, on What3Words, "banana rabbit monkey" is a location in Argentina,
