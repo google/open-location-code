@@ -135,7 +135,7 @@
              * Using the OpenLocationCode.shortenBy4() function, we can try to
              * shorten the OLC code using this location.
              */
-            var shortCode = OpenLocationCode.shortenBy4(code, lat, lng);
+            var shortCode = OpenLocationCode.shorten(code, lat, lng);
             var messageHeader = document.getElementById('message_header');
             if (shortCode != olcCode) {
               messageHeader.innerHTML = '<p>Using the entered address ' +
@@ -201,7 +201,6 @@
                 title: address
             });
 
-console.log('Trying to extend ' + codeFragment);
             try {
               var fullCode = OpenLocationCode.recoverNearest(
                   codeFragment, lat, lng);
@@ -210,7 +209,6 @@ console.log('Trying to extend ' + codeFragment);
                   'is not a valid part of an OLC code.</p>';
               return;
             }
-console.log('zooming to the full code ' + fullCode);
 
             zoomTo(fullCode);
             polygons.push(displayOlcArea(map, fullCode));

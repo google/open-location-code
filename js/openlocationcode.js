@@ -49,23 +49,24 @@
     var coord = OpenLocationCode.decode(code);
     var msg = 'Center is ' + coord.latitudeCenter + ',' + coord.longitudeCenter;
 
-    Attempt to trim the first four characters from a code:
-    var shortCode = OpenLocationCode.shortenBy4('+8FVC.9G8F6X', 47.5, 8.5);
+    Attempt to trim the first characters from a code:
+    var shortCode = OpenLocationCode.shorten('8FVC9G8F+6X', 47.5, 8.5);
 
     Recover the full code from a short code:
-    var code = OpenLocationCode.recoverNearest('+9G8F6X', 47.4, 8.6);
+    var code = OpenLocationCode.recoverNearest('9G8F+6X', 47.4, 8.6);
+    var code = OpenLocationCode.recoverNearest('8F+6X', 47.4, 8.6);
  */
 (function(window) {
   var OpenLocationCode = window.OpenLocationCode = {};
 
-  // The prefix char. Used to help disambiguate OLC codes from postcodes.
-  var PREFIX_ = '+';
-
   // A separator used to break the code into two parts to aid memorability.
-  var SEPARATOR_ = '.';
+  var SEPARATOR_ = '+';
 
   // The number of characters to place before the separator.
-  var SEPARATOR_POSITION_ = 4;
+  var SEPARATOR_POSITION_ = 8;
+
+  // The character used to pad codes.
+  var PADDING_CHARACTER_ = '0';
 
   // The character set used to encode the values.
   var CODE_ALPHABET_ = '23456789CFGHJMPQRVWX';
@@ -98,17 +99,8 @@
   // Size of the initial grid in degrees.
   var GRID_SIZE_DEGREES_ = 0.000125;
 
-  // Minimum length of a short code.
-  var MIN_SHORT_CODE_LEN_ = 4;
-
-  // Maximum length of a short code.
-  var MAX_SHORT_CODE_LEN_ = 7;
-
   // Minimum length of a code that can be shortened.
-  var MIN_TRIMMABLE_CODE_LEN_ = 10;
-
-  // Maximum length of a code that can be shortened.
-  var MAX_TRIMMABLE_CODE_LEN_ = 11;
+  var MIN_TRIMMABLE_CODE_LEN_ = 6;
 
   /**
     Returns the OLC alphabet.
@@ -121,36 +113,52 @@
     Determines if a code is valid.
 
     To be valid, all characters must be from the Open Location Code character
-    set with at most one separator. If the prefix character is present, it
-    must be the first character. If the separator character is present,
-    it must be after four characters.
+    set with at most one separator. The separator can be in any even-numbered
+    position up to the eighth digit.
    */
   var isValid = OpenLocationCode.isValid = function(code) {
     if (!code) {
       return false;
     }
-    // If the code includes more than one prefix character, it is not valid.
-    if (code.indexOf(PREFIX_) != code.lastIndexOf(PREFIX_)) {
+    // The separator is required.
+    if (code.indexOf(SEPARATOR_) == -1) {
       return false;
     }
-    // If the code includes the prefix character but not in the first position,
-    // it is not valid.
-    if (code.indexOf(PREFIX_) > 0) {
+    if (code.indexOf(SEPARATOR_) != code.lastIndexOf(SEPARATOR_)) {
       return false;
     }
-    // Strip off the prefix if it was provided.
-    code = code.replace(PREFIX_, '');
-    // If the code includes more than one separator, it is not valid.
-    if (code.indexOf(SEPARATOR_) >= 0) {
-      if (code.indexOf(SEPARATOR_) != code.lastIndexOf(SEPARATOR_)) {
+    // Is it in an illegal position?
+    if (code.indexOf(SEPARATOR_) > SEPARATOR_POSITION_ ||
+        code.indexOf(SEPARATOR_) % 2 == 1) {
+      return false;
+    }
+    // We can have an even number of padding characters before the separator,
+    // but then it must be the final character.
+    if (code.indexOf(PADDING_CHARACTER_) > -1) {
+      // Not allowed to start with them!
+      if (code.indexOf(PADDING_CHARACTER_) == 0) {
         return false;
       }
-      // If there is a separator, and it is in a position != SEPARATOR_POSITION,
-      // the code is not valid.
-      if (code.indexOf(SEPARATOR_) != SEPARATOR_POSITION_) {
+      // There can only be one group and it must have even length.
+      var padMatch = code.match(new RegExp('(' + PADDING_CHARACTER_ + '+)', 'g'));
+      if (padMatch.length > 1 || padMatch[0].length % 2 == 1 ||
+          padMatch[0].length > SEPARATOR_POSITION_ - 2) {
+        return false;
+      }
+      // If the code is long enough to end with a separator, make sure it does.
+      if (code.charAt(code.length - 1) != SEPARATOR_) {
         return false;
       }
     }
+    // If there are characters after the separator, make sure there isn't just
+    // one of them (not legal).
+    if (code.length - code.indexOf(SEPARATOR_) - 1 == 1) {
+      return false;
+    }
+
+    // Strip the separator and any padding characters.
+    code = code.replace(new RegExp('\\' + SEPARATOR_ + '+'), '')
+        .replace(new RegExp(PADDING_CHARACTER_ + '+'), '');
     // Check the code contains only valid characters.
     for (var i = 0, len = code.length; i < len; i++) {
       var character = code.charAt(i).toUpperCase();
@@ -164,30 +172,21 @@
   /**
     Determines if a code is a valid short code.
 
-    A short Open Location Code is a sequence created by removing the first
-    four or six characters from a full Open Location Code.
-
-    A code must be a possible sub-string of a generated Open Location Code, at
-    least four and at most seven characters long and not include a separator
-    character. If the prefix character is present, it must be the first
+    A short Open Location Code is a sequence created by removing four or more
+    digits from an Open Location Code. It must include a separator
     character.
    */
   var isShort = OpenLocationCode.isShort = function(code) {
+    // Check it's valid.
     if (!isValid(code)) {
       return false;
     }
-    if (code.indexOf(SEPARATOR_) != -1) {
-      return false;
+    // If there are less characters than expected before the SEPARATOR.
+    if (code.indexOf(SEPARATOR_) >= 0 &&
+        code.indexOf(SEPARATOR_) < SEPARATOR_POSITION_) {
+      return true;
     }
-    // Strip off the prefix if it was provided.
-    code = code.replace(PREFIX_, '');
-    if (code.length < MIN_SHORT_CODE_LEN_) {
-      return false;
-    }
-    if (code.length > MAX_SHORT_CODE_LEN_) {
-      return false;
-    }
-    return true;
+    return false;
   };
 
   /**
@@ -203,8 +202,10 @@
     if (!isValid(code)) {
       return false;
     }
-    // Strip off the prefix if it was provided.
-    code = code.replace(PREFIX_, '');
+    // If it's short, it's not full.
+    if (isShort(code)) {
+      return false;
+    }
 
     // Work out what the first latitude character indicates for latitude.
     var firstLatValue = CODE_ALPHABET_.indexOf(
@@ -249,7 +250,8 @@
     if (typeof codeLength == 'undefined') {
       codeLength = PAIR_CODE_LENGTH_;
     }
-    if (codeLength < 2) {
+    if (codeLength < 2 ||
+        (codeLength < SEPARATOR_POSITION_ && codeLength % 2 == 1)) {
       throw 'IllegalArgumentException: Invalid Open Location Code length';
     }
     // Ensure that latitude and longitude are valid.
@@ -260,7 +262,7 @@
     if (latitude == 90) {
       latitude = latitude - computeLatitudePrecision(codeLength);
     }
-    var code = PREFIX_ + encodePairs(
+    var code = encodePairs(
         latitude, longitude, Math.min(codeLength, PAIR_CODE_LENGTH_));
     // If the requested length indicates we want grid refined codes.
     if (codeLength > PAIR_CODE_LENGTH_) {
@@ -288,11 +290,12 @@
       throw ('IllegalArgumentException: ' +
           'Passed Open Location Code is not a valid full code: ' + code);
     }
-    // Strip off the prefix if it was provided.
-    code = code.replace(PREFIX_, '');
     // Strip out separator character (we've already established the code is
-    // valid so the maximum is one) and convert to upper case.
-    code = code.replace(SEPARATOR_, '').toUpperCase();
+    // valid so the maximum is one), padding characters and convert to upper
+    // case.
+    code = code.replace(SEPARATOR_, '');
+    code = code.replace(new RegExp(PADDING_CHARACTER_ + '+'), '');
+    code = code.toUpperCase();
     // Decode the lat/lng pair component.
     var codeArea = decodePairs(code.substring(0, PAIR_CODE_LENGTH_));
     // If there is a grid refinement component, decode that.
@@ -314,8 +317,13 @@
     Given a short Open Location Code of between four and seven characters,
     this recovers the nearest matching full code to the specified location.
 
-    The number of characters that will be prepended to the short code, where S
-    is the supplied short code and R are the computed characters, are:
+    The number of characters that will be prepended to the short code, depends
+    on the length of the short code and whether it starts with the separator.
+
+    If it starts with the separator, four characters will be prepended. If it
+    does not, the characters that will be prepended to the short code, where S
+    is the supplied short code and R are the computed characters, are as
+    follows:
     SSSS    -> RRRR.RRSSSS
     SSSSS   -> RRRR.RRSSSSS
     SSSSSS  -> RRRR.SSSSSS
@@ -350,14 +358,11 @@
     // Ensure that latitude and longitude are valid.
     referenceLatitude = clipLatitude(referenceLatitude);
     referenceLongitude = normalizeLongitude(referenceLongitude);
-    // Strip off the prefix if it was provided.
-    shortCode = shortCode.replace(PREFIX_, '');
 
-    // Compute padding length and adjust for odd-length short codes.
-    var paddingLength = PAIR_CODE_LENGTH_ - shortCode.length;
-    if (shortCode.length % 2 == 1) {
-      paddingLength += 1;
-    }
+    // Clean up the passed code.
+    shortCode = shortCode.toUpperCase();
+    // Compute the number of digits we need to recover.
+    var paddingLength = SEPARATOR_POSITION_ - shortCode.indexOf(SEPARATOR_);
     // The resolution (height and width) of the padded area in degrees.
     var resolution = Math.pow(20, 2 - (paddingLength / 2));
     // Distance from the center to an edge (in degrees).
@@ -369,9 +374,10 @@
     var roundedLongitude = Math.floor(referenceLongitude / resolution) *
         resolution;
 
-    // Pad the short code with the rounded reference location.
+    // Use the reference location to pad the supplied short code and decode it.
     var codeArea = decode(
-        encode(roundedLatitude, roundedLongitude, paddingLength) + shortCode);
+        encode(roundedLatitude, roundedLongitude).substr(0, paddingLength)
+        + shortCode);
     // How many degrees latitude is the code from the reference? If it is more
     // than half the resolution, we need to move it east or west.
     var degreesDifference = codeArea.latitudeCenter - referenceLatitude;
@@ -398,12 +404,20 @@
   };
 
   /**
-    Try to remove the first four characters from an OLC code.
+    Remove characters from the start of an OLC code.
 
-    This uses a reference location to determine if the first four characters
-    can be removed from the OLC code. The reference location must be within
-    +/- 0.25 degrees of the code center. This allows the original code to be
-    recovered using this location, with a safety margin.
+    This uses a reference location to determine how many initial characters
+    can be removed from the OLC code. The number of characters that can be
+    removed depends on the distance between the code center and the reference
+    location.
+
+    The minimum number of characters that will be removed is four. If more than
+    four characters can be removed, the additional characters will be replaced
+    with the padding character. At most eight characters will be removed.
+
+    The reference location must be within 50% of the maximum range. This ensures
+    that the shortened code will be able to be recovered using slightly different
+    locations.
 
     Args:
       code: A full, valid code to shorten.
@@ -413,85 +427,40 @@
           point.
 
     Returns:
-      The OLC code with the first four characters removed. If the reference
-      location is not close enough, the passed code is returned unchanged.
+      Either the original code, if the reference location was not close enough,
+      or the .
    */
-  var shortenBy4 = OpenLocationCode.shortenBy4 = function(
+  var shorten = OpenLocationCode.shorten = function(
       code, latitude, longitude) {
-    return shortenBy(4, code, latitude, longitude, 0.25);
-  };
-
-  /**
-    Try to remove the first six characters from an OLC code.
-
-    This uses a reference location to determine if the first six characters
-    can be removed from the OLC code. The reference location must be within
-    +/- 0.0125 degrees of the code center. This allows the original code to be
-    recovered using this location, with a safety margin.
-
-    Args:
-      code: A full, valid code to shorten.
-      latitude: A latitude, in signed decimal degrees, to use as the reference
-          point.
-      longitude: A longitude, in signed decimal degrees, to use as the reference
-          point.
-
-    Returns:
-      The OLC code with the first six characters removed. If the reference
-      location is not close enough, the passed code is returned unchanged.
-   */
-  var shortenBy6 = OpenLocationCode.shortenBy6 = function(
-      code, latitude, longitude) {
-    return shortenBy(6, code, latitude, longitude, 0.0125);
-  };
-
-  /**
-    Try to remove the first few characters from an OLC code.
-
-    This uses a reference location to determine if the first few characters
-    can be removed from the OLC code. The reference location must be within
-    the passed range (in degrees) of the code center. This allows the original
-    code to be recovered using this location, with a safety margin.
-
-    Args:
-      trimLength: The number of characters to try to remove.
-      code: A full, valid code to shorten.
-      latitude: A latitude, in signed decimal degrees, to use as the reference
-          point.
-      longitude: A longitude, in signed decimal degrees, to use as the reference
-          point.
-      range: The maximum acceptable difference in either latitude or longitude.
-
-    Returns:
-      The OLC code with leading characters removed. If the reference
-      location is not close enough, the passed code is returned unchanged.
-   */
-  var shortenBy = function(trimLength, code, latitude, longitude, range) {
     if (!isFull(code)) {
       throw 'ValueError: Passed code is not valid and full: ' + code;
     }
+    if (code.indexOf(PADDING_CHARACTER_) != -1) {
+      throw 'ValueError: Cannot shorten padded codes: ' + code;
+    }
+    var code = code.toUpperCase();
     var codeArea = decode(code);
-    if (codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN_ ||
-        codeArea.codeLength > MAX_TRIMMABLE_CODE_LEN_) {
-      throw 'ValueError: Code length must be between ' +
-          MIN_TRIMMABLE_CODE_LEN_ + ' and ' + MAX_TRIMMABLE_CODE_LEN_;
+    if (codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN_) {
+      throw 'ValueError: Code length must be at least ' +
+          MIN_TRIMMABLE_CODE_LEN_;
     }
     // Ensure that latitude and longitude are valid.
     latitude = clipLatitude(latitude);
     longitude = normalizeLongitude(longitude);
-    // Are the latitude and longitude close enough?
-    if (Math.abs(codeArea.latitudeCenter - latitude) > range ||
-        Math.abs(codeArea.longitudeCenter - longitude) > range) {
-      // No they're not, so return the original code.
-      return code;
+    // How close are the latitude and longitude to the code center.
+    var range = Math.max(
+        Math.abs(codeArea.latitudeCenter - latitude),
+        Math.abs(codeArea.longitudeCenter - longitude));
+    for (var i = PAIR_RESOLUTIONS_.length - 2; i >= 1; i--) {
+      // Check if we're close enough to shorten. The range must be less than 1/2
+      // the resolution to shorten at all, and we want to allow some safety, so
+      // use 0.3 instead of 0.5 as a multiplier.
+      if (range < (PAIR_RESOLUTIONS_[i] * 0.3)) {
+        // Trim it.
+        return code.substring((i + 1) * 2);
+      }
     }
-    // They are, so we can trim the required number of characters from the
-    // code. But first we strip the prefix and separator and convert to upper
-    // case.
-    var newCode = code.replace(PREFIX_, '').
-        replace(SEPARATOR_, '').toUpperCase();
-    // And trim the characters, adding one to avoid the prefix.
-    return PREFIX_ + newCode.substring(trimLength);
+    return code;
   };
 
   /**
@@ -563,9 +532,6 @@
       adjustedLatitude -= digitValue * placeValue;
       code += CODE_ALPHABET_.charAt(digitValue);
       digitCount += 1;
-      if (digitCount == codeLength) {
-        break;
-      }
       // And do the longitude - gets the digit for this place and subtracts that
       // for the next digit.
       digitValue = Math.floor(adjustedLongitude / placeValue);
@@ -576,6 +542,12 @@
       if (digitCount == SEPARATOR_POSITION_ && digitCount < codeLength) {
         code += SEPARATOR_;
       }
+    }
+    if (code.length < SEPARATOR_POSITION_) {
+      code = code + Array(SEPARATOR_POSITION_ - code.length + 1).join(PADDING_CHARACTER_);
+    }
+    if (code.length == SEPARATOR_POSITION_) {
+      code = code + SEPARATOR_;
     }
     return code;
   };

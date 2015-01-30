@@ -1,26 +1,21 @@
 # Test data for validity tests.
 # Format of each line is:
 #   code,isValid,isShort,isFull
-+8FWC,true,true,true
-8+FWC,false,false,false
-+8+FWC,false,false,false
-8FWC.,true,false,true
-8F.,false,false,false
-8FWCX4,true,true,true
-8fwc.x4,true,false,true
-8FWC2.,false,false,false
-A,false,false,false
-8F WC,false,false,false
- 8FWC,false,false,false
-8FWC_X4,false,false,false
-8FWCX.4,false,false,false
-8F.W.C64,false,false,false
-8FηWC,false,false,false
-8FρWC,false,false,false
-8FW,true,false,true
-,false,false,false
-XX,true,false,false
-X,true,false,false
-CVXX,true,true,true
-FX22,true,true,false
-FX23,true,true,false
+# Valid full codes:
+8FWC2345+G6,true,false,true
+8FWC2345+G6G,true,false,true
+8fwc2345+,true,false,true
+8FWCX400+,true,false,true
+# Valid short codes:
+WC2345+G6g,true,true,false
+2345+G6,true,true,false
+45+G6,true,true,false
++G6,true,true,false
+# Invalid codes
+8FWC2345+G,false,false,false
+8FWC2_45+G6,false,false,false
+8FWC2η45+G6,false,false,false
+8FWC2345+G6+,false,false,false
+8FWC2300+G6,false,false,false
+WC2300+G6g,false,false,false
+WC2345+G,false,false,false

@@ -242,7 +242,7 @@ The codes may be pseudo-randomly generated and so nearby places may have
 completely different codes. It may be possible for multiple people to apply
 for codes for the same location and for different codes to be generated.
 
-What3words codes use three words to represent 3x3 meter squares. Codes have 
+What3words codes use three words to represent 3x3 meter squares. Codes have
 been assigned for all locations on the earth using a proprietary algorithm.
 Single words can be purchased ("OneWord"). In late 2014 an offline SDK was
 announced, although this does not support purchased OneWords.
@@ -265,15 +265,13 @@ our requirements. As a result, we defined a new coding system and termed it
 Open Location Code.
 
 Open Location Codes are 10 to 11 characters long. They can also be used in a
-short form of six to seven characters, similar to telephone numbers and
+short form of four to seven characters, similar to telephone numbers and
 postcodes, within approximately 50km of the original location. Within
 approximately 2.5km of the original location they can be shortened further,
 to just four to five characters.
 
-To aid memorisation, we include a separator to break the code into two. To
-aid recognition, we use a "+" prefix to distinguish Open Location Codes from
-postcodes. Both of these characters are optional and omitting either or both
-does not result in an invalid code.
+To aid recognition and memorisation, we include a separator to break the code
+into two parts, and to distinguise codes from postal codes.
 
 In their short form, Open Location Codes have from four to seven characters.
 These can be used on their own within 50km of the place, or globally by
@@ -298,7 +296,7 @@ The character set used to form Open Location Codes is not contiguous. This
 is a result of removing easily confused characters, vowels and some other
 characters. This does make manually comparing codes difficult, as one has to
 remember whether there are characters between 9 and C in order to tell if
-+8FV9 is next to +8FVC. However, we think that this is justified by the
+8FV9 is next to 8FVC. However, we think that this is justified by the
 improved usability.
 
 Nearby places have similar Open Location Codes. There are three

@@ -175,10 +175,11 @@
             '<span class="button_label">Back</span></button>';
       }
       html += '<br/>';
-      if (codeLen <= 10) {
+      if (codeArea.codeLength <= 10) {
         olcGrids.push(new OlcStandardGrid(parentCode, '#546e7a', map));
-        var row = currentCode.substr(currentCode.length - 2).charAt(0);
-        var col = currentCode.substr(currentCode.length - 2).charAt(1);
+        var cleanedCode = currentCode.replace('+', '');
+        var row = cleanedCode.charAt(codeArea.codeLength - 2);
+        var col = cleanedCode.charAt(codeArea.codeLength - 1);
         html += '<p>The cell containing the marker is in row <em>' + row + '</em> ' +
             'and column <em>' + col + '</em>, making its OLC code ' +
             '<em>' + currentCode + '</em>.</p>';

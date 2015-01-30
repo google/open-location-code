@@ -191,12 +191,6 @@ function geocodeLatLng(lat, lng, olcCode, callbackFunction) {
                 addressNames.push(component.long_name);
                 addressComponents.push(component.types[k]);
               }
-              if (component.types[k] === 'postal_code') {
-                if (postal_code === '' ||
-                    component.long_name.length > postal_code.length) {
-                  postal_code = component.long_name;
-                }
-              }
             }
           }
         }

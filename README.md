@@ -7,7 +7,7 @@ easier to use than latitude and longitude.
 They are designed to be used as a replacement for street addresses, especially
 in places where buildings aren't numbered or streets aren't named.
 
-Open Location Codes represent an area, not a point. As characters are added
+Open Location Codes represent an area, not a point. As digits are added
 to a code, the area shrinks, so a long code is more accurate than a short
 code.
 
@@ -30,40 +30,32 @@ Links
 Description
 -----------
 
-Codes are made up of a sequence of characters chosen from a set of 20. The
-characters in the code alternate between latitude and longitude. The first
-four characters describe a one degree latitude by one degree longitude
-area, aligned on degrees. Adding two further characters to the code,
+Codes are made up of a sequence of digits chosen from a set of 20. The
+digits in the code alternate between latitude and longitude. The first
+four digits describe a one degree latitude by one degree longitude
+area, aligned on degrees. Adding two further digits to the code,
 reduces the area to 1/20th of a degree by 1/20th of a degree within the
-previous area. And so on - each pair of characters reduces the area to
+previous area. And so on - each pair of digits reduces the area to
 1/400th of the previous area.
 
 As an example, the Parliament Buildings in Nairobi, Kenya are located at
-6GCR.PR6C24. 6GCR is the area from 2S 36E to 1S 37E. PR6C24 is a 14 meter
+6GCRPR6C+24. 6GCR is the area from 2S 36E to 1S 37E. PR6C+24 is a 14 meter
 wide by 14 meter high area within 6GCR.
 
-Because codes can appear similar to telephone numbers or postcodes, they can
-be prefixed with a "+" character to disambiguate them.
+A "+" character is used after eight digits, to break the code up into two parts
+and to distinguish shortened Open Location Codes from postal codes.
 
-A "." character is used to break the code up into two parts, in the same way
-that spaces are used to break up telephone numbers to make them easier to
-remember and communicate. It also makes it easier to process code fragments.
+There will be locations where a 10 digit code is not sufficiently accurate, but
+refining it by a factor of 20 is unnecessarily precise and requires extending
+the code by two digits. Instead, after 10 digits, the area is divided
+into a 4x5 grid and a single digit used to identify the grid square. A single
+grid refinement step reduces the area to approximately 3.5x2.8 meters.
 
-From character 11 on in the code, the code can be refined using a single
-character. This is because there will be locations where a 10 character code is
-not sufficiently accurate. After 10 characters, instead of dividing the latitude
-and longitude range by 20 and adding a character for each, the area is divided
-into a 4x5 grid and a single character used to identify the grid square.
-
-A single grid refinement step reduces the area to approximately 3.5x2.8 meters.
-
-Codes can be shortened relative to a location. This reduces the amount of code
-that is necessary to be remembered, by using the location to identify an
-approximate area, and then generating the nearest matching code. Only codes
-whose length is 10 (standard accuracy) or 11 (one grid refinement) can be
-shortened. Shortening a code, if possible, will drop four or more characters
-from the start of the code. The degree to which a code can be shortened depends
-on the proximity of the reference location.
+Codes can be shortened relative to a location. This reduces the number of digits
+that must be remembered, by using a location to identify an approximate area,
+and then generating the nearest matching code. Shortening a code, if possible,
+will drop four or more digits from the start of the code. The degree to which a
+code can be shortened depends on the proximity of the reference location.
 
 If the reference location is derived from a town or city name, it is dependent
 on the accuracy of the geocoding service. Although one service may place
@@ -75,14 +67,11 @@ variation in their geocode results.
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
-code, but it does need to be nearby. The short codes will be modified according
-to the following pattern, where S represents the supplied characters, and R are
-the recovered characters:
+code, but it does need to be nearby. Shortened codes always include the "+"
+character so it is simple to compute the missing component.
 
- * SSSS    -> RRRR.RRSSSS
- * SSSSS   -> RRRR.RRSSSSS
- * SSSSSS  -> RRRR.SSSSSS
- * SSSSSSS -> RRRR.SSSSSSS
+ * 8F+GG is missing six leading characters
+ * 6C8F+GG is missing four leading characters
 
 Example Code
 ------------
