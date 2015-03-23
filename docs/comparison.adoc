@@ -72,10 +72,10 @@ and longitude coordinates are still not widely used by people to specify
 locations. We think that this shows latitude and longitude have too many
 disadvantages to be adopted for a street addressing solution.
 
-== link:http://geohash.org[Geohash]
+== Geohash
 
-Geohash codes were designed to be used in short URLs to identify locations
-<<geohash>>. They use 32 characters in their symbol set made up of 0-9A-Z excluding
+Geohash codes <<geohash-site>> were designed to be used in short URLs to identify locations
+<<geohash32>>. They use 32 characters in their symbol set made up of 0-9A-Z excluding
 "A", "I", "L" and "O". This means that Geohash codes can include vowels (and
 the digits "0" and "1" with a similar appearance to "0" and "I"). Geohash
 can generate codes that include words ("DRUGGED"), almost words ("ZUR1CH")
@@ -99,7 +99,7 @@ along them .
 A single location can have more than one code, depending on the input
 values, and multiple different codes can decode to the same value. For
 example, "c216ne4" and "c216new" (and others) all decode to the
-same coordinates (45.37 -121.7).
+same coordinates (45.37 -121.7). 
 
 == Geohash-36
 
@@ -128,7 +128,7 @@ for similar accuracies.
 The Geohash-36 definition includes an optional altitude specification, and
 an optional checksum, neither of which are provided by Open Location Code.
 
-== link:http://mapcode.com[MapCode]
+== MapCode
 
 MapCodes can be defined globally or within a containing territory
 <<mapcode>>. The global codes are a similar length to Open Location Codes,
@@ -157,14 +157,14 @@ challenges distinguishing visually similar codes such as "HH.HH" from the
 cyrillic "НН.НН". Open Location Code currently only supports a Latin
 character set.
 
-== link:http://openpostcode.org[Open Post Code]
+== Open Post Code
 
-Open Post Codes can be defined globally or within a containing country
+Open Post Codes <<openpostcode-site>> can be defined globally or within a containing country
 <<openpostcode>>. The global codes are a similar length to Open Location
 Codes, but codes defined within a country are shorter than full Open
 Location Codes, and a similar length to short Open Location Codes.
 
-Four countries are defined: Ireland, Hong Kong, Yemen and India.
+Four countries are defined: Ireland, Hong Kong, Yemen and India. 
 
 Every location on the planet has a global code. Locations within the
 countries where Open Post Code has been defined also have a local code.
@@ -196,9 +196,9 @@ away.
 Open Post Codes have an optional checksum that can be used to distinguish
 the country a code was generated for.
 
-== link:http://nacgeo.com[Natural Area Code]
+== Natural Area Code
 
-Natural Area Code is a proprietary system that requires licenses to use
+Natural Area Code <<nac-site>> is a proprietary system that requires licenses to use
 <<naclicense>>. The codes are made up of up to three parts, the first
 provides the latitude, the second the longitude and an optional third part
 the altitude as the arctangent of the altitude relative to the Earth's
@@ -340,7 +340,9 @@ receivers, the compact eTrex series, was introduced in 2000". In Wikipedia.
 
 - [[[garmin]]] Retrieved October 15 2014 from http://en.wikipedia.org/wiki/Garmin
 
-- [[[geohash]]] In Wikipedia. Retrieved October 15 2014 from http://en.wikipedia.org/wiki/Geohash
+- [[[geohash32]]] In Wikipedia. Retrieved October 15 2014 from http://en.wikipedia.org/wiki/Geohash
+
+- [[[geohash-site]]] http://geohash.org/ Retrieved October 15 2014.
 
 - [[[geohash36]]] In Wikipedia. Retrieved October 15 2014 from http://en.wikipedia.org/wiki/Geohash-36
 
@@ -348,8 +350,12 @@ receivers, the compact eTrex series, was introduced in 2000". In Wikipedia.
 
 - [[[openpostcode]]] In Wikipedia. Retrieved October 15 2014 from http://en.wikipedia.org/wiki/Postal_addresses_in_the_Republic_of_Ireland
 
+- [[openpostcode-site]] http://www.openpostcode.org/ Retrieved October 15 2014.
+
 - [[[naclicense]]] Legal and Licensing Retrieved October 15 2014 from http://www.nacgeo.com/nacsite/licensing/
 
 - [[[nac]]] The Natural Area Coding System Retrieved October 15 2014 from http://www.nacgeo.com/nacsite/documents/nac.asp
+
+- [[nac-site]] http://nacgeo.com Retrieved October 15 2014.
 
 - [[[mls]]] In Wikipedia. Retrieved October 15 2014 from http://en.wikipedia.org/wiki/Maidenhead_Locator_System
