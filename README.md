@@ -79,12 +79,12 @@ Example Code
 The subdirectories contain sample implementations and tests for different
 languages. Each implementation provides the following functions:
 
- * Test an code to see if it is a valid sequence
- * Test an code to see if it is a valid full code. Not all valid sequences
-are valid full codes
- * Encode a latitude and longitude to a standard accuracy (14 meter by 14
-meter) code
- * Encode a latitude and longitude to any length code
- * Decode a code to it's coordinates - low, high and center
+ * Test a code to see if it is a valid sequence
+ * Test a code to see if it is a valid full code
+   Not all valid sequences are valid full codes
+ * Encode a latitude and longitude to a standard accuracy
+   (14 meter by 14 meter) code
+ * Encode a latitude and longitude to a code of any length
+ * Decode a code to its coordinates: low, high and center
  * Shorten a full code relative to a location
- * Extend a short code relative to a location.
+ * Extend a short code relative to a location
