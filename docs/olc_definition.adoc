@@ -349,7 +349,7 @@ shown below:
 |19|X
 |=======================
 +
-. In addition to the above characters, a full Open Location Code can include a
+. In addition to the above characters, a full Open Location Code must include a
 single "+" as a separator after the eighth digit.
 
 . Open Location Codes with less than eight digits can be suffixed with zeros
@@ -358,7 +358,7 @@ other digit.
 
 . Processing of Open Location Codes must be case insensitive.
 
-. Open Location Code implementations must return upper case codes. They may
+. Open Location Code implementations must return upper case codes. They must
 include the "+" character and zero padding when returning codes.
 
 . Latitude and longitude coordinates must be provided in decimal degrees,
