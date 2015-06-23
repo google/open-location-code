@@ -10,7 +10,6 @@ import 'dart:io';
 // code,isValid,isShort,isFull
 bool checkValidity(OpenLocationCode olc, String csvLine) {
   List<String> elements = csvLine.split(",");
-  print(elements);
   String code = elements[0];
   bool isValid = elements[1] == 'true';
   bool isShort = elements[2] == 'true';
@@ -18,7 +17,6 @@ bool checkValidity(OpenLocationCode olc, String csvLine) {
   bool isValidOlc = olc.isValid(code);
   bool isShortOlc = olc.isShort(code);
   bool isFullOlc = olc.isFull(code);
-  print(" $code, $isValidOlc, $isShortOlc, $isFullOlc");
   return isFull == isFullOlc && isShortOlc == isShort && isValidOlc == isValid;
 }
 
@@ -34,7 +32,6 @@ checkEncodeDecode(OpenLocationCode olc, String csvLine) {
   num lngHi = double.parse(elements[6]);
   CodeArea codeArea = olc.decode(code);
   String codeOlc = olc.encode(lat, lng, codeLength: codeArea.codeLength);
-  print("Decoded code: $code Decoded area: $codeArea Encoded code: $codeOlc");
   expect(code, equals(codeOlc));
   expect(codeArea.latitudeLo, closeTo(latLo, 0.001));
   expect(codeArea.latitudeHi, closeTo(latHi, 0.001));
