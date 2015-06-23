@@ -127,6 +127,10 @@
     if (code.indexOf(SEPARATOR_) != code.lastIndexOf(SEPARATOR_)) {
       return false;
     }
+    // Is it the only character?
+    if (code.length == 1) {
+      return false;
+    }
     // Is it in an illegal position?
     if (code.indexOf(SEPARATOR_) > SEPARATOR_POSITION_ ||
         code.indexOf(SEPARATOR_) % 2 == 1) {
