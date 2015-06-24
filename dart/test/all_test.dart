@@ -4,7 +4,8 @@
 library dart.test;
 
 import 'package:dart/olc.dart';
-import "package:test/test.dart";
+import 'package:test/test.dart';
+import 'package:path/path.dart' as path;
 import 'dart:io';
 
 // code,isValid,isShort,isFull
@@ -61,7 +62,10 @@ List<String> getCsvLines(String fileName) {
 }
 
 main(List<String> args) {
-  String testDataPath = "${Directory.current.path}/test_data";
+  // Requires test csv files in a test_data directory under open location code project root.
+  Directory projectRoot =
+      new Directory.fromUri(Platform.script).parent.parent.parent;
+  String testDataPath = path.absolute(projectRoot.path, 'test_data');
   print("Test data path: $testDataPath");
 
   group('Open location code tests', () {
@@ -92,7 +96,8 @@ main(List<String> args) {
     });
 
     test('Check short codes', () {
-      List<String> shortCodeLines = getCsvLines('$testDataPath/shortCodeTests.csv');
+      List<String> shortCodeLines =
+          getCsvLines('$testDataPath/shortCodeTests.csv');
       for (String line in shortCodeLines) {
         checkShortCode(olc, line);
       }
