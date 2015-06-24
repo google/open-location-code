@@ -76,20 +76,20 @@ main() {
     });
 
     test('Check Validity', () {
-      for (String line in getCsvLines('test/validityTests.csv')) {
+      for (String line in getCsvLines('../test_data/validityTests.csv')) {
         expect(checkValidity(olc, line), true);
       }
     });
 
     test('Check encode decode', () {
-      List<String> encodeLines = getCsvLines('test/encodingTests.csv');
+      List<String> encodeLines = getCsvLines('../test_data/encodingTests.csv');
       for (String line in encodeLines) {
         checkEncodeDecode(olc, line);
       }
     });
 
     test('Check short codes', () {
-      List<String> shortCodeLines = getCsvLines('test/shortCodeTests.csv');
+      List<String> shortCodeLines = getCsvLines('../test_data/shortCodeTests.csv');
       for (String line in shortCodeLines) {
         checkShortCode(olc, line);
       }
