@@ -83,13 +83,14 @@ main(List<String> args) {
     });
 
     test('Check Validity', () {
-      for (String line in getCsvLines('$testDataPath/validityTests.csv')) {
+      for (String line in getCsvLines(path.absolute(testDataPath, 'validityTests.csv'))) {
         expect(checkValidity(olc, line), true);
       }
     });
 
     test('Check encode decode', () {
-      List<String> encodeLines = getCsvLines('$testDataPath/encodingTests.csv');
+      List<String> encodeLines =
+          getCsvLines(path.absolute(testDataPath, 'encodingTests.csv'));
       for (String line in encodeLines) {
         checkEncodeDecode(olc, line);
       }
@@ -97,7 +98,7 @@ main(List<String> args) {
 
     test('Check short codes', () {
       List<String> shortCodeLines =
-          getCsvLines('$testDataPath/shortCodeTests.csv');
+          getCsvLines(path.absolute(testDataPath, 'shortCodeTests.csv'));
       for (String line in shortCodeLines) {
         checkShortCode(olc, line);
       }
