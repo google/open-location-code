@@ -62,7 +62,7 @@ const List<int> decode_ = const [
 class OpenLocationCode {
 
   bool isValid(String code) {
-    if (code == null) {
+    if (code == null || code.length == 1) {
       return false;
     }
 

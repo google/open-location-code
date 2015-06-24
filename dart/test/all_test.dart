@@ -60,7 +60,10 @@ List<String> getCsvLines(String fileName) {
       .toList();
 }
 
-main() {
+main(List<String> args) {
+  String testDataPath = "${Directory.current.path}/test_data";
+  print("Test data path: $testDataPath");
+
   group('Open location code tests', () {
     OpenLocationCode olc;
 
@@ -76,20 +79,20 @@ main() {
     });
 
     test('Check Validity', () {
-      for (String line in getCsvLines('../test_data/validityTests.csv')) {
+      for (String line in getCsvLines('$testDataPath/validityTests.csv')) {
         expect(checkValidity(olc, line), true);
       }
     });
 
     test('Check encode decode', () {
-      List<String> encodeLines = getCsvLines('../test_data/encodingTests.csv');
+      List<String> encodeLines = getCsvLines('$testDataPath/encodingTests.csv');
       for (String line in encodeLines) {
         checkEncodeDecode(olc, line);
       }
     });
 
     test('Check short codes', () {
-      List<String> shortCodeLines = getCsvLines('../test_data/shortCodeTests.csv');
+      List<String> shortCodeLines = getCsvLines('$testDataPath/shortCodeTests.csv');
       for (String line in shortCodeLines) {
         checkShortCode(olc, line);
       }
