@@ -20,11 +20,10 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"gopkg.in/inconshreveable/log15.v2"
 )
 
 // Fuzz usage:
@@ -50,17 +49,16 @@ func Fuzz(data []byte) int {
 	return 1
 }
 
-func init() {
+func extractCorpus() error {
 	dir := filepath.Join("testdata", "gofuzz")
 	if _, err := os.Stat(filepath.Join(dir, "001.code.txt")); err == nil {
-		return
+		return err
 	}
-	Log.SetHandler(log15.StderrHandler)
 	src := filepath.Join("..", "test_data")
 	fis, err := ioutil.ReadDir(src)
 	if err != nil {
-		Log.Error("read test_data", "dir", src, "error", err)
-		return
+		log.Printf("read test_data from %s: %v", src, err)
+		return err
 	}
 	_ = os.MkdirAll(dir, 0755)
 	n := 0
@@ -71,7 +69,7 @@ func init() {
 		fn := filepath.Join(src, fi.Name())
 		data, err := ioutil.ReadFile(fn)
 		if err != nil {
-			Log.Error("read csv", "file", fn, "error", err)
+			log.Printf("read csv %s: %v", fn, err)
 			continue
 		}
 		for _, row := range bytes.Split(data, []byte{'\n'}) {
@@ -82,11 +80,12 @@ func init() {
 			if i := bytes.IndexByte(row, ','); i >= 0 {
 				fn := filepath.Join(dir, fmt.Sprintf("%003d.code.txt", n))
 				if err := ioutil.WriteFile(fn, row[:i], 0644); err != nil {
-					Log.Error("Write", "file", fn, "error", err)
+					log.Printf("Write %s: %v", fn, err)
 					continue
 				}
 				n++
 			}
 		}
 	}
+	return nil
 }

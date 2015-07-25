@@ -22,8 +22,6 @@ import (
 	"strconv"
 	"sync"
 	"testing"
-
-	"github.com/tgulacsi/go/loghlp/tsthlp"
 )
 
 var (
@@ -92,18 +90,16 @@ func init() {
 }
 
 func TestCheck(t *testing.T) {
-	Log.SetHandler(tsthlp.TestHandler(t))
 	for i, elt := range validity {
 		err := Check(elt.code)
 		got := err == nil
 		if got != elt.isValid {
-			t.Errorf("%d. %q got %t (%v), awaited %t.", i, elt.code, got, err, elt.isValid)
+			t.Errorf("%d. %q validity is %t (err=%v), awaited %t.", i, elt.code, got, err, elt.isValid)
 		}
 	}
 }
 
 func TestEncode(t *testing.T) {
-	Log.SetHandler(tsthlp.TestHandler(t))
 	for i, elt := range encoding {
 		n := len(stripCode(elt.code))
 		code := Encode(elt.lat, elt.lng, n)
@@ -115,7 +111,6 @@ func TestEncode(t *testing.T) {
 }
 
 func TestDecode(t *testing.T) {
-	Log.SetHandler(tsthlp.TestHandler(t))
 	check := func(i int, code, name string, got, want float64) {
 		if !closeEnough(got, want) {
 			t.Errorf("%d. %q want %s=%f, got %f", i, code, name, want, got)
@@ -143,7 +138,6 @@ func TestDecode(t *testing.T) {
 }
 
 func TestShorten(t *testing.T) {
-	Log.SetHandler(tsthlp.TestHandler(t))
 	for i, elt := range shorten {
 		got, err := Shorten(elt.code, elt.lat, elt.lng)
 		if err != nil {

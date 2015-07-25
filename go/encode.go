@@ -68,7 +68,7 @@ func Encode(lat, lng float64, codeLen int) string {
 	if lng == lngMax {
 		lng = normalizeLng(lng + computePrec(codeLen+2, true))
 	}
-	Log.Debug("Encode", "lat", lat, "lng", lng)
+	debug("Encode lat=%f lng=%f", lat, lng)
 	n := codeLen
 	if n > pairCodeLen {
 		n = pairCodeLen

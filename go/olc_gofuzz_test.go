@@ -18,8 +18,8 @@ package olc
 
 import "testing"
 
-// just for testing gofuzz's init().
-
 func TestGofuzz(t *testing.T) {
-	t.Skip()
+	if err := extractCorpus(); err != nil {
+		t.Error(err)
+	}
 }

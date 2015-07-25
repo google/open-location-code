@@ -18,21 +18,17 @@ package olc
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"strings"
-
-	"gopkg.in/inconshreveable/log15.v2"
 )
 
 var (
-	Log = log15.New("lib", "olc")
-
 	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
-)
 
-func init() {
-	Log.SetHandler(log15.DiscardHandler())
-}
+	// Set Debug to true to have debug prints.
+	Debug = false
+)
 
 const (
 	Separator = '+'
@@ -62,7 +58,7 @@ func (area CodeArea) Center() (lat, lng float64) {
 
 // Check checks the code whether it is a valid code, or not.
 func Check(code string) error {
-	if code == "" {
+	if code == "" || len(code) == 1 && code[0] == Separator {
 		return errors.New("empty code")
 	}
 	n := len(code)
@@ -195,4 +191,10 @@ func normalizeLat(value float64) float64 {
 
 func normalizeLng(value float64) float64 {
 	return normalize(value, lngMax)
+}
+
+func debug(format string, args ...interface{}) {
+	if Debug {
+		log.Printf(format, args...)
+	}
 }
