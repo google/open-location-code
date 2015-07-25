@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// MinTrimmableCodeLen is the minimum length of a code that is able to be shortened
 const MinTrimmableCodeLen = 6
 
 // Shorten removes characters from the start of an OLC code.
