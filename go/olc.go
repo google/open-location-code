@@ -122,6 +122,10 @@ func Check(code string) error {
 			return errors.New("odd number of padding chars")
 		}
 	}
+	if n == 1 {
+		return errors.New("only separator present in code")
+	}
+
 	return nil
 }
 
