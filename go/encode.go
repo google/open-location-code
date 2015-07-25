@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// See https://github.com/google/open-location-code
 package olc
 
 import (
@@ -23,7 +22,10 @@ import (
 )
 
 var (
-	ErrShort    = errors.New("short code")
+	// ErrShort indicates the provided code was a short code
+	ErrShort = errors.New("short code")
+
+	// ErrNotShort indicates the provided code was not a short code
 	ErrNotShort = errors.New("not short code")
 )
 
