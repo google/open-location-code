@@ -198,3 +198,76 @@ func mustFloat(a []byte) float64 {
 	}
 	return f
 }
+
+func TestFuzzCrashers(t *testing.T) {
+	for i, code := range []string{
+		"+975722X988X29qqX297" +
+			"5722X888X2975722X888" +
+			"X2975722X988X29qqX29" +
+			"75722X888X2975722X88" +
+			"8X2975722X988X29qqX2" +
+			"975722X88qqX2975722X" +
+			"888X2975722X888X2975" +
+			"722X988X29qqX2975722" +
+			"X888X2975722X888X297" +
+			"5722X988X29qqX297572" +
+			"2X888X2975722X888X29" +
+			"75722X988X29qqX29757" +
+			"22X88qqX2975722X888X" +
+			"2975722X888X2975722X" +
+			"988X29qqX2975722X888" +
+			"X2975722X888X2975722" +
+			"X988X29qqX2975722X88" +
+			"8X2975722X888X297572" +
+			"2X988X29qqX2975722X8" +
+			"8qqX2975722X888X2975" +
+			"722X888X2975722X988X" +
+			"29qqX2975722X888X297" +
+			"5722X888X2975722X988" +
+			"X20",
+
+		"+qqX2975722X888X2975" +
+			"722X888X2975722X988X" +
+			"29qqX2975722X888X297" +
+			"5722X888X2975722X988" +
+			"X29qqX2975722X888X29" +
+			"75722X888X2975722X98" +
+			"8X29qqX2975722X88qqX" +
+			"2975722X888X2975722X" +
+			"888X2975722X988X29qq" +
+			"X2975722X888X2975722" +
+			"X888X2975722X988X29q" +
+			"qX2975722X888X297572" +
+			"2X888X2975722X988X29" +
+			"qqX2975722X88qqX2975" +
+			"722X888X2975722X888X" +
+			"2975722X988X29qqX297" +
+			"5722X888X2975722X888" +
+			"X2975722X988X29qqX29" +
+			"75722X888X2975722X88" +
+			"8X2975722X988X29qqX2" +
+			"975722X88qqX2975722X" +
+			"888X2975722X888X2975" +
+			"722X988X29qqX2975722" +
+			"X888X2975722X888X297" +
+			"5722X988X29qqX297572" +
+			"2X888X2975722X888X29" +
+			"75722X988X29qqX29757" +
+			"2",
+	} {
+		if err := Check(code); err != nil {
+			t.Logf("%d. %q Check: %v", i, code, err)
+		}
+		area, err := Decode(code)
+		if err != nil {
+			t.Logf("%d. %q Decode: %v", i, code, err)
+		}
+		if _, err = Decode(Encode(area.LatLo, area.LngLo, len(code))); err != nil {
+			t.Logf("%d. Lo Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatLo, area.LngLo, len(code), err)
+		}
+		if _, err = Decode(Encode(area.LatHi, area.LngHi, len(code))); err != nil {
+			t.Logf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
+		}
+
+	}
+}

@@ -18,6 +18,7 @@ package olc
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"sync"
 )
@@ -75,11 +76,14 @@ func Encode(lat, lng float64, codeLen int) string {
 	}
 	code := codePool.Get().([]byte)
 	code = encodePairs(code[:0], lat, lng, n)
-	var codeS string
-	if codeLen <= pairCodeLen {
-		codeS = string(code)
-	} else {
-		codeS = string(encodeGrid(code, lat, lng, codeLen-pairCodeLen))
+	codeS := string(code)
+	if codeLen > pairCodeLen {
+		finerCode, err := encodeGrid(code, lat, lng, codeLen-pairCodeLen)
+		if err != nil {
+			log.Printf("encodeGrid(%q, %f, %f, %d): %v", code, lat, lng, codeLen-pairCodeLen, err)
+		} else {
+			codeS = string(finerCode)
+		}
 	}
 	codePool.Put(code)
 	return codeS
@@ -131,7 +135,7 @@ func encodePairs(code []byte, lat, lng float64, codeLen int) []byte {
 // The grid refinement method divides the area into a grid of 4x5, and uses a
 // single character to refine the area. This allows default accuracy OLC codes
 // to be refined with just a single character.
-func encodeGrid(code []byte, lat, lng float64, codeLen int) []byte {
+func encodeGrid(code []byte, lat, lng float64, codeLen int) ([]byte, error) {
 	latPlaceValue, lngPlaceValue := gridSizeDegrees, gridSizeDegrees
 	lat = math.Remainder((lat + latMax), latPlaceValue)
 	if lat < 0 {
@@ -146,7 +150,7 @@ func encodeGrid(code []byte, lat, lng float64, codeLen int) []byte {
 		col := int(math.Floor(lng / (lngPlaceValue / gridCols)))
 		pos := row*gridCols + col
 		if !(0 <= pos && pos < len(Alphabet)) {
-			panic(fmt.Sprintf("encodeGrid loc=(%f,%f) row=%d col=%d latVal=%f lngVal=%f", lat, lng, row, col, latPlaceValue, lngPlaceValue))
+			return nil, fmt.Errorf("pos=%d is out of alphabet", pos)
 		}
 		code = append(code, Alphabet[pos])
 		if i == codeLen-1 {
@@ -158,7 +162,7 @@ func encodeGrid(code []byte, lat, lng float64, codeLen int) []byte {
 		lat -= float64(row) * latPlaceValue
 		lng -= float64(col) * lngPlaceValue
 	}
-	return code
+	return code, nil
 }
 
 // computePrec computes the precision value for a given code length.
