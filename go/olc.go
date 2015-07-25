@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// See https://github.com/google/open-location-code
+// Package olc implements Open Location Code.
+//
+// See https://github.com/google/open-location-code .
 package olc
 
 import (
@@ -26,14 +28,17 @@ import (
 var (
 	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
 
-	// Set Debug to true to have debug prints.
+	// Debug governs the debug output.
 	Debug = false
 )
 
 const (
+	// Separator is the character that separates the two parts of location code.
 	Separator = '+'
-	Padding   = '0'
+	// Padding is the optional (left) padding character.
+	Padding = '0'
 
+	// Alphabet is the set of valid encoding characters.
 	Alphabet = "23456789CFGHJMPQRVWX"
 
 	pairCodeLen     = 10
@@ -45,6 +50,7 @@ const (
 	lngMax = 180
 )
 
+// CodeArea is the area represented by a location code.
 type CodeArea struct {
 	LatLo, LngLo, LatHi, LngHi float64
 	Len                        int
