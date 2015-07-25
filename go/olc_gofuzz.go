@@ -30,7 +30,8 @@ import (
 // Fuzz usage:
 //   go get github.com/dvyukov/go-fuzz/...
 //
-//   GOROOT=$(go env | sed -ne '/GOROOT=/ s/^.*=//p') go-fuzz-build github.com/tgulacsi/golc && go-fuzz -bin=./olc-fuzz -corpus=testdata/gofuzz -workdir=/tmp/olc-fuzz
+//   go-fuzz-build github.com/google/open-location-code/go && go test -tags gofuzz && go-fuzz -bin=./olc-fuzz.zip -workdir=workdir
+
 func Fuzz(data []byte) int {
 	code := string(data)
 	if err := Check(code); err != nil {
@@ -51,7 +52,7 @@ func Fuzz(data []byte) int {
 }
 
 func init() {
-	dir := filepath.Join("testdata", "gofuzz")
+	dir := filepath.Join("workdir", "corpus")
 	if _, err := os.Stat(filepath.Join(dir, "001.code.txt")); err == nil {
 		return
 	}
