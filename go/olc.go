@@ -143,7 +143,7 @@ func CheckFull(code string) error {
 	if err := Check(code); err != nil {
 		return err
 	}
-	if err := CheckShort; err == nil {
+	if err := CheckShort(code); err == nil {
 		return ErrShort
 	}
 	if firstLat := strings.IndexByte(Alphabet, upper(code[0])) * encBase; firstLat >= latMax*2 {
