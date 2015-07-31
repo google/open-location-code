@@ -19,66 +19,85 @@ MinCodeLength = 6
 #Returns whether the provided string is a valid Open Location code.
 def isValid(OlcCode):
 
-	#Checks if Separator is available
-	if (OlcCode.find(Separator) == -1):
-		return False  
-	#Compare the index of Separator
-	if OlcCode.find(Separator) != OlcCode.rfind(Separator):
-		return False
-	
-	#Checks if the index of Separator is greater than Separator position
-	if (OlcCode.find(Separator) > SeparatorPosition):
-		return False
-	
-	#Checks if index of sepator is even number 
-	if (OlcCode.find(Separator) % 2 != 0):
-		return False
-	#Checks if there is character after Separator
-	CharAfterSep = OlcCode[OlcCode.index(Separator) + len(Separator):]
-	if (len(CharAfterSep) < 2):
-		return False
+    #Check digits after Pad character
+    if (OlcCode.find(PAD_CHAR) != -1):
+        CharAfterSep = OlcCode[OlcCode.index(Separator) + len(Separator):]
+        if (len(CharAfterSep) > 0):
+            return False
 
-	#Compare given code with OLC characterset
-	OlcCode = OlcCode.replace(Separator,'')
-	data = list(OlcCode)
-	countt = 0
-	for x in range(len(data)):
-		if data[x] in OlcCharacterSet:
-			countt+=1
+    #Checks if Separator is available
+    if (OlcCode.find(Separator) == -1):
+        return False
+    
+    #Compare the index of Separator
+    if OlcCode.find(Separator) != OlcCode.rfind(Separator):
+        return False
+    
+    #Checks if the index of Separator is greater than Separator position
+    if (OlcCode.find(Separator) > SeparatorPosition):
+        return False
+    
+    #Checks if index of sepator is even number 
+    if (OlcCode.find(Separator) % 2 != 0):
+        return False
+    '''
+    #Checks if there is character after Separator
+    CharAfterSep = OlcCode[OlcCode.index(Separator) + len(Separator):]
+    if (len(CharAfterSep) < 2):
+        return False
+    '''
+    #Checks if there is one character.
+    if (len(OlcCode) == 1):
+        return False
 
-	if countt != len(OlcCode):
-		return False
+    #Compare given code with OLC characterset
+    OlcCode = OlcCode.replace(Separator,'')
+    OlcCode = re.sub(PAD_CHAR,'',OlcCode)
+    data = list(OlcCode.upper())
+    
+    countt = 0
+    for x in range(len(data)):
+        if data[x] in OlcCharacterSet:
+            countt+=1
 
+    if countt != len(OlcCode):
+        return False
 
+    return True
 
 
 #Returns if the code is a valid short Open Location Code.
 def isShort(OlcCode):
 
-	if (isValid(OlcCode) == False):
-		return False
-	#checks the index Separator and compare it with Separator position
-	if (OlcCode.find(Separator) <= 0 and OlcCode.find(Separator) >= SeparatorPosition):
-		return False
+    OlcCode = OlcCode.upper()
+    if (isValid(OlcCode) == False):
+        return False
+    
+    #checks the index Separator and compare it with Separator position
+    if (OlcCode.find(Separator) <= 0 and OlcCode.find(Separator) >= SeparatorPosition):
+        return False
 
-	
-	#checks Whether codelength is between 4 && 7
-	OlcCode = OlcCode.replace(Separator,'')
-	if (len(OlcCode) < 4 and len(OlcCode) > 7):
-		return False
-	return True
+    
+    #checks Whether codelength 
+    OlcCode = OlcCode.replace(Separator,'')
+    if (len(OlcCode) > 7):
+        return False
+    
+    return True
 	
 #Returns if the code is a valid full Open Location Code
 def isFull(OlcCode):
-	
-	#Validating the Open Location Code
-	if (isValid(OlcCode) == False):
-		return False
+    
+    OlcCode = OlcCode.upper()
+    #Validating the Open Location Code
+    if (isValid(OlcCode) == False):
+        return False
 
-	#Checks if the position of Separator is equal to Separator position
-	if(OlcCode.find(Separator) != SeparatorPosition):
-		return False
-	return True 
+    #Checks if the position of Separator is equal to Separator position
+    if(OlcCode.find(Separator) != SeparatorPosition):
+        return False
+    return True
+
 
 #Encode a location into a sequence of OLC lat/lng pairs.
 def encode1(latitude, longitude, codeLength):
@@ -107,11 +126,11 @@ def encode1(latitude, longitude, codeLength):
 		if (count == SeparatorPosition and count < codeLength):
 			code = code + Separator
 	
-	#Adding pad characters  
+	#Adding pad characters.  
 	if (len(code) < SeparatorPosition):
-		arr = SeparatorPosition - len(code) + 1
-		code = code + arr.join(PAD_CHAR)
-	#if Length of the code equals Separator position add Separator
+        code = code + (PAD_CHAR * (SeparatorPosition - len(code)))
+
+	#if Length of the code equals Separator position add Separator.
 	if (len(code) == SeparatorPosition):
 		code = code + Separator
 	
@@ -220,7 +239,7 @@ def decode(code):
 	q = codeArea.latitudeSW + gridArea.latitudeNE
 	s = codeArea.longitudeSW + gridArea.longitudeNE
 	d = codeArea.codeLength + gridArea.codeLength
-	return r,p,q,s,d
+	return codeArea(r,p,q,s,d)
 	
 #Decode an OLC code made up of lat/lng pairs.
 #This decodes an OLC code made up of alternating latitude and longitude
