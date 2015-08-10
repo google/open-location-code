@@ -1,7 +1,7 @@
 # Test shortening and extending codes.
 #
 # Format:
-# full code,lat,lng,shortcode
+# fullcode,lat,lng,shortcode
 9C3W9QCJ+2VX,51.3701125,-1.217765625,+2VX
 # Adjust so we can't trim by 8 (+/- .000755)
 9C3W9QCJ+2VX,51.3708675,-1.217765625,CJ+2VX
