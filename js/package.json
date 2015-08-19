@@ -18,7 +18,7 @@
     "openlocationcode"
   ],
   "scripts": {
-    "test": "gulp"
+    "test": "cd test && gulp"
   },
   "devDependencies": {
     "gulp-qunit": "~0.2.1",
