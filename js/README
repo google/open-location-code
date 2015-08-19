@@ -1,10 +1,11 @@
 This is the Javascript implementation of the Open Location Code API.
 
-The library file is openlocationcode.js.
+The library file is src/openlocationcode.js.
 
-Unit tests are included and can be executed by loading test.html in a
-browser.
+Unit tests are included and can be executed by installing gulp, gulp-qunit
+and gulp-util and running gulp. Unit tests are automatically run on pull
+and push requests and visible at https://travis-ci.org/google/open-location-code.
 
 Example web pages illustrating converting map clicks to Open Location Codes,
-and using Googles Maps API to extend place codes to full codes are in
-example1.html and example2.html.
+and using Googles Maps API to extend place codes to full codes are in the
+examples/ directory.
