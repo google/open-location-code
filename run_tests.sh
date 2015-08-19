@@ -3,20 +3,14 @@
 # platform.
 # The script needs to test each implementation in turn, and return a failure
 # if any script fails.
+# The language to test comes as the environment variable TEST_LANG.
 
-# Javascript
-pushd js && npm install && npm test
-JS_RETURN_CODE=$?
-popd
-echo "Javascript tests completed with return code: $JS_RETURN_CODE"
+set -ev
 
-# Add other languages above. Each language should be of the form:
-# pushd $DIR && test command
-# LANG_RETURN_CODE=$?
-# popd
-# Make sure to add $LANG_RETURN_CODE into the exit statement at the bottom of
-# the file.
+# Javascript?
+if [ "$TEST_LANG" == "js" ]; then
+  cd js && npm install && npm test
+  exit $?
+fi
 
-# The return code is the total of the return codes of the tests, so that if
-# any of them fail, a failure will be signaled.
-exit $(($JS_RETURN_CODE))
+echo "Unknown test lang: $TEST_LANG"

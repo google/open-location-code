@@ -6,4 +6,8 @@ node_js:
 before_script:
   - npm install -g gulp
 
+env:
+  - TEST_LANG=js
+  - TEST_LANG=banana
+
 script: ./run_tests.sh
