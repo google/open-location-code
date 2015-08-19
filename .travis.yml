@@ -3,10 +3,15 @@ language: node_js
 node_js:
   - "0.10"
 
+# Install package dependencies. See
+# http://docs.travis-ci.com/user/installing-dependencies/
 before_script:
   - npm install -g gulp
 
+# Define the list of directories to execute tests in.
 env:
   - TEST_DIR=js
+  - TEST_DIR=go
 
+# Test script to run. This is called once for each TEST_DIR value above.
 script: ./run_tests.sh
