@@ -1,0 +1,12 @@
+sudo: false
+language: node_js
+node_js:
+  - "0.10"
+
+before_script:
+  - npm install -g gulp
+
+env:
+  - TEST_DIR=js
+
+script: cd $TEST_DIR && npm install && npm test
