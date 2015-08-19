@@ -7,10 +7,11 @@
 # Javascript
 cd js
 npm install && npm test
-RETURN_CODE=$((0+$?))
+JS_RETURN_CODE=$?
+echo "Javascript tests completed with return code: $JS_RETURN_CODE"
 
 # Add other languages here...
 
 # The return code is the total of the return codes of the tests, so that if
 # any of them fail, a failure will be signaled.
-exit $RETURN_CODE
+exit $(($JS_RETURN_CODE))
