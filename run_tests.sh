@@ -5,9 +5,9 @@
 # if any script fails.
 
 # Javascript
-cd js
-npm install && npm test
+pushd js && npm install && npm test
 JS_RETURN_CODE=$?
+popd
 echo "Javascript tests completed with return code: $JS_RETURN_CODE"
 
 # Add other languages here...
