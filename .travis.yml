@@ -6,7 +6,4 @@ node_js:
 before_script:
   - npm install -g gulp
 
-env:
-  - TEST_DIR=js
-
 script: ./run_tests.sh

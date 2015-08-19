@@ -10,7 +10,12 @@ JS_RETURN_CODE=$?
 popd
 echo "Javascript tests completed with return code: $JS_RETURN_CODE"
 
-# Add other languages here...
+# Add other languages above. Each language should be of the form:
+# pushd $DIR && test command
+# LANG_RETURN_CODE=$?
+# popd
+# Make sure to add $LANG_RETURN_CODE into the exit statement at the bottom of
+# the file.
 
 # The return code is the total of the return codes of the tests, so that if
 # any of them fail, a failure will be signaled.
