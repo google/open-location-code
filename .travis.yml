@@ -9,4 +9,4 @@ before_script:
 env:
   - TEST_DIR=js
 
-script: cd $TEST_DIR && npm install && npm test
+script: ./run_tests.sh
