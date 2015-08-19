@@ -1,16 +1,15 @@
 #!/bin/bash
 # Script to execute the JS tests for the travis-ci.org integration testing
 # platform.
-# The script needs to test each implementation in turn, and return a failure
-# if any script fails.
-# The language to test comes as the environment variable TEST_LANG.
+# The directory to test comes as the environment variable TEST_DIR. The script
+# needs to check for it, change into it, and run the tests as necessary.
 
 set -ev
 
 # Javascript?
-if [ "$TEST_LANG" == "js" ]; then
+if [ "$TEST_DIR" == "js" ]; then
   cd js && npm install && npm test
   exit $?
 fi
 
-echo "Unknown test lang: $TEST_LANG"
+echo "Unknown test directory: $TEST_DIR"
