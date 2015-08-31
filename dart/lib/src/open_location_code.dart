@@ -2,53 +2,54 @@ library open_location_code.base;
 
 import 'dart:math';
 
-// A separator used to break the code into two parts to aid memorability.
+/// A separator used to break the code into two parts to aid memorability.
 const SEPARATOR = '+'; // 43 Ascii
 
-// The number of characters to place before the separator.
+/// The number of characters to place before the separator.
 const int SEPARATOR_POSITION = 8;
 
-// The character used to pad codes.
+/// The character used to pad codes.
 const String PADDING = '0'; // 48 in Ascii
 
-// The character set used to encode the values.
+/// The character set used to encode the values.
 const String CODE_ALPHABET = '23456789CFGHJMPQRVWX';
 
-// The base to use to convert numbers to/from.
+/// The base to use to convert numbers to/from.
 const int ENCODING_BASE = CODE_ALPHABET.length;
 
-// The maximum value for latitude in degrees.
+/// The maximum value for latitude in degrees.
 const int LATITUDE_MAX = 90;
 
-// The maximum value for longitude in degrees.
+/// The maximum value for longitude in degrees.
 const int LONGITUDE_MAX = 180;
 
-// Maximum code length using lat/lng pair encoding. The area of such a
-// code is approximately 13x13 meters (at the equator), and should be suitable
-// for identifying buildings. This excludes prefix and separator characters.
+/// Maximum code length using lat/lng pair encoding. The area of such a
+/// code is approximately 13x13 meters (at the equator), and should be suitable
+/// for identifying buildings. This excludes prefix and separator characters.
 const int PAIR_CODE_LENGTH = 10;
 
-// The resolution values in degrees for each position in the lat/lng pair
-// encoding. These give the place value of each position, and therefore the
-// dimensions of the resulting area.
+/// The resolution values in degrees for each position in the lat/lng pair
+/// encoding. These give the place value of each position, and therefore the
+/// dimensions of the resulting area.
 List<double> PAIR_RESOLUTIONS = [20.0, 1.0, .05, .0025, .000125];
 
-// Number of columns in the grid refinement method.
+/// Number of columns in the grid refinement method.
 const int GRID_COLUMNS = 4;
 
-// Number of rows in the grid refinement method.
+/// Number of rows in the grid refinement method.
 const int GRID_ROWS = 5;
 
-// Size of the initial grid in degrees.
+/// Size of the initial grid in degrees.
 const double GRID_SIZE_DEGREES = 0.000125;
 
-// Minimum length of a code that can be shortened.
+/// Minimum length of a code that can be shortened.
 const int MIN_TRIMMABLE_CODE_LEN = 6;
 
-// Decoder lookup table.
-// -2: illegal.
-// -1: Padding or Separator
-// >= 0: index in the alphabet.
+/// Decoder lookup table.
+///
+/// * -2: illegal.
+/// * -1: Padding or Separator
+/// * >= 0: index in the alphabet.
 const List<int> decode_ = const [
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
@@ -75,8 +76,8 @@ class OpenLocationCode {
       return false;
     }
 
-    /// We can have an even number of padding characters before the separator,
-    /// but then it must be the final character.
+    // We can have an even number of padding characters before the separator,
+    // but then it must be the final character.
     if (code.indexOf(PADDING) > -1) {
       // Not allowed to start with them!
       if (code.indexOf(PADDING) == 0) {
@@ -113,12 +114,11 @@ class OpenLocationCode {
 
   double clipLatitude(double latitude) => min(90.0, max(-90.0, latitude));
 
-/**
-    Compute the latitude precision value for a given code length. Lengths <=
-    10 have the same precision for latitude and longitude, but lengths > 10
-    have different precisions due to the grid method having fewer columns than
-    rows.
- */
+  /// Compute the latitude precision value for a given code length.
+  ///
+  /// Lengths <= 10 have the same precision for latitude and longitude, but
+  /// lengths > 10 have different precisions due to the grid method having fewer
+  /// columns than rows.
   int computeLatitudePrecision(int codeLength) {
     if (codeLength <= 10) {
       return pow(20, (codeLength ~/ -2) + 2);
@@ -126,11 +126,7 @@ class OpenLocationCode {
     return pow(20, -3) ~/ pow(GRID_ROWS, codeLength - 10);
   }
 
-/**
-    Normalize a longitude into the range -180 to 180, not including 180.
-    Args:
-    longitude: A longitude in signed decimal degrees.
- */
+  /// Normalize a [longitude] into the range -180 to 180, not including 180.
   double normalizeLongitude(double longitude) {
     while (longitude < -180) {
       longitude += 360;
@@ -141,12 +137,10 @@ class OpenLocationCode {
     return longitude;
   }
 
-  /**
-      Determines if a code is a valid short code.
-      A short Open Location Code is a sequence created by removing four or more
-      digits from an Open Location Code. It must include a separator
-      character.
-   */
+  /// Determines if a [code] is a valid short code.
+  ///
+  /// A short Open Location Code is a sequence created by removing four or more
+  /// digits from an Open Location Code. It must include a separator character.
   bool isShort(String code) {
     // Check it's valid.
     if (!isValid(code)) {
@@ -160,14 +154,13 @@ class OpenLocationCode {
     return false;
   }
 
-  /**
-      Determines if a code is a valid full Open Location Code.
-      Not all possible combinations of Open Location Code characters decode to
-      valid latitude and longitude values. This checks that a code is valid
-      and also that the latitude and longitude values are legal. If the prefix
-      character is present, it must be the first character. If the separator
-      character is present, it must be after four characters.
-   */
+  /// Determines if a [code] is a valid full Open Location Code.
+  ///
+  /// Not all possible combinations of Open Location Code characters decode to
+  /// valid latitude and longitude values. This checks that a code is valid
+  /// and also that the latitude and longitude values are legal. If the prefix
+  /// character is present, it must be the first character. If the separator
+  /// character is present, it must be after four characters.
   bool isFull(String code) {
     if (!isValid(code)) {
       return false;
@@ -193,22 +186,24 @@ class OpenLocationCode {
     return true;
   }
 
-  /**
-      Encode a location into an Open Location Code.
-      Produces a code of the specified length, or the default length if no length
-      is provided.
-      The length determines the accuracy of the code. The default length is
-      10 characters, returning a code of approximately 13.5x13.5 meters. Longer
-      codes represent smaller areas, but lengths > 14 are sub-centimetre and so
-      11 or 12 are probably the limit of useful codes.
-      Args:
-      latitude: A latitude in signed decimal degrees. Will be clipped to the
-      range -90 to 90.
-      longitude: A longitude in signed decimal degrees. Will be normalised to
-      the range -180 to 180.
-      codeLength: The number of significant digits in the output code, not
-      including any separator characters.
-   */
+  /// Encode a location into an Open Location Code.
+  ///
+  /// Produces a code of the specified length, or the default length if no
+  /// length is provided.
+  /// The length determines the accuracy of the code. The default length is
+  /// 10 characters, returning a code of approximately 13.5x13.5 meters. Longer
+  /// codes represent smaller areas, but lengths > 14 are sub-centimetre and so
+  /// 11 or 12 are probably the limit of useful codes.
+  ///
+  /// Args:
+  ///
+  /// * [latitude]: A latitude in signed decimal degrees. Will be clipped to the
+  /// range -90 to 90.
+  /// * [longitude]: A longitude in signed decimal degrees. Will be normalised
+  /// to the range -180 to 180.
+  /// * [codeLength]: The number of significant digits in the output code, not
+  /// including any separator characters.
+
   String encode(double latitude, double longitude,
       {int codeLength: PAIR_CODE_LENGTH}) {
     if (codeLength < 2 ||
@@ -232,16 +227,10 @@ class OpenLocationCode {
     return code;
   }
 
-  /**
-      Decodes an Open Location Code into the location coordinates.
-      Returns a CodeArea object that includes the coordinates of the bounding
-      box - the lower left, center and upper right.
-      Args:
-      code: The Open Location Code to decode.
-      Returns:
-      A CodeArea object that provides the latitude and longitude of two of the
-      corners of the area, the center, and the length of the original code.
-   */
+  /// Decodes an Open Location Code into the location coordinates.
+  ///
+  /// Returns a [CodeArea] object that includes the coordinates of the bounding
+  /// box - the lower left, center and upper right.
   CodeArea decode(String code) {
     if (!isFull(code)) {
       throw new ArgumentError(
@@ -267,36 +256,40 @@ class OpenLocationCode {
         codeArea.codeLength + gridArea.codeLength);
   }
 
-  /**
-      Recover the nearest matching code to a specified location.
-      Given a short Open Location Code of between four and seven characters,
-      this recovers the nearest matching full code to the specified location.
-      The number of characters that will be prepended to the short code, depends
-      on the length of the short code and whether it starts with the separator.
-      If it starts with the separator, four characters will be prepended. If it
-      does not, the characters that will be prepended to the short code, where S
-      is the supplied short code and R are the computed characters, are as
-      follows:
-      SSSS    -> RRRR.RRSSSS
-      SSSSS   -> RRRR.RRSSSSS
-      SSSSSS  -> RRRR.SSSSSS
-      SSSSSSS -> RRRR.SSSSSSS
-      Note that short codes with an odd number of characters will have their
-      last character decoded using the grid refinement algorithm.
-      Args:
-      shortCode: A valid short OLC character sequence.
-      referenceLatitude: The latitude (in signed decimal degrees) to use to
-      find the nearest matching full code.
-      referenceLongitude: The longitude (in signed decimal degrees) to use
-      to find the nearest matching full code.
-      Returns:
-      The nearest full Open Location Code to the reference location that matches
-      the short code. Note that the returned code may not have the same
-      computed characters as the reference location. This is because it returns
-      the nearest match, not necessarily the match within the same cell. If the
-      passed code was not a valid short code, but was a valid full code, it is
-      returned unchanged.
-   */
+  /// Recover the nearest matching code to a specified location.
+  ///
+  /// Given a short Open Location Code of between four and seven characters,
+  /// this recovers the nearest matching full code to the specified location.
+  /// The number of characters that will be prepended to the short code, depends
+  /// on the length of the short code and whether it starts with the separator.
+  /// If it starts with the separator, four characters will be prepended. If it
+  /// does not, the characters that will be prepended to the short code, where S
+  /// is the supplied short code and R are the computed characters, are as
+  /// follows:
+  ///
+  /// * SSSS    -> RRRR.RRSSSS
+  /// * SSSSS   -> RRRR.RRSSSSS
+  /// * SSSSSS  -> RRRR.SSSSSS
+  /// * SSSSSSS -> RRRR.SSSSSSS
+  ///
+  /// Note that short codes with an odd number of characters will have their
+  /// last character decoded using the grid refinement algorithm.
+  ///
+  /// Args:
+  ///
+  /// * [shortCode]: A valid short OLC character sequence.
+  /// * [referenceLatitude]: The latitude (in signed decimal degrees) to use to
+  /// find the nearest matching full code.
+  /// * [referenceLongitude]: The longitude (in signed decimal degrees) to use
+  ///  to find the nearest matching full code.
+  ///
+  /// It returns the nearest full Open Location Code to the reference location
+  /// that matches the [shortCode]. Note that the returned code may not have the
+  /// same computed characters as the reference location (provided by
+  /// [referenceLatitude] and [referenceLongitude]). This is because it returns
+  /// the nearest match, not necessarily the match within the same cell. If the
+  /// passed code was not a valid short code, but was a valid full code, it is
+  /// returned unchanged.
   String recoverNearest(
       String shortCode, double referenceLatitude, double referenceLongitude) {
     if (!isShort(shortCode)) {
@@ -353,28 +346,22 @@ class OpenLocationCode {
         codeLength: codeArea.codeLength);
   }
 
-/**
-    Remove characters from the start of an OLC code.
-    This uses a reference location to determine how many initial characters
-    can be removed from the OLC code. The number of characters that can be
-    removed depends on the distance between the code center and the reference
-    location.
-    The minimum number of characters that will be removed is four. If more than
-    four characters can be removed, the additional characters will be replaced
-    with the padding character. At most eight characters will be removed.
-    The reference location must be within 50% of the maximum range. This ensures
-    that the shortened code will be able to be recovered using slightly different
-    locations.
-    Args:
-    code: A full, valid code to shorten.
-    latitude: A latitude, in signed decimal degrees, to use as the reference
-    point.
-    longitude: A longitude, in signed decimal degrees, to use as the reference
-    point.
-    Returns:
-    Either the original code, if the reference location was not close enough,
-    or the .
- */
+  /// Remove characters from the start of an OLC [code].
+  ///
+  /// This uses a reference location to determine how many initial characters
+  /// can be removed from the OLC code. The number of characters that can be
+  /// removed depends on the distance between the code center and the reference
+  /// location.
+  /// The minimum number of characters that will be removed is four. If more
+  /// than four characters can be removed, the additional characters will be
+  /// replaced with the padding character. At most eight characters will be
+  /// removed.
+  /// The reference location must be within 50% of the maximum range. This
+  /// ensures that the shortened code will be able to be recovered using
+  /// slightly different locations.
+  ///
+  /// It returns either the original code, if the reference location was not
+  /// close enough, or the .
   String shorten(String code, double latitude, double longitude) {
     if (!isFull(code)) {
       throw new ArgumentError(
@@ -407,41 +394,42 @@ class OpenLocationCode {
     return code;
   }
 
-/**
-    Encode a location into a sequence of OLC lat/lng pairs.
-    This uses pairs of characters (longitude and latitude in that order) to
-    represent each step in a 20x20 grid. Each code, therefore, has 1/400th
-    the area of the previous code.
-    Args:
-    latitude: A latitude in signed decimal degrees.
-    longitude: A longitude in signed decimal degrees.
-    codeLength: The number of significant digits in the output code, not
-    including any separator characters.
- */
+  /// Encode a location into a sequence of OLC lat/lng pairs.
+  ///
+  /// This uses pairs of characters (longitude and latitude in that order) to
+  /// represent each step in a 20x20 grid. Each code, therefore, has 1/400th
+  /// the area of the previous code.
+  ///
+  /// Args:
+  ///
+  /// * [latitude]: A latitude in signed decimal degrees.
+  /// * [longitude]: A longitude in signed decimal degrees.
+  /// * [codeLength]: The number of significant digits in the output code, not
+  ///  including any separator characters.
   String encodePairs(double latitude, double longitude, int codeLength) {
     var code = '';
-    /// Adjust latitude and longitude so they fall into positive ranges.
+    // Adjust latitude and longitude so they fall into positive ranges.
     var adjustedLatitude = latitude + LATITUDE_MAX;
     var adjustedLongitude = longitude + LONGITUDE_MAX;
-    /// Count digits - can't use string length because it may include a separator
-    /// character.
+    // Count digits - can't use string length because it may include a separator
+    // character.
     var digitCount = 0;
     while (digitCount < codeLength) {
-      /// Provides the value of digits in this place in decimal degrees.
+      // Provides the value of digits in this place in decimal degrees.
       var placeValue = PAIR_RESOLUTIONS[digitCount ~/ 2];
-      /// Do the latitude - gets the digit for this place and subtracts that for
-      /// the next digit.
+      // Do the latitude - gets the digit for this place and subtracts that for
+      // the next digit.
       var digitValue = adjustedLatitude ~/ placeValue;
       adjustedLatitude -= digitValue * placeValue;
       code += CODE_ALPHABET[digitValue];
       digitCount++;
-      /// And do the longitude - gets the digit for this place and subtracts that
-      /// for the next digit.
+      // And do the longitude - gets the digit for this place and subtracts that
+      // for the next digit.
       digitValue = adjustedLongitude ~/ placeValue;
       adjustedLongitude -= digitValue * placeValue;
       code += CODE_ALPHABET[digitValue];
       digitCount++;
-      /// Should we add a separator here?
+      // Should we add a separator here?
       if (digitCount == SEPARATOR_POSITION && digitCount < codeLength) {
         code += SEPARATOR;
       }
@@ -456,16 +444,17 @@ class OpenLocationCode {
     return code;
   }
 
-/**
-    Encode a location using the grid refinement method into an OLC string.
-    The grid refinement method divides the area into a grid of 4x5, and uses a
-    single character to refine the area. This allows default accuracy OLC codes
-    to be refined with just a single character.
-    Args:
-    latitude: A latitude in signed decimal degrees.
-    longitude: A longitude in signed decimal degrees.
-    codeLength: The number of characters required.
- */
+  /// Encode a location using the grid refinement method into an OLC string.
+  ///
+  /// The grid refinement method divides the area into a grid of 4x5, and uses a
+  /// single character to refine the area. This allows default accuracy OLC
+  /// codes to be refined with just a single character.
+  ///
+  /// Args:
+  ///
+  /// * [latitude]: A latitude in signed decimal degrees.
+  /// * [longitude]: A longitude in signed decimal degrees.
+  /// * [codeLength]: The number of characters required.
   String encodeGrid(double latitude, double longitude, int codeLength) {
     var code = '';
     var latPlaceValue = GRID_SIZE_DEGREES;
@@ -487,14 +476,15 @@ class OpenLocationCode {
     return code;
   }
 
-  /**
-      Decode an OLC code made up of lat/lng pairs.
-      This decodes an OLC code made up of alternating latitude and longitude
-      characters, encoded using base 20.
-      Args:
-      code: A valid OLC code, presumed to be full, but with the separator
-      removed.
-   */
+  /// Decode an OLC code made up of lat/lng pairs.
+  ///
+  /// This decodes an OLC code made up of alternating latitude and longitude
+  /// characters, encoded using base 20.
+  ///
+  /// Args:
+  ///
+  /// * [code]: A valid OLC code, presumed to be full, but with the separator
+  /// removed.
   CodeArea decodePairs(String code) {
     // Get the latitude and longitude values. These will need correcting from
     // positive ranges.
@@ -506,20 +496,22 @@ class OpenLocationCode {
         longitude[1] - LONGITUDE_MAX, code.length);
   }
 
-/**
-    Decode either a latitude or longitude sequence.
-    This decodes the latitude or longitude sequence of a lat/lng pair encoding.
-    Starting at the character at position offset, every second character is
-    decoded and the value returned.
-    Args:
-    code: A valid OLC code, presumed to be full, with the separator removed.
-    offset: The character to start from.
-    Returns:
-    A pair of the low and high values. The low value comes from decoding the
-    characters. The high value is the low value plus the resolution of the
-    last position. Both values are offset into positive ranges and will need
-    to be corrected before use.
- */
+  /// Decode either a latitude or longitude sequence.
+  ///
+  /// This decodes the latitude or longitude sequence of a lat/lng pair
+  /// encoding. Starting at the character at position offset, every second
+  /// character is decoded and the value returned.
+  ///
+  /// Args:
+  ///
+  /// * [code]: A valid OLC code, presumed to be full, with the separator
+  /// removed.
+  /// * [offset]: The character to start from.
+  ///
+  /// It returns a pair of the low and high values. The low value comes from
+  /// decoding the characters. The high value is the low value plus the
+  /// resolution of the last position. Both values are offset into positive
+  /// ranges and will need to be corrected before use.
   List<double> decodePairsSequence(String code, double offset) {
     int i = 0;
     num value = 0;
@@ -530,13 +522,14 @@ class OpenLocationCode {
     return [value, value + PAIR_RESOLUTIONS[i - 1]];
   }
 
-/**
-    Decode the grid refinement portion of an OLC code.
-    This decodes an OLC code using the grid refinement method.
-    Args:
-    code: A valid OLC code sequence that is only the grid refinement
-    portion. This is the portion of a code starting at position 11.
- */
+  /// Decode the grid refinement portion of an OLC code.
+  ///
+  /// This decodes an OLC code using the grid refinement method.
+  ///
+  /// Args:
+  ///
+  /// * [code]: A valid OLC code sequence that is only the grid refinement
+  /// portion. This is the portion of a code starting at position 11.
   CodeArea decodeGrid(String code) {
     var latitudeLo = 0.0;
     var longitudeLo = 0.0;
@@ -560,21 +553,11 @@ class OpenLocationCode {
   }
 }
 
-/**
-    Coordinates of a decoded Open Location Code.
-    The coordinates include the latitude and longitude of the lower left and
-    upper right corners and the center of the bounding box for the area the
-    code represents.
-    Attributes:
-    latitude_lo: The latitude of the SW corner in degrees.
-    longitude_lo: The longitude of the SW corner in degrees.
-    latitude_hi: The latitude of the NE corner in degrees.
-    longitude_hi: The longitude of the NE corner in degrees.
-    latitude_center: The latitude of the center in degrees.
-    longitude_center: The longitude of the center in degrees.
-    code_length: The number of significant characters that were in the code.
-    This excludes the separator.
- */
+/// Coordinates of a decoded Open Location Code.
+///
+/// The coordinates include the latitude and longitude of the lower left and
+/// upper right corners and the center of the bounding box for the area the
+/// code represents.
 class CodeArea {
   double latitudeLo;
   double longitudeLo;
@@ -584,6 +567,18 @@ class CodeArea {
   double longitudeCenter;
   int codeLength;
 
+  /// Create a [CodeArea].
+  ///
+  /// Args:
+  ///
+  /// *[latitude_lo]: The latitude of the SW corner in degrees.
+  /// *[longitude_lo]: The longitude of the SW corner in degrees.
+  /// *[latitude_hi]: The latitude of the NE corner in degrees.
+  /// *[longitude_hi]: The longitude of the NE corner in degrees.
+  /// *[latitude_center]: The latitude of the center in degrees.
+  /// *[longitude_center]: The longitude of the center in degrees.
+  /// *[code_length]: The number of significant characters that were in the code.
+  /// This excludes the separator.
   CodeArea(this.latitudeLo, this.longitudeLo, this.latitudeHi, this.longitudeHi,
       this.codeLength) {
     latitudeCenter =
