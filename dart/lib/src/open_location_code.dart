@@ -6,51 +6,51 @@ import 'dart:math';
 const SEPARATOR = '+'; // 43 Ascii
 
 /// The number of characters to place before the separator.
-const int SEPARATOR_POSITION = 8;
+const SEPARATOR_POSITION = 8;
 
 /// The character used to pad codes.
-const String PADDING = '0'; // 48 in Ascii
+const PADDING = '0'; // 48 in Ascii
 
 /// The character set used to encode the values.
-const String CODE_ALPHABET = '23456789CFGHJMPQRVWX';
+const CODE_ALPHABET = '23456789CFGHJMPQRVWX';
 
 /// The base to use to convert numbers to/from.
-const int ENCODING_BASE = CODE_ALPHABET.length;
+const ENCODING_BASE = CODE_ALPHABET.length;
 
 /// The maximum value for latitude in degrees.
-const int LATITUDE_MAX = 90;
+const LATITUDE_MAX = 90;
 
 /// The maximum value for longitude in degrees.
-const int LONGITUDE_MAX = 180;
+const LONGITUDE_MAX = 180;
 
 /// Maximum code length using lat/lng pair encoding. The area of such a
 /// code is approximately 13x13 meters (at the equator), and should be suitable
 /// for identifying buildings. This excludes prefix and separator characters.
-const int PAIR_CODE_LENGTH = 10;
+const PAIR_CODE_LENGTH = 10;
 
 /// The resolution values in degrees for each position in the lat/lng pair
 /// encoding. These give the place value of each position, and therefore the
 /// dimensions of the resulting area.
-List<double> PAIR_RESOLUTIONS = [20.0, 1.0, .05, .0025, .000125];
+const PAIR_RESOLUTIONS = const <double>[20.0, 1.0, .05, .0025, .000125];
 
 /// Number of columns in the grid refinement method.
-const int GRID_COLUMNS = 4;
+const GRID_COLUMNS = 4;
 
 /// Number of rows in the grid refinement method.
-const int GRID_ROWS = 5;
+const GRID_ROWS = 5;
 
 /// Size of the initial grid in degrees.
-const double GRID_SIZE_DEGREES = 0.000125;
+const GRID_SIZE_DEGREES = 0.000125;
 
 /// Minimum length of a code that can be shortened.
-const int MIN_TRIMMABLE_CODE_LEN = 6;
+const MIN_TRIMMABLE_CODE_LEN = 6;
 
 /// Decoder lookup table.
 ///
 /// * -2: illegal.
 /// * -1: Padding or Separator
 /// * >= 0: index in the alphabet.
-const List<int> decode_ = const [
+const decode_ = const <int>[
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -2, -2,  //
