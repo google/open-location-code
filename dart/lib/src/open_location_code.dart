@@ -50,7 +50,7 @@ const MIN_TRIMMABLE_CODE_LEN = 6;
 /// * -2: illegal.
 /// * -1: Padding or Separator
 /// * >= 0: index in the alphabet.
-const decode_ = const <int>[
+const _decode = const <int>[
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -2, -2,  //
@@ -105,7 +105,7 @@ class OpenLocationCode {
 
     // Check code contains only valid characters.
     for (int ch in code.codeUnits) {
-      if (ch > decode_.length || decode_[ch] < -1) {
+      if (ch > _decode.length || _decode[ch] < -1) {
         return false;
       }
     }
@@ -170,14 +170,14 @@ class OpenLocationCode {
       return false;
     }
     // Work out what the first latitude character indicates for latitude.
-    var firstLatValue = decode_[code.codeUnitAt(0)] * ENCODING_BASE;
+    var firstLatValue = _decode[code.codeUnitAt(0)] * ENCODING_BASE;
     if (firstLatValue >= LATITUDE_MAX * 2) {
       // The code would decode to a latitude of >= 90 degrees.
       return false;
     }
     if (code.length > 1) {
       // Work out what the first longitude character indicates for longitude.
-      var firstLngValue = decode_[code.codeUnitAt(1)] * ENCODING_BASE;
+      var firstLngValue = _decode[code.codeUnitAt(1)] * ENCODING_BASE;
       if (firstLngValue >= LONGITUDE_MAX * 2) {
         // The code would decode to a longitude of >= 180 degrees.
         return false;
@@ -516,7 +516,7 @@ class OpenLocationCode {
     int i = 0;
     num value = 0;
     while (i * 2 + offset < code.length) {
-      value += decode_[code.codeUnitAt(i * 2 + offset.floor())] * PAIR_RESOLUTIONS[i];
+      value += _decode[code.codeUnitAt(i * 2 + offset.floor())] * PAIR_RESOLUTIONS[i];
       i += 1;
     }
     return [value, value + PAIR_RESOLUTIONS[i - 1]];
@@ -537,7 +537,7 @@ class OpenLocationCode {
     var lngPlaceValue = GRID_SIZE_DEGREES;
     var i = 0;
     while (i < code.length) {
-      var codeIndex = decode_[code.codeUnitAt(i)];
+      var codeIndex = _decode[code.codeUnitAt(i)];
       var row = (codeIndex / GRID_COLUMNS).floor();
       var col = codeIndex % GRID_COLUMNS;
 
