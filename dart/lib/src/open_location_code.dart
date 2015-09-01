@@ -113,7 +113,7 @@ class OpenLocationCode {
     return true;
   }
 
-  double clipLatitude(double latitude) => min(90.0, max(-90.0, latitude));
+  double clipLatitude(double latitude) => latitude.clamp(-90, 90);
 
   /// Compute the latitude precision value for a given code length.
   ///
