@@ -84,7 +84,8 @@ class OpenLocationCode {
         return false;
       }
       // There can only be one group and it must have even length.
-      List<Match> padMatch = new RegExp('($PADDING+)').allMatches(code).toList();
+      List<Match> padMatch =
+          new RegExp('($PADDING+)').allMatches(code).toList();
       if (padMatch.length != 1) {
         return false;
       }
@@ -243,13 +244,15 @@ class OpenLocationCode {
     code = code.replaceAll(new RegExp('$PADDING+'), '');
     code = code.toUpperCase();
     // Decode the lat/lng pair component.
-    var codeArea = decodePairs(code.substring(0, min(code.length, PAIR_CODE_LENGTH)));
+    var codeArea =
+        decodePairs(code.substring(0, min(code.length, PAIR_CODE_LENGTH)));
     // If there is a grid refinement component, decode that.
     if (code.length <= PAIR_CODE_LENGTH) {
       return codeArea;
     }
     var gridArea = decodeGrid(code.substring(PAIR_CODE_LENGTH));
-    return new CodeArea(codeArea.latitudeLo + gridArea.latitudeLo,
+    return new CodeArea(
+        codeArea.latitudeLo + gridArea.latitudeLo,
         codeArea.longitudeLo + gridArea.longitudeLo,
         codeArea.latitudeLo + gridArea.latitudeHi,
         codeArea.longitudeLo + gridArea.longitudeHi,
@@ -491,9 +494,12 @@ class OpenLocationCode {
     var latitude = decodePairsSequence(code, 0.0);
     var longitude = decodePairsSequence(code, 1.0);
     // Correct the values and set them into the CodeArea object.
-    return new CodeArea(latitude[0] - LATITUDE_MAX,
-        longitude[0] - LONGITUDE_MAX, latitude[1] - LATITUDE_MAX,
-        longitude[1] - LONGITUDE_MAX, code.length);
+    return new CodeArea(
+        latitude[0] - LATITUDE_MAX,
+        longitude[0] - LONGITUDE_MAX,
+        latitude[1] - LATITUDE_MAX,
+        longitude[1] - LONGITUDE_MAX,
+        code.length);
   }
 
   /// Decode either a latitude or longitude sequence.
@@ -516,7 +522,8 @@ class OpenLocationCode {
     int i = 0;
     num value = 0;
     while (i * 2 + offset < code.length) {
-      value += _decode[code.codeUnitAt(i * 2 + offset.floor())] * PAIR_RESOLUTIONS[i];
+      value += _decode[code.codeUnitAt(i * 2 + offset.floor())] *
+          PAIR_RESOLUTIONS[i];
       i += 1;
     }
     return [value, value + PAIR_RESOLUTIONS[i - 1]];
@@ -588,6 +595,8 @@ class CodeArea {
   }
 
   String toString() {
-    return "latLo: $latitudeLo longLo: $longitudeLo latHi: $latitudeHi longHi: $longitudeHi codelen: $codeLength";
+    return "latLo: $latitudeLo longLo: $longitudeLo "
+        "latHi: $latitudeHi longHi: $longitudeHi "
+        "codelen: $codeLength";
   }
 }
