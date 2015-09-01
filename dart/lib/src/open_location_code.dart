@@ -51,17 +51,17 @@ const MIN_TRIMMABLE_CODE_LEN = 6;
 /// * -1: Padding or Separator
 /// * >= 0: index in the alphabet.
 const _decode = const <int>[
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,  //
-    -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -2, -2,  //
-    -1, -2,  0,  1,  2,  3,  4,  5,  6,  7, -2, -2, -2, -2, -2, -2,  //
-    -2, -2, -2,  8, -2, -2,  9, 10, 11, -2, 12, -2, -2, 13, -2, -2,  //
-    14, 15, 16, -2, -2, -2, 17, 18, 19, -2, -2, -2, -2, -2, -2, -2,  //
-    -2, -2, -2,  8, -2, -2,  9, 10, 11, -2, 12, -2, -2, 13, -2, -2,  //
-    14, 15, 16, -2, -2, -2, 17, 18, 19, -2, -2, -2, -2, -2, -2, -2,];//
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, //
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, //
+  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -2, -2, //
+  -1, -2, 0, 1, 2, 3, 4, 5, 6, 7, -2, -2, -2, -2, -2, -2, //
+  -2, -2, -2, 8, -2, -2, 9, 10, 11, -2, 12, -2, -2, 13, -2, -2, //
+  14, 15, 16, -2, -2, -2, 17, 18, 19, -2, -2, -2, -2, -2, -2, -2, //
+  -2, -2, -2, 8, -2, -2, 9, 10, 11, -2, 12, -2, -2, 13, -2, -2, //
+  14, 15, 16, -2, -2, -2, 17, 18, 19, -2, -2, -2, -2, -2, -2, -2,
+]; //
 
 class OpenLocationCode {
-
   bool isValid(String code) {
     if (code == null || code.length == 1) {
       return false;
@@ -204,7 +204,6 @@ class OpenLocationCode {
   /// to the range -180 to 180.
   /// * [codeLength]: The number of significant digits in the output code, not
   /// including any separator characters.
-
   String encode(double latitude, double longitude,
       {int codeLength: PAIR_CODE_LENGTH}) {
     if (codeLength < 2 ||
@@ -252,10 +251,10 @@ class OpenLocationCode {
     }
     var gridArea = decodeGrid(code.substring(PAIR_CODE_LENGTH));
     return new CodeArea(
-        codeArea.latitudeLo + gridArea.latitudeLo,
-        codeArea.longitudeLo + gridArea.longitudeLo,
-        codeArea.latitudeLo + gridArea.latitudeHi,
-        codeArea.longitudeLo + gridArea.longitudeHi,
+        new LatLng(codeArea.sw.latitude + gridArea.sw.latitude,
+            codeArea.sw.longitude + gridArea.sw.longitude),
+        new LatLng(codeArea.sw.latitude + gridArea.ne.latitude,
+            codeArea.sw.longitude + gridArea.ne.longitude),
         codeArea.codeLength + gridArea.codeLength);
   }
 
@@ -324,28 +323,31 @@ class OpenLocationCode {
     CodeArea codeArea = decode(
         encode(roundedLatitude, roundedLongitude).substring(0, paddingLength) +
             shortCode);
+    double centerLatitude = codeArea.center.latitude;
+    double centerLongitude = codeArea.center.longitude;
+
     // How many degrees latitude is the code from the reference? If it is more
     // than half the resolution, we need to move it east or west.
-    var degreesDifference = codeArea.latitudeCenter - referenceLatitude;
+    var degreesDifference = centerLatitude - referenceLatitude;
     if (degreesDifference > areaToEdge) {
       // If the center of the short code is more than half a cell east,
       // then the best match will be one position west.
-      codeArea.latitudeCenter -= resolution;
+      centerLatitude -= resolution;
     } else if (degreesDifference < -areaToEdge) {
       // If the center of the short code is more than half a cell west,
       // then the best match will be one position east.
-      codeArea.latitudeCenter += resolution;
+      centerLatitude += resolution;
     }
 
     // How many degrees longitude is the code from the reference?
-    degreesDifference = codeArea.longitudeCenter - referenceLongitude;
+    degreesDifference = codeArea.center.longitude - referenceLongitude;
     if (degreesDifference > areaToEdge) {
-      codeArea.longitudeCenter -= resolution;
+      centerLongitude -= resolution;
     } else if (degreesDifference < -areaToEdge) {
-      codeArea.longitudeCenter += resolution;
+      centerLongitude += resolution;
     }
 
-    return encode(codeArea.latitudeCenter, codeArea.longitudeCenter,
+    return encode(centerLatitude, centerLongitude,
         codeLength: codeArea.codeLength);
   }
 
@@ -383,8 +385,8 @@ class OpenLocationCode {
     latitude = clipLatitude(latitude);
     longitude = normalizeLongitude(longitude);
     // How close are the latitude and longitude to the code center.
-    var range = max((codeArea.latitudeCenter - latitude).abs(),
-        (codeArea.longitudeCenter - longitude).abs());
+    var range = max((codeArea.center.latitude - latitude).abs(),
+        (codeArea.center.longitude - longitude).abs());
     for (var i = PAIR_RESOLUTIONS.length - 2; i >= 1; i--) {
       // Check if we're close enough to shorten. The range must be less than 1/2
       // the resolution to shorten at all, and we want to allow some safety, so
@@ -495,10 +497,8 @@ class OpenLocationCode {
     var longitude = decodePairsSequence(code, 1.0);
     // Correct the values and set them into the CodeArea object.
     return new CodeArea(
-        latitude[0] - LATITUDE_MAX,
-        longitude[0] - LONGITUDE_MAX,
-        latitude[1] - LATITUDE_MAX,
-        longitude[1] - LONGITUDE_MAX,
+        new LatLng(latitude[0] - LATITUDE_MAX, longitude[0] - LONGITUDE_MAX),
+        new LatLng(latitude[1] - LATITUDE_MAX, longitude[1] - LONGITUDE_MAX),
         code.length);
   }
 
@@ -555,8 +555,10 @@ class OpenLocationCode {
       longitudeLo += col * lngPlaceValue;
       i += 1;
     }
-    return new CodeArea(latitudeLo, longitudeLo, latitudeLo + latPlaceValue,
-        longitudeLo + lngPlaceValue, code.length);
+    return new CodeArea(
+        new LatLng(latitudeLo, longitudeLo),
+        new LatLng(latitudeLo + latPlaceValue, longitudeLo + lngPlaceValue),
+        code.length);
   }
 }
 
@@ -566,37 +568,32 @@ class OpenLocationCode {
 /// upper right corners and the center of the bounding box for the area the
 /// code represents.
 class CodeArea {
-  double latitudeLo;
-  double longitudeLo;
-  double latitudeHi;
-  double longitudeHi;
-  double latitudeCenter;
-  double longitudeCenter;
-  int codeLength;
+  final LatLng sw, ne;
+  final LatLng center;
+  final int codeLength;
 
   /// Create a [CodeArea].
   ///
   /// Args:
   ///
-  /// *[latitude_lo]: The latitude of the SW corner in degrees.
-  /// *[longitude_lo]: The longitude of the SW corner in degrees.
-  /// *[latitude_hi]: The latitude of the NE corner in degrees.
-  /// *[longitude_hi]: The longitude of the NE corner in degrees.
-  /// *[latitude_center]: The latitude of the center in degrees.
-  /// *[longitude_center]: The longitude of the center in degrees.
+  /// *[sw]: The SW corner in degrees.
+  /// *[ne]: The NE corner in degrees.
   /// *[code_length]: The number of significant characters that were in the code.
   /// This excludes the separator.
-  CodeArea(this.latitudeLo, this.longitudeLo, this.latitudeHi, this.longitudeHi,
-      this.codeLength) {
-    latitudeCenter =
-        min(latitudeLo + (latitudeHi - latitudeLo) / 2, LATITUDE_MAX);
-    longitudeCenter =
-        min(longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX);
-  }
+  CodeArea(LatLng sw, LatLng ne, this.codeLength)
+      : sw = sw,
+        ne = ne,
+        center = new LatLng(
+            (sw.latitude + ne.latitude) / 2, (sw.longitude + ne.longitude) / 2);
 
-  String toString() {
-    return "latLo: $latitudeLo longLo: $longitudeLo "
-        "latHi: $latitudeHi longHi: $longitudeHi "
-        "codelen: $codeLength";
-  }
+  @override String toString() =>
+      'CodeArea(sw:$sw, ne:$ne, codelen: $codeLength)';
+}
+
+/// Coordinates of a point identified by its [latitude] and [longitude] in
+/// degrees.
+class LatLng {
+  final double latitude, longitude;
+  LatLng(this.latitude, this.longitude);
+  @override String toString() => 'LatLng($latitude, $longitude)';
 }
