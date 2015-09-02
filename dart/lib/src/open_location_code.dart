@@ -296,7 +296,7 @@ String recoverNearest(
     if (isFull(shortCode)) {
       return shortCode;
     } else {
-      throw 'ValueError: Passed short code is not valid: ' + shortCode;
+      throw new ArgumentError('Passed short code is not valid: $shortCode');
     }
   }
   // Ensure that latitude and longitude are valid.
@@ -366,17 +366,16 @@ String recoverNearest(
 /// close enough, or the .
 String shorten(String code, double latitude, double longitude) {
   if (!isFull(code)) {
-    throw new ArgumentError(
-        'ValueError: Passed code is not valid and full: $code');
+    throw new ArgumentError('Passed code is not valid and full: $code');
   }
   if (code.indexOf(PADDING) != -1) {
-    throw new ArgumentError('ValueError: Cannot shorten padded codes: $code');
+    throw new ArgumentError('Cannot shorten padded codes: $code');
   }
   code = code.toUpperCase();
   var codeArea = decode(code);
   if (codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN) {
     throw new RangeError(
-        'ValueError: Code length must be at least $MIN_TRIMMABLE_CODE_LEN');
+        'Code length must be at least $MIN_TRIMMABLE_CODE_LEN');
   }
   // Ensure that latitude and longitude are valid.
   latitude = clipLatitude(latitude);
