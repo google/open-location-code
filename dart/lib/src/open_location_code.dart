@@ -83,11 +83,11 @@ bool isValid(String code) {
       return false;
     }
     // There can only be one group and it must have even length.
-    List<Match> padMatch = new RegExp('($PADDING+)').allMatches(code).toList();
+    var padMatch = new RegExp('($PADDING+)').allMatches(code).toList();
     if (padMatch.length != 1) {
       return false;
     }
-    String match = padMatch[0].group(0);
+    var match = padMatch[0].group(0);
     if (match.length % 2 == 1 || match.length > SEPARATOR_POSITION - 2) {
       return false;
     }
@@ -103,7 +103,7 @@ bool isValid(String code) {
   }
 
   // Check code contains only valid characters.
-  for (int ch in code.codeUnits) {
+  for (var ch in code.codeUnits) {
     if (ch > _decode.length || _decode[ch] < -1) {
       return false;
     }
@@ -111,7 +111,7 @@ bool isValid(String code) {
   return true;
 }
 
-double clipLatitude(double latitude) => latitude.clamp(-90.0, 90.0);
+num clipLatitude(num latitude) => latitude.clamp(-90.0, 90.0);
 
 /// Compute the latitude precision value for a given code length.
 ///
@@ -126,7 +126,7 @@ int computeLatitudePrecision(int codeLength) {
 }
 
 /// Normalize a [longitude] into the range -180 to 180, not including 180.
-double normalizeLongitude(double longitude) {
+num normalizeLongitude(num longitude) {
   while (longitude < -180) {
     longitude += 360;
   }
@@ -202,8 +202,7 @@ bool isFull(String code) {
 /// to the range -180 to 180.
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
-String encode(double latitude, double longitude,
-    {int codeLength: PAIR_CODE_LENGTH}) {
+String encode(num latitude, num longitude, {int codeLength: PAIR_CODE_LENGTH}) {
   if (codeLength < 2 ||
       (codeLength < SEPARATOR_POSITION && codeLength % 2 == 1)) {
     throw new ArgumentError('Invalid Open Location Code length: $codeLength');
@@ -291,7 +290,7 @@ CodeArea decode(String code) {
 /// passed code was not a valid short code, but was a valid full code, it is
 /// returned unchanged.
 String recoverNearest(
-    String shortCode, double referenceLatitude, double referenceLongitude) {
+    String shortCode, num referenceLatitude, num referenceLongitude) {
   if (!isShort(shortCode)) {
     if (isFull(shortCode)) {
       return shortCode;
@@ -317,11 +316,11 @@ String recoverNearest(
   var roundedLongitude = (referenceLongitude / resolution).floor() * resolution;
 
   // Use the reference location to pad the supplied short code and decode it.
-  CodeArea codeArea = decode(
+  var codeArea = decode(
       encode(roundedLatitude, roundedLongitude).substring(0, paddingLength) +
           shortCode);
-  double centerLatitude = codeArea.center.latitude;
-  double centerLongitude = codeArea.center.longitude;
+  var centerLatitude = codeArea.center.latitude;
+  var centerLongitude = codeArea.center.longitude;
 
   // How many degrees latitude is the code from the reference? If it is more
   // than half the resolution, we need to move it east or west.
@@ -364,7 +363,7 @@ String recoverNearest(
 ///
 /// It returns either the original code, if the reference location was not
 /// close enough, or the .
-String shorten(String code, double latitude, double longitude) {
+String shorten(String code, num latitude, num longitude) {
   if (!isFull(code)) {
     throw new ArgumentError('Passed code is not valid and full: $code');
   }
@@ -407,7 +406,7 @@ String shorten(String code, double latitude, double longitude) {
 /// * [longitude]: A longitude in signed decimal degrees.
 /// * [codeLength]: The number of significant digits in the output code, not
 ///  including any separator characters.
-String encodePairs(double latitude, double longitude, int codeLength) {
+String encodePairs(num latitude, num longitude, int codeLength) {
   var code = '';
   // Adjust latitude and longitude so they fall into positive ranges.
   var adjustedLatitude = latitude + LATITUDE_MAX;
@@ -456,7 +455,7 @@ String encodePairs(double latitude, double longitude, int codeLength) {
 /// * [latitude]: A latitude in signed decimal degrees.
 /// * [longitude]: A longitude in signed decimal degrees.
 /// * [codeLength]: The number of characters required.
-String encodeGrid(double latitude, double longitude, int codeLength) {
+String encodeGrid(num latitude, num longitude, int codeLength) {
   var code = '';
   var latPlaceValue = GRID_SIZE_DEGREES;
   var lngPlaceValue = GRID_SIZE_DEGREES;
@@ -489,8 +488,8 @@ String encodeGrid(double latitude, double longitude, int codeLength) {
 CodeArea decodePairs(String code) {
   // Get the latitude and longitude values. These will need correcting from
   // positive ranges.
-  var latitude = decodePairsSequence(code, 0.0);
-  var longitude = decodePairsSequence(code, 1.0);
+  var latitude = decodePairsSequence(code, 0);
+  var longitude = decodePairsSequence(code, 1);
   // Correct the values and set them into the CodeArea object.
   return new CodeArea(
       new LatLng(latitude[0] - LATITUDE_MAX, longitude[0] - LONGITUDE_MAX),
@@ -514,12 +513,11 @@ CodeArea decodePairs(String code) {
 /// decoding the characters. The high value is the low value plus the
 /// resolution of the last position. Both values are offset into positive
 /// ranges and will need to be corrected before use.
-List<double> decodePairsSequence(String code, double offset) {
+List<double> decodePairsSequence(String code, int offset) {
   int i = 0;
   num value = 0;
   while (i * 2 + offset < code.length) {
-    value +=
-        _decode[code.codeUnitAt(i * 2 + offset.floor())] * PAIR_RESOLUTIONS[i];
+    value += _decode[code.codeUnitAt(i * 2 + offset)] * PAIR_RESOLUTIONS[i];
     i += 1;
   }
   return [value, value + PAIR_RESOLUTIONS[i - 1]];
@@ -588,7 +586,7 @@ class CodeArea {
 /// Coordinates of a point identified by its [latitude] and [longitude] in
 /// degrees.
 class LatLng {
-  final double latitude, longitude;
+  final num latitude, longitude;
   LatLng(this.latitude, this.longitude);
   @override String toString() => 'LatLng($latitude, $longitude)';
 }
