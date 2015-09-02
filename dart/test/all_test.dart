@@ -3,13 +3,13 @@
 
 library dart.test;
 
-import 'package:dart/olc.dart';
+import 'package:dart/olc.dart' as olc;
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io';
 
 // code,isValid,isShort,isFull
-bool checkValidity(OpenLocationCode olc, String csvLine) {
+bool checkValidity(String csvLine) {
   List<String> elements = csvLine.split(",");
   String code = elements[0];
   bool isValid = elements[1] == 'true';
@@ -22,7 +22,7 @@ bool checkValidity(OpenLocationCode olc, String csvLine) {
 }
 
 // code,lat,lng,latLo,lngLo,latHi,lngHi
-checkEncodeDecode(OpenLocationCode olc, String csvLine) {
+checkEncodeDecode(String csvLine) {
   List<String> elements = csvLine.split(",");
   String code = elements[0];
   num lat = double.parse(elements[1]);
@@ -31,7 +31,7 @@ checkEncodeDecode(OpenLocationCode olc, String csvLine) {
   num lngLo = double.parse(elements[4]);
   num latHi = double.parse(elements[5]);
   num lngHi = double.parse(elements[6]);
-  CodeArea codeArea = olc.decode(code);
+  olc.CodeArea codeArea = olc.decode(code);
   String codeOlc = olc.encode(lat, lng, codeLength: codeArea.codeLength);
   expect(code, equals(codeOlc));
   expect(codeArea.sw.latitude, closeTo(latLo, 0.001));
@@ -41,7 +41,7 @@ checkEncodeDecode(OpenLocationCode olc, String csvLine) {
 }
 
 // full code,lat,lng,shortcode
-checkShortCode(OpenLocationCode olc, String csvLine) {
+checkShortCode(String csvLine) {
   List<String> elements = csvLine.split(",");
   String code = elements[0];
   num lat = double.parse(elements[1]);
@@ -69,11 +69,6 @@ main(List<String> args) {
   print("Test data path: $testDataPath");
 
   group('Open location code tests', () {
-    OpenLocationCode olc;
-
-    setUp(() {
-      olc = new OpenLocationCode();
-    });
 
     test('Clip latitude test', () {
       expect(olc.clipLatitude(100.0), 90.0);
@@ -84,7 +79,7 @@ main(List<String> args) {
 
     test('Check Validity', () {
       for (String line in getCsvLines(path.absolute(testDataPath, 'validityTests.csv'))) {
-        expect(checkValidity(olc, line), true);
+        expect(checkValidity(line), true);
       }
     });
 
@@ -92,7 +87,7 @@ main(List<String> args) {
       List<String> encodeLines =
           getCsvLines(path.absolute(testDataPath, 'encodingTests.csv'));
       for (String line in encodeLines) {
-        checkEncodeDecode(olc, line);
+        checkEncodeDecode(line);
       }
     });
 
@@ -100,7 +95,7 @@ main(List<String> args) {
       List<String> shortCodeLines =
           getCsvLines(path.absolute(testDataPath, 'shortCodeTests.csv'));
       for (String line in shortCodeLines) {
-        checkShortCode(olc, line);
+        checkShortCode(line);
       }
     });
   });
