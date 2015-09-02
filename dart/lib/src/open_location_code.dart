@@ -111,7 +111,7 @@ bool isValid(String code) {
   return true;
 }
 
-double clipLatitude(double latitude) => latitude.clamp(-90, 90);
+double clipLatitude(double latitude) => latitude.clamp(-90.0, 90.0);
 
 /// Compute the latitude precision value for a given code length.
 ///

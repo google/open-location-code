@@ -9,16 +9,15 @@ import 'package:path/path.dart' as path;
 import 'dart:io';
 
 // code,isValid,isShort,isFull
-bool checkValidity(String csvLine) {
+void checkValidity(String csvLine) {
   List<String> elements = csvLine.split(",");
   String code = elements[0];
   bool isValid = elements[1] == 'true';
   bool isShort = elements[2] == 'true';
   bool isFull = elements[3] == 'true';
-  bool isValidOlc = olc.isValid(code);
-  bool isShortOlc = olc.isShort(code);
-  bool isFullOlc = olc.isFull(code);
-  return isFull == isFullOlc && isShortOlc == isShort && isValidOlc == isValid;
+  expect(olc.isValid(code), equals(isValid));
+  expect(olc.isShort(code), equals(isShort));
+  expect(olc.isFull(code), equals(isFull));
 }
 
 // code,lat,lng,latLo,lngLo,latHi,lngHi
@@ -61,15 +60,13 @@ List<String> getCsvLines(String fileName) {
       .toList();
 }
 
-main(List<String> args) {
+main() {
   // Requires test csv files in a test_data directory under open location code project root.
-  Directory projectRoot =
-      new Directory.fromUri(Platform.script).parent.parent.parent;
+  Directory projectRoot = Directory.current.parent;
   String testDataPath = path.absolute(projectRoot.path, 'test_data');
   print("Test data path: $testDataPath");
 
   group('Open location code tests', () {
-
     test('Clip latitude test', () {
       expect(olc.clipLatitude(100.0), 90.0);
       expect(olc.clipLatitude(-100.0), -90.0);
@@ -78,23 +75,23 @@ main(List<String> args) {
     });
 
     test('Check Validity', () {
-      for (String line in getCsvLines(path.absolute(testDataPath, 'validityTests.csv'))) {
-        expect(checkValidity(line), true);
+      var lines = getCsvLines(path.absolute(testDataPath, 'validityTests.csv'));
+      for (String line in lines) {
+        checkValidity(line);
       }
     });
 
     test('Check encode decode', () {
-      List<String> encodeLines =
-          getCsvLines(path.absolute(testDataPath, 'encodingTests.csv'));
-      for (String line in encodeLines) {
+      var lines = getCsvLines(path.absolute(testDataPath, 'encodingTests.csv'));
+      for (String line in lines) {
         checkEncodeDecode(line);
       }
     });
 
     test('Check short codes', () {
-      List<String> shortCodeLines =
+      var lines =
           getCsvLines(path.absolute(testDataPath, 'shortCodeTests.csv'));
-      for (String line in shortCodeLines) {
+      for (String line in lines) {
         checkShortCode(line);
       }
     });
