@@ -38,14 +38,14 @@ public class OpenLocationCode {
     public class CodeArea {
         private final double southLatitude;
         private final double westLongitude;
-        private final double latitudeHeight;
-        private final double longitudeWidth;
+        private final double northLatitude;
+        private final double eastLongitude;
 
-        public CodeArea(double southLatitude, double westLongitude, double latitudeHeight, double longitudeWidth) {
+        public CodeArea(double southLatitude, double westLongitude, double northLatitude, double eastLongitude) {
             this.southLatitude = southLatitude;
             this.westLongitude = westLongitude;
-            this.latitudeHeight = latitudeHeight;
-            this.longitudeWidth = longitudeWidth;
+            this.northLatitude = northLatitude;
+            this.eastLongitude = eastLongitude;
         }
 
         public double getSouthLatitude() {
@@ -57,27 +57,27 @@ public class OpenLocationCode {
         }
 
         public double getLatitudeHeight() {
-            return latitudeHeight;
+            return northLatitude - southLatitude;
         }
 
         public double getLongitudeWidth() {
-            return longitudeWidth;
+            return eastLongitude - westLongitude;
         }
 
         public double getCenterLatitude() {
-            return southLatitude + latitudeHeight / 2;
+            return (southLatitude + northLatitude) / 2;
         }
 
         public double getCenterLongitude() {
-            return westLongitude + longitudeWidth / 2;
+            return (westLongitude + eastLongitude) / 2;
         }
 
         public double getNorthLatitude() {
-            return southLatitude + latitudeHeight;
+            return northLatitude;
         }
 
         public double getEastLongitude() {
-            return westLongitude + longitudeWidth;
+            return eastLongitude;
         }
     }
 
