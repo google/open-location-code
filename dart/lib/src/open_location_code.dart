@@ -3,47 +3,47 @@ library open_location_code.base;
 import 'dart:math';
 
 /// A separator used to break the code into two parts to aid memorability.
-const SEPARATOR = '+'; // 43 Ascii
+const separator = '+'; // 43 Ascii
 
 /// The number of characters to place before the separator.
-const SEPARATOR_POSITION = 8;
+const separatorPosition = 8;
 
 /// The character used to pad codes.
-const PADDING = '0'; // 48 in Ascii
+const padding = '0'; // 48 in Ascii
 
 /// The character set used to encode the values.
-const CODE_ALPHABET = '23456789CFGHJMPQRVWX';
+const codeAlphabet = '23456789CFGHJMPQRVWX';
 
 /// The base to use to convert numbers to/from.
-const ENCODING_BASE = CODE_ALPHABET.length;
+const encodingBase = codeAlphabet.length;
 
 /// The maximum value for latitude in degrees.
-const LATITUDE_MAX = 90;
+const latitudeMax = 90;
 
 /// The maximum value for longitude in degrees.
-const LONGITUDE_MAX = 180;
+const longitudeMax = 180;
 
 /// Maximum code length using lat/lng pair encoding. The area of such a
 /// code is approximately 13x13 meters (at the equator), and should be suitable
 /// for identifying buildings. This excludes prefix and separator characters.
-const PAIR_CODE_LENGTH = 10;
+const pairCodeLength = 10;
 
 /// The resolution values in degrees for each position in the lat/lng pair
 /// encoding. These give the place value of each position, and therefore the
 /// dimensions of the resulting area.
-const PAIR_RESOLUTIONS = const <double>[20.0, 1.0, .05, .0025, .000125];
+const pairResolutions = const <double>[20.0, 1.0, .05, .0025, .000125];
 
 /// Number of columns in the grid refinement method.
-const GRID_COLUMNS = 4;
+const gridColumns = 4;
 
 /// Number of rows in the grid refinement method.
-const GRID_ROWS = 5;
+const gridRows = 5;
 
 /// Size of the initial grid in degrees.
-const GRID_SIZE_DEGREES = 0.000125;
+const gridSizeDegrees = 0.000125;
 
 /// Minimum length of a code that can be shortened.
-const MIN_TRIMMABLE_CODE_LEN = 6;
+const minTrimmableCodeLen = 6;
 
 /// Decoder lookup table.
 ///
@@ -66,33 +66,33 @@ bool isValid(String code) {
     return false;
   }
 
-  int separatorIndex = code.indexOf(SEPARATOR);
+  int separatorIndex = code.indexOf(separator);
   // There must be a single separator at an even index and position should be < SEPARATOR_POSITION.
   if (separatorIndex == -1 ||
-      separatorIndex != code.lastIndexOf(SEPARATOR) ||
-      separatorIndex > SEPARATOR_POSITION ||
+      separatorIndex != code.lastIndexOf(separator) ||
+      separatorIndex > separatorPosition ||
       separatorIndex % 2 == 1) {
     return false;
   }
 
   // We can have an even number of padding characters before the separator,
   // but then it must be the final character.
-  if (code.indexOf(PADDING) > -1) {
+  if (code.indexOf(padding) > -1) {
     // Not allowed to start with them!
-    if (code.indexOf(PADDING) == 0) {
+    if (code.indexOf(padding) == 0) {
       return false;
     }
     // There can only be one group and it must have even length.
-    var padMatch = new RegExp('($PADDING+)').allMatches(code).toList();
+    var padMatch = new RegExp('($padding+)').allMatches(code).toList();
     if (padMatch.length != 1) {
       return false;
     }
     var match = padMatch[0].group(0);
-    if (match.length % 2 == 1 || match.length > SEPARATOR_POSITION - 2) {
+    if (match.length % 2 == 1 || match.length > separatorPosition - 2) {
       return false;
     }
     // If the code is long enough to end with a separator, make sure it does.
-    if (code[code.length - 1] != SEPARATOR) {
+    if (code[code.length - 1] != separator) {
       return false;
     }
   }
@@ -122,7 +122,7 @@ int computeLatitudePrecision(int codeLength) {
   if (codeLength <= 10) {
     return pow(20, (codeLength ~/ -2) + 2);
   }
-  return pow(20, -3) ~/ pow(GRID_ROWS, codeLength - 10);
+  return pow(20, -3) ~/ pow(gridRows, codeLength - 10);
 }
 
 /// Normalize a [longitude] into the range -180 to 180, not including 180.
@@ -146,8 +146,8 @@ bool isShort(String code) {
     return false;
   }
   // If there are less characters than expected before the SEPARATOR.
-  if (code.indexOf(SEPARATOR) >= 0 &&
-      code.indexOf(SEPARATOR) < SEPARATOR_POSITION) {
+  if (code.indexOf(separator) >= 0 &&
+      code.indexOf(separator) < separatorPosition) {
     return true;
   }
   return false;
@@ -169,15 +169,15 @@ bool isFull(String code) {
     return false;
   }
   // Work out what the first latitude character indicates for latitude.
-  var firstLatValue = _decode[code.codeUnitAt(0)] * ENCODING_BASE;
-  if (firstLatValue >= LATITUDE_MAX * 2) {
+  var firstLatValue = _decode[code.codeUnitAt(0)] * encodingBase;
+  if (firstLatValue >= latitudeMax * 2) {
     // The code would decode to a latitude of >= 90 degrees.
     return false;
   }
   if (code.length > 1) {
     // Work out what the first longitude character indicates for longitude.
-    var firstLngValue = _decode[code.codeUnitAt(1)] * ENCODING_BASE;
-    if (firstLngValue >= LONGITUDE_MAX * 2) {
+    var firstLngValue = _decode[code.codeUnitAt(1)] * encodingBase;
+    if (firstLngValue >= longitudeMax * 2) {
       // The code would decode to a longitude of >= 180 degrees.
       return false;
     }
@@ -202,9 +202,9 @@ bool isFull(String code) {
 /// to the range -180 to 180.
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
-String encode(num latitude, num longitude, {int codeLength: PAIR_CODE_LENGTH}) {
+String encode(num latitude, num longitude, {int codeLength: pairCodeLength}) {
   if (codeLength < 2 ||
-      (codeLength < SEPARATOR_POSITION && codeLength % 2 == 1)) {
+      (codeLength < separatorPosition && codeLength % 2 == 1)) {
     throw new ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   // Ensure that latitude and longitude are valid.
@@ -215,11 +215,10 @@ String encode(num latitude, num longitude, {int codeLength: PAIR_CODE_LENGTH}) {
   if (latitude == 90) {
     latitude = latitude - computeLatitudePrecision(codeLength).toDouble();
   }
-  var code =
-      encodePairs(latitude, longitude, min(codeLength, PAIR_CODE_LENGTH));
+  var code = encodePairs(latitude, longitude, min(codeLength, pairCodeLength));
   // If the requested length indicates we want grid refined codes.
-  if (codeLength > PAIR_CODE_LENGTH) {
-    code += encodeGrid(latitude, longitude, codeLength - PAIR_CODE_LENGTH);
+  if (codeLength > pairCodeLength) {
+    code += encodeGrid(latitude, longitude, codeLength - pairCodeLength);
   }
   return code;
 }
@@ -236,17 +235,17 @@ CodeArea decode(String code) {
   // Strip out separator character (we've already established the code is
   // valid so the maximum is one), padding characters and convert to upper
   // case.
-  code = code.replaceAll(SEPARATOR, '');
-  code = code.replaceAll(new RegExp('$PADDING+'), '');
+  code = code.replaceAll(separator, '');
+  code = code.replaceAll(new RegExp('$padding+'), '');
   code = code.toUpperCase();
   // Decode the lat/lng pair component.
   var codeArea =
-      decodePairs(code.substring(0, min(code.length, PAIR_CODE_LENGTH)));
+      decodePairs(code.substring(0, min(code.length, pairCodeLength)));
   // If there is a grid refinement component, decode that.
-  if (code.length <= PAIR_CODE_LENGTH) {
+  if (code.length <= pairCodeLength) {
     return codeArea;
   }
-  var gridArea = decodeGrid(code.substring(PAIR_CODE_LENGTH));
+  var gridArea = decodeGrid(code.substring(pairCodeLength));
   return new CodeArea(
       new LatLng(codeArea.sw.latitude + gridArea.sw.latitude,
           codeArea.sw.longitude + gridArea.sw.longitude),
@@ -305,7 +304,7 @@ String recoverNearest(
   // Clean up the passed code.
   shortCode = shortCode.toUpperCase();
   // Compute the number of digits we need to recover.
-  var paddingLength = SEPARATOR_POSITION - shortCode.indexOf(SEPARATOR);
+  var paddingLength = separatorPosition - shortCode.indexOf(separator);
   // The resolution (height and width) of the padded area in degrees.
   var resolution = pow(20, 2 - (paddingLength / 2));
   // Distance from the center to an edge (in degrees).
@@ -367,14 +366,13 @@ String shorten(String code, num latitude, num longitude) {
   if (!isFull(code)) {
     throw new ArgumentError('Passed code is not valid and full: $code');
   }
-  if (code.indexOf(PADDING) != -1) {
+  if (code.indexOf(padding) != -1) {
     throw new ArgumentError('Cannot shorten padded codes: $code');
   }
   code = code.toUpperCase();
   var codeArea = decode(code);
-  if (codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN) {
-    throw new RangeError(
-        'Code length must be at least $MIN_TRIMMABLE_CODE_LEN');
+  if (codeArea.codeLength < minTrimmableCodeLen) {
+    throw new RangeError('Code length must be at least $minTrimmableCodeLen');
   }
   // Ensure that latitude and longitude are valid.
   latitude = clipLatitude(latitude);
@@ -382,11 +380,11 @@ String shorten(String code, num latitude, num longitude) {
   // How close are the latitude and longitude to the code center.
   var range = max((codeArea.center.latitude - latitude).abs(),
       (codeArea.center.longitude - longitude).abs());
-  for (var i = PAIR_RESOLUTIONS.length - 2; i >= 1; i--) {
+  for (var i = pairResolutions.length - 2; i >= 1; i--) {
     // Check if we're close enough to shorten. The range must be less than 1/2
     // the resolution to shorten at all, and we want to allow some safety, so
     // use 0.3 instead of 0.5 as a multiplier.
-    if (range < (PAIR_RESOLUTIONS[i] * 0.3)) {
+    if (range < (pairResolutions[i] * 0.3)) {
       // Trim it.
       return code.substring((i + 1) * 2);
     }
@@ -409,37 +407,37 @@ String shorten(String code, num latitude, num longitude) {
 String encodePairs(num latitude, num longitude, int codeLength) {
   var code = '';
   // Adjust latitude and longitude so they fall into positive ranges.
-  var adjustedLatitude = latitude + LATITUDE_MAX;
-  var adjustedLongitude = longitude + LONGITUDE_MAX;
+  var adjustedLatitude = latitude + latitudeMax;
+  var adjustedLongitude = longitude + longitudeMax;
   // Count digits - can't use string length because it may include a separator
   // character.
   var digitCount = 0;
   while (digitCount < codeLength) {
     // Provides the value of digits in this place in decimal degrees.
-    var placeValue = PAIR_RESOLUTIONS[digitCount ~/ 2];
+    var placeValue = pairResolutions[digitCount ~/ 2];
     // Do the latitude - gets the digit for this place and subtracts that for
     // the next digit.
     var digitValue = adjustedLatitude ~/ placeValue;
     adjustedLatitude -= digitValue * placeValue;
-    code += CODE_ALPHABET[digitValue];
+    code += codeAlphabet[digitValue];
     digitCount++;
     // And do the longitude - gets the digit for this place and subtracts that
     // for the next digit.
     digitValue = adjustedLongitude ~/ placeValue;
     adjustedLongitude -= digitValue * placeValue;
-    code += CODE_ALPHABET[digitValue];
+    code += codeAlphabet[digitValue];
     digitCount++;
     // Should we add a separator here?
-    if (digitCount == SEPARATOR_POSITION && digitCount < codeLength) {
-      code += SEPARATOR;
+    if (digitCount == separatorPosition && digitCount < codeLength) {
+      code += separator;
     }
   }
   // If necessary, Add padding.
-  if (code.length < SEPARATOR_POSITION) {
-    code = code + (PADDING * (SEPARATOR_POSITION - code.length));
+  if (code.length < separatorPosition) {
+    code = code + (padding * (separatorPosition - code.length));
   }
-  if (code.length == SEPARATOR_POSITION) {
-    code = code + SEPARATOR;
+  if (code.length == separatorPosition) {
+    code = code + separator;
   }
   return code;
 }
@@ -457,21 +455,21 @@ String encodePairs(num latitude, num longitude, int codeLength) {
 /// * [codeLength]: The number of characters required.
 String encodeGrid(num latitude, num longitude, int codeLength) {
   var code = '';
-  var latPlaceValue = GRID_SIZE_DEGREES;
-  var lngPlaceValue = GRID_SIZE_DEGREES;
+  var latPlaceValue = gridSizeDegrees;
+  var lngPlaceValue = gridSizeDegrees;
   // Adjust latitude and longitude so they fall into positive ranges and
   // get the offset for the required places.
-  var adjustedLatitude = (latitude + LATITUDE_MAX) % latPlaceValue;
-  var adjustedLongitude = (longitude + LONGITUDE_MAX) % lngPlaceValue;
+  var adjustedLatitude = (latitude + latitudeMax) % latPlaceValue;
+  var adjustedLongitude = (longitude + longitudeMax) % lngPlaceValue;
   for (var i = 0; i < codeLength; i++) {
     // Work out the row and column.
-    var row = (adjustedLatitude / (latPlaceValue / GRID_ROWS)).floor();
-    var col = (adjustedLongitude / (lngPlaceValue / GRID_COLUMNS)).floor();
-    latPlaceValue /= GRID_ROWS;
-    lngPlaceValue /= GRID_COLUMNS;
+    var row = (adjustedLatitude / (latPlaceValue / gridRows)).floor();
+    var col = (adjustedLongitude / (lngPlaceValue / gridColumns)).floor();
+    latPlaceValue /= gridRows;
+    lngPlaceValue /= gridColumns;
     adjustedLatitude -= row * latPlaceValue;
     adjustedLongitude -= col * lngPlaceValue;
-    code += CODE_ALPHABET[row * GRID_COLUMNS + col];
+    code += codeAlphabet[row * gridColumns + col];
   }
   return code;
 }
@@ -492,8 +490,8 @@ CodeArea decodePairs(String code) {
   var longitude = decodePairsSequence(code, 1);
   // Correct the values and set them into the CodeArea object.
   return new CodeArea(
-      new LatLng(latitude[0] - LATITUDE_MAX, longitude[0] - LONGITUDE_MAX),
-      new LatLng(latitude[1] - LATITUDE_MAX, longitude[1] - LONGITUDE_MAX),
+      new LatLng(latitude[0] - latitudeMax, longitude[0] - longitudeMax),
+      new LatLng(latitude[1] - latitudeMax, longitude[1] - longitudeMax),
       code.length);
 }
 
@@ -517,10 +515,10 @@ List<double> decodePairsSequence(String code, int offset) {
   int i = 0;
   num value = 0;
   while (i * 2 + offset < code.length) {
-    value += _decode[code.codeUnitAt(i * 2 + offset)] * PAIR_RESOLUTIONS[i];
+    value += _decode[code.codeUnitAt(i * 2 + offset)] * pairResolutions[i];
     i += 1;
   }
-  return [value, value + PAIR_RESOLUTIONS[i - 1]];
+  return [value, value + pairResolutions[i - 1]];
 }
 
 /// Decode the grid refinement portion of an OLC code.
@@ -534,16 +532,16 @@ List<double> decodePairsSequence(String code, int offset) {
 CodeArea decodeGrid(String code) {
   var latitudeLo = 0.0;
   var longitudeLo = 0.0;
-  var latPlaceValue = GRID_SIZE_DEGREES;
-  var lngPlaceValue = GRID_SIZE_DEGREES;
+  var latPlaceValue = gridSizeDegrees;
+  var lngPlaceValue = gridSizeDegrees;
   var i = 0;
   while (i < code.length) {
     var codeIndex = _decode[code.codeUnitAt(i)];
-    var row = (codeIndex / GRID_COLUMNS).floor();
-    var col = codeIndex % GRID_COLUMNS;
+    var row = (codeIndex / gridColumns).floor();
+    var col = codeIndex % gridColumns;
 
-    latPlaceValue /= GRID_ROWS;
-    lngPlaceValue /= GRID_COLUMNS;
+    latPlaceValue /= gridRows;
+    lngPlaceValue /= gridColumns;
 
     latitudeLo += row * latPlaceValue;
     longitudeLo += col * lngPlaceValue;
