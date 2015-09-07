@@ -33,10 +33,10 @@ checkEncodeDecode(String csvLine) {
   olc.CodeArea codeArea = olc.decode(code);
   String codeOlc = olc.encode(lat, lng, codeLength: codeArea.codeLength);
   expect(code, equals(codeOlc));
-  expect(codeArea.sw.latitude, closeTo(latLo, 0.001));
-  expect(codeArea.ne.latitude, closeTo(latHi, 0.001));
-  expect(codeArea.sw.longitude, closeTo(lngLo, 0.001));
-  expect(codeArea.ne.longitude, closeTo(lngHi, 0.001));
+  expect(codeArea.south, closeTo(latLo, 0.001));
+  expect(codeArea.north, closeTo(latHi, 0.001));
+  expect(codeArea.west, closeTo(lngLo, 0.001));
+  expect(codeArea.east, closeTo(lngHi, 0.001));
 }
 
 // full code,lat,lng,shortcode

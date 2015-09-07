@@ -247,10 +247,10 @@ CodeArea decode(String code) {
   }
   var gridArea = decodeGrid(code.substring(pairCodeLength));
   return new CodeArea(
-      new LatLng(codeArea.sw.latitude + gridArea.sw.latitude,
-          codeArea.sw.longitude + gridArea.sw.longitude),
-      new LatLng(codeArea.sw.latitude + gridArea.ne.latitude,
-          codeArea.sw.longitude + gridArea.ne.longitude),
+      codeArea.south + gridArea.south,
+      codeArea.west + gridArea.west,
+      codeArea.south + gridArea.north,
+      codeArea.west + gridArea.east,
       codeArea.codeLength + gridArea.codeLength);
 }
 
@@ -489,10 +489,8 @@ CodeArea decodePairs(String code) {
   var latitude = decodePairsSequence(code, 0);
   var longitude = decodePairsSequence(code, 1);
   // Correct the values and set them into the CodeArea object.
-  return new CodeArea(
-      new LatLng(latitude[0] - latitudeMax, longitude[0] - longitudeMax),
-      new LatLng(latitude[1] - latitudeMax, longitude[1] - longitudeMax),
-      code.length);
+  return new CodeArea(latitude[0] - latitudeMax, longitude[0] - longitudeMax,
+      latitude[1] - latitudeMax, longitude[1] - longitudeMax, code.length);
 }
 
 /// Decode either a latitude or longitude sequence.
@@ -530,8 +528,8 @@ List<double> decodePairsSequence(String code, int offset) {
 /// * [code]: A valid OLC code sequence that is only the grid refinement
 /// portion. This is the portion of a code starting at position 11.
 CodeArea decodeGrid(String code) {
-  var latitudeLo = 0.0;
-  var longitudeLo = 0.0;
+  var south = 0.0;
+  var west = 0.0;
   var latPlaceValue = gridSizeDegrees;
   var lngPlaceValue = gridSizeDegrees;
   var i = 0;
@@ -543,14 +541,12 @@ CodeArea decodeGrid(String code) {
     latPlaceValue /= gridRows;
     lngPlaceValue /= gridColumns;
 
-    latitudeLo += row * latPlaceValue;
-    longitudeLo += col * lngPlaceValue;
+    south += row * latPlaceValue;
+    west += col * lngPlaceValue;
     i += 1;
   }
   return new CodeArea(
-      new LatLng(latitudeLo, longitudeLo),
-      new LatLng(latitudeLo + latPlaceValue, longitudeLo + lngPlaceValue),
-      code.length);
+      south, west, south + latPlaceValue, west + lngPlaceValue, code.length);
 }
 
 /// Coordinates of a decoded Open Location Code.
@@ -559,7 +555,7 @@ CodeArea decodeGrid(String code) {
 /// upper right corners and the center of the bounding box for the area the
 /// code represents.
 class CodeArea {
-  final LatLng sw, ne;
+  final num south, west, north, east;
   final LatLng center;
   final int codeLength;
 
@@ -567,18 +563,21 @@ class CodeArea {
   ///
   /// Args:
   ///
-  /// *[sw]: The SW corner in degrees.
-  /// *[ne]: The NE corner in degrees.
+  /// *[south]: The south in degrees.
+  /// *[west]: The west in degrees.
+  /// *[north]: The north in degrees.
+  /// *[east]: The east in degrees.
   /// *[code_length]: The number of significant characters that were in the code.
   /// This excludes the separator.
-  CodeArea(LatLng sw, LatLng ne, this.codeLength)
-      : sw = sw,
-        ne = ne,
-        center = new LatLng(
-            (sw.latitude + ne.latitude) / 2, (sw.longitude + ne.longitude) / 2);
+  CodeArea(num south, num west, num north, num east, this.codeLength)
+      : south = south,
+        west = west,
+        north = north,
+        east = east,
+        center = new LatLng((south + north) / 2, (west + east) / 2);
 
   @override String toString() =>
-      'CodeArea(sw:$sw, ne:$ne, codelen: $codeLength)';
+      'CodeArea(south:$south, west:$west, north:$north, , east:$east, codelen: $codeLength)';
 }
 
 /// Coordinates of a point identified by its [latitude] and [longitude] in
