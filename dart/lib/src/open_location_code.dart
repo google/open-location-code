@@ -1,4 +1,4 @@
-library open_location_code.base;
+library open_location_code.src.open_location_code;
 
 import 'dart:math';
 
