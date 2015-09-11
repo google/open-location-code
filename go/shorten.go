@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// MinTrimmableCodeLen is the minimum length of a code that is able to be shortened.
 const MinTrimmableCodeLen = 6
 
 // Shorten removes characters from the start of an OLC code.
@@ -36,7 +37,7 @@ func Shorten(code string, lat, lng float64) (string, error) {
 	}
 	code = strings.ToUpper(code)
 	area, err := Decode(code)
-	Log.Debug("Shorten", "code", code, "area", area, "error", err)
+	debug("Shorten(%s) area=%v error=%v", code, area, err)
 	if err != nil {
 		return code, err
 	}
@@ -50,7 +51,7 @@ func Shorten(code string, lat, lng float64) (string, error) {
 	centerLat, centerLng := area.Center()
 	distance := math.Max(math.Abs(centerLat-lat), math.Abs(centerLng-lng))
 
-	//Log.Debug("Shorten", "lat", lat, "lng", lng, "centerLat", centerLat, "centerLng", centerLng, "distance", fmt.Sprintf("%.10f", distance))
+	//debug("Shorten lat=%f lng=%f centerLat=%f centerLng=%f distance=%.10f", lat, lng, centerLat, centerLng, distance)
 	for i := len(pairResolutions) - 2; i >= 1; i-- {
 		// Check if we're close enough to shorten. The range must be less than 1/2
 		// the resolution to shorten at all, and we want to allow some safety, so
@@ -121,7 +122,7 @@ func RecoverNearest(code string, lat, lng float64) (string, error) {
 
 	// Use the reference location to pad the supplied short code and decode it.
 	area, err := Decode(Encode(rndLat, rndLng, 0)[:padLen] + code)
-	Log.Debug("round", "rndLat", rndLat, "rndLng", rndLng, "padLen", padLen, "code", code, "area", area, "error", err)
+	debug("round rndLat=%f rndLng=%f padLen=%d code=%s area=%v error=%v", rndLat, rndLng, padLen, code, area, err)
 	if err != nil {
 		return code, err
 	}

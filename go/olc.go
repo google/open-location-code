@@ -12,32 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// See https://github.com/google/open-location-code
+// Package olc implements Open Location Code.
+//
+// See https://github.com/google/open-location-code .
 package olc
 
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"strings"
-
-	"gopkg.in/inconshreveable/log15.v2"
 )
 
 var (
-	Log = log15.New("lib", "olc")
-
 	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
+
+	// Debug governs the debug output.
+	Debug = false
 )
 
-func init() {
-	Log.SetHandler(log15.DiscardHandler())
-}
-
 const (
+	// Separator is the character that separates the two parts of location code.
 	Separator = '+'
-	Padding   = '0'
+	// Padding is the optional (left) padding character.
+	Padding = '0'
 
+	// Alphabet is the set of valid encoding characters.
 	Alphabet = "23456789CFGHJMPQRVWX"
 
 	pairCodeLen     = 10
@@ -49,6 +50,7 @@ const (
 	lngMax = 180
 )
 
+// CodeArea is the area represented by a location code.
 type CodeArea struct {
 	LatLo, LngLo, LatHi, LngHi float64
 	Len                        int
@@ -62,7 +64,7 @@ func (area CodeArea) Center() (lat, lng float64) {
 
 // Check checks the code whether it is a valid code, or not.
 func Check(code string) error {
-	if code == "" {
+	if code == "" || len(code) == 1 && code[0] == Separator {
 		return errors.New("empty code")
 	}
 	n := len(code)
@@ -143,7 +145,7 @@ func CheckFull(code string) error {
 	if err := Check(code); err != nil {
 		return err
 	}
-	if err := CheckShort; err == nil {
+	if err := CheckShort(code); err == nil {
 		return ErrShort
 	}
 	if firstLat := strings.IndexByte(Alphabet, upper(code[0])) * encBase; firstLat >= latMax*2 {
@@ -195,4 +197,10 @@ func normalizeLat(value float64) float64 {
 
 func normalizeLng(value float64) float64 {
 	return normalize(value, lngMax)
+}
+
+func debug(format string, args ...interface{}) {
+	if Debug {
+		log.Printf(format, args...)
+	}
 }
