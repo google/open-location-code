@@ -1,25 +1,29 @@
-### Automated Integration Testing
+# Automated Integration Testing
 Changes are sent to [Travis CI](https://travis-ci.org)
-for integration testing after pushes.
+for integration testing after pushes, and you can see the current test status
+[here](https://travis-ci.org/google/open-location-code).
 
-Open Location Code's [current test status](https://travis-ci.org/google/open-location-code).
+The testing configuration is controlled by two files:
+[`travis.yml`](.travis.yml) and [`run_tests.sh`](run_tests.sh).
 
-The testing is controlled by two files: [`.travis.yml`](.travis.yml) and
-[`run_tests.sh`](run_tests.sh).
+## [.travis.yml](.travis.yml)
+This file defines the prerequisites required for testing, and the list of
+directories to be tested. (The directories listed are tested in parallel.)
 
-[`.travis.yml`](.travis.yml) includes any prerequisites required for testing, and also defines
-the list of directories to be tested. The directories are tested in parallel.
+The same script ([run_tests.sh](run_tests.sh)) is executed for all directories.
 
-[`run_tests.sh`](run_tests.sh) is run once for each directory defined in
-`.travis.yml`. (The directory name is passed in the environment variable
-`TEST_DIR`.)
+## [run_tests.sh](run_tests.sh)
+This file is run once for _each_ directory defined in
+`.travis.yml`. The directory name being tested is passed in the environment
+variable `TEST_DIR`.)
 
-[`run_tests.sh`](run_tests.sh) has to check the value of `TEST_DIR`, and then
-do whatever is necessary to test that implementation. The code to test must
-return 0 on success and another value on failure. _Just outputting a failure
-message will be considered by the testing framework as a success_.
+[`run_tests.sh`](run_tests.sh) checks the value of `TEST_DIR`, and then runs
+commands to test the relevant implementation. The commands that do the testing
+**must** return zero on success and non-zero value on failure. _Tests that
+return zero, even if they output error messages, will be considered by the
+testing framework as a success_.
 
-### Adding Your Tests
+## Adding Your Tests
 Add your directory to the [`.travis.yml`](.travis.yml) file:
 ```
 # Define the list of directories to execute tests in.
@@ -34,12 +38,13 @@ Then add the necessary code to [`run_tests.sh`](run_tests.sh):
 # Your language goes here
 if [ "$TEST_DIR" == "your directory goes here" ]; then
   cd directory && run something && run another thing
-  exit
+  exit  # Exit immediately, returning the last command status
 fi
 ```
-Note the use of `&&` to combine the test commands. This ensures that if any of
-them fail, it will stop and return a test failure.
+Note the use of `&&` to combine the test commands. This ensures that if any
+command in the sequence fails, the script will stop and return a test failure.
 
-The test commands are followed by an `exit` statement that will immediately
-return the last command status as the result. If this is zero, the test will
-be marked successful. If not, the test will be marked as a failure.
+The test commands **must be** followed by an `exit` statement. This ensures that
+the script will return the same status as the tests. If this status is zero,
+the test will be marked successful. If not, the test will be marked as a
+failure.
