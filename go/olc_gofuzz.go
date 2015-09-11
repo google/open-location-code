@@ -1,4 +1,4 @@
-// +build: gofuzz
+// +build gofuzz
 
 // Copyright 2015 Tamás Gulácsi. All rights reserved.
 //
@@ -16,21 +16,12 @@
 
 package olc
 
-import (
-	"bytes"
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
-
-	"gopkg.in/inconshreveable/log15.v2"
-)
+//go:generate go run corpus/gen.go -test-data=../test_data -dest=corpus
 
 // Fuzz usage:
 //   go get github.com/dvyukov/go-fuzz/...
 //
-//   GOROOT=$(go env | sed -ne '/GOROOT=/ s/^.*=//p') go-fuzz-build github.com/tgulacsi/golc && go-fuzz -bin=./olc-fuzz -corpus=testdata/gofuzz -workdir=/tmp/olc-fuzz
+//   go-fuzz-build github.com/google/open-location-code/go && go-fuzz -bin=./olc-fuzz.zip -workdir=/tmp/olc-fuzz
 func Fuzz(data []byte) int {
 	code := string(data)
 	if err := Check(code); err != nil {
@@ -48,45 +39,4 @@ func Fuzz(data []byte) int {
 	}
 
 	return 1
-}
-
-func init() {
-	dir := filepath.Join("testdata", "gofuzz")
-	if _, err := os.Stat(filepath.Join(dir, "001.code.txt")); err == nil {
-		return
-	}
-	Log.SetHandler(log15.StderrHandler)
-	src := filepath.Join("..", "test_data")
-	fis, err := ioutil.ReadDir(src)
-	if err != nil {
-		Log.Error("read test_data", "dir", src, "error", err)
-		return
-	}
-	_ = os.MkdirAll(dir, 0755)
-	n := 0
-	for _, fi := range fis {
-		if !strings.HasSuffix(fi.Name(), ".csv") {
-			continue
-		}
-		fn := filepath.Join(src, fi.Name())
-		data, err := ioutil.ReadFile(fn)
-		if err != nil {
-			Log.Error("read csv", "file", fn, "error", err)
-			continue
-		}
-		for _, row := range bytes.Split(data, []byte{'\n'}) {
-			if i := bytes.IndexByte(row, '#'); i >= 0 {
-				row = row[:i]
-			}
-			// assume that the first field is the code
-			if i := bytes.IndexByte(row, ','); i >= 0 {
-				fn := filepath.Join(dir, fmt.Sprintf("%003d.code.txt", n))
-				if err := ioutil.WriteFile(fn, row[:i], 0644); err != nil {
-					Log.Error("Write", "file", fn, "error", err)
-					continue
-				}
-				n++
-			}
-		}
-	}
 }
