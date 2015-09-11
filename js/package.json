@@ -1,0 +1,28 @@
+{
+  "name": "open-location-code",
+  "description": "Library to convert between lat/lng and OLC codes",
+  "version": "20150729.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google/open-location-code.git"
+  },
+  "bugs": {
+    "url": "https://github.com/google/open-location-code/issues"
+  },
+  "author": "The Open Location Code Library Authors",
+  "license": "Apache-2.0",
+  "homepage": "http://openlocationcode.com/",
+  "keywords": [
+    "javascript",
+    "library",
+    "openlocationcode"
+  ],
+  "scripts": {
+    "test": "cd test && gulp"
+  },
+  "devDependencies": {
+    "gulp-qunit": "^1.0.0",
+    "gulp-util": "^3.0.0",
+    "gulp": "^3.8.9"
+  }
+}

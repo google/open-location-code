@@ -1,0 +1,20 @@
+sudo: false
+# Travis only supports one language per project, so we need to put something
+# here. node_js is as good as any other I suppose.
+language: node_js
+node_js:
+  - "0.10"
+
+# Install package dependencies. See
+# http://docs.travis-ci.com/user/installing-dependencies/
+# gulp: required for JS testing
+before_script:
+  - npm install -g gulp
+
+# Define the list of directories to execute tests in.
+env:
+  - TEST_DIR=js
+  - TEST_DIR=go
+
+# Test script to run. This is called once for each TEST_DIR value above.
+script: ./run_tests.sh
