@@ -6,6 +6,11 @@
 
 set -ev
 
+# Go?
+if [ "$TEST_DIR" == "go" ]; then
+  go test ./go
+  exit $?
+fi
 # Javascript?
 if [ "$TEST_DIR" == "js" ]; then
   cd js && npm install && npm test
