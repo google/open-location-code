@@ -1,6 +1,5 @@
 #!/bin/bash
-# Script to execute the JS tests for the travis-ci.org integration testing
-# platform.
+# Execute the JS tests for travis-ci.org integration testing platform.
 # The directory to test comes as the environment variable TEST_DIR. The script
 # needs to check for it, change into it, and run the tests as necessary.
 
