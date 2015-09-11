@@ -48,3 +48,14 @@ The test commands **must be** followed by an `exit` statement. This ensures that
 the script will return the same status as the tests. If this status is zero,
 the test will be marked successful. If not, the test will be marked as a
 failure.
+
+## Testing Multiple Languages
+[Travis CI](https://travis-ci.org) assumes that each github project has only
+a single language. That language is specified in the [.travis.yml](.travis.yml)
+file (`language: node_js`).
+
+This shouldn't be a problem, since prerequisites can still be loaded in the
+`before_script` section, and then commands executed in
+[`run_tests.sh`](run_tests.sh). However in the event that you can't resolve a
+problem, leave a comment in the issue or push request and we'll see if someone
+can figure out a solution.
