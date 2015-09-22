@@ -285,6 +285,9 @@ public class OpenLocationCode {
         double latitudeDiff = Math.abs(referenceLatitude - codeArea.getCenterLatitude());
         double longitudeDiff = Math.abs(referenceLongitude - codeArea.getCenterLongitude());
 
+        if (latitudeDiff < 0.000625 && longitudeDiff < 0.000625) {
+            return new OpenLocationCode(code.substring(8));
+        }
         if (latitudeDiff < 0.0125 && longitudeDiff < 0.0125) {
             return new OpenLocationCode(code.substring(6));
         }
