@@ -1,7 +1,7 @@
 package codes.plus.tests;
 
 import codes.plus.OpenLocationCode;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
