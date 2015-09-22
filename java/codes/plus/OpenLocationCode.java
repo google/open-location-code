@@ -14,10 +14,12 @@ import java.util.Map;
  */
 public class OpenLocationCode {
 
-    private static final BigDecimal BD_20 = new BigDecimal(20);
-
-    private static final BigDecimal BD_5 = new BigDecimal(5);
-    private static final BigDecimal BD_4 = new BigDecimal(4);
+    private static final BigDecimal BD_0   = new BigDecimal(0);
+    private static final BigDecimal BD_5   = new BigDecimal(5);
+    private static final BigDecimal BD_4   = new BigDecimal(4);
+    private static final BigDecimal BD_20  = new BigDecimal(20);
+    private static final BigDecimal BD_90  = new BigDecimal(90);
+    private static final BigDecimal BD_180 = new BigDecimal(180);
 
     private static final char[] ALPHABET = "23456789CFGHJMPQRVWX".toCharArray();
     private static Map<Character, Integer> CHARACTER_TO_INDEX = new HashMap<>();
@@ -36,48 +38,48 @@ public class OpenLocationCode {
 
     /** Class providing information about area covered by Open Location Code. */
     public class CodeArea {
-        private final double southLatitude;
-        private final double westLongitude;
-        private final double latitudeHeight;
-        private final double longitudeWidth;
+        private final BigDecimal southLatitude;
+        private final BigDecimal westLongitude;
+        private final BigDecimal northLatitude;
+        private final BigDecimal eastLongitude;
 
-        public CodeArea(double southLatitude, double westLongitude, double latitudeHeight, double longitudeWidth) {
+        public CodeArea(BigDecimal southLatitude, BigDecimal westLongitude, BigDecimal northLatitude, BigDecimal eastLongitude) {
             this.southLatitude = southLatitude;
             this.westLongitude = westLongitude;
-            this.latitudeHeight = latitudeHeight;
-            this.longitudeWidth = longitudeWidth;
+            this.northLatitude = northLatitude;
+            this.eastLongitude = eastLongitude;
         }
 
         public double getSouthLatitude() {
-            return southLatitude;
+            return southLatitude.doubleValue();
         }
 
         public double getWestLongitude() {
-            return westLongitude;
+            return westLongitude.doubleValue();
         }
 
         public double getLatitudeHeight() {
-            return latitudeHeight;
+            return northLatitude.subtract(southLatitude).doubleValue();
         }
 
         public double getLongitudeWidth() {
-            return longitudeWidth;
+            return eastLongitude.subtract(westLongitude).doubleValue();
         }
 
         public double getCenterLatitude() {
-            return southLatitude + latitudeHeight / 2;
+            return southLatitude.add(northLatitude).doubleValue() / 2;
         }
 
         public double getCenterLongitude() {
-            return westLongitude + longitudeWidth / 2;
+            return westLongitude.add(eastLongitude).doubleValue() / 2;
         }
 
         public double getNorthLatitude() {
-            return southLatitude + latitudeHeight;
+            return northLatitude.doubleValue();
         }
 
         public double getEastLongitude() {
-            return westLongitude + longitudeWidth;
+            return eastLongitude.doubleValue();
         }
     }
 
@@ -192,8 +194,8 @@ public class OpenLocationCode {
         }
         String decoded = code.replaceAll("[0+]", "");
         // Decode the lat/lng pair component.
-        double southLatitude = 0;
-        double westLongitude = 0;
+        BigDecimal southLatitude = BD_0;
+        BigDecimal westLongitude = BD_0;
 
         int digit = 0;
         double latitudeResolution = 400, longitudeResolution = 400;
@@ -203,18 +205,22 @@ public class OpenLocationCode {
             if (digit < 10) {
                 latitudeResolution /= 20;
                 longitudeResolution /= 20;
-                southLatitude += latitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit));
-                westLongitude += longitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit + 1));
+                southLatitude = southLatitude.add(new BigDecimal(latitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit))));
+                westLongitude = westLongitude.add(new BigDecimal(longitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit + 1))));
                 digit += 2;
             } else {
                 latitudeResolution /= 5;
                 longitudeResolution /= 4;
-                southLatitude += latitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) / 4);
-                westLongitude += longitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) % 4);
+                southLatitude = southLatitude.add(new BigDecimal(latitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) / 4)));
+                westLongitude = westLongitude.add(new BigDecimal(longitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) % 4)));
                 digit += 1;
             }
         }
-        return new CodeArea(southLatitude - 90, westLongitude - 180, latitudeResolution, longitudeResolution);
+        return new CodeArea(
+            southLatitude.subtract(BD_90),
+            westLongitude.subtract(BD_180),
+            southLatitude.subtract(BD_90).add(new BigDecimal(latitudeResolution)),
+            westLongitude.subtract(BD_180).add(new BigDecimal(longitudeResolution)));
     }
 
     /**
