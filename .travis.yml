@@ -1,4 +1,4 @@
-sudo: true
+sudo: false
 # Travis only supports one language per project, so we need to put something
 # here. node_js is as good as any other I suppose.
 language: node_js
@@ -10,8 +10,6 @@ node_js:
 # gulp: required for JS testing
 before_script:
   - npm install -g gulp
-  - sudo apt-get update -qq
-  - sudo apt-get install -y ruby-2.2.3
 
 # Define the list of directories to execute tests in.
 env:
