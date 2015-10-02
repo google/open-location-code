@@ -10,6 +10,8 @@ node_js:
 # gulp: required for JS testing
 before_script:
   - npm install -g gulp
+  - sudo apt-get update -qq
+  - sudo apt-get install -y ruby-head
 
 # Define the list of directories to execute tests in.
 env:
