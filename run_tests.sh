@@ -27,6 +27,8 @@ if [ "$TEST_DIR" == "js" ]; then
 fi
 # Ruby?
 if [ "$TEST_DIR" == "ruby" ]; then
+  rvm install 2.2.3
+  rvm use 2.2.3
   cd ruby && ruby plus_codes_test.rb
   exit
 fi

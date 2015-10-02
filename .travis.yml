@@ -11,7 +11,6 @@ node_js:
 # gulp: required for JS testing
 before_install:
   - npm install -g gulp
-  - rvm install 2.2.3
 
 # Define the list of directories to execute tests in.
 env:
