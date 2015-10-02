@@ -28,12 +28,9 @@ fi
 # Ruby?
 if [ "$TEST_DIR" == "ruby" ]; then
   rvm install 2.2.3
-  source ~/.rvm/scripts/rvm
-  echo "Running rvm use 2.2.3"
-  rvm use 2.2.3
-  echo "Running which ruby"
-  which ruby
-  echo "PATH is %PATH"
+  #source ~/.rvm/scripts/rvm
+  #rvm use 2.2.3
+  rvm alias create default 2.2.3
   gem install test-unit
   cd ruby && ruby test/plus_codes_test.rb
   exit
