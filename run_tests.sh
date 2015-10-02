@@ -28,8 +28,9 @@ fi
 # Ruby?
 if [ "$TEST_DIR" == "ruby" ]; then
   rvm install 2.2.3
-  source ~/.rvm/scripts/rvm
-  rvm alias create default 2.2.3
+  . ~/.rvm/scripts/rvm
+  echo $PATH
+  rvm use 2.2.3
   ls -l /home/travis/.rvm/bin
   cd ruby && ruby plus_codes_test.rb
   exit
