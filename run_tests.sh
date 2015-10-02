@@ -33,8 +33,8 @@ if [ "$TEST_DIR" == "ruby" ]; then
   rvm use 2.2.3
   echo "Running which ruby"
   which ruby
-  ls -l /home/travis/.rvm/bin
-  cd ruby && ruby plus_codes_test.rb
+  echo "PATH is %PATH"
+  cd ruby && /home/travis/.rvm/rubies/ruby-2.2.3/bin/ruby plus_codes_test.rb
   exit
 fi
 
