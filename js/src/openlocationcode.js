@@ -56,8 +56,24 @@
     var code = OpenLocationCode.recoverNearest('9G8F+6X', 47.4, 8.6);
     var code = OpenLocationCode.recoverNearest('8F+6X', 47.4, 8.6);
  */
-(function(window) {
-  var OpenLocationCode = window.OpenLocationCode = {};
+(function (root, factory) {
+  /* global define, module */
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['b'], function (b) {
+      return (root.returnExportsGlobal = factory(b));
+    });
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like enviroments that support module.exports,
+    // like Node.
+    module.exports = factory(require('b'));
+  } else {
+    // Browser globals
+    root.OpenLocationCode = factory();
+  }
+} (this, function () {
+  var OpenLocationCode = {};
 
   // A separator used to break the code into two parts to aid memorability.
   var SEPARATOR_ = '+';
@@ -710,4 +726,6 @@
     }
   };
   CodeArea.fn.init.prototype = CodeArea.fn;
-})(window || this);
+
+  return OpenLocationCode;
+}));
