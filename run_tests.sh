@@ -27,7 +27,7 @@ if [ "$TEST_DIR" == "js" ]; then
 fi
 # Ruby?
 if [ "$TEST_DIR" == "ruby" ]; then
-  cd ruby && /usr/bin/ruby plus_codes_test.rb
+  cd ruby && ruby plus_codes_test.rb
   exit
 fi
 
