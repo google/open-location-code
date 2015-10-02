@@ -34,6 +34,7 @@ if [ "$TEST_DIR" == "ruby" ]; then
   echo "Running which ruby"
   which ruby
   echo "PATH is %PATH"
+  gem install test-unit
   cd ruby && ruby test/plus_codes_test.rb
   exit
 fi
