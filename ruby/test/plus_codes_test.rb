@@ -55,7 +55,7 @@ class PlusCodesTest < Test::Unit::TestCase
     @olc.shorten('9C3W9QCJ+2VX', 60.3701125, 10.202665625)
   end
 
-  def test_longer_encoding_with_speacial_case
+  def test_longer_encoding_with_special_case
     assert_equal('CFX3X2X2+X2RRRRJ', @olc.encode(90.0, 1.0, 15));
   end
 
@@ -78,7 +78,7 @@ class PlusCodesTest < Test::Unit::TestCase
     end
   end
 
-  def test_valid_with_speacial_case
+  def test_valid_with_special_case
     assert_false(@olc.valid?('3W00CJJJ+'))
   end
 
