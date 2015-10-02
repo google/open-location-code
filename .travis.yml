@@ -15,6 +15,7 @@ before_script:
 env:
   - TEST_DIR=js
   - TEST_DIR=go
+  - TEST_DIR=ruby
 
 # Test script to run. This is called once for each TEST_DIR value above.
 script: ./run_tests.sh

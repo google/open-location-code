@@ -25,5 +25,10 @@ if [ "$TEST_DIR" == "js" ]; then
   cd js && npm install && npm test
   exit
 fi
+# Ruby?
+if [ "$TEST_DIR" == "ruby" ]; then
+  cd ruby && ruby plus_codes_test.rb
+  exit
+fi
 
 echo "Unknown test directory: $TEST_DIR"
