@@ -28,9 +28,11 @@ fi
 # Ruby?
 if [ "$TEST_DIR" == "ruby" ]; then
   rvm install 2.2.3
-  . ~/.rvm/scripts/rvm
-  echo $PATH
+  source ~/.rvm/scripts/rvm
+  echo "Running rvm use 2.2.3"
   rvm use 2.2.3
+  echo "Running which ruby"
+  which ruby
   ls -l /home/travis/.rvm/bin
   cd ruby && ruby plus_codes_test.rb
   exit
