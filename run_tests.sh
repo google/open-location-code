@@ -34,7 +34,7 @@ if [ "$TEST_DIR" == "ruby" ]; then
   echo "Running which ruby"
   which ruby
   echo "PATH is %PATH"
-  cd ruby && /home/travis/.rvm/rubies/ruby-2.2.3/bin/ruby plus_codes_test.rb
+  cd ruby && ruby test/plus_codes_test.rb
   exit
 fi
 
