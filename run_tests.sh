@@ -2,9 +2,6 @@
 # Execute the JS tests for travis-ci.org integration testing platform.
 # The directory to test comes as the environment variable TEST_DIR.
 
-# Echo lines as they are executed.
-set -v
-
 # Use an "if" statement to check the value of TEST_DIR, then include commands
 # necessary to test that implmentation. Note that this script is running in the
 # top level directory, not in TEST_DIR. The commands must be followed with an
@@ -23,6 +20,15 @@ fi
 # Javascript?
 if [ "$TEST_DIR" == "js" ]; then
   cd js && npm install && npm test
+  exit
+fi
+# Ruby?
+if [ "$TEST_DIR" == "ruby" ]; then
+  rvm install 2.2.3
+  source ~/.rvm/scripts/rvm
+  rvm use 2.2.3
+  gem install test-unit
+  cd ruby && ruby test/plus_codes_test.rb
   exit
 fi
 
