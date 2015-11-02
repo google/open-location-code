@@ -7,15 +7,19 @@ import java.util.Map;
 /**
  * Representation of open location code.
  * https://github.com/google/open-location-code
+ * The OpenLocationCode class is a wrapper around String value {@code code}, which guarantees
+ * that the value is a valid Open Location Code.
  *
  * @author Jiri Semecky
  */
 public class OpenLocationCode {
 
-    private static final BigDecimal BD_20 = new BigDecimal(20);
-
-    private static final BigDecimal BD_5 = new BigDecimal(5);
-    private static final BigDecimal BD_4 = new BigDecimal(4);
+    private static final BigDecimal BD_0   = new BigDecimal(0);
+    private static final BigDecimal BD_5   = new BigDecimal(5);
+    private static final BigDecimal BD_4   = new BigDecimal(4);
+    private static final BigDecimal BD_20  = new BigDecimal(20);
+    private static final BigDecimal BD_90  = new BigDecimal(90);
+    private static final BigDecimal BD_180 = new BigDecimal(180);
 
     private static final char[] ALPHABET = "23456789CFGHJMPQRVWX".toCharArray();
     private static Map<Character, Integer> CHARACTER_TO_INDEX = new HashMap<>();
@@ -34,52 +38,53 @@ public class OpenLocationCode {
 
     /** Class providing information about area covered by Open Location Code. */
     public class CodeArea {
-        private final double southLatitude;
-        private final double westLongitude;
-        private final double latitudeHeight;
-        private final double longitudeWidth;
+        private final BigDecimal southLatitude;
+        private final BigDecimal westLongitude;
+        private final BigDecimal northLatitude;
+        private final BigDecimal eastLongitude;
 
-        public CodeArea(double southLatitude, double westLongitude, double latitudeHeight, double longitudeWidth) {
+        public CodeArea(BigDecimal southLatitude, BigDecimal westLongitude, BigDecimal northLatitude, BigDecimal eastLongitude) {
             this.southLatitude = southLatitude;
             this.westLongitude = westLongitude;
-            this.latitudeHeight = latitudeHeight;
-            this.longitudeWidth = longitudeWidth;
+            this.northLatitude = northLatitude;
+            this.eastLongitude = eastLongitude;
         }
 
         public double getSouthLatitude() {
-            return southLatitude;
+            return southLatitude.doubleValue();
         }
 
         public double getWestLongitude() {
-            return westLongitude;
+            return westLongitude.doubleValue();
         }
 
         public double getLatitudeHeight() {
-            return latitudeHeight;
+            return northLatitude.subtract(southLatitude).doubleValue();
         }
 
         public double getLongitudeWidth() {
-            return longitudeWidth;
+            return eastLongitude.subtract(westLongitude).doubleValue();
         }
 
         public double getCenterLatitude() {
-            return southLatitude + latitudeHeight / 2;
+            return southLatitude.add(northLatitude).doubleValue() / 2;
         }
 
         public double getCenterLongitude() {
-            return westLongitude + longitudeWidth / 2;
+            return westLongitude.add(eastLongitude).doubleValue() / 2;
         }
 
         public double getNorthLatitude() {
-            return southLatitude + latitudeHeight;
+            return northLatitude.doubleValue();
         }
 
         public double getEastLongitude() {
-            return westLongitude + longitudeWidth;
+            return eastLongitude.doubleValue();
         }
     }
 
 
+    /** The state of the OpenLocationCode. */
     private final String code;
 
     /** Creates Open Location Code for the provided code. */
@@ -167,21 +172,21 @@ public class OpenLocationCode {
 
     /**
      * Encodes latitude/longitude into 10 digit Open Location Code.
-     * This method has the same functionality as constructor but it is require by the specification.
+     * This method is equivalent to creating the OpenLocationCode object and getting the code from it.
      */
-    public static OpenLocationCode encode(double latitude, double longitude) {
-        return new OpenLocationCode(latitude, longitude);
+    public static String encode(double latitude, double longitude) {
+        return new OpenLocationCode(latitude, longitude).getCode();
     }
 
     /**
      * Encodes latitude/longitude into Open Location Code of the provided length.
-     * This method has the same functionality as constructor but it is require by the specification.
+     * This method is equivalent to creating the OpenLocationCode object and getting the code from it.
      */
-    public static OpenLocationCode encode(double latitude, double longitude, int codeLength) {
-        return new OpenLocationCode(latitude, longitude, codeLength);
+    public static String encode(double latitude, double longitude, int codeLength) {
+        return new OpenLocationCode(latitude, longitude, codeLength).getCode();
     }
 
-    /** Decodes Open Location Code into CodeArea object encapsulating latitude/longitude bounding box. */
+    /** Decodes {@link OpenLocationCode} object into {@link CodeArea} object encapsulating latitude/longitude bounding box. */
     public CodeArea decode() {
         if (!isFullCode(code)) {
             throw new IllegalStateException(
@@ -189,8 +194,8 @@ public class OpenLocationCode {
         }
         String decoded = code.replaceAll("[0+]", "");
         // Decode the lat/lng pair component.
-        double southLatitude = 0;
-        double westLongitude = 0;
+        BigDecimal southLatitude = BD_0;
+        BigDecimal westLongitude = BD_0;
 
         int digit = 0;
         double latitudeResolution = 400, longitudeResolution = 400;
@@ -200,37 +205,72 @@ public class OpenLocationCode {
             if (digit < 10) {
                 latitudeResolution /= 20;
                 longitudeResolution /= 20;
-                southLatitude += latitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit));
-                westLongitude += longitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit + 1));
+                southLatitude = southLatitude.add(new BigDecimal(latitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit))));
+                westLongitude = westLongitude.add(new BigDecimal(longitudeResolution * CHARACTER_TO_INDEX.get(decoded.charAt(digit + 1))));
                 digit += 2;
             } else {
                 latitudeResolution /= 5;
                 longitudeResolution /= 4;
-                southLatitude += latitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) / 4);
-                westLongitude += longitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) % 4);
+                southLatitude = southLatitude.add(new BigDecimal(latitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) / 4)));
+                westLongitude = westLongitude.add(new BigDecimal(longitudeResolution * (CHARACTER_TO_INDEX.get(decoded.charAt(digit)) % 4)));
                 digit += 1;
             }
         }
-        return new CodeArea(southLatitude - 90, westLongitude - 180, latitudeResolution, longitudeResolution);
+        return new CodeArea(
+            southLatitude.subtract(BD_90),
+            westLongitude.subtract(BD_180),
+            southLatitude.subtract(BD_90).add(new BigDecimal(latitudeResolution)),
+            westLongitude.subtract(BD_180).add(new BigDecimal(longitudeResolution)));
     }
 
-    /** Returns whether the Open Location Code is a full Open Location Code. */
+    /**
+     * Decodes code representing Open Location Code into {@link CodeArea} object encapsulating latitude/longitude
+     * bounding box.
+     * @param code Open Location Code to be decoded.
+     * @throws IllegalArgumentException if the provided code is not a valid Open Location Code.
+     */
+    public static CodeArea decode(String code) throws IllegalArgumentException {
+        return new OpenLocationCode(code).decode();
+    }
+
+    /** Returns whether this {@link OpenLocationCode} is a full Open Location Code. */
     public boolean isFull() {
         return code.indexOf(SEPARATOR) == SEPARATOR_POSITION;
     }
 
-    /** Returns whether the Open Location Code is a short Open Location Code. */
+    /** Returns whether the provided Open Location Code is a full Open Location Code. */
+    public static boolean isFull(String code) throws IllegalArgumentException {
+        return new OpenLocationCode(code).isFull();
+    }
+
+    /** Returns whether this {@link OpenLocationCode} is a short Open Location Code. */
     public boolean isShort() {
         return code.indexOf(SEPARATOR) >= 0 && code.indexOf(SEPARATOR) < SEPARATOR_POSITION;
     }
 
-    /** Returns whether the Open Location Code is padded, meaning that it contains less than 8 valid digits. */
+    /** Returns whether the provided Open Location Code is a short Open Location Code. */
+    public static boolean isShort(String code) throws IllegalArgumentException {
+        return new OpenLocationCode(code).isShort();
+    }
+
+    /**
+     * Returns whether this {@link OpenLocationCode} is a padded Open Location Code,
+     * meaning that it contains less than 8 valid digits.
+     */
     private boolean isPadded() {
         return code.indexOf(SUFFIX_PADDING) >= 0;
     }
 
     /**
-     * Returns short Open Location Code from the full Open Location Code created by removing four or six digits,
+     * Returns whether the provided Open Location Code is a padded Open Location Code,
+     * meaning that it contains less than 8 valid digits.
+     */
+    public static boolean isPadded(String code) throws IllegalArgumentException {
+        return new OpenLocationCode(code).isPadded();
+    }
+
+    /**
+     * Returns short {@link OpenLocationCode} from the full Open Location Code created by removing four or six digits,
      * depending on the provided reference point.  It removes as many digits as possible.
      */
     public OpenLocationCode shorten(double referenceLatitude, double referenceLongitude) {
@@ -245,6 +285,9 @@ public class OpenLocationCode {
         double latitudeDiff = Math.abs(referenceLatitude - codeArea.getCenterLatitude());
         double longitudeDiff = Math.abs(referenceLongitude - codeArea.getCenterLongitude());
 
+        if (latitudeDiff < 0.000625 && longitudeDiff < 0.000625) {
+            return new OpenLocationCode(code.substring(8));
+        }
         if (latitudeDiff < 0.0125 && longitudeDiff < 0.0125) {
             return new OpenLocationCode(code.substring(6));
         }
@@ -254,7 +297,10 @@ public class OpenLocationCode {
         throw new IllegalArgumentException("Reference location is too far from the Open Location Code center.");
     }
 
-    /** Returns full Open Location Code from this (short) Open Location Code, given the reference location. */
+    /**
+     * Returns an {@link OpenLocationCode} object representing a full Open Location Code from this (short)
+     * Open Location Code, given the reference location.
+     */
     public OpenLocationCode recover(double referenceLatitude, double referenceLongitude) {
         if (isFull()) {
             // Note: each code is either full xor short, no other option.
@@ -273,7 +319,7 @@ public class OpenLocationCode {
         double roundedLongitude = Math.floor(referenceLongitude / paddedAreaSize) * paddedAreaSize;
 
         // Use the reference location to pad the supplied short code and decode it.
-        String recoveredPrefix = encode(roundedLatitude, roundedLongitude).getCode().substring(0, digitsToRecover);
+        String recoveredPrefix = new OpenLocationCode(roundedLatitude, roundedLongitude).getCode().substring(0, digitsToRecover);
         OpenLocationCode recovered = new OpenLocationCode(recoveredPrefix + code);
         CodeArea recoveredCodeArea = recovered.decode();
         double recoveredLatitude = recoveredCodeArea.getCenterLatitude();
@@ -295,7 +341,7 @@ public class OpenLocationCode {
             recoveredLongitude += paddedAreaSize;
         }
 
-        return encode(recoveredLatitude, recoveredLongitude, recovered.getCode().length() - 1);
+        return new OpenLocationCode(recoveredLatitude, recoveredLongitude, recovered.getCode().length() - 1);
     }
 
     /** Returns whether the bounding box specified by the Open Location Code contains provided point. */
