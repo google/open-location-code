@@ -1,6 +1,6 @@
-package codes.plus.tests;
+package com.google.openlocationcode.tests;
 
-import codes.plus.OpenLocationCode;
+import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tests methods {@link codes.plus.OpenLocationCode#isValidCode(String)},
- * {@link codes.plus.OpenLocationCode#isShortCode(String)}} and
- * {@link codes.plus.OpenLocationCode#isFullCode(String)} Open Location Code.
+ * Tests methods {@link com.google.openlocationcode.OpenLocationCode#isValidCode(String)},
+ * {@link com.google.openlocationcode.OpenLocationCode#isShortCode(String)}} and
+ * {@link com.google.openlocationcode.OpenLocationCode#isFullCode(String)} Open Location Code.
  */
 public class ValidityTest {
 

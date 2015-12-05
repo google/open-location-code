@@ -1,4 +1,4 @@
-package codes.plus;
+package com.google.openlocationcode;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
