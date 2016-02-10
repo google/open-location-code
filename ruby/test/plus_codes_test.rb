@@ -19,7 +19,7 @@ class PlusCodesTest < Test::Unit::TestCase
       is_short_olc = @olc.short?(code)
       is_full_olc = @olc.full?(code)
       result = is_valid_olc == is_valid && is_short_olc == is_short && is_full_olc == is_full
-      assert_true(result)
+      assert(result)
     end
   end
 
@@ -33,10 +33,10 @@ class PlusCodesTest < Test::Unit::TestCase
         code = @olc.encode(cols[1].to_f, cols[2].to_f, cols[0].length - 1)
       end
       assert_equal(cols[0], code)
-      assert_true((code_area.south_latitude - cols[3].to_f).abs < 0.001)
-      assert_true((code_area.west_longitude - cols[4].to_f).abs < 0.001)
-      assert_true((code_area.north_latitude - cols[5].to_f).abs < 0.001)
-      assert_true((code_area.east_longitude - cols[6].to_f).abs < 0.001)
+      assert((code_area.south_latitude - cols[3].to_f).abs < 0.001)
+      assert((code_area.west_longitude - cols[4].to_f).abs < 0.001)
+      assert((code_area.north_latitude - cols[5].to_f).abs < 0.001)
+      assert((code_area.east_longitude - cols[6].to_f).abs < 0.001)
     end
   end
 
@@ -79,7 +79,7 @@ class PlusCodesTest < Test::Unit::TestCase
   end
 
   def test_valid_with_special_case
-    assert_false(@olc.valid?('3W00CJJJ+'))
+    assert(!@olc.valid?('3W00CJJJ+'))
   end
 
   def read_csv_lines(csv_file)
