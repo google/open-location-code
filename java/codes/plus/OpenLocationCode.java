@@ -312,14 +312,9 @@ public class OpenLocationCode {
         int digitsToRecover = 8 - code.indexOf(SEPARATOR);
         // The resolution (height and width) of the padded area in degrees.
         double paddedAreaSize = Math.pow(20, 2 - (digitsToRecover / 2));
-        // Distance from the center to an edge (in degrees).
-
-        // Round down the reference latitude and longitude to the resolution.
-        double roundedLatitude = Math.floor(referenceLatitude / paddedAreaSize) * paddedAreaSize;
-        double roundedLongitude = Math.floor(referenceLongitude / paddedAreaSize) * paddedAreaSize;
 
         // Use the reference location to pad the supplied short code and decode it.
-        String recoveredPrefix = new OpenLocationCode(roundedLatitude, roundedLongitude).getCode().substring(0, digitsToRecover);
+        String recoveredPrefix = new OpenLocationCode(referenceLatitude, referenceLongitude).getCode().substring(0, digitsToRecover);
         OpenLocationCode recovered = new OpenLocationCode(recoveredPrefix + code);
         CodeArea recoveredCodeArea = recovered.decode();
         double recoveredLatitude = recoveredCodeArea.getCenterLatitude();

@@ -319,14 +319,9 @@ class OpenLocationCode {
     // Distance from the center to an edge (in degrees).
     var areaToEdge = resolution / 2.0;
 
-    // Now round down the reference latitude and longitude to the resolution.
-    var roundedLatitude = (referenceLatitude / resolution).floor() * resolution;
-    var roundedLongitude =
-        (referenceLongitude / resolution).floor() * resolution;
-
     // Use the reference location to pad the supplied short code and decode it.
     CodeArea codeArea = decode(
-        encode(roundedLatitude, roundedLongitude).substring(0, paddingLength) +
+        encode(referenceLatitude, referenceLongitude).substring(0, paddingLength) +
             shortCode);
     // How many degrees latitude is the code from the reference? If it is more
     // than half the resolution, we need to move it east or west.

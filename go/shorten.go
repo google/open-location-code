@@ -116,13 +116,8 @@ func RecoverNearest(code string, lat, lng float64) (string, error) {
 	// Distance from the center to an edge (in degrees).
 	areaToEdge := float64(resolution) / 2
 
-	// Now round down the reference latitude and longitude to the resolution.
-	rndLat := math.Floor(lat/resolution) * resolution
-	rndLng := math.Floor(lng/resolution) * resolution
-
 	// Use the reference location to pad the supplied short code and decode it.
-	area, err := Decode(Encode(rndLat, rndLng, 0)[:padLen] + code)
-	debug("round rndLat=%f rndLng=%f padLen=%d code=%s area=%v error=%v", rndLat, rndLng, padLen, code, area, err)
+	area, err := Decode(Encode(lat, lng, 0)[:padLen] + code)
 	if err != nil {
 		return code, err
 	}

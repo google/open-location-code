@@ -334,22 +334,11 @@
   /**
     Recover the nearest matching code to a specified location.
 
-    Given a short Open Location Code of between four and seven characters,
-    this recovers the nearest matching full code to the specified location.
+    Given a valid short Open Location Code this recovers the nearest matching
+    full code to the specified location.
 
-    The number of characters that will be prepended to the short code, depends
-    on the length of the short code and whether it starts with the separator.
-
-    If it starts with the separator, four characters will be prepended. If it
-    does not, the characters that will be prepended to the short code, where S
-    is the supplied short code and R are the computed characters, are as
-    follows:
-    SSSS    -> RRRR.RRSSSS
-    SSSSS   -> RRRR.RRSSSSS
-    SSSSSS  -> RRRR.SSSSSS
-    SSSSSSS -> RRRR.SSSSSSS
-    Note that short codes with an odd number of characters will have their
-    last character decoded using the grid refinement algorithm.
+    Short codes will have characters prepended so that there are a total of
+    eight characters before the separator.
 
     Args:
       shortCode: A valid short OLC character sequence.
@@ -388,15 +377,9 @@
     // Distance from the center to an edge (in degrees).
     var areaToEdge = resolution / 2.0;
 
-    // Now round down the reference latitude and longitude to the resolution.
-    var roundedLatitude = Math.floor(referenceLatitude / resolution) *
-        resolution;
-    var roundedLongitude = Math.floor(referenceLongitude / resolution) *
-        resolution;
-
     // Use the reference location to pad the supplied short code and decode it.
     var codeArea = decode(
-        encode(roundedLatitude, roundedLongitude).substr(0, paddingLength)
+        encode(referenceLatitude, referenceLongitude).substr(0, paddingLength)
         + shortCode);
     // How many degrees latitude is the code from the reference? If it is more
     // than half the resolution, we need to move it east or west.
