@@ -160,7 +160,7 @@ module PlusCodes
       lng_diff = (longitude - code_area.longitude_center).abs
       max_diff = [lat_diff, lng_diff].max
       [8, 6, 4].each do |removal_len|
-        area_edge = precision_by_length(removal_len + 2) / 2
+        area_edge = precision_by_length(removal_len) * 0.3
         return code[removal_len..-1] if max_diff < area_edge
       end
 
