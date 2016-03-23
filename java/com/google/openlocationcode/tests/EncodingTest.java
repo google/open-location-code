@@ -1,6 +1,6 @@
-package codes.plus.tests;
+package com.google.openlocationcode.tests;
 
-import codes.plus.OpenLocationCode;
+import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,19 +95,19 @@ public class EncodingTest {
 
     @Test
     public void testClipping() {
-        junit.framework.Assert.assertEquals("Clipping of negative latitude doesn't work.",
+        Assert.assertEquals("Clipping of negative latitude doesn't work.",
             OpenLocationCode.encode(-90, 5),
             OpenLocationCode.encode(-91, 5));
-        junit.framework.Assert.assertEquals("Clipping of positive latitude doesn't work.",
+        Assert.assertEquals("Clipping of positive latitude doesn't work.",
             OpenLocationCode.encode(90, 5),
             OpenLocationCode.encode(91, 5));
-        junit.framework.Assert.assertEquals("Clipping of negative longitude doesn't work.",
+        Assert.assertEquals("Clipping of negative longitude doesn't work.",
             OpenLocationCode.encode(5, 175),
             OpenLocationCode.encode(5, -185));
-        junit.framework.Assert.assertEquals("Clipping of very long negative longitude doesn't work.",
+        Assert.assertEquals("Clipping of very long negative longitude doesn't work.",
             OpenLocationCode.encode(5, 175),
             OpenLocationCode.encode(5, -905));
-        junit.framework.Assert.assertEquals("Clipping of very long positive longitude doesn't work.",
+        Assert.assertEquals("Clipping of very long positive longitude doesn't work.",
             OpenLocationCode.encode(5, -175),
             OpenLocationCode.encode(5, 905));
     }
