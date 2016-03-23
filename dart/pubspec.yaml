@@ -1,9 +1,6 @@
-name: dart
-description: A starting point for Dart libraries or applications.
+name: open_location_code
+description: Open Location Codes are short, generated codes that can be used like street addresses, for places where street addresses don't exist.
 version: 0.0.1
-#author: <your name> <email@example.com>
-#homepage: https://www.example.com
-#dependencies:
-#  lib_name: any
+homepage: http://openlocationcode.com/
 dev_dependencies:
   test: '>=0.12.0'
