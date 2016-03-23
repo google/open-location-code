@@ -1,6 +1,6 @@
-package codes.plus.tests;
+package com.google.openlocationcode.tests;
 
-import codes.plus.OpenLocationCode;
+import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Assert;
 import org.junit.Test;
 
