@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Representation of open location code.
- * https://github.com/google/open-location-code
- * The OpenLocationCode class is a wrapper around String value {@code code}, which guarantees that
- * the value is a valid Open Location Code.
+ * Representation of open location code. https://github.com/google/open-location-code The
+ * OpenLocationCode class is a wrapper around String value {@code code}, which guarantees that the
+ * value is a valid Open Location Code.
  *
  * @author Jiri Semecky
  */
@@ -38,9 +37,7 @@ public class OpenLocationCode {
   private static final char SEPARATOR_POSITION = 8;
   private static final char SUFFIX_PADDING = '0';
 
-  /**
-   * Class providing information about area covered by Open Location Code.
-   */
+  /** Class providing information about area covered by Open Location Code. */
   public class CodeArea {
 
     private final BigDecimal southLatitude;
@@ -93,14 +90,10 @@ public class OpenLocationCode {
   }
 
 
-  /**
-   * The state of the OpenLocationCode.
-   */
+  /** The state of the OpenLocationCode. */
   private final String code;
 
-  /**
-   * Creates Open Location Code for the provided code.
-   */
+  /** Creates Open Location Code for the provided code. */
   public OpenLocationCode(String code) {
     if (!isValidCode(code)) {
       throw new IllegalArgumentException(
@@ -109,9 +102,7 @@ public class OpenLocationCode {
     this.code = code.toUpperCase();
   }
 
-  /**
-   * Creates Open Location Code from the provided latitude, longitude and desired code length.
-   */
+  /** Creates Open Location Code from the provided latitude, longitude and desired code length. */
   public OpenLocationCode(double latitude, double longitude, int codeLength)
       throws IllegalArgumentException {
     if (codeLength < 4 || (codeLength < 10 & codeLength % 2 == 1)) {
@@ -178,9 +169,7 @@ public class OpenLocationCode {
     this.code = codeBuilder.toString();
   }
 
-  /**
-   * Creates Open Location Code with code length 10 from the provided latitude, longitude.
-   */
+  /** Creates Open Location Code with code length 10 from the provided latitude, longitude. */
   public OpenLocationCode(double latitude, double longitude) {
     this(latitude, longitude, 10);
   }
@@ -267,30 +256,22 @@ public class OpenLocationCode {
     return new OpenLocationCode(code).decode();
   }
 
-  /**
-   * Returns whether this {@link OpenLocationCode} is a full Open Location Code.
-   */
+  /** Returns whether this {@link OpenLocationCode} is a full Open Location Code. */
   public boolean isFull() {
     return code.indexOf(SEPARATOR) == SEPARATOR_POSITION;
   }
 
-  /**
-   * Returns whether the provided Open Location Code is a full Open Location Code.
-   */
+  /** Returns whether the provided Open Location Code is a full Open Location Code. */
   public static boolean isFull(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isFull();
   }
 
-  /**
-   * Returns whether this {@link OpenLocationCode} is a short Open Location Code.
-   */
+  /** Returns whether this {@link OpenLocationCode} is a short Open Location Code. */
   public boolean isShort() {
     return code.indexOf(SEPARATOR) >= 0 && code.indexOf(SEPARATOR) < SEPARATOR_POSITION;
   }
 
-  /**
-   * Returns whether the provided Open Location Code is a short Open Location Code.
-   */
+  /** Returns whether the provided Open Location Code is a short Open Location Code. */
   public static boolean isShort(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isShort();
   }
@@ -423,9 +404,7 @@ public class OpenLocationCode {
 
   // Exposed static helper methods.
 
-  /**
-   * Returns whether the provided string is a valid Open Location code.
-   */
+  /** Returns whether the provided string is a valid Open Location code. */
   public static boolean isValidCode(String code) {
     if (code == null || code.length() < 2) {
       return false;
@@ -502,9 +481,7 @@ public class OpenLocationCode {
     return true;
   }
 
-  /**
-   * Returns if the code is a valid full Open Location Code.
-   */
+  /** Returns if the code is a valid full Open Location Code. */
   public static boolean isFullCode(String code) {
     try {
       return new OpenLocationCode(code).isFull();
@@ -513,9 +490,7 @@ public class OpenLocationCode {
     }
   }
 
-  /**
-   * Returns if the code is a valid short Open Location Code.
-   */
+  /** Returns if the code is a valid short Open Location Code. */
   public static boolean isShortCode(String code) {
     try {
       return new OpenLocationCode(code).isShort();

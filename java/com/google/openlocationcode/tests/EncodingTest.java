@@ -12,9 +12,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Tests encoding and decoding between Open Location Code and latitude/longitude pair.
- */
+/** Tests encoding and decoding between Open Location Code and latitude/longitude pair. */
 public class EncodingTest {
 
   public static final double PRECISION = 1e-10;

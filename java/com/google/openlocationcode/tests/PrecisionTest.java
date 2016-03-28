@@ -5,9 +5,7 @@ import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * Tests size of rectangles defined by open location codes of various size.
- */
+/** Tests size of rectangles defined by open location codes of various size. */
 public class PrecisionTest {
 
   @Test

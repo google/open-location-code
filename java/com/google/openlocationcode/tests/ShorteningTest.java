@@ -12,9 +12,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Tests shortening functionality of Open Location Code.
- */
+/** Tests shortening functionality of Open Location Code. */
 public class ShorteningTest {
 
   private class TestData {
