@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @author Jiri Semecky
  */
-public class OpenLocationCode {
+public final class OpenLocationCode {
 
   private static final BigDecimal BD_0 = new BigDecimal(0);
   private static final BigDecimal BD_5 = new BigDecimal(5);
