@@ -27,7 +27,7 @@ isShort:
   boolean indicating whether the string is a valid short Open Location Code
   or not.
 
-  A short Open Location Code is a sequence created by removing a even number
+  A short Open Location Code is a sequence created by removing an even number
   of characters from a full Open Location Code. The resulting code must still
   include the separator character.
 
@@ -36,8 +36,8 @@ isFull:
 
   Not all possible combinations of Open Location Code characters decode to
   valid latitude and longitude values. This checks that a code is valid and
-  also that the latitude and longitude values are legal. If the separator
-  character is present, it must be after four characters.
+  also that the latitude and longitude values are legal. Full codes must
+  include the separator character and it must be after eight characters.
 
 encode:
     Encode a location into an Open Location Code. This takes a latitude and
