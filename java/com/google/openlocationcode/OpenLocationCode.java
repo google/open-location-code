@@ -19,6 +19,9 @@ public final class OpenLocationCode {
   private static final BigDecimal BD_20 = new BigDecimal(20);
   private static final BigDecimal BD_90 = new BigDecimal(90);
   private static final BigDecimal BD_180 = new BigDecimal(180);
+  private static final double LATITUDE_PRECISION_8_DIGITS = computeLatitudePrecision(8) / 4;
+  private static final double LATITUDE_PRECISION_6_DIGITS = computeLatitudePrecision(6) / 4;
+  private static final double LATITUDE_PRECISION_4_DIGITS = computeLatitudePrecision(4) / 4;
 
   private static final char[] ALPHABET = "23456789CFGHJMPQRVWX".toCharArray();
   private static final Map<Character, Integer> CHARACTER_TO_INDEX = new HashMap<>();
@@ -309,13 +312,13 @@ public final class OpenLocationCode {
     double latitudeDiff = Math.abs(referenceLatitude - codeArea.getCenterLatitude());
     double longitudeDiff = Math.abs(referenceLongitude - codeArea.getCenterLongitude());
 
-    if (latitudeDiff < 0.000625 && longitudeDiff < 0.000625) {
+    if (latitudeDiff < LATITUDE_PRECISION_8_DIGITS && longitudeDiff < LATITUDE_PRECISION_8_DIGITS) {
       return new OpenLocationCode(code.substring(8));
     }
-    if (latitudeDiff < 0.0125 && longitudeDiff < 0.0125) {
+    if (latitudeDiff < LATITUDE_PRECISION_6_DIGITS && longitudeDiff < LATITUDE_PRECISION_6_DIGITS) {
       return new OpenLocationCode(code.substring(6));
     }
-    if (latitudeDiff < 0.25 && longitudeDiff < 0.25) {
+    if (latitudeDiff < LATITUDE_PRECISION_4_DIGITS && longitudeDiff < LATITUDE_PRECISION_4_DIGITS) {
       return new OpenLocationCode(code.substring(4));
     }
     throw new IllegalArgumentException(
