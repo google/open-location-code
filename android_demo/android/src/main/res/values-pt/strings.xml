@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2016 Google Inc. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+-->
+<resources>
+    <string name="app_name">OLC Demo</string>
+    <string name="current_title">OLC Demo</string>
+
+    <string name="get_your_code">Obter o seu código</string>
+
+    <string name="code_view_empty">Sem código para mostrar </string>
+    <string name="current_location_loading">A carregar a sua localização</string>
+    <string name="current_location_error">Não identificámos a sua localização</string>
+
+    <string name="share_chooser_title">Partilhar através de…</string>
+    <string name="share_menu_share_code">Partilhar…</string>
+    <string name="share_menu_save_to_contact">Guardar em contactos</string>
+
+    <string name="no_locality">localidade desconhecida</string>
+
+    <string name="distance_meters">%d m</string>
+    <string name="distance_few_kilometers">%.1f km</string>
+    <string name="distance_many_kilometers">%.0f km</string>
+
+    <string name="search_hint">Introduza um código</string>
+    <string name="search_invalid">Código não encontrado</string>
+    <string name="search_empty">Introduza um código para procurar</string>
+
+    <string name="welcome_page_title">Descubra o seu OLC</string>
+    <string name="welcome_page_text">Descubra o OLC (Open Location Code) de sua casa. OLC são livres e funciona com o Google Maps.</string>
+
+    <string name="navigate_button_desc">Navegar da sua localização ao código</string>
+    <string name="share_code_button_desc">Partilhar código ou guardar em contactos</string>
+    <string name="satellite_button_desc">Camada de satélite de alternância</string>
+    <string name="my_location_button_desc">Mostrar a sua localização actual</string>
+    <string name="cancel_search_desc">Anular pesquisa</string>
+</resources>

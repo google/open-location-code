@@ -1,0 +1,22 @@
+# Built application files
+*/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# IntelliJ configuration file
+android/android.iml
+
+# Gradle generated files
+.gradle/
+
+# Signing files
+.signing/
+
+# User-specific configurations
+.idea/*
+
+# OS-specific files
+.DS_Store
+._*
+.Trashes

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2016 Google Inc. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_bar_height"
+        android:background="@android:color/white"
+        android:elevation="@dimen/app_bar_elevation"
+        android:layout_alignParentBottom="true">
+
+        <com.openlocationcode.android.code.CodeView
+            android:id="@+id/codeView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="@dimen/code_view_margin"
+            android:layout_marginStart="@dimen/code_view_margin" />
+
+        <!--
+          DirectionView has to drop between elements of CodeView - play close attention
+          to marginRight. It needs to be large enough so that it doesn't collide with the
+          navigation and share buttons.
+        -->
+        <com.openlocationcode.android.direction.DirectionView
+            android:id="@+id/directionView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="@dimen/direction_view_margin"
+            android:layout_marginStart="@dimen/direction_view_margin"
+            android:layout_marginRight="@dimen/direction_view_margin_right"
+            android:layout_marginEnd="@dimen/direction_view_margin_right" />
+
+    </RelativeLayout>
+
+    <com.openlocationcode.android.map.MyMapView
+        android:id="@+id/myMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomBar" />
+
+    <com.openlocationcode.android.search.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</RelativeLayout>
