@@ -17,7 +17,7 @@
 <html>
 <head>
   <title>Open Location Code Javascript Unit Tests</title>
-  <link rel="stylesheet" href="qunit-1.14.0.css"></link>
+  <link rel="stylesheet" href="qunit-2.0.1.css"></link>
 </head>
 <body>
   <div id="qunit"></div>
@@ -28,28 +28,28 @@
 
   <!-- Required libraries. -->
   <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
-  <script type="text/javascript" src="qunit-1.14.0.js"></script>
+  <script type="text/javascript" src="qunit-2.0.1.js"></script>
 
   <!-- Extend QUnit to add a function to check two floats. -->
   <script type="text/javascript">
-    QUnit.extend(QUnit, {
-      /**
-        Checks two floating point numbers and return true if they are within
-        tolerance.
-        */
-      closeEnough: function(actual, expected, message) {
-        var isOk = (actual === expected) || Math.abs(actual - expected) <= 0.0000000001;
-        QUnit.push(isOk, actual, expected, message);
-      },
-    });
+    /**
+     * Checks two floating point numbers and return true if they are within
+     * tolerance.
+     */
+    QUnit.assert.closeEnough = function(actual, expected, message) {
+      var isOk = (actual === expected) || Math.abs(actual - expected) <= 0.0000000001;
+      this.push(isOk, actual, expected, message);
+    };
   </script>
 
   <script type="text/javascript">
-    // Load the data file.
-    $.get("../../test_data/encodingTests.csv", function(testData) {
-      testData = testData.split('\n');
+    QUnit.test('Encoding', function(assert) {
+      var done = assert.async();
 
-      test('Encoding', function() {
+      // Load the data file.
+      $.get("../../test_data/encodingTests.csv", function(testData) {
+        testData = testData.split('\n');
+
         for (var i = 0; i < testData.length; ++i) {
           var testCsv = testData[i];
           if (testCsv[0] === '#' || testCsv.trim().length == 0) {
@@ -66,46 +66,60 @@
           var codeArea = OpenLocationCode.decode(testFields[0]);
           var code = OpenLocationCode.encode(testFields[1], testFields[2], codeArea.codeLength);
           // Did we get the same code?
-          strictEqual(code, testFields[0], testFields[0] + ': encoding confirm');
+          assert.strictEqual(code, testFields[0], testFields[0] + ': encoding confirm');
           // Check that it decoded to the correct coordinates.
-          QUnit.closeEnough(testFields[3], codeArea.latitudeLo, testFields[0] + ': lat lo');
-          QUnit.closeEnough(testFields[4], codeArea.longitudeLo, testFields[0] + 'lng lo');
-          QUnit.closeEnough(testFields[5], codeArea.latitudeHi, testFields[0] + 'lat hi');
-          QUnit.closeEnough(testFields[6], codeArea.longitudeHi, testFields[0] + 'lng hi');
+          assert.closeEnough(testFields[3], codeArea.latitudeLo, testFields[0] + ': lat lo');
+          assert.closeEnough(testFields[4], codeArea.longitudeLo, testFields[0] + 'lng lo');
+          assert.closeEnough(testFields[5], codeArea.latitudeHi, testFields[0] + 'lat hi');
+          assert.closeEnough(testFields[6], codeArea.longitudeHi, testFields[0] + 'lng hi');
         }
+
+        done();
       });
     });
   </script>
 
   <script type="text/javascript">
-    // Load the data file.
-    $.get("../../test_data/validityTests.csv", function(testData) {
-      testData = testData.split('\n');
+    QUnit.test('Validity', function(assert) {
+      var done = assert.async();
 
-      test('Validity', function() {
+      // Load the data file.
+      $.get("../../test_data/validityTests.csv", function(testData) {
+        testData = testData.split('\n');
+
         for (var i = 0; i < testData.length; ++i) {
           var testCsv = testData[i];
           if (testCsv[0] === '#' || testCsv.trim().length == 0) {
             continue;
           }
           var testFields = testCsv.split(',');
-          strictEqual(OpenLocationCode.isValid(testFields[0]), testFields[1] === 'true',
+          assert.strictEqual(
+              OpenLocationCode.isValid(testFields[0]),
+              testFields[1] === 'true',
               'Code valid: ' + test[0]);
-          strictEqual(OpenLocationCode.isShort(testFields[0]), testFields[2] === 'true',
+          assert.strictEqual(
+              OpenLocationCode.isShort(testFields[0]),
+              testFields[2] === 'true',
               'Code valid and place: ' + testFields[0]);
-          strictEqual(OpenLocationCode.isFull(testFields[0]), testFields[3] === 'true',
+          assert.strictEqual(
+              OpenLocationCode.isFull(testFields[0]),
+              testFields[3] === 'true',
               'Code valid and full: ' + testFields[0]);
         }
+
+        done();
       });
     });
   </script>
 
   <script type="text/javascript">
-    // Load the data file.
-    $.get("../../test_data/shortCodeTests.csv", function(testData) {
-      testData = testData.split('\n');
+    QUnit.test('Short codes', function(assert) {
+      var done = assert.async();
 
-      test('Short codes', function() {
+      // Load the data file.
+      $.get("../../test_data/shortCodeTests.csv", function(testData) {
+        testData = testData.split('\n');
+
         for (var i = 0; i < testData.length; ++i) {
           var testCsv = testData[i];
           if (testCsv[0] === '#' || testCsv.trim().length == 0) {
@@ -124,17 +138,19 @@
           //    testFields[0], testFields[1], testFields[2]);
           // Confirm we got what we expected.
           var coords = ' with ' + testFields[1] + ',' + testFields[2];
-          strictEqual(shorten, testFields[3], testFields[0] + ' shorten ' + coords);
+          assert.strictEqual(shorten, testFields[3], testFields[0] + ' shorten ' + coords);
           //strictEqual(shortenBy4, testFields[3], testFields[0] + ' shortenBy4 ' + coords);
           //strictEqual(shortenBy6, testFields[4], testFields[0] + ' shortenBy6 ' + coords);
           // Now try expanding the shortened code.
           var expanded = OpenLocationCode.recoverNearest(shorten, testFields[1], testFields[2]);
-          strictEqual(expanded, testFields[0], testFields[0] + ' expanding shorten ' + coords);
+          assert.strictEqual(expanded, testFields[0], testFields[0] + ' expanding shorten ' + coords);
           //var expanded = OpenLocationCode.recoverNearest(shortenBy4, testFields[1], testFields[2]);
           //strictEqual(expanded, testFields[0], testFields[0] + ' expanding shortenBy4 ' + coords);
           //expanded = OpenLocationCode.recoverNearest(shortenBy6, testFields[1], testFields[2]);
           //strictEqual(expanded, testFields[0], testFields[0] + ' expanding shortenBy6 ' + coords);
         }
+
+        done();
       });
     });
   </script>
