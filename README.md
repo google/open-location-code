@@ -1,6 +1,8 @@
 Open Location Code
 ==================
 
+[![Build Status](https://api.travis-ci.org/google/open-location-code.svg?branch=master)](https://travis-ci.org/google/open-location-code)
+
 Open Location Codes are a way of encoding location into a form that is
 easier to use than latitude and longitude.
 
