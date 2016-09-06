@@ -1,7 +1,8 @@
-var gulp = require('gulp'),
-    qunit = require('gulp-qunit');
+var gulp = require('gulp');
+var qunit = require('gulp-qunit');
 
-gulp.task('default', function() {
-    return gulp.src('./test.html')
-        .pipe(qunit());
+gulp.task('test', function() {
+  return gulp.src('./test.html').pipe(qunit());
 });
+
+gulp.task('default', ['test']);
