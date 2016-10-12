@@ -26,7 +26,7 @@ Links
 -----
  * [Demonstration site](http://plus.codes/)
  * [Mailing list](https://groups.google.com/forum/#!forum/open-location-code)
- * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/blob/master/docs/comparison.adoc)
+ * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/wiki/Evaluation-of-Location-Encoding-Systems)
  * [Open Location Code definition](https://github.com/google/open-location-code/blob/master/docs/olc_definition.adoc)
 
 Description
