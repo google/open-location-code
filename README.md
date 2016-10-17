@@ -2,6 +2,7 @@ Open Location Code
 ==================
 
 [![Build Status](https://api.travis-ci.org/google/open-location-code.svg?branch=master)](https://travis-ci.org/google/open-location-code)
+[![CDNJS](https://img.shields.io/cdnjs/v/openlocationcode.svg)](https://cdnjs.com/libraries/openlocationcode)
 
 Open Location Codes are a way of encoding location into a form that is
 easier to use than latitude and longitude.
