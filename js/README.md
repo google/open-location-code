@@ -6,7 +6,7 @@ The library file is in `src/openlocationcode.js`. There is also a minified versi
 * [jsDelivr](https://www.jsdelivr.com)
   * https://cdn.jsdelivr.net/openlocationcode/1.0.0/openlocationcode.js
   * https://cdn.jsdelivr.net/openlocationcode/1.0.0/openlocationcode.min.js
-* [cdnjs](link:https://cdnjs.com/)
+* [cdnjs](https://cdnjs.com/)
   * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.0/openlocationcode.js
   * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.0/openlocationcode.min.js
 
