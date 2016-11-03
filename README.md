@@ -4,14 +4,15 @@ Open Location Code
 [![Build Status](https://api.travis-ci.org/google/open-location-code.svg?branch=master)](https://travis-ci.org/google/open-location-code)
 [![CDNJS](https://img.shields.io/cdnjs/v/openlocationcode.svg)](https://cdnjs.com/libraries/openlocationcode)
 
-Open Location Codes are a way of encoding location into a form that is
-easier to use than latitude and longitude.
+Open Location Code is a technology that gives a way of encoding location into a form that is
+easier to use than latitude and longitude. The codes generated are called plus codes, as their
+distinguishing attribute is that they include a "+" character.
 
-They are designed to be used as a replacement for street addresses, especially
+The technology is designed to produce codes that can be used as a replacement for street addresses, especially
 in places where buildings aren't numbered or streets aren't named.
 
-Open Location Codes represent an area, not a point. As digits are added
-to a code, the area shrinks, so a long code is more accurate than a short
+Plus codes represent an area, not a point. As digits are added
+to a code, the area shrinks, so a long code is more precise than a short
 code.
 
 Codes that are similar are located closer together than codes that are
@@ -46,10 +47,10 @@ As an example, the Parliament Buildings in Nairobi, Kenya are located at
 wide by 14 meter high area within 6GCR.
 
 A "+" character is used after eight digits, to break the code up into two parts
-and to distinguish shortened Open Location Codes from postal codes.
+and to distinguish codes from postal codes.
 
-There will be locations where a 10 digit code is not sufficiently accurate, but
-refining it by a factor of 20 is unnecessarily precise and requires extending
+There will be locations where a 10 digit code is not sufficiently precise, but
+refining it by a factor of 20 is i) unnecessarily precise and ii) requires extending
 the code by two digits. Instead, after 10 digits, the area is divided
 into a 4x5 grid and a single digit used to identify the grid square. A single
 grid refinement step reduces the area to approximately 3.5x2.8 meters.
@@ -67,6 +68,8 @@ more, and this could be enough to prevent the original code being recovered.
 Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
+
+Guidelines for shortening codes are in the wiki.
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
