@@ -1,19 +1,41 @@
 /*
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+
+/**
  * Open Location Code grid overlay. This displays the OLC grid with labels for
  * each major grid square, and if divided, labels for the rows and columns.
  *
- * The default class definition for labels is automatically added to the document. If you want to
- * modify it, copy the following style using a different class name. Specify it using the
- * roadMapLabelClass or satelliteMapLabelClass options:
+ * The default class definition for labels, 'olc_overlay_text', is NOT
+ * automatically added to the document. Either provide your own class names or
+ * add it by copying the following style:
  *
- *   font-family: Arial, sans; color: #7BAAF7; text-align: center; position: fixed; display: flex;
- *   justify-content: center; flex-direction: column;
+ * .olc_overlay_text {
+ *   font-family: Arial, sans;
+ *   color: #7BAAF7;
+ *   text-align: center;
+ *   position: fixed;
+ *   display: flex;
+ *   flex-direction: column;
+ *   justify-content: center;
+ * }
  */
-(function (root, factory) {
+(function(root, factory) {
   /* global define, module */
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['b'], function (b) {
+    define(['b'], function(b) {
       return (root.returnExportsGlobal = factory(b));
     });
   } else if (typeof module === 'object' && module.exports) {
@@ -25,9 +47,8 @@
     // Browser globals
     root.OLCGridOverlay = factory();
   }
-} (this, function () {
+} (this, function() {
   function OLCGridOverlay(opts) {
-    this._checkDefaultLabelStyle();
     opts = opts || {};
     if (typeof(opts.map) !== 'undefined') {
       this.setMap(map);
@@ -36,16 +57,24 @@
     if (typeof(opts.minorGridDisplay) === 'boolean') {
       this._minorGridDisplay = opts.minorGridDisplay;
     }
+    this._minorLabelDisplay = true;
+    if (typeof(opts.minorLabelDisplay) === 'boolean') {
+      this._minorLabelDisplay = opts.minorLabelDisplay;
+    }
     this._roadmap = {
       gridColor: '#7BAAF7',
       labelClass: 'olc_overlay_text',
-      majorOpacity: 0.75,
+      majorStroke: 2,
+      majorOpacity: 0.5,
+      minorStroke: 1,
       minorOpacity: 0.2
     };
     this._satellite = {
       gridColor: '#7BAAF7',
       labelClass: 'olc_overlay_text',
-      majorOpacity: 0.8,
+      majorStroke: 2,
+      majorOpacity: 0.5,
+      minorStroke: 1,
       minorOpacity: 0.4
     };
     if (typeof(opts.roadMapColor) === 'string') {
@@ -64,14 +93,15 @@
     this._gridSettings = this._roadmap;
     this._gridLines = [];
     this._listeners = [];
-    this._olcAlphabet = '23456789CFGHJMPQRVWX';
+    this._OLC_ALPHABET = '23456789CFGHJMPQRVWX';
+    this._OLC_LABEL_CLASSNAME = '__olc_overlay_label__';
     this._gridBounds = {latLo: 0, lngLo: 0, latHi: 0, lngHi: 0};
     this._majorGridSizeDeg = 0;
     this._majorGridZoomLevels = [
       {zoom: 6, grid: 20},
       {zoom: 10, grid: 1},
-      {zoom: 14, grid: 1/20},
-      {zoom: 32, grid: 1/400}
+      {zoom: 14, grid: 1 / 20},
+      {zoom: 32, grid: 1 / 400}
     ];
     this._labelFontSizes = {
       cellLabelMinFontPx: 16,
@@ -83,7 +113,9 @@
 
   OLCGridOverlay.prototype = new google.maps.OverlayView();
 
-  // Add event listeners that cause the grid to be drawn or redrawn.
+  /**
+   * Add event listeners for when the grid needs to be redrawn.
+   */
   OLCGridOverlay.prototype.onAdd = function() {
     var self = this;
     this._draw();
@@ -99,16 +131,20 @@
         self._clearLabels();
     }
     this._listeners.push(google.maps.event.addListener(this.getMap(), 'idle', redraw));
-    this._listeners.push(google.maps.event.addListener(this.getMap(), "maptypeid_changed", redraw));
-    this._listeners.push(google.maps.event.addListener(this.getMap(), "zoom_changed", clear));
-    this._listeners.push(google.maps.event.addListener(this.getMap(), "dragstart", clearLabels));
+    this._listeners.push(google.maps.event.addListener(this.getMap(), 'maptypeid_changed', redraw));
+    this._listeners.push(google.maps.event.addListener(this.getMap(), 'zoom_changed', clear));
+    if (this._minorLabelDisplay) {
+      this._listeners.push(google.maps.event.addListener(this.getMap(), 'dragstart', clearLabels));
+    }
   };
 
   // Does nothing - updates are driven by the event listeners.
   OLCGridOverlay.prototype.draw = function() {
   };
 
-  // Remove all lines, labels and listeners.
+  /**
+   * Removes all lines, labels and listeners when the overlay is removed from the map.
+   */
   OLCGridOverlay.prototype.onRemove = function() {
     this._clear();
     for (var i = 0; i < this._listeners.length; i++) {
@@ -116,41 +152,32 @@
     }
   };
 
+  /**
+   * Hide the grid.
+   */
   OLCGridOverlay.prototype.hide = function() {
+    this._clear();
   };
 
+  /**
+   * Show the grid.
+   */
   OLCGridOverlay.prototype.show = function() {
+    this._clear();
+    this._draw();
   };
 
-  OLCGridOverlay.prototype._checkDefaultLabelStyle = function() {
-    for (var i = 0; i < document.styleSheets.length; i++) {
-      var rules = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
-      for (var x in rules) {
-        if (typeof rules[x].selectorText === 'string' && rules[x].selectorText === ".olc_overlay_text") {
-          return;
-        }
-      }
-    }
-    var defaultLabelStyle = document.createElement('style');
-    defaultLabelStyle.type = 'text/css';
-    defaultLabelStyle.innerHTML = '.olc_overlay_text { '
-        + ' font-family: Arial, sans; '
-        + ' color: #7BAAF7; '
-        + ' text-align: center; '
-        + ' position: fixed; '
-        + ' display: flex; '
-        + ' justify-content: center; '
-        + ' flex-direction: column; }';
-    document.getElementsByTagName('head')[0].appendChild(defaultLabelStyle);
-  };
-
-  // Remove all lines and labels.
+  /**
+   * Remove all lines and labels.
+   */
   OLCGridOverlay.prototype._clear = function() {
     this._clearLines();
     this._clearLabels();
-  }
+  };
 
-  // Remove the lines.
+  /**
+   * Remove the grid lines.
+   */
   OLCGridOverlay.prototype._clearLines = function() {
     try {
       for (var i = 0; i < this._gridLines.length; i++) {
@@ -162,12 +189,23 @@
     this._gridLines = [];
   };
 
-  // Remove the labels.
+  /**
+   * Remove the overlay labels.
+   * Removes all overlay elements with the label classname.
+   */
   OLCGridOverlay.prototype._clearLabels = function() {
-    this._clearMarkerLayer();
+    var nodes = this.getPanes().overlayLayer.children;
+    var len = nodes.length;
+    for (var i = len - 1; i >= 0; i--) {
+      if (nodes[i].className.indexOf(this._OLC_LABEL_CLASSNAME) > -1) {
+        nodes[i].parentNode.removeChild(nodes[i]);
+      }
+    }
   };
 
-  // Main draw method that draws grids and labels.
+  /**
+   * Main draw method that draws grids and labels.
+   */
   OLCGridOverlay.prototype._draw = function() {
     // Calculates the size of the main grid (in degrees) depending on the zoom level.
     for (var i = 0; i < this._majorGridZoomLevels.length; i++) {
@@ -200,30 +238,38 @@
       this._gridSettings = this._satellite;
     }
     // Draw the major lines and label the cells.
-    this._drawLines(this._majorGridSizeDeg, this._gridSettings.majorOpacity);
+    this._drawLines(this._majorGridSizeDeg, this._gridSettings.majorStroke, this._gridSettings.majorOpacity);
     this._labelOLCCells();
-    this.show();
 
     // If not displaying the minor grid, or if it is less than 10 pixels height, we are done.
-    if (!this._minorGridDisplay || Math.abs(
+    if (Math.abs(
         this._llToPixels(this.getMap().getCenter().lat(), 0).y -
         this._llToPixels(this.getMap().getCenter().lat() + this._majorGridSizeDeg / 20, 0).y) < 10) {
       return;
     }
     // Draw the minor lines and label the rows and columns.
-    this._drawLines(this._majorGridSizeDeg / 20, this._gridSettings.minorOpacity);
-    this._labelGridRowsCols();
-    this.show();
+    if (this._minorGridDisplay) {
+      this._drawLines(this._majorGridSizeDeg / 20, this._gridSettings.minorStroke, this._gridSettings.minorOpacity);
+    }
+    if (this._minorLabelDisplay) {
+      this._labelGridRowsCols();
+    }
   };
 
-  // Draw a grid of lines covering the current major grid area. Passed the step size and opacity for the lines.
-  OLCGridOverlay.prototype._drawLines = function(stepsize, opacity) {
+  /**
+   * Draw a grid of lines covering the current major grid area.
+   * This area is the current viewport, rounded up to the major grid.
+   * @param {number} stepsize The step, in degrees, between the grid lines.
+   * @param {number} stroke The stroke width.
+   * @param {number} opacity The line opacity.
+   */
+  OLCGridOverlay.prototype._drawLines = function(stepsize, stroke, opacity) {
     // Draw vertical lines.
     for (var lng = this._gridBounds.lngLo; lng < this._gridBounds.lngHi; lng = lng + stepsize) {
       var line = new google.maps.Polyline({
           path: [{lat: this._gridBounds.latLo, lng: lng}, {lat: this._gridBounds.latHi, lng: lng}],
           strokeColor: this._gridSettings.gridColor,
-          strokeWeight: 1,
+          strokeWeight: stroke,
           strokeOpacity: opacity,
           clickable: false,
           map: this.getMap()
@@ -236,7 +282,7 @@
           // Draw from -180 to 0 to 180 to avoid wrapping problems.
           path: [{lat: lat, lng: -180}, {lat: lat, lng: 0}, {lat: lat, lng: 180}],
           strokeColor: this._gridSettings.gridColor,
-          strokeWeight: 1,
+          strokeWeight: stroke,
           strokeOpacity: opacity,
           clickable: false,
           map: this.getMap()
@@ -245,25 +291,29 @@
     }
   };
 
-  // Add labels for each of the OLC cells. The label will depend on the grid size.
+  /**
+   * Add the OLC cell labels.
+   */
   OLCGridOverlay.prototype._labelOLCCells = function() {
     for (var lat = this._gridBounds.latLo; lat <= this._gridBounds.latHi; lat = lat + this._majorGridSizeDeg) {
       for (var lng = this._gridBounds.lngLo; lng <= this._gridBounds.lngHi; lng = lng + this._majorGridSizeDeg) {
         // Get the OLC code for the center of the grid square. The label depends on the grid resolution.
         var olc = OpenLocationCode.encode(lat + (this._majorGridSizeDeg / 2), lng + (this._majorGridSizeDeg / 2));
-        var contents = {}
+        var title = null;
+        var contents = null;
         if (this._majorGridSizeDeg == 20) {
-          contents.mainlabel = olc.substr(0, 2);
+          contents = olc.substr(0, 2);
         } else if (this._majorGridSizeDeg == 1) {
-          contents.mainlabel = olc.substr(0, 4);
+          contents = olc.substr(0, 4);
         } else if (this._majorGridSizeDeg == .05) {
-          contents.mainlabel = olc.substr(4, 2);
-          contents.title = olc.substr(0, 4);
+          contents = olc.substr(4, 2);
+          title = olc.substr(0, 4);
         } else {
-          contents.mainlabel = olc.substr(4, 5);
-          contents.title = olc.substr(0, 4);
+          contents = olc.substr(4, 5);
+          title = olc.substr(0, 4);
         }
         this._makeLabel(
+            title,
             contents,
             lat,
             lng,
@@ -275,7 +325,9 @@
     }
   };
 
-  // Draw the labels for the grid rows and columns.
+  /**
+   * Add the row and column labels.
+   */
   OLCGridOverlay.prototype._labelGridRowsCols = function() {
     var mapbounds = this.getMap().getBounds();
     var row_lo = mapbounds.getSouthWest().lng();
@@ -291,8 +343,8 @@
           Math.abs(lat - col_hi) < (this._majorGridSizeDeg / 20 / 2)) {
         continue;
       }
-      this._labelGrid(this._olcAlphabet[step % 20], lat, row_lo);
-      this._labelGrid(this._olcAlphabet[step % 20], lat, row_hi);
+      this._labelGrid(this._OLC_ALPHABET[step % 20], lat, row_lo);
+      this._labelGrid(this._OLC_ALPHABET[step % 20], lat, row_hi);
     }
     // Column labels.
     step = 0;
@@ -302,15 +354,21 @@
           (Math.abs(lng - row_hi) < (this._majorGridSizeDeg / 20 / 2))) {
         continue;
       }
-      this._labelGrid(this._olcAlphabet[step % 20], col_lo, lng);
-      this._labelGrid(this._olcAlphabet[step % 20], col_hi, lng);
+      this._labelGrid(this._OLC_ALPHABET[step % 20], col_lo, lng);
+      this._labelGrid(this._OLC_ALPHABET[step % 20], col_hi, lng);
     }
   };
 
-  // Make an OLC row or column label whose lower left corner is at lat,lng.
+  /**
+   * Make an OLC row or column (not cell) label whose lower left corner is at lat,lng.
+   * @param {string} label The text to put in the label.
+   * @param {number} lat The latitude of the lower left corner of the label.
+   * @param {number} lng The longitude of the lower left corner of the label.
+   */
   OLCGridOverlay.prototype._labelGrid = function(label, lat, lng) {
     this._makeLabel(
-        {mainlabel: label},
+        null,
+        label,
         lat,
         lng,
         this._majorGridSizeDeg / 20,
@@ -319,12 +377,22 @@
         this._labelFontSizes.gridLabelMaxFontPx);
   };
 
-  // Create a text label as a DIV and add it to the marker layer.
-  // The contents are specified as an object with two attributes: title and mainlabel.
-  // The title value will be displayed first and smaller. The mainlabel content is displayed
-  // second, scaled to fill the width but restricted to between min- and maxfontsize.
-  // The DIV will have it's lower left corner at lat,lng with width and height deg degrees.
-  OLCGridOverlay.prototype._makeLabel = function(contents, lat, lng, deg, classname, minfontsize, maxfontsize) {
+  /**
+   * Create a text label and add it to the overlay.
+   * The text will be scaled (between minfontsize and maxfontsize) to fit in the area.
+   * @param {string} title If not null, displayed on an initial line.
+   * @param {string} contents The main text to put in the label.
+   * @param {number} lat The latitude of the lower left corner of the label.
+   * @param {number} lng The longitude of the lower left corner of the label.
+   * @param {number} deg The height and width of the label in degrees.
+   * @param {string} classname The CSS class to apply to the label.
+   * @param {number} minfontsize The minimum font size to use (in px).
+   * @param {number} maxfontsize The maximum font size to use (in px).
+   */
+  OLCGridOverlay.prototype._makeLabel = function(title, contents, lat, lng, deg, classname, minfontsize, maxfontsize) {
+    if (contents === null) {
+      return;
+    }
     // Convert the lat and lng to pixels to get the position and dimensions of the div.
     var lo = this._llToPixels(lat, lng);
     var hi = this._llToPixels(lat + deg, lng + deg);
@@ -333,28 +401,28 @@
     var left = lo.x;
     var top = lo.y - height;
 
-    var div = document.createElement("DIV");
-    div.className = classname;
-    div.style.left = left + "px";
-    div.style.top = top + "px";
-    div.style.width = width + "px";
-    div.style.height = height + "px";
+    var div = document.createElement('DIV');
+    // Set the overlay label classname so labels can be detected and removed.
+    div.className = classname + ' ' + this._OLC_LABEL_CLASSNAME;
+    div.style.position = 'absolute';
+    div.style.left = left + 'px';
+    div.style.top = top + 'px';
+    div.style.width = width + 'px';
+    div.style.height = height + 'px';
 
     var html = '';
-    if (typeof(contents.title) == 'string') {
-      var ratio = Math.min(Math.round(contents.mainlabel.length / contents.title.length * 100), 75);
-      html += '<span style="font-size: ' + ratio + '%;">' + contents.title + '<br/></span>';
+    if (title !== null) {
+      var ratio = Math.min(Math.round(contents.length / title.length * 100), 75);
+      html += '<span style="font-size: ' + ratio + '%;">' + title + '<br/></span>';
     }
 
-    if (typeof(contents.mainlabel) == 'string') {
-      html += '<span>' + contents.mainlabel + '</span>';
-    }
+    html += '<span>' + contents + '</span>';
     div.innerHTML = html;
     // Set the font size to width in pixels / number of chars in the main part of the label. Limit it
     // between the minimum and maximum font size.
-    var fontsize = Math.min(Math.max(width / contents.mainlabel.length, minfontsize), maxfontsize);
-    div.style.fontSize = fontsize + "px";
-    this._addToMarkerLayer(div);
+    var fontsize = Math.min(Math.max(width / contents.length, minfontsize), maxfontsize);
+    div.style.fontSize = fontsize + 'px';
+    this.getPanes().overlayLayer.appendChild(div)
   };
 
   // Convert a lat/lng to a pixel reference.
@@ -362,18 +430,5 @@
     return this.getProjection().fromLatLngToDivPixel(new google.maps.LatLng({lat: lat, lng: lng}));
   };
 
-  // Add something to the marker layer - above the polylines (overlayLayer) but below mouse targets (overlayMouseTarget).
-  OLCGridOverlay.prototype._addToMarkerLayer = function(div) {
-    var panes = this.getPanes();
-    panes.markerLayer.appendChild(div);
-  };
-
-  // Clear the marker layer.
-  OLCGridOverlay.prototype._clearMarkerLayer = function() {
-    var panes = this.getPanes();
-    while (panes.markerLayer.firstChild) {
-      panes.markerLayer.removeChild(panes.markerLayer.firstChild);
-    }
-  };
   return OLCGridOverlay;
 }));
