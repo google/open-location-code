@@ -4,11 +4,11 @@ This is the Javascript implementation of the Open Location Code API.
 The library file is in `src/openlocationcode.js`. There is also a minified version, and both are also available using the following CDNs:
 
 * [jsDelivr](https://www.jsdelivr.com)
-  * https://cdn.jsdelivr.net/openlocationcode/1.0.0/openlocationcode.js
-  * https://cdn.jsdelivr.net/openlocationcode/1.0.0/openlocationcode.min.js
+  * https://cdn.jsdelivr.net/openlocationcode/1.0.1/openlocationcode.js
+  * https://cdn.jsdelivr.net/openlocationcode/1.0.1/openlocationcode.min.js
 * [cdnjs](https://cdnjs.com/)
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.0/openlocationcode.js
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.0/openlocationcode.min.js
+  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.1/openlocationcode.js
+  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.1/openlocationcode.min.js
 
 Unit tests are included and can be executed by installing gulp, gulp-qunit
 and gulp-util and running gulp. Unit tests are automatically run on pull
