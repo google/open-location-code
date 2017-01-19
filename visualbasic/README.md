@@ -122,8 +122,7 @@ spreadsheet!
 ## Reporting Issues
 
 If the self tests fail, copy the error message or take a
-screen shot and log an issue on
-[Github](https://github.com/google/open-location-code/issues/new?labels=visualbasic&assignee=drinckes).
+screen shot and [log an issue](https://github.com/google/open-location-code/issues/new?labels=visualbasic&assignee=drinckes).
 
 If you have any requests or suggestions on how to improve the code, either
 log an issue using the link above, or send us a pull request.
