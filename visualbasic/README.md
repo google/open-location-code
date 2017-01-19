@@ -123,8 +123,7 @@ spreadsheet!
 
 If the self tests fail, copy the error message or take a
 screen shot and log an issue on
-[Github](https://github.com/google/open-location-code). (You will probably be
-asked to do a number of tests.)
+[Github](https://github.com/google/open-location-code/issues/new?labels=visualbasic&assignee=drinckes).
 
 If you have any requests or suggestions on how to improve the code, either
-log an issue on Github or send us a pull request.
+log an issue using the link above, or send us a pull request.
