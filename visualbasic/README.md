@@ -38,13 +38,13 @@ OLCDecode(code)
 This decodes the passed Open Location Code, and returns an `OLCArea` data
 structure, which has the following fields:
 
-* `LatLo`: The latitude of the south-west corner of the code area.
-* `LngLo`: The longitude of the south-west corner of the code area.
-* `LatCenter`: The latitude of the center of the code area.
-* `LngCenter`: The longitude of the center of the code area.
-* `LatHi`: The latitude of the north-east corner of the code area.
-* `LngHi`: The longitude of the north-east corner of the code area.
-* `CodeLength`: The number of digits in the code.
+* `latLo`: The latitude of the south-west corner of the code area.
+* `lngLo`: The longitude of the south-west corner of the code area.
+* `latCenter`: The latitude of the center of the code area.
+* `lngCenter`: The longitude of the center of the code area.
+* `latHi`: The latitude of the north-east corner of the code area.
+* `lngHi`: The longitude of the north-east corner of the code area.
+* `codeLength`: The number of digits in the code.
 
 ```
 OLCDecode2Array(code)
@@ -53,7 +53,7 @@ OLCDecode2Array(code)
 This returns an array of the fields from the `OLCArea` data structure, in the
 following order:
 
-`LatLo`, `LngLo`, `LatCenter`, `LngCenter`, `LatHi`, `LngHi`, `CodeLength`
+`latLo`, `lngLo`, `latCenter`, `lngCenter`, `latHi`, `lngHi`, `codeLength`
 
 ### Shortening And Recovery
 
@@ -91,6 +91,7 @@ and import the `OpenLocationCode.bas` file. This will add the functions to the
 current workbook.
 
 After importing, go back to the workbook, and run the self checks with:
+
 1. Select menu option Tools > Macro > Macros...
 2. In the Macro name: field type 'TestOLCLibrary' (it should be listed in the
 box) and click Run
