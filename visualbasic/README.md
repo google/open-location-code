@@ -116,7 +116,7 @@ OK. It will then display the macro editor.
 ```
 Option VBASupport 1
 ```
-6. That's it. Save the file. You can now use the functions above in your
+That's it. Save the file. You can now use the functions above in your
 spreadsheet!
 
 ## Reporting Issues
