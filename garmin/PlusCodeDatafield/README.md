@@ -67,7 +67,7 @@ The following devices are supported:
 
 ## Logging issues
 
-You can enter feedback in the Connect IQ store or create an issue on the project site by
+Create an issue on the project site by
 [clicking here](https://github.com/google/open-location-code/issues/new?title=Issue%20with%20Garmin%20datafield&body=Provide%20your%20device%20model%20and%20what%20the%20problem%20is.%20Including%20screenshots%20would%20really%20help.&labels=garmin).
 
 ## Using Connect IQ on Linux
