@@ -1,5 +1,8 @@
 # Plus code datafield for Garmin Connect IQ devices.
 
+[<img src="https://developer.garmin.com/img/connect-iq/brand/available-badge.svg" alt="Drawing" width=200 style="width: 200px;"/>](https://apps.garmin.com/en-US/apps/74d90879-fbac-48e7-8405-28af2a0a55a7#0)
+
+
 Plus codes are short codes you can use to refer to a place, that are easier
 to use than latitude and longitude. They were designed to provide an
 address-like solution for the areas of the world where street addresses do not
@@ -29,6 +32,10 @@ They can enter the code into Google Maps, or into
 The code will fade if the location accuracy is poor or the GPS signal is lost.
 
 The code precision is approximately 14 by 14 meters.
+
+A built version of the datafield is available on the Garmin Connect IQ
+[app store](https://apps.garmin.com/en-US/apps/74d90879-fbac-48e7-8405-28af2a0a55a7#0),
+or you can build your own version.
 
 ## Build and Installation
 
