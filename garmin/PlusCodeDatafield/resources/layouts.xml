@@ -1,0 +1,30 @@
+<layouts>
+    <!-- A generic, centered layout with a large font size. -->
+    <layout id="MainLayout">
+        <drawable class="PlusCodeBackground" />
+        <label id="areacode" x="0" y="0" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_TINY" />
+        <label id="localcode" x="0" y="0" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_LARGE" />
+    </layout>
+
+    <!-- Layouts used for the for the four quadrants, e.g. on watches. -->
+    <layout id="TopLeftLayout">
+        <drawable class="PlusCodeBackground" />
+        <label id="areacode" x="99" y="58" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="Gfx.FONT_TINY" />
+        <label id="localcode" x="99" y="75" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="Gfx.FONT_SMALL" />
+    </layout>
+    <layout id="TopRightLayout">
+        <drawable class="PlusCodeBackground" />
+        <label id="areacode" x="8" y="58" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_LEFT" font="Gfx.FONT_TINY" />
+        <label id="localcode" x="8" y="75" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_LEFT" font="Gfx.FONT_SMALL" />
+    </layout>
+    <layout id="BottomLeftLayout">
+        <drawable class="PlusCodeBackground" />
+        <label id="areacode" x="99" y="5" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="Gfx.FONT_TINY" />
+        <label id="localcode" x="99" y="22" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="Gfx.FONT_SMALL" />
+    </layout>
+    <layout id="BottomRightLayout">
+        <drawable class="PlusCodeBackground" />
+        <label id="areacode" x="8" y="5" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_LEFT" font="Gfx.FONT_TINY" />
+        <label id="localcode" x="8" y="22" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_LEFT" font="Gfx.FONT_SMALL" />
+    </layout>
+</layouts>
