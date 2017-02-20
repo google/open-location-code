@@ -9,7 +9,7 @@ a separator if they have five or more characters.
 
 Methods that accept Open Location Codes as parameters should be case
 insensitive, prefixes optional, and for full codes the separator character
-is optional (although if present, it is permissable to throw an error if
+is optional (although if present, it is permissible. to throw an error if
 there are more than one or if it is in the wrong position).
 
 isValid:
