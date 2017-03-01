@@ -598,7 +598,7 @@ Sub TestOLCLibrary()
       Exit Sub
     End If
     If f <> (validity(i)(3) = "true") Then
-      MsgBox ("IsFull test " + CStr(i) + ", expected: " + CStr(validity(i)(2) = "true") + ", actual: " + CStr(f))
+      MsgBox ("IsFull test " + CStr(i) + ", expected: " + CStr(validity(i)(3) = "true") + ", actual: " + CStr(f))
       Exit Sub
     End If
   Next
