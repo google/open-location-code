@@ -1,0 +1,9 @@
+csharp/.vs/
+csharp/src/Google.OpenLocationCode/obj/
+csharp/src/Google.OpenLocationCode/bin/
+csharp/test/Google.OpenLocationCode.Tests/obj/
+csharp/test/Google.OpenLocationCode.Tests/bin/
+csharp/src/Google.OpenLocationCode/project.lock.json
+csharp/src/Google.OpenLocationCode/.vs/
+csharp/src/.vs/
+csharp/test/Google.OpenLocationCode.Tests/project.lock.json
