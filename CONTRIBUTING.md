@@ -19,6 +19,18 @@ us first through the issue tracker with your idea so that we can help out and
 possibly guide you. Coordinating up front makes it much easier to avoid
 frustration later on.
 
+## Writing a new implementation
+
+Before you start writing a new implementation, look at some of the existing ones. If you copy the
+code structure from them, you are more likely to have fewer bugs and an easier review cycle.
+
+If you create new algorithms to encode or decode, then your reviewer will have to spend more time
+trying to understand your code in a language they may not be familiar with, and the review cycle
+will take longer.
+
+The reason we say this is because once code is accepted into our repository, we have the responsibility
+to maintain and look after it. You are not writing the code for you, but for the OLC project team.
+
 ## Code reviews
 All submissions, including submissions by project members, require review. We
 use Github pull requests for this purpose.
