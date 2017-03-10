@@ -19,11 +19,29 @@ import java.math.BigDecimal;
 /**
  * Convert locations to and from convenient short codes.
  *
- * <p>Open Location Codes are short, ~10 character codes that can be used instead of street
+ * Open Location Codes are short, ~10 character codes that can be used instead of street
  * addresses. The codes can be generated and decoded offline, and use a reduced character set that
  * minimises the chance of codes including words.
  *
- * <p>This provides both an object and static methods.
+ * This provides both object and static methods.
+ *
+ * Create an object with:
+ * OpenLocationCode code = new OpenLocationCode("7JVW52GR+2V");
+ * OpenLocationCode code = new OpenLocationCode("52GR+2V");
+ * OpenLocationCode code = new OpenLocationCode(27.175063, 78.042188);
+ * OpenLocationCode code = new OpenLocationCode(27.175063, 78.042188, 11);
+ *
+ * Once you have a code object, you can apply the other methods to it, such as to shorten:
+ * code.shorten(27.176, 78.05)
+ *
+ * Recover the nearest match (if the code was a short code):
+ * code.recover(27.176, 78.05)
+ *
+ * Or decode a code into it's coordinates, returning a CodeArea object.
+ * code.decode()
+ *
+ * @author Jiri Semecky
+ * @author Doug Rinckes
  */
 public final class OpenLocationCode {
 
@@ -132,6 +150,7 @@ public final class OpenLocationCode {
    * Creates Open Location Code object for the provided code.
    * @param code A valid OLC code. Can be a full code or a shortened code.
    * @throws IlegalArgumentException when the passed code is not valid.
+   * @constructor
   */
   public OpenLocationCode(String code) {
     if (!isValidCode(code.toUpperCase())) {
@@ -147,6 +166,7 @@ public final class OpenLocationCode {
    * @param longitude The longitude in decimal degrees.
    * @param codeLength The desired number of digits in the code.
    * @throws IllegalArgumentException if the code length is not valid.
+   * @constructor
    */
   public OpenLocationCode(double latitude, double longitude, int codeLength)
       throws IllegalArgumentException {
@@ -215,11 +235,19 @@ public final class OpenLocationCode {
     this.code = codeBuilder.toString();
   }
 
-  /** Creates Open Location Code with code length 10 from the provided latitude, longitude. */
+  /**
+   * Creates Open Location Code with the default precision length.
+   * @param latitude The latitude in decimal degrees.
+   * @param longitude The longitude in decimal degrees.
+   * @constructor
+   */
   public OpenLocationCode(double latitude, double longitude) {
     this(latitude, longitude, CODE_PRECISION_NORMAL);
   }
 
+  /**
+   * Returns the string representation of the code.
+   */
   public String getCode() {
     return code;
   }
@@ -227,6 +255,8 @@ public final class OpenLocationCode {
   /**
    * Encodes latitude/longitude into 10 digit Open Location Code. This method is equivalent to
    * creating the OpenLocationCode object and getting the code from it.
+   * @param latitude The latitude in decimal degrees.
+   * @param longitude The longitude in decimal degrees.
    */
   public static String encode(double latitude, double longitude) {
     return new OpenLocationCode(latitude, longitude).getCode();
@@ -235,6 +265,8 @@ public final class OpenLocationCode {
   /**
    * Encodes latitude/longitude into Open Location Code of the provided length. This method is
    * equivalent to creating the OpenLocationCode object and getting the code from it.
+   * @param latitude The latitude in decimal degrees.
+   * @param longitude The longitude in decimal degrees.
    */
   public static String encode(double latitude, double longitude, int codeLength) {
     return new OpenLocationCode(latitude, longitude, codeLength).getCode();
