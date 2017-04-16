@@ -32,4 +32,10 @@ if [ "$TEST_DIR" == "ruby" ]; then
   exit
 fi
 
+if [ "$TEST_DIR" == "rust" ]; then
+  rustup update stable
+  cd rust && cargo test
+  exit
+fi
+
 echo "Unknown test directory: $TEST_DIR"
