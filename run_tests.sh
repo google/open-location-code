@@ -35,7 +35,7 @@ fi
 if [ "$TEST_DIR" == "rust" ]; then
   curl https://sh.rustup.rs -sSf | sh -s -- -y
   rustup update stable
-  cd rust && cargo test
+  cd rust && rustup run stable cargo test
   exit
 fi
 
