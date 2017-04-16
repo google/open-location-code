@@ -34,6 +34,7 @@ fi
 
 if [ "$TEST_DIR" == "rust" ]; then
   curl https://sh.rustup.rs -sSf | sh -s -- -y
+  export PATH=$PATH:`pwd`/.cargo/bin
   rustup update stable
   cd rust && rustup run stable cargo test
   exit
