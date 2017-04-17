@@ -6,6 +6,7 @@ authors = ["James Fysh <james.fysh@gmail.com>"]
 license = "MIT/Apache-2.0"
 repository = "https://github.com/JamesFysh/open-location-code"
 keywords = ["geography", "geospatial", "gis", "gps", "olc"]
+exclude = ["rust.iml"]
 
 [dependencies]
 geo = "^0.4.3"
