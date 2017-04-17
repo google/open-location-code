@@ -102,9 +102,9 @@ pub fn is_full(_code: &str) -> bool {
 /// 10 characters, returning a code of approximately 13.5x13.5 meters. Longer
 /// codes represent smaller areas, but lengths > 14 are sub-centimetre and so
 /// 11 or 12 are probably the limit of useful codes.
-pub fn encode(c: Point<f64>, code_length: usize) -> String {
-    let mut lat = clip_latitude(c.lat());
-    let mut lng = normalize_longitude(c.lng());
+pub fn encode(pt: Point<f64>, code_length: usize) -> String {
+    let mut lat = clip_latitude(pt.lat());
+    let mut lng = normalize_longitude(pt.lng());
 
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
@@ -200,7 +200,7 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
 ///
 /// It returns either the original code, if the reference location was not
 /// close enough, or the .
-pub fn shorten(_code: &str, latitude: f64, longitude: f64) -> Result<String, String> {
+pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
     if !is_full(_code) {
         return Ok(_code.to_string());
     }
@@ -214,8 +214,8 @@ pub fn shorten(_code: &str, latitude: f64, longitude: f64) -> Result<String, Str
     }
 
     // How close are the latitude and longitude to the code center.
-    let range = (codearea.center.lat() - clip_latitude(latitude)).abs().max(
-        (codearea.center.lng() - normalize_longitude(longitude)).abs()
+    let range = (codearea.center.lat() - clip_latitude(ref_pt.lat())).abs().max(
+        (codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs()
     );
 
     for i in 0..PAIR_RESOLUTIONS.len() - 2 {
@@ -258,7 +258,7 @@ pub fn shorten(_code: &str, latitude: f64, longitude: f64) -> Result<String, Str
 /// the nearest match, not necessarily the match within the same cell. If the
 /// passed code was not a valid short code, but was a valid full code, it is
 /// returned unchanged.
-pub fn recover_nearest(_code: &str, ref_lat: f64, ref_lng: f64) -> Result<String, String> {
+pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
     if !is_short(_code) {
         if is_full(_code) {
             return Ok(_code.to_string());
@@ -267,11 +267,8 @@ pub fn recover_nearest(_code: &str, ref_lat: f64, ref_lng: f64) -> Result<String
         }
     }
 
-    let ref_latitude = clip_latitude(ref_lat);
-    let ref_longitude = normalize_longitude(ref_lng);
-
     let prefix_len = SEPARATOR_POSITION - _code.find(SEPARATOR).unwrap();
-    let mut code = prefix_by_reference(ref_lat, ref_lng, prefix_len);
+    let mut code = prefix_by_reference(ref_pt, prefix_len);
     code.push_str(_code);
 
     let code_area = decode(code.as_str()).unwrap();
@@ -282,13 +279,13 @@ pub fn recover_nearest(_code: &str, ref_lat: f64, ref_lng: f64) -> Result<String
     let mut latitude = code_area.center.lat();
     let mut longitude = code_area.center.lng();
 
-    let latitude_diff = latitude - ref_latitude;
+    let latitude_diff = latitude - clip_latitude(ref_pt.lat());
     if latitude_diff > area_edge {
         latitude -= area_range;
     } else if latitude_diff < -area_edge {
         latitude += area_range;
     }
-    let longitude_diff = longitude - ref_longitude;
+    let longitude_diff = longitude - normalize_longitude(ref_pt.lng());
     if longitude_diff > area_edge {
         longitude -= area_range;
     } else if longitude_diff < -area_edge {

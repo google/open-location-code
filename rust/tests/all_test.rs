@@ -78,8 +78,12 @@ fn shorten_recovery_test() {
         let lng = cols[2].parse::<f64>().unwrap();
         let short_code = cols[3];
 
-        assert_eq!(shorten(full_code, lat, lng).unwrap(), short_code, "shorten");
-        assert_eq!(recover_nearest(short_code, lat, lng), Ok(full_code.to_string()), "recover");
+        assert_eq!(shorten(full_code, Point::new(lng, lat)).unwrap(), short_code, "shorten");
+        assert_eq!(
+            recover_nearest(short_code, Point::new(lng, lat)),
+            Ok(full_code.to_string()),
+            "recover"
+        );
 
         tested += 1;
     }

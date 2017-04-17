@@ -38,12 +38,13 @@ pub fn compute_latitude_precision(code_length: usize) -> f64 {
     ENCODING_BASE.powf(-3f64) / GRID_ROWS.powf(code_length as f64 - PAIR_CODE_LENGTH as f64)
 }
 
-pub fn prefix_by_reference(lat: f64, lng: f64, code_length: usize) -> String {
+pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
     let precision = compute_latitude_precision(code_length);
-    let rounded_lat = (lat / precision).floor() * precision;
-    let rounded_lng = (lng / precision).floor() * precision;
     let mut code = encode(
-        Point::new(rounded_lng, rounded_lat),
+        Point::new(
+            (pt.lng() / precision).floor() * precision,
+            (pt.lat() / precision).floor() * precision
+        ),
         PAIR_CODE_LENGTH
     );
     code.drain(code_length..);
