@@ -26,7 +26,7 @@
 
   Codes represent rectangular areas rather than points, and the longer the
   code, the smaller the area. A 10 character code represents a 13.5x13.5
-  meter area (at the equator. An 11 character code represents approximately
+  meter area (at the equator). An 11 character code represents approximately
   a 2.8x3.5 meter area.
 
   Two encoding algorithms are used. The first 10 characters are pairs of
@@ -351,9 +351,6 @@ function decode(code) {
       // Row and column numbers must be integers.
       var row = Math.floor(value / GRID_COLUMNS);
       var col = Math.floor(value % GRID_COLUMNS);
-      // Lat and lng grid sizes shouldn't underflow due to maximum code length
-      // enforcement, but a hypothetical underflow won't cause fatal errors
-      // here.
       latitude_resolution /= GRID_ROWS;
       longitude_resolution /= GRID_COLUMNS;
       latitude += row * latitude_resolution;
