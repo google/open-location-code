@@ -1,47 +1,49 @@
 # Java Open Location Code library
 
-## Building
+## Building and Testing
 
-Create an empty `build` directory:
+Included is a `BUILD` file that uses the [Bazel](https://bazel.build/) build system to produce a JAR file and to run tests. You will need to install Bazel on your system to run the tests.
 
-```shell
+### Building the JAR file
+
+To build a JAR file, run:
+
+```
+$ bazel build java:openlocationcode
+INFO: Found 1 target...
+Target //java:openlocationcode up-to-date:
+  bazel-bin/java/libopenlocationcode.jar
+INFO: Elapsed time: 3.107s, Critical Path: 0.22s
+$
+```
+
+The JAR file is accessable using the path shown in the output.
+
+If you cannot install Bazel, you can build the JAR file manually with:
+
+```
 mkdir build
-```
-
-Compile the `com/google/openlocationcode/OpenLocationCode.java` file and then
-package it as a jar file:
-
-```shell
 javac -d build com/google/openlocationcode/OpenLocationCode.java
-cd build
-jar cvf OpenLocationCode.jar com/google/openlocationcode/OpenLocationCode*.class
-cd ..
-```
-That's it - you'll have a jar file in `build/OpenLocationCode.jar`.
-
-## Testing
-
-Download the `junit` and `hamcrest` jar files from [their repository](https://github.com/junit-team/junit4/wiki/Download-and-Install)
-and place them somewhere.
-
-(This will assume you downloaded `junit-41.2.jar` and `hamcrest-core-1.3.jar`)
-
-Build the `OpenLocationCode.jar` file as above.
-
-Add all three files to your `CLASSPATH` variable (obviously use the real paths to the files):
-
-```shell
-CLASSPATH=$CLASSPATH:build/OpenLocationCode.jar:/path/to/junit-4.12.jar:/path/to/hamcrest-core-1.3.jar
 ```
 
-Compile the test classes:
+This will  create a JAR file in the `build` directory. Change that to a suitable location.
 
-```shell
-javac -cp $CLASSPATH -d build com/google/openlocationcode/tests/*java
+### Running tests
+
+The tests read their data from the [`test_data`](https://github.com/google/open-location-code/tree/master/test_data) directory.
+
+Run the tests from the top-level github directory. This command will build the JAR file and test classes, and execute them:
+
+```
+$ bazel test java:all
+INFO: Found 1 target and 4 test targets...
+INFO: Elapsed time: 0.657s, Critical Path: 0.46s
+//java:encoding_Test                                                     PASSED in 0.4s
+//java:precision_test                                                    PASSED in 0.4s
+//java:shortening_test                                                   PASSED in 0.4s
+//java:validity_test                                                     PASSED in 0.4s
+
+Executed 4 out of 4 tests: 4 tests pass.
+$
 ```
 
-Run the tests. Note that we need to use the `-cp` argument to give the location of the test classes and the test data files:
-
-```shell
-java -cp $CLASSPATH:build:../test_data: org.junit.runner.JUnitCore com.google.openlocationcode.tests.EncodingTest com.google.openlocationcode.tests.PrecisionTest com.google.openlocationcode.tests.ShorteningTest com.google.openlocationcode.tests.ValidityTest
-```
