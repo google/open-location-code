@@ -1,4 +1,22 @@
-# Automated Integration Testing
+# Testing
+The preferred mechanism for testing is using the [Bazel](https://bazel.build/)
+build system. This uses files called `BUILD` ([example](https://github.com/google/open-location-code/blob/master/BUILD)
+to provide rules to build code and run tests.
+
+Create a `BUILD` file in your code directory with a [test rule](https://bazel.build/versions/master/docs/test-encyclopedia.html).
+You can then test your code by running:
+
+```sh
+blaze test <dir>:<rule>
+```
+
+All tests can be run with:
+
+```sh
+blaze test ...:all
+```
+
+## Automated Integration Testing
 Changes are sent to [Travis CI](https://travis-ci.org)
 for integration testing after pushes, and you can see the current test status
 [here](https://travis-ci.org/google/open-location-code).
@@ -6,13 +24,13 @@ for integration testing after pushes, and you can see the current test status
 The testing configuration is controlled by two files:
 [`travis.yml`](.travis.yml) and [`run_tests.sh`](run_tests.sh).
 
-## [.travis.yml](.travis.yml)
+### [.travis.yml](.travis.yml)
 This file defines the prerequisites required for testing, and the list of
 directories to be tested. (The directories listed are tested in parallel.)
 
 The same script ([run_tests.sh](run_tests.sh)) is executed for all directories.
 
-## [run_tests.sh](run_tests.sh)
+### [run_tests.sh](run_tests.sh)
 This file is run once for _each_ directory defined in
 `.travis.yml`. The directory name being tested is passed in the environment
 variable `TEST_DIR`.)
@@ -23,7 +41,7 @@ commands to test the relevant implementation. The commands that do the testing
 return zero, even if they output error messages, will be considered by the
 testing framework as a success_.
 
-## Adding Your Tests
+### Adding Your Tests
 Add your directory to the [`.travis.yml`](.travis.yml) file:
 ```
 # Define the list of directories to execute tests in.
@@ -49,7 +67,7 @@ the script will return the same status as the tests. If this status is zero,
 the test will be marked successful. If not, the test will be marked as a
 failure.
 
-## Testing Multiple Languages
+### Testing Multiple Languages
 [Travis CI](https://travis-ci.org) assumes that each github project has only
 a single language. That language is specified in the [.travis.yml](.travis.yml)
 file (`language: node_js`).

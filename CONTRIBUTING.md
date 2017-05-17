@@ -1,55 +1,72 @@
-Want to contribute? Great! First, read this page (including the small print at the end).
+# Contributing to Open Location Code
 
-## Before you contribute
-Before we can use your code, you must sign the
-[Google Individual Contributor License Agreement](https://developers.google.com/open-source/cla/individual?csw=1)
-(CLA), which you can do online.
+The Open Location Code project strongly encourages technical contributions.
 
-The CLA is necessary mainly because you own the
-copyright to your changes, even after your contribution becomes part of our
-codebase, so we need your permission to use and distribute your code. We also
-need to be sure of various other things—for instance that you'll tell us if you
-know that your code infringes on other people's patents.
+We hope you'll become an ongoing participant in our open source community but we also welcome one-off contributions for the issues you're particularly passionate about.
 
-You don't have to sign
-the CLA until after you've submitted your code for review and a member has
-approved it, but you must do it before we can put your code into our codebase.
-Before you start working on a larger contribution, you should get in touch with
-us first through the issue tracker with your idea so that we can help out and
-possibly guide you. Coordinating up front makes it much easier to avoid
-frustration later on.
+- [Filing issues](#filing-issues)
+  * [Bugs](#bugs)
+  * [Suggestions](#suggestions)
+- [Contributing code](#contributing-code)
+- [Contributing a new implementation](#contributing-a-new-implementation)
+- [Contributor License Agreement](#contributor-license-agreement)
+- [Ongoing participation](#ongoing-participation)
+  * [Discussion channels](#discussion-channels)
 
-## Writing a new implementation
+## Filing issues
 
-Before you start writing a new implementation, look at some of the existing ones. If you copy the
-code structure from them, you are more likely to have fewer bugs and an easier review cycle.
+### Bugs
 
-If you create new algorithms to encode or decode, then your reviewer will have to spend more time
-trying to understand your code in a language they may not be familiar with, and the review cycle
-will take longer.
+If you find a bug in an Open Location Code library, please [file an issue](https://github.com/google/open-location-code/issues/new).  Members of the community are regularly monitoring issues and will try to fix open bugs quickly.
 
-The reason we say this is because once code is accepted into our repository, we have the responsibility
-to maintain and look after it. You are not writing the code for you, but for the OLC project team.
+The best bug reports provide a detailed description of the issue, step-by-step instructions for predictably reproducing the issue, and possibly even a working example that demonstrates the issue.
 
-## Code reviews
-All submissions, including submissions by project members, require review. We
-use Github pull requests for this purpose.
+Please note that questions about how to use Open Location Code or other general questions should be asked on the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code)<!-- Uncomment if this becomes sensible --><!-- or [Stack Overflow under the Open Location Code tag](http://stackoverflow.com/questions/tagged/open-location-code) -->
+instead of filing an issue here.
 
-## Code Style
-Programs written in Go must be formatted with `gofmt`. For other languages, we use the 
-[Google style guides](https://google.github.io/styleguide/) for code styling. Specifically, this means:
+### Suggestions
 
-* Line length: 80 chars (Java 100)
-* No extra whitespace around arguments `(code)` not `( code )`
-*  K & R style braces:
-```java
-if (condition()) {
-  something();
-} else {
-  somethingElse();
-}
-```
+The Open Location Code project is meant to evolve with feedback.  The project and its users appreciate your thoughts on ways to improve the design or features or creative ways to use the codes.
 
-## The small print
-Contributions made by corporations are covered by a different agreement than
-the one above, the Software Grant and Corporate Contributor License Agreement.
+To make a suggestion [file an issue](https://github.com/google/open-location-code/issues/new).
+
+If you are intending to implement, please see the [Contributing code](#contributing-code) section below for next steps.
+
+If you are adding Open Location Codes to your project, please contact the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code) so we can suggest how you can make the most of the codes.
+
+## Contributing code
+
+The Open Location Code project accepts and greatly appreciates code contributions!
+
+If you are contributing code to the project consider [joining the Open Location Code project on GitHub](https://goo.gl/forms/T65peVtfQfEoDWeD3).
+
+A few things to note:
+
+* The Open Location Code project follows the [fork & pull](https://help.github.com/articles/using-pull-requests/#fork--pull) model for accepting contributions.
+* We follow [Google's JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html).  More generally make sure to follow the same comment and coding style as the rest of the project.
+* Include [tests](TESTING.md) when contributing code.  There are tests that you can use as examples.
+
+## Contributing a new implementation
+
+Follow this process for contributing a new implementation:
+
+* Look at the existing implementations, to get an idea of the usage and how much work is involved.
+* If you copy the code structure and algorithms from an existing implementation, you'll have a much shorter review cycle.
+* [Create a new GitHub issue](https://github.com/google/open-location-code/issues/new) to start discussion of the new feature.
+* Follow the guidelines for [Contributing code](#contributing-code) described above.
+
+## Contributor License Agreement
+
+The Open Location Code project hosted at GitHub requires all contributors to sign a Contributor License Agreement ([individual](https://developers.google.com/open-source/cla/individual) or [corporation](https://developers.google.com/open-source/cla/corporate)) in order to protect contributors, users and Google in issues of intellectual property.
+
+When you create a Pull Request a check will be run to ensure that you have signed the CLA.  Make sure that you sign the CLA with the same email address you associate with your commits (likely via the `user.email` Git config as described on GitHub's [Set up Git](https://help.github.com/articles/set-up-git/) page).
+
+## Ongoing participation
+
+We actively encourage ongoing participation by community members.
+
+### Discussion channels
+
+Technical issues, designs, etc. are discussed on [GitHub issues](https://github.com/google/open-location-code/issues) and [pull requests](https://github.com/google/open-location-code/pulls),
+or the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code)<!-- Uncomment if this becomes sensible --><!-- and [Stack Overflow under the Open Location Code tag](http://stackoverflow.com/questions/tagged/open-location-code) -->.
+
