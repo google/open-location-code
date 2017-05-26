@@ -22,7 +22,7 @@
 goog.module('openlocationcode_test');
 goog.setTestOnly('openlocationcode_test');
 
-var openlocationcode = goog.require('google.openlocationcode');
+var OpenLocationCode = goog.require('openlocationcode.OpenLocationCode');
 var testSuite = goog.require('goog.testing.testSuite');
 goog.require('goog.testing.asserts');
 
@@ -162,9 +162,9 @@ testSuite({
     for (var i = 0; i < tests.length; i++) {
       var td = tests[i];
       // Decode the code.
-      var ca = openlocationcode.decode(td[0]);
+      var ca = OpenLocationCode.decode(td[0]);
       // Encode the center coordinates.
-      var code = openlocationcode.encode(td[1], td[2], ca.codeLength);
+      var code = OpenLocationCode.encode(td[1], td[2], ca.codeLength);
       // Did we get the same code?
       assertEquals('Test ' + 1, td[0], code);
       // Check that the decode gave the correct coordinates.
@@ -250,9 +250,9 @@ testSuite({
     for (var i = 0; i < tests.length; i++) {
       var td = tests[i];
       // Shorten the code.
-      var short = openlocationcode.shorten(td[0], td[1], td[2]);
+      var short = OpenLocationCode.shorten(td[0], td[1], td[2]);
       assertEquals('Test ' + i, short, td[3]);
-      var recovered = openlocationcode.recoverNearest(short, td[1], td[2]);
+      var recovered = OpenLocationCode.recoverNearest(short, td[1], td[2]);
       assertEquals('Test ' + i, recovered, td[0]);
     }
   },
@@ -367,9 +367,9 @@ testSuite({
     ];
     for (var i = 0; i < tests.length; i++) {
       var td = tests[i];
-      assertEquals('Test ' + i, openlocationcode.isValid(td[0]), td[1]);
-      assertEquals('Test ' + i, openlocationcode.isShort(td[0]), td[2]);
-      assertEquals('Test ' + i, openlocationcode.isFull(td[0]), td[3]);
+      assertEquals('Test ' + i, OpenLocationCode.isValid(td[0]), td[1]);
+      assertEquals('Test ' + i, OpenLocationCode.isShort(td[0]), td[2]);
+      assertEquals('Test ' + i, OpenLocationCode.isFull(td[0]), td[3]);
     }
   },
 });

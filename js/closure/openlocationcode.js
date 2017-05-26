@@ -57,7 +57,7 @@
     var code = OpenLocationCode.recoverNearest('8F+6X', 47.4, 8.6);
  */
 
-goog.module('google.openlocationcode');
+goog.module('openlocationcode.OpenLocationCode');
 
 // A separator used to break the code into two parts to aid memorability.
 var SEPARATOR = '+';
