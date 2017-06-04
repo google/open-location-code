@@ -5,6 +5,7 @@ language: node_js
 node_js:
   - "0.10"
 
+sudo: true
 
 # Install package dependencies. See
 # http://docs.travis-ci.com/user/installing-dependencies/
