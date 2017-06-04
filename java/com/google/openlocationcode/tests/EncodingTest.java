@@ -7,6 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -46,7 +48,8 @@ public class EncodingTest {
 
   @Before
   public void setUp() throws Exception {
-    InputStream testDataStream = ClassLoader.getSystemResourceAsStream("encodingTests.csv");
+    File testFile = new File(System.getenv("JAVA_RUNFILES"), "openlocationcode/test_data/encodingTests.csv");
+    InputStream testDataStream = new FileInputStream(testFile);
     BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream));
     String line;
     while ((line = reader.readLine()) != null) {

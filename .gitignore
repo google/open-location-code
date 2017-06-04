@@ -1,0 +1,7 @@
+# Ignore backup and swap files.
+*~
+.*.swp
+# Ignore all bazel-* links.
+/bazel-*
+# Ignore outputs generated during Bazel bootstrapping.
+/output/
