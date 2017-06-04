@@ -12,7 +12,7 @@ sudo: true
 # gulp: required for JS testing
 before_install:
   - npm install -g gulp
-  - yes | sudo add-apt-repository ppa:hansjorg/rust
+  - yes | sudo add-apt-repository ppa:jonathonf/rustlang 
   - sudo apt-get update
 
 install:
