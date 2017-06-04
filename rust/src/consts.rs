@@ -45,3 +45,4 @@ pub const GRID_ROWS: f64 = 5f64;
 
 // Minimum length of a code that can be shortened.
 pub const MIN_TRIMMABLE_CODE_LEN: usize = 6;
+

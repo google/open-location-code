@@ -1,11 +1,11 @@
-extern crate olc;
+extern crate open_location_code;
 extern crate geo;
 
 use std::vec::Vec;
 
-use olc::{is_valid, is_short, is_full};
-use olc::{encode, decode};
-use olc::{shorten, recover_nearest};
+use open_location_code::{is_valid, is_short, is_full};
+use open_location_code::{encode, decode};
+use open_location_code::{shorten, recover_nearest};
 
 use geo::Point;
 
@@ -58,10 +58,10 @@ fn encode_decode_test() {
             code,
             "encoding lat={},lng={}", lat, lng
         );
-        assert!((latlo - codearea.south).abs() < 0.001f64);
-        assert!((lathi - codearea.north).abs() < 0.001f64);
-        assert!((lnglo - codearea.west).abs() < 0.001f64);
-        assert!((lnghi - codearea.east).abs() < 0.001f64);
+        assert!((latlo - codearea.south).abs() < 1e-10f64);
+        assert!((lathi - codearea.north).abs() < 1e-10f64);
+        assert!((lnglo - codearea.west).abs() < 1e-10f64);
+        assert!((lnghi - codearea.east).abs() < 1e-10f64);
 
         tested += 1;
     }
@@ -90,3 +90,4 @@ fn shorten_recovery_test() {
 
     assert!(tested > 0);
 }
+

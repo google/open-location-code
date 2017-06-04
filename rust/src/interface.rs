@@ -108,7 +108,7 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
 
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
-    if lat == LATITUDE_MAX {
+    if lat > LATITUDE_MAX || (LATITUDE_MAX - lat) < 1e-10f64 {
         lat = lat - compute_latitude_precision(code_length);
     }
 
@@ -126,8 +126,7 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
             code.push(CODE_ALPHABET[lat_digit]);
             code.push(CODE_ALPHABET[lng_digit]);
             digit += 2;
-        }
-        else {
+        } else {
             code.push(CODE_ALPHABET[4 * lat_digit + lng_digit]);
             digit += 1;
         }
@@ -293,3 +292,4 @@ pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String
     }
     Ok(encode(Point::new(longitude, latitude), code_area.code_length))
 }
+

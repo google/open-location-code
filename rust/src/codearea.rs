@@ -28,3 +28,4 @@ impl CodeArea {
         )
     }
 }
+

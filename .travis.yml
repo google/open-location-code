@@ -11,6 +11,11 @@ node_js:
 # gulp: required for JS testing
 before_install:
   - npm install -g gulp
+  - yes | sudo add-apt-repository ppa:hansjorg/rust
+  - sudo apt-get update
+
+install:
+  sudo apt-get install rust-nightly
 
 # Define the list of directories to execute tests in.
 env:

@@ -13,7 +13,12 @@ pub fn code_value(chr: char) -> usize {
             return i;
         }
     }
-    0
+    // We assume this function is only called by other functions that have
+    // already ensured that the characters in the passed-in code are all valid
+    // and have all been "treated" (upper-cased, padding and '+' stripped)
+    //
+    // If that is the case, we will always return above.
+    unreachable!();
 }
 
 pub fn normalize_longitude(value: f64) -> f64 {
@@ -52,6 +57,11 @@ pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
 }
 
 pub fn near(value: f64) -> bool {
+    // Detects real values that are "very near" the next integer value
+    // returning true when this is the case.
+    //
+    // I'm not particularly happy with this function, but I am at a loss
+    // for another (better?) way to achieve the required behaviour.
     value.trunc() != (value + 0.0000000001f64).trunc()
 }
 
@@ -59,7 +69,7 @@ pub fn narrow_region(digit: usize, lat: &mut f64, lng: &mut f64) {
     if digit == 0 {
         *lat /= ENCODING_BASE;
         *lng /= ENCODING_BASE;
-    } else if digit < 10 {
+    } else if digit < PAIR_CODE_LENGTH {
         *lat *= ENCODING_BASE;
         *lng *= ENCODING_BASE;
     } else {
