@@ -18,6 +18,8 @@ dist: trusty
 before_install:
   - npm install -g gulp
   - yes | sudo add-apt-repository ppa:jonathonf/rustlang 
+  - yes | sudo add-apt-repository ppa:jonathonf/llvm
+  - yes | sudo add-apt-repository ppa:jonathonf/gcc
   - sudo apt-get update
 
 install:
