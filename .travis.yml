@@ -21,7 +21,7 @@ before_install:
   - sudo apt-get update
 
 install:
-  sudo apt-get -y install libstd-rust-dev rustc cargo
+  sudo apt-get -y install libstd-rust-1.16 libstd-rust-dev rustc cargo
 
 # Define the list of directories to execute tests in.
 env:
