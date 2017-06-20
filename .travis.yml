@@ -21,7 +21,7 @@ before_install:
   - sudo apt-get update
 
 install:
-  sudo apt-get install rust-nightly
+  sudo apt-get -y install rustc cargo
 
 # Define the list of directories to execute tests in.
 env:
