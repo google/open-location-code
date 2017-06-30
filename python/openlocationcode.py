@@ -275,11 +275,8 @@ def decode(code):
        to find the nearest matching full code.
  Returns:
    The nearest full Open Location Code to the reference location that matches
-   the short code. Note that the returned code may not have the same
-   computed characters as the reference location. This is because it returns
-   the nearest match, not necessarily the match within the same cell. If the
-   passed code was not a valid short code, but was a valid full code, it is
-   returned unchanged.
+   the short code. If the passed code was not a valid short code, but was a
+   valid full code, it is returned unchanged.
 """
 def recoverNearest(shortcode, referenceLatitude, referenceLongitude):
     if not isShort(shortcode):
@@ -295,11 +292,8 @@ def recoverNearest(shortcode, referenceLatitude, referenceLongitude):
     resolution = pow(20, 2 - (paddingLength / 2))
     # Distance from the center to an edge (in degrees).
     areaToEdge = resolution / 2.0
-    # Now round down the reference latitude and longitude to the resolution.
-    roundedLatitude = math.floor(referenceLatitude / resolution) * resolution
-    roundedLongitude = math.floor(referenceLongitude / resolution) * resolution
     # Use the reference location to pad the supplied short code and decode it.
-    codeArea = decode(encode(roundedLatitude, roundedLongitude)[0:paddingLength] + shortcode)
+    codeArea = decode(encode(referenceLatitude, referenceLongitude)[0:paddingLength] + shortcode)
     # How many degrees latitude is the code from the reference? If it is more
     # than half the resolution, we need to move it east or west.
     degreesDifference = codeArea.latitudeCenter - referenceLatitude
