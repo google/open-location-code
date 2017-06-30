@@ -364,7 +364,7 @@ def shorten(code,latitude,longitude):
    latitude: A latitude in signed decimal degrees.
 """
 def clipLatitude(latitude):
-    return min(90,max(-90,latitude))
+    return min(90, max(-90, latitude))
 
 """
  Compute the latitude precision value for a given code length. Lengths <=
@@ -374,7 +374,7 @@ def clipLatitude(latitude):
 """
 def computeLatitutePrecision(codeLength):
     if codeLength <= 10:
-        return pow(20,math.floor((codeLength / -2) + 2))
+        return pow(20, math.floor((codeLength / -2) + 2))
     return pow(20, -3) / pow(GRID_ROWS_, codeLength - 10)
 
 """
@@ -410,16 +410,16 @@ def encodePairs(latitude, longitude, codeLength):
     digitCount = 0
     while digitCount < codeLength:
         # Provides the value of digits in this place in decimal degrees.
-        placeValue = PAIR_RESOLUTIONS_[math.floor(digitCount / 2)]
+        placeValue = PAIR_RESOLUTIONS_[int(math.floor(digitCount / 2))]
         # Do the latitude - gets the digit for this place and subtracts that for
         # the next digit.
-        digitValue = math.floor(adjustedLatitude / placeValue)
+        digitValue = int(math.floor(adjustedLatitude / placeValue))
         adjustedLatitude -= digitValue * placeValue
         code += CODE_ALPHABET_[digitValue]
         digitCount += 1
         # And do the longitude - gets the digit for this place and subtracts that
         # for the next digit.
-        digitValue = math.floor(adjustedLongitude / placeValue)
+        digitValue = int(math.floor(adjustedLongitude / placeValue))
         adjustedLongitude -= digitValue * placeValue
         code += CODE_ALPHABET_[digitValue]
         digitCount += 1
@@ -452,8 +452,8 @@ def encodeGrid(latitude, longitude, codeLength):
     adjustedLongitude = (longitude + LONGITUDE_MAX_) % lngPlaceValue
     for i in range(codeLength):
         # Work out the row and column.
-        row = math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_))
-        col = math.floor(adjustedLongitude / (lngPlaceValue / GRID_COLUMNS_))
+        row = int(math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_)))
+        col = int(math.floor(adjustedLongitude / (lngPlaceValue / GRID_COLUMNS_)))
         latPlaceValue /= GRID_ROWS_
         lngPlaceValue /= GRID_COLUMNS_
         adjustedLatitude -= row * latPlaceValue
@@ -543,7 +543,7 @@ def decodeGrid(code):
    code_length: The number of significant characters that were in the code.
        This excludes the separator.
 """
-class CodeArea:
+class CodeArea(object):
     def __init__(self,latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength):
         self.latitudeLo = latitudeLo
         self.longitudeLo = longitudeLo
