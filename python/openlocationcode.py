@@ -1,3 +1,60 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+#
+#
+# Convert locations to and from short codes.
+#
+# Open Location Codes are short, 10-11 character codes that can be used instead
+# of street addresses. The codes can be generated and decoded offline, and use
+# a reduced character set that minimises the chance of codes including words.
+#
+# Codes are able to be shortened relative to a nearby location. This means that
+# in many cases, only four to seven characters of the code are needed.
+# To recover the original code, the same location is not required, as long as
+# a nearby location is provided.
+#
+# Codes represent rectangular areas rather than points, and the longer the
+# code, the smaller the area. A 10 character code represents a 13.5x13.5
+# meter area (at the equator. An 11 character code represents approximately
+# a 2.8x3.5 meter area.
+#
+# Two encoding algorithms are used. The first 10 characters are pairs of
+# characters, one for latitude and one for latitude, using base 20. Each pair
+# reduces the area of the code by a factor of 400. Only even code lengths are
+# sensible, since an odd-numbered length would have sides in a ratio of 20:1.
+#
+# At position 11, the algorithm changes so that each character selects one
+# position from a 4x5 grid. This allows single-character refinements.
+#
+# Examples:
+#
+#   Encode a location, default accuracy:
+#   var code = olc.encode(47.365590, 8.524997);
+#
+#   Encode a location using one stage of additional refinement:
+#   var code = olc.encode(47.365590, 8.524997, 11);
+#
+#   Decode a full code:
+#   var coord = olc.decode(code);
+#   var msg = 'Center is ' + coord.latitudeCenter + ',' + coord.longitudeCenter;
+#
+#   Attempt to trim the first characters from a code:
+#   var shortCode = olc.shorten('8FVC9G8F+6X', 47.5, 8.5);
+#
+#   Recover the full code from a short code:
+#   var code = olc.recoverNearest('9G8F+6X', 47.4, 8.6);
+#   var code = olc.recoverNearest('8F+6X', 47.4, 8.6);
+
 import re
 import math
 
