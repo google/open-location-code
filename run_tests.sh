@@ -32,4 +32,12 @@ if [ "$TEST_DIR" == "ruby" ]; then
   exit
 fi
 
+if [ "$TEST_DIR" == "rust" ]; then
+  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  export PATH=$PATH:$HOME/.cargo/bin
+  rustup update stable
+  cd rust && rustup run stable cargo test
+  exit
+fi
+
 echo "Unknown test directory: $TEST_DIR"
