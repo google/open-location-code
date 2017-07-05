@@ -31,6 +31,11 @@ if [ "$TEST_DIR" == "ruby" ]; then
   cd ruby && ruby test/plus_codes_test.rb
   exit
 fi
+# Python?
+if [ "$TEST_DIR" == "python" ]; then
+  python python/openlocationcode_test.py
+  exit
+fi
 
 if [ "$TEST_DIR" == "rust" ]; then
   curl https://sh.rustup.rs -sSf | sh -s -- -y

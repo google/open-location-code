@@ -30,6 +30,7 @@ env:
   - TEST_DIR=js
   - TEST_DIR=go
   - TEST_DIR=ruby
+  - TEST_DIR=python
   - TEST_DIR=rust
 
 # Test script to run. This is called once for each TEST_DIR value above.

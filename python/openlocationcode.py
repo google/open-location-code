@@ -1,3 +1,62 @@
+#  -*- coding: utf-8 -*-
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+#
+#
+# Convert locations to and from short codes.
+#
+# Open Location Codes are short, 10-11 character codes that can be used instead
+# of street addresses. The codes can be generated and decoded offline, and use
+# a reduced character set that minimises the chance of codes including words.
+#
+# Codes are able to be shortened relative to a nearby location. This means that
+# in many cases, only four to seven characters of the code are needed.
+# To recover the original code, the same location is not required, as long as
+# a nearby location is provided.
+#
+# Codes represent rectangular areas rather than points, and the longer the
+# code, the smaller the area. A 10 character code represents a 13.5x13.5
+# meter area (at the equator. An 11 character code represents approximately
+# a 2.8x3.5 meter area.
+#
+# Two encoding algorithms are used. The first 10 characters are pairs of
+# characters, one for latitude and one for latitude, using base 20. Each pair
+# reduces the area of the code by a factor of 400. Only even code lengths are
+# sensible, since an odd-numbered length would have sides in a ratio of 20:1.
+#
+# At position 11, the algorithm changes so that each character selects one
+# position from a 4x5 grid. This allows single-character refinements.
+#
+# Examples:
+#
+#   Encode a location, default accuracy:
+#   var code = olc.encode(47.365590, 8.524997);
+#
+#   Encode a location using one stage of additional refinement:
+#   var code = olc.encode(47.365590, 8.524997, 11);
+#
+#   Decode a full code:
+#   var coord = olc.decode(code);
+#   var msg = 'Center is ' + coord.latitudeCenter + ',' + coord.longitudeCenter;
+#
+#   Attempt to trim the first characters from a code:
+#   var shortCode = olc.shorten('8FVC9G8F+6X', 47.5, 8.5);
+#
+#   Recover the full code from a short code:
+#   var code = olc.recoverNearest('9G8F+6X', 47.4, 8.6);
+#   var code = olc.recoverNearest('8F+6X', 47.4, 8.6);
+
 import re
 import math
 
@@ -218,11 +277,8 @@ def decode(code):
        to find the nearest matching full code.
  Returns:
    The nearest full Open Location Code to the reference location that matches
-   the short code. Note that the returned code may not have the same
-   computed characters as the reference location. This is because it returns
-   the nearest match, not necessarily the match within the same cell. If the
-   passed code was not a valid short code, but was a valid full code, it is
-   returned unchanged.
+   the short code. If the passed code was not a valid short code, but was a
+   valid full code, it is returned unchanged.
 """
 def recoverNearest(shortcode, referenceLatitude, referenceLongitude):
     if not isShort(shortcode):
@@ -238,11 +294,8 @@ def recoverNearest(shortcode, referenceLatitude, referenceLongitude):
     resolution = pow(20, 2 - (paddingLength / 2))
     # Distance from the center to an edge (in degrees).
     areaToEdge = resolution / 2.0
-    # Now round down the reference latitude and longitude to the resolution.
-    roundedLatitude = math.floor(referenceLatitude / resolution) * resolution
-    roundedLongitude = math.floor(referenceLongitude / resolution) * resolution
     # Use the reference location to pad the supplied short code and decode it.
-    codeArea = decode(encode(roundedLatitude, roundedLongitude)[0:paddingLength] + shortcode)
+    codeArea = decode(encode(referenceLatitude, referenceLongitude)[0:paddingLength] + shortcode)
     # How many degrees latitude is the code from the reference? If it is more
     # than half the resolution, we need to move it east or west.
     degreesDifference = codeArea.latitudeCenter - referenceLatitude
@@ -313,7 +366,7 @@ def shorten(code,latitude,longitude):
    latitude: A latitude in signed decimal degrees.
 """
 def clipLatitude(latitude):
-    return min(90,max(-90,latitude))
+    return min(90, max(-90, latitude))
 
 """
  Compute the latitude precision value for a given code length. Lengths <=
@@ -323,7 +376,7 @@ def clipLatitude(latitude):
 """
 def computeLatitutePrecision(codeLength):
     if codeLength <= 10:
-        return pow(20,math.floor((codeLength / -2) + 2))
+        return pow(20, math.floor((codeLength / -2) + 2))
     return pow(20, -3) / pow(GRID_ROWS_, codeLength - 10)
 
 """
@@ -359,16 +412,16 @@ def encodePairs(latitude, longitude, codeLength):
     digitCount = 0
     while digitCount < codeLength:
         # Provides the value of digits in this place in decimal degrees.
-        placeValue = PAIR_RESOLUTIONS_[math.floor(digitCount / 2)]
+        placeValue = PAIR_RESOLUTIONS_[int(math.floor(digitCount / 2))]
         # Do the latitude - gets the digit for this place and subtracts that for
         # the next digit.
-        digitValue = math.floor(adjustedLatitude / placeValue)
+        digitValue = int(math.floor(adjustedLatitude / placeValue))
         adjustedLatitude -= digitValue * placeValue
         code += CODE_ALPHABET_[digitValue]
         digitCount += 1
         # And do the longitude - gets the digit for this place and subtracts that
         # for the next digit.
-        digitValue = math.floor(adjustedLongitude / placeValue)
+        digitValue = int(math.floor(adjustedLongitude / placeValue))
         adjustedLongitude -= digitValue * placeValue
         code += CODE_ALPHABET_[digitValue]
         digitCount += 1
@@ -401,8 +454,8 @@ def encodeGrid(latitude, longitude, codeLength):
     adjustedLongitude = (longitude + LONGITUDE_MAX_) % lngPlaceValue
     for i in range(codeLength):
         # Work out the row and column.
-        row = math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_))
-        col = math.floor(adjustedLongitude / (lngPlaceValue / GRID_COLUMNS_))
+        row = int(math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_)))
+        col = int(math.floor(adjustedLongitude / (lngPlaceValue / GRID_COLUMNS_)))
         latPlaceValue /= GRID_ROWS_
         lngPlaceValue /= GRID_COLUMNS_
         adjustedLatitude -= row * latPlaceValue
@@ -492,7 +545,7 @@ def decodeGrid(code):
    code_length: The number of significant characters that were in the code.
        This excludes the separator.
 """
-class CodeArea:
+class CodeArea(object):
     def __init__(self,latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength):
         self.latitudeLo = latitudeLo
         self.longitudeLo = longitudeLo
