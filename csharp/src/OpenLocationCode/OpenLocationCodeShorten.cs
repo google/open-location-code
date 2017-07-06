@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace Google.OpenLocationCode
+namespace OpenLocationCode
 {
     public static class OpenLocationCodeShorten
     {

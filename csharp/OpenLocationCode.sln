@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8A0D0419-7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{67999BB4-2D1A-4A87-8737-EC430F56C699}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Google.OpenLocationCode", "src\Google.OpenLocationCode\Google.OpenLocationCode.xproj", "{C111EEC8-EEE4-49AC-807F-D2C9950A7736}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "OpenLocationCode", "src\OpenLocationCode\OpenLocationCode.xproj", "{C111EEC8-EEE4-49AC-807F-D2C9950A7736}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7328EE8C-7660-4910-AB32-FC3F76F6C81E}"
 	ProjectSection(SolutionItems) = preProject
@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Google.OpenLocationCode.Tests", "test\Google.OpenLocationCode.Tests\Google.OpenLocationCode.Tests.xproj", "{BF750C88-E150-416A-9A39-588101548290}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "OpenLocationCode.Tests", "test\OpenLocationCode.Tests\OpenLocationCode.Tests.xproj", "{BF750C88-E150-416A-9A39-588101548290}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

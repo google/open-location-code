@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Google.OpenLocationCode
+namespace OpenLocationCode
 {
     internal static class Builder
     {

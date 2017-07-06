@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Google.OpenLocationCode
+namespace OpenLocationCode
 {
     internal static class Constants
     {

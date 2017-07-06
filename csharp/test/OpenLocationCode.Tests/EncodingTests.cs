@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Google.OpenLocationCode.Tests
+namespace OpenLocationCode.Tests
 {
     public class EncodingTests
     {

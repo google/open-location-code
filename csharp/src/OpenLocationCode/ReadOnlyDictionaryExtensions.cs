@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 
-namespace Google.OpenLocationCode
+namespace OpenLocationCode
 {
     internal static class ReadOnlyDictionaryExtensions
     {

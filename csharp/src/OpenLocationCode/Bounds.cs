@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Google.OpenLocationCode
+namespace OpenLocationCode
 {
     public sealed class Bounds
     {
