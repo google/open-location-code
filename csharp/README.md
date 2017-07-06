@@ -1,6 +1,6 @@
 # Open Location Code
 
-This is a C# implementation of Google Open Location Code (Plus+Codes).
+This is a C# implementation of the Open Location Code algorithm.
 
 ## Building
 
@@ -22,6 +22,8 @@ dotnet test
 
 ## Usage
 
+Note that some methods are static (Encode) and others act on an `OpenLocationCode` object (Shorten).
+
 ```csharp
 
 // encoding a latitude and longitude into an Open Location Code
@@ -29,7 +31,7 @@ string code = OpenLocationCode.Encode( 51.506187,-0.116438 );
 // output:  9C3XGV4M+FC
 
 // decoding an Open Location Code into an area
-OpenLocationCode olc = new OpenLocationCode( code );
+OpenLocationCode olc = new OpenLocationCode("9C3XGV4M+FC");
 var bounds = olc.Decode();
 
 // check if a code is valid
