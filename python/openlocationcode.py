@@ -208,7 +208,7 @@ def isFull(code):
        including any separator characters.
 """
 def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
-    if codeLength < 2 or (codeLength < SEPARATOR_POSITION_ and codeLength % 2 == 1):
+    if codeLength < 2 or (codeLength < PAIR_CODE_LENGTH_ and codeLength % 2 == 1):
         raise ValueError('Invalid Open Location Code length - ' + str(codeLength))
     # Ensure that latitude and longitude are valid.
     latitude = clipLatitude(latitude)
