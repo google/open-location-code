@@ -8,26 +8,19 @@ use interface::encode;
 use geo::Point;
 
 pub fn code_value(chr: char) -> usize {
-    for (i, c) in CODE_ALPHABET.iter().enumerate() {
-        if chr == *c {
-            return i;
-        }
-    }
     // We assume this function is only called by other functions that have
     // already ensured that the characters in the passed-in code are all valid
     // and have all been "treated" (upper-cased, padding and '+' stripped)
-    //
-    // If that is the case, we will always return above.
-    unreachable!();
+    CODE_ALPHABET.iter().position(|&x| x == char).unwrap()
 }
 
 pub fn normalize_longitude(value: f64) -> f64 {
     let mut result: f64 = value;
     while result >= LONGITUDE_MAX {
-        result = result - LONGITUDE_MAX * 2f64;
+        result -= LONGITUDE_MAX * 2f64;
     }
     while result < -LONGITUDE_MAX{
-        result = result + LONGITUDE_MAX * 2f64;
+        result += LONGITUDE_MAX * 2f64;
     }
     result
 }
@@ -40,7 +33,7 @@ pub fn compute_latitude_precision(code_length: usize) -> f64 {
     if code_length <= PAIR_CODE_LENGTH {
         return ENCODING_BASE.powf((code_length as f64 / -2f64 + 2f64).floor())
     }
-    ENCODING_BASE.powf(-3f64) / GRID_ROWS.powf(code_length as f64 - PAIR_CODE_LENGTH as f64)
+    ENCODING_BASE.powi(-3f64) / GRID_ROWS.powf(code_length as f64 - PAIR_CODE_LENGTH as f64)
 }
 
 pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
