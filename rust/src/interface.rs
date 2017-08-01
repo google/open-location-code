@@ -109,13 +109,13 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
     if lat > LATITUDE_MAX || (LATITUDE_MAX - lat) < 1e-10f64 {
-        lat = lat - compute_latitude_precision(code_length);
+        lat -= compute_latitude_precision(code_length);
     }
 
     lat += LATITUDE_MAX;
     lng += LONGITUDE_MAX;
 
-    let mut code = String::new();
+    let mut code = String::with_capacity(code_length + 1);
     let mut digit = 0;
     while digit < code_length {
         narrow_region(digit, &mut lat, &mut lng);
@@ -130,8 +130,8 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
             code.push(CODE_ALPHABET[4 * lat_digit + lng_digit]);
             digit += 1;
         }
-        lat = lat - lat_digit as f64;
-        lng = lng - lng_digit as f64;
+        lat -= lat_digit as f64;
+        lng -= lng_digit as f64;
         if digit == SEPARATOR_POSITION {
             code.push(SEPARATOR);
         }
