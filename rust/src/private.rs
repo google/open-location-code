@@ -33,7 +33,7 @@ pub fn compute_latitude_precision(code_length: usize) -> f64 {
     if code_length <= PAIR_CODE_LENGTH {
         return ENCODING_BASE.powf((code_length as f64 / -2f64 + 2f64).floor())
     }
-    ENCODING_BASE.powi(-3f64) / GRID_ROWS.powf(code_length as f64 - PAIR_CODE_LENGTH as f64)
+    ENCODING_BASE.powi(-3i32) / GRID_ROWS.powf(code_length as f64 - PAIR_CODE_LENGTH as f64)
 }
 
 pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
