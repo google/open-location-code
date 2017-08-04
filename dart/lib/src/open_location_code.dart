@@ -220,7 +220,7 @@ bool isFull(String code) {
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength: pairCodeLength}) {
   if (codeLength < 2 ||
-      (codeLength < separatorPosition && codeLength % 2 == 1)) {
+      (codeLength < pairCodeLength && codeLength % 2 == 1)) {
     throw new ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   // Ensure that latitude and longitude are valid.
