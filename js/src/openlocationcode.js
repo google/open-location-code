@@ -286,7 +286,7 @@
       throw ('ValueError: Parameters are not numbers');
     }
     if (codeLength < 2 ||
-        (codeLength < SEPARATOR_POSITION_ && codeLength % 2 == 1)) {
+        (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
       throw 'IllegalArgumentException: Invalid Open Location Code length';
     }
     // Ensure that latitude and longitude are valid.
