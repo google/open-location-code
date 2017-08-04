@@ -57,7 +57,7 @@ func Encode(lat, lng float64, codeLen int) string {
 		codeLen = pairCodeLen
 	} else if codeLen < 2 {
 		codeLen = 2
-	} else if codeLen < sepPos && codeLen%2 == 1 {
+	} else if codeLen < pairCodeLen && codeLen%2 == 1 {
 		codeLen++
 	}
 	lat, lng = clipLatitude(lat), normalizeLng(lng)
