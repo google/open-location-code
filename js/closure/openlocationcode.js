@@ -264,7 +264,7 @@ function encode(latitude, longitude, opt_length) {
     opt_length = PAIR_CODE_LENGTH;
   }
   if (opt_length < 2 ||
-      (opt_length < SEPARATOR_POSITION && opt_length % 2 == 1)) {
+      (opt_length < PAIR_CODE_LENGTH && opt_length % 2 == 1)) {
     throw 'IllegalArgumentException: Invalid Open Location Code length';
   }
   // Ensure that latitude and longitude are valid.
