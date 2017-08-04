@@ -9,6 +9,11 @@ module PlusCodes
   # The max number of characters can be placed before the separator.
   SEPARATOR_POSITION = 8
 
+  # Maxiumum code length using lat/lng pair encoding. The area of such a
+  # code is approximately 13x13 meters (at the equator), and should be suitable
+  # for identifying buildings. This excludes prefix and separator characters.
+  PAIR_CODE_LENGTH = 10
+
   # The character used to pad a code
   PADDING = '0'.freeze
 
