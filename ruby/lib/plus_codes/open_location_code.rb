@@ -41,7 +41,7 @@ module PlusCodes
     # @param longitude [Numeric] a longitude in degrees
     # @param code_length [Integer] the number of characters in the code, this excludes the separator
     # @return [String] a plus+codes
-    def encode(latitude, longitude, code_length = 10)
+    def encode(latitude, longitude, code_length = PAIR_CODE_LENGTH)
       raise ArgumentError,
       "Invalid Open Location Code(Plus+Codes) length: #{code_length}" if invalid_length?(code_length)
 
@@ -83,7 +83,7 @@ module PlusCodes
 
       digit = 0
       while digit < code.length
-        if digit < 10
+        if digit < PAIR_CODE_LENGTH
           lat_resolution /= 20
           lng_resolution /= 20
           south_latitude += lat_resolution * DECODE[code[digit].ord]
@@ -180,7 +180,7 @@ module PlusCodes
       if digit == 0
         latitude /= 20
         longitude /= 20
-      elsif digit < 10
+      elsif digit < PAIR_CODE_LENGTH
         latitude *= 20
         longitude *= 20
       else
@@ -193,7 +193,7 @@ module PlusCodes
     def build_code(digit_count, code, latitude, longitude)
       lat_digit = latitude.to_i
       lng_digit = longitude.to_i
-      if digit_count < 10
+      if digit_count < PAIR_CODE_LENGTH
         code << CODE_ALPHABET[lat_digit]
         code << CODE_ALPHABET[lng_digit]
         [digit_count + 2, latitude - lat_digit, longitude - lng_digit]
@@ -230,7 +230,7 @@ module PlusCodes
     end
 
     def invalid_length?(code_length)
-      code_length < 2 || (code_length < SEPARATOR_POSITION && code_length.odd?)
+      code_length < 2 || (code_length < PAIR_CODE_LENGTH && code_length.odd?)
     end
 
     def padded(code)
@@ -238,10 +238,10 @@ module PlusCodes
     end
 
     def precision_by_length(code_length)
-      if code_length <= 10
+      if code_length <= PAIR_CODE_LENGTH
         precision = 20 ** ((code_length / -2).to_i + 2)
       else
-        precision = (20 ** -3) / (5 ** (code_length - 10))
+        precision = (20 ** -3) / (5 ** (code_length - PAIR_CODE_LENGTH))
       end
       precision.to_r
     end

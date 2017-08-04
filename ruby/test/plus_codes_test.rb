@@ -64,6 +64,9 @@ class PlusCodesTest < Test::Unit::TestCase
       @olc.encode(20, 30, 1)
     end
     assert_raise ArgumentError do
+      @olc.encode(20, 30, 9)
+    end
+    assert_raise ArgumentError do
       @olc.recover_nearest('9C3W9QCJ-2VX', 51.3708675, -1.217765625)
     end
     @olc.recover_nearest('9C3W9QCJ+2VX', 51.3708675, -1.217765625)
