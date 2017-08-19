@@ -36,7 +36,7 @@ if [ "$TEST_DIR" == "python" ]; then
   python python/openlocationcode_test.py
   exit
 fi
-
+# Rust?
 if [ "$TEST_DIR" == "rust" ]; then
   curl https://sh.rustup.rs -sSf | sh -s -- -y
   export PATH=$PATH:$HOME/.cargo/bin

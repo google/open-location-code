@@ -1,31 +1,13 @@
-# Travis only supports one language per project, so we need to put something
-# here. node_js is as good as any other I suppose.
-language: node_js
-node_js:
-  - "0.10"
-
-# TODO(issue #75): Fix rust travisCi config.
-## For rust, we need to install cargo, rustc.  In order to do that, we'll use
-## apt-get, which requires sudo.
-#sudo: true
-#
-## The rust-nightly package is only built for 14.04 (Trusty) and 16.04 (Xenial),
-## so we cannot use the default Travis ubuntu image (Precise) for these tests.
-#dist: trusty
-
-# Install package dependencies. See
-# http://docs.travis-ci.com/user/installing-dependencies/
-# gulp: required for JS testing
-before_install:
-  - npm install -g gulp
-# TODO(issue #75): Fix rust travisCi config.
-#  - yes | sudo add-apt-repository ppa:jonathonf/rustlang 
-#  - yes | sudo add-apt-repository ppa:jonathonf/llvm
-#  - yes | sudo add-apt-repository ppa:jonathonf/gcc
-#  - sudo apt-get update
-#
-#install:
-#  sudo apt-get -y install libstd-rust-1.16 libstd-rust-dev rustc cargo
+matrix:
+  include:
+    - language: node_js
+      node_js:
+        - "0.10"
+    - language: rust
+      script: 
+        - cd rust/
+        - cargo build --verbose --all
+        - cargo test --verbose --all
 
 # Define the list of directories to execute tests in.
 env:
@@ -33,8 +15,7 @@ env:
   - TEST_DIR=go
   - TEST_DIR=ruby
   - TEST_DIR=python
-# TODO(issue #75): Fix rust travisCi config.
-#  - TEST_DIR=rust
+  - TEST_DIR=rust
 
 # Test script to run. This is called once for each TEST_DIR value above.
 script: ./run_tests.sh
