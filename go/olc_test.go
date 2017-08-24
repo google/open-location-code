@@ -140,7 +140,7 @@ func TestDecode(t *testing.T) {
 
 func TestShorten(t *testing.T) {
 	for i, elt := range shorten {
-		if tType == "B" || tType == "S" {
+		if elt.tType == "B" || elt.tType == "S" {
 			got, err := Shorten(elt.code, elt.lat, elt.lng)
 			if err != nil {
 				t.Errorf("%d. shorten %q: %v", i, elt.code, err)
@@ -152,7 +152,7 @@ func TestShorten(t *testing.T) {
 			}
 		}
 
-		if tType == "B" || tType == "R" {
+		if elt.tType == "B" || elt.tType == "R" {
 			got, err = RecoverNearest(elt.short, elt.lat, elt.lng)
 			if err != nil {
 				t.Errorf("%d. nearest %q: %v", i, got, err)
