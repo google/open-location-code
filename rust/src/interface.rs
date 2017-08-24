@@ -272,23 +272,23 @@ pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String
 
     let code_area = decode(code.as_str()).unwrap();
 
-    let area_range = compute_latitude_precision(prefix_len);
-    let area_edge = area_range / 2f64;
+    let resolution = compute_latitude_precision(prefix_len);
+    let half_res = area_range / 2f64;
 
     let mut latitude = code_area.center.lat();
     let mut longitude = code_area.center.lng();
 
-    let latitude_diff = latitude - clip_latitude(ref_pt.lat());
-    if latitude_diff > area_edge {
-        latitude -= area_range;
-    } else if latitude_diff < -area_edge {
-        latitude += area_range;
+    let ref_lat = clip_latitude(ref_pt.lat());
+    let ref_lng = normalize_longitude(ref_pt.lng());
+    if ref_lat + half_res < latitude && latitude - resolution >= -LATITUDE_MAX {
+        latitude -= resolution;
+    } else if ref_lat - half_res > latitude && latitude + resolution <= LATITUDE_MAX {
+        latitude += resolution;
     }
-    let longitude_diff = longitude - normalize_longitude(ref_pt.lng());
-    if longitude_diff > area_edge {
-        longitude -= area_range;
-    } else if longitude_diff < -area_edge {
-        longitude += area_range;
+    if ref_lng + half_res < longitude {
+        longitude -= resolution;
+    } else if ref_lng - half_res > longitude {
+        longitude += resolution;
     }
     Ok(encode(Point::new(longitude, latitude), code_area.code_length))
 }
