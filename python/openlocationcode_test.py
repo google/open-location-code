@@ -50,9 +50,9 @@ class TestShorten(unittest.TestCase):
 
     def test_full2short(self):
         for td in self.testdata:
-            if td['testdata'] == 'B' or td['testdata'] == 'S':
+            if td['testtype'] == 'B' or td['testtype'] == 'S':
                 self.assertEqual(td['shortcode'], olc.shorten(td['fullcode'], td['lat'], td['lng']), td)
-            if td['testdata'] == 'B' or td['testdata'] == 'R':
+            if td['testtype'] == 'B' or td['testtype'] == 'R':
                 self.assertEqual(td['fullcode'], olc.recoverNearest(td['shortcode'], td['lat'], td['lng']), td)
 
 
