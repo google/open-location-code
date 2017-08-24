@@ -16,3 +16,6 @@
 # Added to detect error in recoverNearest functionality
 8FJFW222+,42.899,9.012,22+
 796RXG22+,14.95125,-23.5001,22+
+# Added to detect errors recovering codes near the poles
+CFX22222+22,89.6,0.0,2222+22
+2FXXXXXX+XX,-81.0,0.0,XXXXXX+XX
