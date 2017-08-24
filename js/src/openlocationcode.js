@@ -393,24 +393,22 @@
     // How many degrees latitude is the code from the reference? If it is more
     // than half the resolution, we need to move it north or south but keep it
     // within -90 to 90 degrees.
-    var degreesDifference = codeArea.latitudeCenter - referenceLatitude;
-    if (degreesDifference > halfResolution &&
+    if (referenceLatitude + halfResolution < codeArea.latitudeCenter &&
         codeArea.latitudeCenter - resolution >= -LATITUDE_MAX_) {
-      // If the center of the short code is more than half a cell east,
-      // then the best match will be one position west.
+      // If the proposed code is more than half a cell north of the reference location,
+      // it's too far, and the best match will be one cell south.
       codeArea.latitudeCenter -= resolution;
-    } else if (degreesDifference < -halfResolution &&
+    } else if (referenceLatitude - halfResolution > codeArea.latitudeCenter &&
                codeArea.latitudeCenter + resolution <= LATITUDE_MAX_) {
-      // If the center of the short code is more than half a cell west,
-      // then the best match will be one position east.
+      // If the proposed code is more than half a cell south of the reference location,
+      // it's too far, and the best match will be one cell north.
       codeArea.latitudeCenter += resolution;
     }
 
     // How many degrees longitude is the code from the reference?
-    degreesDifference = codeArea.longitudeCenter - referenceLongitude;
-    if (degreesDifference > halfResolution) {
+    if (codeArea.longitudeCenter - referenceLongitude > halfResolution) {
       codeArea.longitudeCenter -= resolution;
-    } else if (degreesDifference < -halfResolution) {
+    } else if (referenceLongitude - codeArea.longitudeCenter > halfResolution) {
       codeArea.longitudeCenter += resolution;
     }
 
