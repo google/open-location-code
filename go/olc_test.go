@@ -84,6 +84,7 @@ func init() {
 				code: string(cols[0]),
 				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
 				short: string(cols[3]),
+				tType: string(cols[4]),
 			})
 		}
 	}()
@@ -153,7 +154,7 @@ func TestShorten(t *testing.T) {
 		}
 
 		if elt.tType == "B" || elt.tType == "R" {
-			got, err = RecoverNearest(elt.short, elt.lat, elt.lng)
+			got, err := RecoverNearest(elt.short, elt.lat, elt.lng)
 			if err != nil {
 				t.Errorf("%d. nearest %q: %v", i, got, err)
 				t.FailNow()
