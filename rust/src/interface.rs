@@ -122,7 +122,7 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
 
         let lat_digit = lat as usize;
         let lng_digit = lng as usize;
-        if digit < 10 {
+        if digit < PAIR_CODE_LENGTH {
             code.push(CODE_ALPHABET[lat_digit]);
             code.push(CODE_ALPHABET[lng_digit]);
             digit += 2;
