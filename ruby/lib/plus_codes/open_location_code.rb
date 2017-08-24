@@ -121,23 +121,21 @@ module PlusCodes
       code = prefix_by_reference(ref_lat, ref_lng, prefix_len) << short_code
       code_area = decode(code)
 
-      area_range = precision_by_length(prefix_len)
-      area_edge = area_range / 2
+      resolution = precision_by_length(prefix_len)
+      half_res = resolution / 2
 
       latitude = code_area.latitude_center
-      latitude_diff = latitude - ref_lat
-      if (latitude_diff > area_edge)
-        latitude -= area_range
-      elsif (latitude_diff < -area_edge)
-        latitude += area_range
+      if (ref_lat + half_res < latitude && latitude - resolution >= -90)
+        latitude -= resolution
+      elsif (ref_lat - half_res > latitude && latitude + resolution <= 90)
+        latitude += resolution
       end
 
       longitude = code_area.longitude_center
-      longitude_diff = longitude - ref_lng
-      if (longitude_diff > area_edge)
-        longitude -= area_range
-      elsif (longitude_diff < -area_edge)
-        longitude += area_range
+      if (ref_lng + half_res < longitude)
+        longitude -= resolution
+      elsif (ref_lng - half_res > longitude)
+        longitude += resolution
       end
 
       encode(latitude, longitude, code.length - SEPARATOR.length)
