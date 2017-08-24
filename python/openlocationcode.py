@@ -293,25 +293,26 @@ def recoverNearest(shortcode, referenceLatitude, referenceLongitude):
     # The resolution (height and width) of the padded area in degrees.
     resolution = pow(20, 2 - (paddingLength / 2))
     # Distance from the center to an edge (in degrees).
-    areaToEdge = resolution / 2.0
+    halfResolution = resolution / 2.0
     # Use the reference location to pad the supplied short code and decode it.
     codeArea = decode(encode(referenceLatitude, referenceLongitude)[0:paddingLength] + shortcode)
     # How many degrees latitude is the code from the reference? If it is more
-    # than half the resolution, we need to move it east or west.
-    degreesDifference = codeArea.latitudeCenter - referenceLatitude
-    if degreesDifference > areaToEdge:
-        # If the center of the short code is more than half a cell east,
-        # then the best match will be one position west.
+    # than half the resolution, we need to move it north or south but keep it
+    # within -90 to 90 degrees.
+    if (referenceLatitude + halfResolution < codeArea.latitudeCenter and
+        codeArea.latitudeCenter - resolution >= -LATITUDE_MAX_):
+        # If the proposed code is more than half a cell north of the reference location,
+        # it's too far, and the best match will be one cell south.
         codeArea.latitudeCenter -= resolution
-    elif degreesDifference < -areaToEdge:
-        # If the center of the short code is more than half a cell west,
-        # then the best match will be one position east.
+    elif (referenceLatitude - halfResolution > codeArea.latitudeCenter &&
+          codeArea.latitudeCenter + resolution <= LATITUDE_MAX_):
+        # If the proposed code is more than half a cell south of the reference location,
+        # it's too far, and the best match will be one cell north.
         codeArea.latitudeCenter += resolution
-    # How many degrees longitude is the code from the reference?
-    degreesDifference = codeArea.longitudeCenter - referenceLongitude
-    if degreesDifference > areaToEdge:
+    # Adjust longitude if necessary.
+    if referenceLongitude + halfResolution < codeArea.longitudeCenter:
         codeArea.longitudeCenter -= resolution
-    elif degreesDifference < -areaToEdge:
+    elif referenceLongitude - halfResolution > codeArea.longitudeCenter:
         codeArea.longitudeCenter += resolution
     return encode(codeArea.latitudeCenter, codeArea.longitudeCenter, codeArea.codeLength)
 
