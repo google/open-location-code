@@ -129,19 +129,19 @@
           // Convert the string numbers to number numbers.
           testFields[1] = parseFloat(testFields[1]);
           testFields[2] = parseFloat(testFields[2]);
+          var coords = testFields[1] + ',' + testFields[2];
 
           if (testFields[4] == "B" || testFields[4] == "S") {
             // Shorten the full length code.
             var shorten = OpenLocationCode.shorten(
                 testFields[0], testFields[1], testFields[2]);
             // Confirm we got what we expected.
-            var coords = ' with ' + testFields[1] + ',' + testFields[2];
-            assert.strictEqual(shorten, testFields[3], testFields[0] + ' shorten ' + coords);
+            assert.strictEqual(shorten, testFields[3], 'shorten ' + testFields[0] + ' with ' + coords);
           }
           if (testFields[4] == "B" || testFields[4] == "R") {
             // Now try expanding the shortened code.
             var expanded = OpenLocationCode.recoverNearest(testFields[3], testFields[1], testFields[2]);
-            assert.strictEqual(expanded, testFields[0], testFields[0] + ' expanding shorten ' + coords);
+            assert.strictEqual(expanded, testFields[0], 'recover ' + testFields[3] + ' with ' + coords);
           }
         }
 
