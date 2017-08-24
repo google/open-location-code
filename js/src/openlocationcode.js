@@ -406,9 +406,9 @@
     }
 
     // How many degrees longitude is the code from the reference?
-    if (codeArea.longitudeCenter - referenceLongitude > halfResolution) {
+    if (referenceLongitude + halfResolution < codeArea.longitudeCenter) {
       codeArea.longitudeCenter -= resolution;
-    } else if (referenceLongitude - codeArea.longitudeCenter > halfResolution) {
+    } else if (referenceLongitude - halfResolution > codeArea.longitudeCenter) {
       codeArea.longitudeCenter += resolution;
     }
 
