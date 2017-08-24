@@ -11,7 +11,7 @@ pub fn code_value(chr: char) -> usize {
     // We assume this function is only called by other functions that have
     // already ensured that the characters in the passed-in code are all valid
     // and have all been "treated" (upper-cased, padding and '+' stripped)
-    CODE_ALPHABET.iter().position(|&x| x == char).unwrap()
+    CODE_ALPHABET.iter().position(|&x| x == chr).unwrap()
 }
 
 pub fn normalize_longitude(value: f64) -> f64 {
