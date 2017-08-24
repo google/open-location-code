@@ -273,7 +273,7 @@ pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String
     let code_area = decode(code.as_str()).unwrap();
 
     let resolution = compute_latitude_precision(prefix_len);
-    let half_res = area_range / 2f64;
+    let half_res = resolution / 2f64;
 
     let mut latitude = code_area.center.lat();
     let mut longitude = code_area.center.lng();
