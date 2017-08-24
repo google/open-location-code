@@ -304,7 +304,7 @@ def recoverNearest(shortcode, referenceLatitude, referenceLongitude):
         # If the proposed code is more than half a cell north of the reference location,
         # it's too far, and the best match will be one cell south.
         codeArea.latitudeCenter -= resolution
-    elif (referenceLatitude - halfResolution > codeArea.latitudeCenter &&
+    elif (referenceLatitude - halfResolution > codeArea.latitudeCenter and
           codeArea.latitudeCenter + resolution <= LATITUDE_MAX_):
         # If the proposed code is more than half a cell south of the reference location,
         # it's too far, and the best match will be one cell north.
