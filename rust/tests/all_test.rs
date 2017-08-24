@@ -79,10 +79,10 @@ fn shorten_recovery_test() {
         let short_code = cols[3];
         let test_type = cols[4];
 
-        if test_type == 'B' || test_type == 'S' {
+        if test_type == "B" || test_type == "S" {
             assert_eq!(shorten(full_code, Point::new(lng, lat)).unwrap(), short_code, "shorten");
         }
-        if test_type == 'B' || test_type == 'R' {
+        if test_type == "B" || test_type == "R" {
             assert_eq!(
                 recover_nearest(short_code, Point::new(lng, lat)),
                 Ok(full_code.to_string()),
