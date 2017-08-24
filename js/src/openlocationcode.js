@@ -384,20 +384,23 @@
     // The resolution (height and width) of the padded area in degrees.
     var resolution = Math.pow(20, 2 - (paddingLength / 2));
     // Distance from the center to an edge (in degrees).
-    var areaToEdge = resolution / 2.0;
+    var halfResolution = resolution / 2.0;
 
     // Use the reference location to pad the supplied short code and decode it.
     var codeArea = decode(
         encode(referenceLatitude, referenceLongitude).substr(0, paddingLength)
         + shortCode);
     // How many degrees latitude is the code from the reference? If it is more
-    // than half the resolution, we need to move it east or west.
+    // than half the resolution, we need to move it north or south but keep it
+    // within -90 to 90 degrees.
     var degreesDifference = codeArea.latitudeCenter - referenceLatitude;
-    if (degreesDifference > areaToEdge) {
+    if (degreesDifference > halfResolution &&
+        codeArea.latitudeCenter - resolution >= -LATITUDE_MAX_) {
       // If the center of the short code is more than half a cell east,
       // then the best match will be one position west.
       codeArea.latitudeCenter -= resolution;
-    } else if (degreesDifference < -areaToEdge) {
+    } else if (degreesDifference < -halfResolution &&
+               codeArea.latitudeCenter + resolution <= LATITUDE_MAX_) {
       // If the center of the short code is more than half a cell west,
       // then the best match will be one position east.
       codeArea.latitudeCenter += resolution;
@@ -405,9 +408,9 @@
 
     // How many degrees longitude is the code from the reference?
     degreesDifference = codeArea.longitudeCenter - referenceLongitude;
-    if (degreesDifference > areaToEdge) {
+    if (degreesDifference > halfResolution) {
       codeArea.longitudeCenter -= resolution;
-    } else if (degreesDifference < -areaToEdge) {
+    } else if (degreesDifference < -halfResolution) {
       codeArea.longitudeCenter += resolution;
     }
 
