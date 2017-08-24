@@ -114,7 +114,7 @@ func RecoverNearest(code string, lat, lng float64) (string, error) {
 	resolution := math.Pow(20, float64(2-(padLen/2)))
 
 	// Distance from the center to an edge (in degrees).
-	areaToEdge := float64(resolution) / 2
+	halfRes := float64(resolution) / 2
 
 	// Use the reference location to pad the supplied short code and decode it.
 	area, err := Decode(Encode(lat, lng, 0)[:padLen] + code)
@@ -123,24 +123,23 @@ func RecoverNearest(code string, lat, lng float64) (string, error) {
 	}
 
 	// How many degrees latitude is the code from the reference? If it is more
-	// than half the resolution, we need to move it east or west.
+	// than half the resolution, we need to move it south or north but keep it
+	// within -90 to 90 degrees.
 	centerLat, centerLng := area.Center()
-	degDiff := centerLat - lat
-	if degDiff > areaToEdge {
-		// If the center of the short code is more than half a cell east,
-		// then the best match will be one position west.
+	if lat + halfRes < centerLat && centerLat - resolution >= -latMax {
+		// If the proposed code is more than half a cell north of the reference location,
+		// it's too far, and the best match will be one cell south.
 		centerLat -= resolution
-	} else if degDiff < -areaToEdge {
-		// If the center of the short code is more than half a cell west,
-		// then the best match will be one position east.
+	} else if lat - halfRes > centerLat && centerLat + resolution <= latMax {
+		// If the proposed code is more than half a cell south of the reference location,
+		// it's too far, and the best match will be one cell north.
 		centerLat += resolution
 	}
 
 	// How many degrees longitude is the code from the reference?
-	degDiff = centerLng - lng
-	if degDiff > areaToEdge {
+	if lng + halfRes < centerLng {
 		centerLng -= resolution
-	} else if degDiff < -areaToEdge {
+	} else if lng - halfRes > centerLng {
 		centerLng += resolution
 	}
 

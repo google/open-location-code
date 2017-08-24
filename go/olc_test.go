@@ -45,6 +45,7 @@ type (
 		code     string
 		lat, lng float64
 		short    string
+		tType    string
 	}
 )
 
@@ -83,6 +84,7 @@ func init() {
 				code: string(cols[0]),
 				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
 				short: string(cols[3]),
+				tType: string(cols[4]),
 			})
 		}
 	}()
@@ -139,24 +141,28 @@ func TestDecode(t *testing.T) {
 
 func TestShorten(t *testing.T) {
 	for i, elt := range shorten {
-		got, err := Shorten(elt.code, elt.lat, elt.lng)
-		if err != nil {
-			t.Errorf("%d. shorten %q: %v", i, elt.code, err)
-			t.FailNow()
-		}
-		if got != elt.short {
-			t.Errorf("%d. shorten got %q, awaited %q.", i, got, elt.short)
-			t.FailNow()
+		if elt.tType == "B" || elt.tType == "S" {
+			got, err := Shorten(elt.code, elt.lat, elt.lng)
+			if err != nil {
+				t.Errorf("%d. shorten %q: %v", i, elt.code, err)
+				t.FailNow()
+			}
+			if got != elt.short {
+				t.Errorf("%d. shorten got %q, awaited %q.", i, got, elt.short)
+				t.FailNow()
+			}
 		}
 
-		got, err = RecoverNearest(got, elt.lat, elt.lng)
-		if err != nil {
-			t.Errorf("%d. nearest %q: %v", i, got, err)
-			t.FailNow()
-		}
-		if got != elt.code {
-			t.Errorf("%d. nearest got %q, awaited %q.", i, got, elt.code)
-			t.FailNow()
+		if elt.tType == "B" || elt.tType == "R" {
+			got, err := RecoverNearest(elt.short, elt.lat, elt.lng)
+			if err != nil {
+				t.Errorf("%d. nearest %q: %v", i, got, err)
+				t.FailNow()
+			}
+			if got != elt.code {
+				t.Errorf("%d. nearest got %q, awaited %q.", i, got, elt.code)
+				t.FailNow()
+			}
 		}
 	}
 }

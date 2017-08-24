@@ -47,10 +47,15 @@ class PlusCodesTest < Test::Unit::TestCase
       lat = cols[1].to_f
       lng = cols[2].to_f
       short_code = cols[3]
-      short = @olc.shorten(code, lat, lng)
-      assert_equal(short_code, short)
-      expanded = @olc.recover_nearest(short, lat, lng)
-      assert_equal(code, expanded)
+      test_type = cols[4]
+      if test_type == 'B' || test_type == 'S'
+        short = @olc.shorten(code, lat, lng)
+        assert_equal(short_code, short)
+      end
+      if test_type == 'B' || test_type == 'R'
+        expanded = @olc.recover_nearest(short_code, lat, lng)
+        assert_equal(code, expanded)
+      end
     end
     @olc.shorten('9C3W9QCJ+2VX', 60.3701125, 10.202665625)
   end

@@ -384,30 +384,31 @@
     // The resolution (height and width) of the padded area in degrees.
     var resolution = Math.pow(20, 2 - (paddingLength / 2));
     // Distance from the center to an edge (in degrees).
-    var areaToEdge = resolution / 2.0;
+    var halfResolution = resolution / 2.0;
 
     // Use the reference location to pad the supplied short code and decode it.
     var codeArea = decode(
         encode(referenceLatitude, referenceLongitude).substr(0, paddingLength)
         + shortCode);
     // How many degrees latitude is the code from the reference? If it is more
-    // than half the resolution, we need to move it east or west.
-    var degreesDifference = codeArea.latitudeCenter - referenceLatitude;
-    if (degreesDifference > areaToEdge) {
-      // If the center of the short code is more than half a cell east,
-      // then the best match will be one position west.
+    // than half the resolution, we need to move it north or south but keep it
+    // within -90 to 90 degrees.
+    if (referenceLatitude + halfResolution < codeArea.latitudeCenter &&
+        codeArea.latitudeCenter - resolution >= -LATITUDE_MAX_) {
+      // If the proposed code is more than half a cell north of the reference location,
+      // it's too far, and the best match will be one cell south.
       codeArea.latitudeCenter -= resolution;
-    } else if (degreesDifference < -areaToEdge) {
-      // If the center of the short code is more than half a cell west,
-      // then the best match will be one position east.
+    } else if (referenceLatitude - halfResolution > codeArea.latitudeCenter &&
+               codeArea.latitudeCenter + resolution <= LATITUDE_MAX_) {
+      // If the proposed code is more than half a cell south of the reference location,
+      // it's too far, and the best match will be one cell north.
       codeArea.latitudeCenter += resolution;
     }
 
     // How many degrees longitude is the code from the reference?
-    degreesDifference = codeArea.longitudeCenter - referenceLongitude;
-    if (degreesDifference > areaToEdge) {
+    if (referenceLongitude + halfResolution < codeArea.longitudeCenter) {
       codeArea.longitudeCenter -= resolution;
-    } else if (degreesDifference < -areaToEdge) {
+    } else if (referenceLongitude - halfResolution > codeArea.longitudeCenter) {
       codeArea.longitudeCenter += resolution;
     }
 

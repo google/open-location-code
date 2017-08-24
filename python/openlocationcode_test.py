@@ -36,7 +36,7 @@ class TestValidity(unittest.TestCase):
 class TestShorten(unittest.TestCase):
     def setUp(self):
         self.testdata = []
-        headermap = {0: 'fullcode', 1: 'lat', 2: 'lng', 3: 'shortcode'}
+        headermap = {0: 'fullcode', 1: 'lat', 2: 'lng', 3: 'shortcode', 4:'testtype'}
         tests_fn = 'test_data/shortCodeTests.csv'
         with open(tests_fn, "r") as fin:
             for line in fin:
@@ -50,7 +50,10 @@ class TestShorten(unittest.TestCase):
 
     def test_full2short(self):
         for td in self.testdata:
-            self.assertEqual(td['shortcode'], olc.shorten(td['fullcode'], td['lat'], td['lng']), td)
+            if td['testtype'] == 'B' or td['testtype'] == 'S':
+                self.assertEqual(td['shortcode'], olc.shorten(td['fullcode'], td['lat'], td['lng']), td)
+            if td['testtype'] == 'B' or td['testtype'] == 'R':
+                self.assertEqual(td['fullcode'], olc.recoverNearest(td['shortcode'], td['lat'], td['lng']), td)
 
 
 class TestEncoding(unittest.TestCase):

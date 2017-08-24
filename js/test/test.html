@@ -129,25 +129,20 @@
           // Convert the string numbers to number numbers.
           testFields[1] = parseFloat(testFields[1]);
           testFields[2] = parseFloat(testFields[2]);
-          // Shorten the full length code.
-          var shorten = OpenLocationCode.shorten(
-              testFields[0], testFields[1], testFields[2]);
-          //var shortenBy4 = OpenLocationCode.shortenBy4(
-          //    testFields[0], testFields[1], testFields[2]);
-          //var shortenBy6 = OpenLocationCode.shortenBy6(
-          //    testFields[0], testFields[1], testFields[2]);
-          // Confirm we got what we expected.
-          var coords = ' with ' + testFields[1] + ',' + testFields[2];
-          assert.strictEqual(shorten, testFields[3], testFields[0] + ' shorten ' + coords);
-          //strictEqual(shortenBy4, testFields[3], testFields[0] + ' shortenBy4 ' + coords);
-          //strictEqual(shortenBy6, testFields[4], testFields[0] + ' shortenBy6 ' + coords);
-          // Now try expanding the shortened code.
-          var expanded = OpenLocationCode.recoverNearest(shorten, testFields[1], testFields[2]);
-          assert.strictEqual(expanded, testFields[0], testFields[0] + ' expanding shorten ' + coords);
-          //var expanded = OpenLocationCode.recoverNearest(shortenBy4, testFields[1], testFields[2]);
-          //strictEqual(expanded, testFields[0], testFields[0] + ' expanding shortenBy4 ' + coords);
-          //expanded = OpenLocationCode.recoverNearest(shortenBy6, testFields[1], testFields[2]);
-          //strictEqual(expanded, testFields[0], testFields[0] + ' expanding shortenBy6 ' + coords);
+          var coords = testFields[1] + ',' + testFields[2];
+
+          if (testFields[4] == "B" || testFields[4] == "S") {
+            // Shorten the full length code.
+            var shorten = OpenLocationCode.shorten(
+                testFields[0], testFields[1], testFields[2]);
+            // Confirm we got what we expected.
+            assert.strictEqual(shorten, testFields[3], 'shorten ' + testFields[0] + ' with ' + coords);
+          }
+          if (testFields[4] == "B" || testFields[4] == "R") {
+            // Now try expanding the shortened code.
+            var expanded = OpenLocationCode.recoverNearest(testFields[3], testFields[1], testFields[2]);
+            assert.strictEqual(expanded, testFields[0], 'recover ' + testFields[3] + ' with ' + coords);
+          }
         }
 
         done();
