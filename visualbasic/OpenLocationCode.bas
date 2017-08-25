@@ -692,5 +692,19 @@ Sub TestOLCLibrary()
     End If
   Next
 
+  ' North pole recovery test.
+  c = OLCRecoverNearest("2222+22", 89.6, 0.0)
+  If c <> "CFX22222+22" Then
+    MsgBox ("North pole recovery test, expected: CFX22222+22, actual: " + c)
+    Exit Sub
+  End If
+  ' South pole recovery test.
+  c = OLCRecoverNearest("XXXXXX+XX", -81.0, 0.0)
+  If c <> "2CXXXXXX+XX" Then
+    MsgBox ("South pole recovery test, expected: 2CXXXXXX+XX, actual: " + c)
+    Exit Sub
+  End If
+
+
   MsgBox ("All tests pass")
 End Sub
