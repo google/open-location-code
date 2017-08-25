@@ -149,7 +149,7 @@ public final class OpenLocationCode {
   /**
    * Creates Open Location Code object for the provided code.
    * @param code A valid OLC code. Can be a full code or a shortened code.
-   * @throws IlegalArgumentException when the passed code is not valid.
+   * @throws IllegalArgumentException when the passed code is not valid.
    * @constructor
   */
   public OpenLocationCode(String code) throws IllegalArgumentException {
@@ -432,11 +432,14 @@ public final class OpenLocationCode {
     double recoveredLatitude = recoveredCodeArea.getCenterLatitude();
     double recoveredLongitude = recoveredCodeArea.getCenterLongitude();
 
-    // Move the recovered latitude by one precision up or down if it is too far from the reference.
+    // Move the recovered latitude by one precision up or down if it is too far from the reference,
+    // unless doing so would lead to an invalid latitude.
     double latitudeDiff = recoveredLatitude - referenceLatitude;
-    if (latitudeDiff > prefixPrecision / 2) {
+    if (latitudeDiff > prefixPrecision / 2
+            && recoveredLatitude - prefixPrecision > -LATITUDE_MAX.intValue()) {
       recoveredLatitude -= prefixPrecision;
-    } else if (latitudeDiff < -prefixPrecision / 2) {
+    } else if (latitudeDiff < -prefixPrecision / 2
+            && recoveredLatitude + prefixPrecision < LATITUDE_MAX.intValue()) {
       recoveredLatitude += prefixPrecision;
     }
 
