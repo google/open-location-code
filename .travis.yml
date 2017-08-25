@@ -3,7 +3,7 @@ matrix:
     - language: dart
       dart: 1.24.2
       script:
-        - cd dart && pub run test
+        - cd dart && pub get && pub run test
     - language: node_js
       node_js:
         - "0.10"
