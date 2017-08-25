@@ -18,8 +18,8 @@ matrix:
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
         - chmod +x install.sh
-        - ./install.sh -user && rm -f install.sh
-        - blaze test --test_output=all python:openlocationcode_test
+        - ./install.sh -user
+        - ~/bin/blaze test --test_output=all python:openlocationcode_test
     - language: ruby
       rvm: 2.2
       script:
