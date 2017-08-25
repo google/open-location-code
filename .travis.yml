@@ -1,9 +1,13 @@
 matrix:
   include:
     - language: dart
-      dart: 1.24.2
+      dart: stable
       script:
         - cd dart && pub get && pub run test
+    - language: go
+      go: stable
+      script:
+        - go test ./go
     - language: node_js
       node_js:
         - "0.10"
@@ -17,7 +21,6 @@ matrix:
 
 # Define the list of directories to execute tests in.
 env:
-  - TEST_DIR=go
   - TEST_DIR=ruby
   - TEST_DIR=python
 
