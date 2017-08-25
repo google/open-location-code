@@ -2,6 +2,8 @@ matrix:
   include:
     - language: dart
       dart: 1.24.2
+      script:
+        - cd dart && pub run test
     - language: node_js
       node_js:
         - "0.10"
