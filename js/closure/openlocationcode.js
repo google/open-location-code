@@ -417,12 +417,12 @@ function recoverNearest(
   // than half the resolution, we need to move it north or south but keep it
   // within -90 to 90 degrees.
   if (referenceLatitude + halfResolution < codeArea.latitudeCenter &&
-      codeArea.latitudeCenter - resolution >= -LATITUDE_MAX_) {
+      codeArea.latitudeCenter - resolution >= -LATITUDE_MAX) {
     // If the proposed code is more than half a cell north of the reference location,
     // it's too far, and the best match will be one cell south.
     codeArea.latitudeCenter -= resolution;
   } else if (referenceLatitude - halfResolution > codeArea.latitudeCenter &&
-             codeArea.latitudeCenter + resolution <= LATITUDE_MAX_) {
+             codeArea.latitudeCenter + resolution <= LATITUDE_MAX) {
     // If the proposed code is more than half a cell south of the reference location,
     // it's too far, and the best match will be one cell north.
     codeArea.latitudeCenter += resolution;
