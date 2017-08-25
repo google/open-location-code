@@ -136,9 +136,9 @@ num clipLatitude(num latitude) => latitude.clamp(-90.0, 90.0);
 /// columns than rows.
 int computeLatitudePrecision(int codeLength) {
   if (codeLength <= 10) {
-    return pow(20, (codeLength ~/ -2) + 2);
+    return pow(encodingBase, (codeLength ~/ -2) + 2);
   }
-  return pow(20, -3) ~/ pow(gridRows, codeLength - 10);
+  return pow(encodingBase, -3) ~/ pow(gridRows, codeLength - 10);
 }
 
 /// Normalize a [longitude] into the range -180 to 180, not including 180.
@@ -322,9 +322,9 @@ String recoverNearest(
   // Compute the number of digits we need to recover.
   var paddingLength = separatorPosition - shortCode.indexOf(separator);
   // The resolution (height and width) of the padded area in degrees.
-  var resolution = pow(20, 2 - (paddingLength / 2));
+  var resolution = pow(encodingBase, 2 - (paddingLength / 2));
   // Distance from the center to an edge (in degrees).
-  var areaToEdge = resolution / 2.0;
+  var halfResolution = resolution / 2.0;
 
   // Use the reference location to pad the supplied short code and decode it.
   var codeArea = decode(
@@ -334,15 +334,17 @@ String recoverNearest(
   var centerLongitude = codeArea.center.longitude;
 
   // How many degrees latitude is the code from the reference? If it is more
-  // than half the resolution, we need to move it east or west.
-  var degreesDifference = centerLatitude - referenceLatitude;
-  if (degreesDifference > areaToEdge) {
-    // If the center of the short code is more than half a cell east,
-    // then the best match will be one position west.
+  // than half the resolution, we need to move it north or south but keep it
+  // within -90 to 90 degrees.
+  if (referenceLatitude + halfResolution < centerLatitude &&
+      centerLatitude - resolution >= -LATITUDE_MAX_) {
+    // If the proposed code is more than half a cell north of the reference location,
+    // it's too far, and the best match will be one cell south.
     centerLatitude -= resolution;
-  } else if (degreesDifference < -areaToEdge) {
-    // If the center of the short code is more than half a cell west,
-    // then the best match will be one position east.
+  } else if (referenceLatitude - halfResolution > centerLatitude &&
+             centerLatitude + resolution <= LATITUDE_MAX_) {
+    // If the proposed code is more than half a cell south of the reference location,
+    // it's too far, and the best match will be one cell north.
     centerLatitude += resolution;
   }
 
@@ -351,6 +353,13 @@ String recoverNearest(
   if (degreesDifference > areaToEdge) {
     centerLongitude -= resolution;
   } else if (degreesDifference < -areaToEdge) {
+    centerLongitude += resolution;
+  }
+
+  // How many degrees longitude is the code from the reference?
+  if (referenceLongitude + halfResolution < centerLongitude) {
+    centerLongitude -= resolution;
+  } else if (referenceLongitude - halfResolution > centerLongitude) {
     centerLongitude += resolution;
   }
 
