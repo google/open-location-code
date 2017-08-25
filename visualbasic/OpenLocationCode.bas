@@ -313,7 +313,7 @@ Public Function OLCRecoverNearest(ByVal code As String, ByVal latitude As Double
   ElseIf Not OLCIsShort(code) Then
     Err.raise vbObjectError + 513, "OLCDecode", "Invalid code"
   Else
-    Dim lat, lng, resolution, toEdge, diff As Double
+    Dim lat, lng, resolution, halfRes As Double
     Dim paddingLength As Integer
     Dim codeArea As OLCArea
     ' Ensure that the latitude and longitude are valid.
@@ -324,26 +324,25 @@ Public Function OLCRecoverNearest(ByVal code As String, ByVal latitude As Double
     ' The resolution (height and width) of the padded area in degrees.
     resolution = ENCODING_BASE_ ^ (2 - (paddingLength / 2))
     ' Distance from the center to an edge (in degrees).
-    toEdge = resolution / 2#
+    halfRes = resolution / 2
     ' Use the reference location to pad the supplied short code and decode it.
     codeArea = OLCDecode(Mid(OLCEncode(lat, lng), 1, paddingLength) + code)
     ' How many degrees latitude is the code from the reference? If it is more
-    ' than half the resolution, we need to move it east or west.
-    diff = codeArea.LatCenter - lat
-    If diff > toEdge Then
-      ' If the center of the short code is more than half a cell east,
-      ' then the best match will be one position west.
+    ' than half the resolution, we need to move it nort or south but keep it
+    ' within -90 to 90 degrees.
+    If lat + halfRes < codeArea.LatCenter And codeArea.LatCenter - resolution > LATITUDE_MAX_ Then
+      ' If the proposed code is more than half a cell north of the reference location,
+      ' it's too far, and the best match will be one cell south.
       codeArea.LatCenter = codeArea.LatCenter - resolution
-    ElseIf diff < -toEdge Then
-      ' If the center of the short code is more than half a cell west,
-      ' then the best match will be one position east.
+    ElseIf lat - halfRes > codeArea.LatCenter And codeArea.LatCenter + resolution < LATITUDE_MAX_ Then
+      ' If the proposed code is more than half a cell south of the reference location,
+      ' it's too far, and the best match will be one cell north.
       codeArea.LatCenter = codeArea.LatCenter + resolution
     End If
     ' How many degrees longitude is the code from the reference?
-    diff = codeArea.LngCenter - lng
-    If diff > toEdge Then
+    If lng + halfRes < codeArea.LngCenter Then
       codeArea.LngCenter = codeArea.LngCenter - resolution
-    ElseIf diff < -toEdge Then
+    ElseIf lng - halfRes > codeArea.LngCenter Then
       codeArea.LngCenter = codeArea.LngCenter + resolution
     End If
     OLCRecoverNearest = OLCEncode(codeArea.LatCenter, codeArea.LngCenter, codeArea.CodeLength)
