@@ -13,6 +13,18 @@ matrix:
         - "0.10"
       script:
         - cd js && npm install && npm test
+    - language: python
+      python: 3.4
+      script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh -user && rm -f install.sh
+        - blaze test --test_output=all python:openlocationcode_test
+    - language: ruby
+      rvm: 2.2
+      script:
+        - gem install test-unit
+        - cd ruby && ruby test/plus_codes_test.rb
     - language: rust
       script: 
         - cd rust/
@@ -20,9 +32,9 @@ matrix:
         - cargo test --verbose --all
 
 # Define the list of directories to execute tests in.
-env:
-  - TEST_DIR=ruby
-  - TEST_DIR=python
+#env:
+#  - TEST_DIR=ruby
+#  - TEST_DIR=python
 
 # Test script to run. This is called once for each TEST_DIR value above.
-script: ./run_tests.sh
+#script: ./run_tests.sh
