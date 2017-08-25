@@ -23,16 +23,18 @@ public class ShorteningTest {
     private final double referenceLatitude;
     private final double referenceLongitude;
     private final String shortCode;
+    private final String testType;
 
     public TestData(String line) {
       String[] parts = line.split(",");
-      if (parts.length != 4) {
+      if (parts.length != 5) {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
       this.code = parts[0];
       this.referenceLatitude = Double.valueOf(parts[1]);
       this.referenceLongitude = Double.valueOf(parts[2]);
       this.shortCode = parts[3];
+      this.testType = parts[4];
     }
   }
 
@@ -55,6 +57,9 @@ public class ShorteningTest {
   @Test
   public void testShortening() {
     for (TestData testData : testDataList) {
+      if (testData.testType != "B" && testData.testType != "S") {
+        continue;
+      }
       OpenLocationCode olc = new OpenLocationCode(testData.code);
       OpenLocationCode shortened =
           olc.shorten(testData.referenceLatitude, testData.referenceLongitude);
@@ -68,6 +73,9 @@ public class ShorteningTest {
   @Test
   public void testRecovering() {
     for (TestData testData : testDataList) {
+      if (testData.testType != "B" && testData.testType != "R") {
+        continue;
+      }
       OpenLocationCode olc = new OpenLocationCode(testData.shortCode);
       OpenLocationCode recovered =
           olc.recover(testData.referenceLatitude, testData.referenceLongitude);
