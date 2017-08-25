@@ -30,9 +30,7 @@ matrix:
     
     # Java implementation. Lives in java/, tested with bazel.
     - language: java
-      jdk:
-        - oraclejdk8
-        - openjdk6
+      jdk: oraclejdk8
       env: OLC_PATH=java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
