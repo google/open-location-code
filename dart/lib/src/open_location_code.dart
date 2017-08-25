@@ -337,12 +337,12 @@ String recoverNearest(
   // than half the resolution, we need to move it north or south but keep it
   // within -90 to 90 degrees.
   if (referenceLatitude + halfResolution < centerLatitude &&
-      centerLatitude - resolution >= -latitidueMax) {
+      centerLatitude - resolution >= -latitudeMax) {
     // If the proposed code is more than half a cell north of the reference location,
     // it's too far, and the best match will be one cell south.
     centerLatitude -= resolution;
   } else if (referenceLatitude - halfResolution > centerLatitude &&
-             centerLatitude + resolution <= latitidueMax) {
+             centerLatitude + resolution <= latitudeMax) {
     // If the proposed code is more than half a cell south of the reference location,
     // it's too far, and the best match will be one cell north.
     centerLatitude += resolution;
