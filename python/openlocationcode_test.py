@@ -9,7 +9,7 @@ class TestValidity(unittest.TestCase):
         self.testdata = []
         headermap = {0: 'code', 1: 'isValid', 2: 'isShort', 3: 'isFull'}
         tests_fn = 'test_data/validityTests.csv'
-        with open(tests_fn, "r") as fin:
+        with open(tests_fn, 'r', encoding='utf-8') as fin:
             for line in fin:
                 if line.startswith('#'):
                     continue
