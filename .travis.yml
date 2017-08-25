@@ -1,3 +1,8 @@
+# Travis CI configuration.
+# Each implementation is listed using the matrix:include configuration.
+
+sudo: false
+dist: trusty
 matrix:
   include:
     # C++ implementation. Lives in cpp/, tested with bazel.
@@ -10,21 +15,24 @@ matrix:
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
     
     # Dart implementation. Lives in dart/
-    #- language: dart
-    #  dart: stable
-    #  env: OLC_PATH=dart
-    #  script:
-    #    - cd dart && pub get && pub run test
+    - language: dart
+      dart: stable
+      env: OLC_PATH=dart
+      script:
+        - cd dart && pub get && pub run test
     
     # Go implementation. Lives in go/
-    #- language: go
-    #  go: stable
-    #  env: OLC_PATH=go
-    #  script:
-    #    - go test ./go
+    - language: go
+      go: stable
+      env: OLC_PATH=go
+      script:
+        - go test ./go
     
     # Java implementation. Lives in java/, tested with bazel.
     - language: java
+      jdk:
+        - oraclejdk8
+        - openjdk6
       env: OLC_PATH=java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
@@ -43,12 +51,12 @@ matrix:
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
     
     # Javascript implementation. Lives in js/.
-    #- language: node_js
-    #  node_js:
-    #    - "0.10"
-    #  env: OLC_PATH=js
-    #  script:
-    #    - cd js && npm install && npm test
+    - language: node_js
+      node_js:
+        - "0.10"
+      env: OLC_PATH=js
+      script:
+        - cd js && npm install && npm test
     
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
@@ -61,25 +69,17 @@ matrix:
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
         
     # Ruby implementation. Lives in ruby/
-    #- language: ruby
-    #  rvm: 2.2
-    #  env: OLC_PATH=ruby
-    #  script:
-    #    - gem install test-unit
-    #    - cd ruby && ruby test/plus_codes_test.rb
+    - language: ruby
+      rvm: 2.2
+      env: OLC_PATH=ruby
+      script:
+        - gem install test-unit
+        - cd ruby && ruby test/plus_codes_test.rb
     
     # Rust implementation. Lives in rust/
-    #- language: rust
-    #  env: OLC_PATH=rust
-    #  script: 
-    #    - cd rust/
-    #    - cargo build --verbose --all
-    #    - cargo test --verbose --all
-
-# Define the list of directories to execute tests in.
-#env:
-#  - TEST_DIR=ruby
-#  - TEST_DIR=python
-
-# Test script to run. This is called once for each TEST_DIR value above.
-#script: ./run_tests.sh
+    - language: rust
+      env: OLC_PATH=rust
+      script: 
+        - cd rust/
+        - cargo build --verbose --all
+        - cargo test --verbose --all
