@@ -50,8 +50,7 @@ matrix:
     
     # Javascript implementation. Lives in js/.
     - language: node_js
-      node_js:
-        - "0.10"
+      node_js: "node"
       env: OLC_PATH=js
       script:
         - cd js && npm install && npm test
