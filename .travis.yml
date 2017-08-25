@@ -1,10 +1,8 @@
 matrix:
   include:
     - language: dart
-      script:
-        - cd dart/
-      dart_task:
-        - test
+      dart:
+        - stable
     - language: node_js
       node_js:
         - "0.10"
