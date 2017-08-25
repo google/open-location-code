@@ -2,7 +2,7 @@ matrix:
   include:
     - language: dart
       dart:
-        - 1.24.2
+        - "1.24.2"
     - language: node_js
       node_js:
         - "0.10"
