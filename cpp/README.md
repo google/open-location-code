@@ -20,7 +20,7 @@ bazel build openlocationcode
 To run the tests, use:
 
 ```
-bazel test openlocationcode_test
+bazel test --test_output=all openlocationcode_test
 ```
 
 The tests use the CSV files in the test_data folder. Make sure you copy this folder to the

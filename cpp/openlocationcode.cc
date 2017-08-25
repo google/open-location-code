@@ -316,7 +316,7 @@ std::string RecoverNearest(const std::string &short_code,
   double resolution = pow_neg(
       internal::kEncodingBase, 2.0 - (padding_length / 2.0));
   // Distance from the center to an edge (in degrees).
-  double area_to_edge = resolution / 2.0;
+  double half_res = resolution / 2.0;
   // Use the reference location to pad the supplied short code and decode it.
   LatLng latlng = {latitude, longitude};
   std::string padding_code = Encode(latlng);
@@ -324,22 +324,23 @@ std::string RecoverNearest(const std::string &short_code,
       Decode(std::string(padding_code.substr(0, padding_length)) +
              std::string(short_code));
   // How many degrees latitude is the code from the reference? If it is more
-  // than half the resolution, we need to move it east or west.
+  // than half the resolution, we need to move it north or south but keep it
+  // within -90 to 90 degrees.
   double center_lat = code_rect.GetCenter().latitude;
   double center_lng = code_rect.GetCenter().longitude;
-  if (center_lat - latitude > area_to_edge) {
-    // If the center of the short code is more than half a cell east,
-    // then the best match will be one position west.
+  if (latitude + half_res < center_lat && center_lat - resolution > internal::kLatitudeMaxDegrees) {
+    // If the proposed code is more than half a cell north of the reference location,
+    // it's too far, and the best match will be one cell south.
     center_lat -= resolution;
-  } else if (center_lat - latitude < -area_to_edge) {
-    // If the center of the short code is more than half a cell west,
-    // then the best match will be one position east.
+  } else if (latitude - half_res > center_lat && center_lat + resolution < internal::kLatitudeMaxDegrees) {
+    // If the proposed code is more than half a cell south of the reference location,
+    // it's too far, and the best match will be one cell north.
     center_lat += resolution;
   }
   // How many degrees longitude is the code from the reference?
-  if (center_lng - longitude > area_to_edge) {
+  if (longitude + half_res < center_lng) {
     center_lng -= resolution;
-  } else if (center_lng - longitude < -area_to_edge) {
+  } else if (longitude - half_res > center_lng) {
     center_lng += resolution;
   }
   LatLng center_latlng = {center_lat, center_lng};

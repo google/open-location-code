@@ -26,19 +26,12 @@ cc_library(
     visibility = ["//visibility:private"],
 )
 
-filegroup(
-    name = "testdata",
-    srcs = glob([
-        "test_data/*",
-    ]),
-)
-
 cc_test(
     name = "openlocationcode_test",
     size = "small",
     srcs = ["openlocationcode_test.cc"],
     data = [
-        "testdata",
+        "//test_data:test_data",
     ],
     deps = [
         "@gtest//:main",
