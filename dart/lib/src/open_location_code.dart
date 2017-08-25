@@ -349,14 +349,6 @@ String recoverNearest(
   }
 
   // How many degrees longitude is the code from the reference?
-  degreesDifference = codeArea.center.longitude - referenceLongitude;
-  if (degreesDifference > areaToEdge) {
-    centerLongitude -= resolution;
-  } else if (degreesDifference < -areaToEdge) {
-    centerLongitude += resolution;
-  }
-
-  // How many degrees longitude is the code from the reference?
   if (referenceLongitude + halfResolution < centerLongitude) {
     centerLongitude -= resolution;
   } else if (referenceLongitude - halfResolution > centerLongitude) {
