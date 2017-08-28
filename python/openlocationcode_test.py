@@ -3,7 +3,7 @@
 # pylint: disable=redefined-builtin
 from io import open
 import unittest
-from google3.third_party.golang.openlocationcode.python import openlocationcode as olc
+import openlocationcode as olc
 
 
 class TestValidity(unittest.TestCase):
