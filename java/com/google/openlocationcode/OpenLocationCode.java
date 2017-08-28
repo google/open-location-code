@@ -92,7 +92,7 @@ public final class OpenLocationCode {
    * <p>The coordinates include the latitude and longitude of the lower left and upper right corners
    * and the center of the bounding box for the area the code represents.
    */
- public class CodeArea {
+ public static class CodeArea {
 
     private final BigDecimal southLatitude;
     private final BigDecimal westLongitude;
@@ -171,7 +171,7 @@ public final class OpenLocationCode {
   public OpenLocationCode(double latitude, double longitude, int codeLength)
       throws IllegalArgumentException {
     // Check that the code length requested is valid.
-    if (codeLength < 4 || (codeLength < PAIR_CODE_LENGTH & codeLength % 2 == 1)) {
+    if (codeLength < 4 || (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
     // Ensure that latitude and longitude are valid.
