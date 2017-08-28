@@ -41,11 +41,13 @@ public class ShorteningTest {
     }
   }
 
+  private static final String TEST_PATH =
+      System.getenv("JAVA_RUNFILES") + "/openlocationcode/test_data";
   private final List<TestData> testDataList = new ArrayList<>();
 
   @Before
   public void setUp() throws Exception {
-    File testFile = new File(System.getenv("JAVA_RUNFILES"), "openlocationcode/test_data/shortCodeTests.csv");
+    File testFile = new File(TEST_PATH, "shortCodeTests.csv");
     InputStream testDataStream = new FileInputStream(testFile);
     BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream));
     String line;
