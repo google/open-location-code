@@ -21,59 +21,51 @@ Changes are sent to [Travis CI](https://travis-ci.org)
 for integration testing after pushes, and you can see the current test status
 [here](https://travis-ci.org/google/open-location-code).
 
-The testing configuration is controlled by two files:
-[`travis.yml`](.travis.yml) and [`run_tests.sh`](run_tests.sh).
+The testing configuration is controlled by the [`travis.yml`](.travis.yml) file.
 
 ### [.travis.yml](.travis.yml)
-This file defines the prerequisites required for testing, and the list of
-directories to be tested. (The directories listed are tested in parallel.)
+This file defines each language configuration to be tested.
 
-The same script ([run_tests.sh](run_tests.sh)) is executed for all directories.
+Some languages can be tested natively, others are built and tested using bazel BUILD files.
 
-### [run_tests.sh](run_tests.sh)
-This file is run once for _each_ directory defined in
-`.travis.yml`. The directory name being tested is passed in the environment
-variable `TEST_DIR`.)
+An example of a language being tested natively is go:
 
-[`run_tests.sh`](run_tests.sh) checks the value of `TEST_DIR`, and then runs
-commands to test the relevant implementation. The commands that do the testing
-**must** return zero on success and non-zero value on failure. _Tests that
-return zero, even if they output error messages, will be considered by the
-testing framework as a success_.
+```
+    # Go implementation. Lives in go/
+    - language: go
+      go: stable
+      env: OLC_PATH=go
+      script:
+        - go test ./go
+```
+
+This defines the language, uses the `stable` version, sets an environment variable
+with the path and then runs the testing command `go test ./go`.
+
+An example of a language using bazel is Python:
+
+```
+    # Python implementation. Lives in python/, tested with bazel.
+    - language: python
+      python: 2.7
+      env: OLC_PATH=python
+      script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+```
+
+The big difference is that the bazel software must be downloaded and
+installed before running the test command: 
+`~/bin/bazel test --test_output=all ${OLC_PATH}:all`.
+
+Note that this configuration tests python version 2.7. If you want to test multiple
+versions, you will need to define **another** language entry with the version
+specified. (You cannot specify multiple versions in a single language entry.)
 
 ### Adding Your Tests
-Add your directory to the [`.travis.yml`](.travis.yml) file:
-```
-# Define the list of directories to execute tests in.
-env:
-  - TEST_DIR=js
-  - TEST_DIR=go
-  - TEST_DIR=your directory goes here
-```
 
-Then add the necessary code to [`run_tests.sh`](run_tests.sh):
-```
-# Your language goes here
-if [ "$TEST_DIR" == "your directory goes here" ]; then
-  cd directory && run something && run another thing
-  exit  # Exit immediately, returning the last command status
-fi
-```
-Note the use of `&&` to combine the test commands. This ensures that if any
-command in the sequence fails, the script will stop and return a test failure.
-
-The test commands **must be** followed by an `exit` statement. This ensures that
-the script will return the same status as the tests. If this status is zero,
-the test will be marked successful. If not, the test will be marked as a
-failure.
-
-### Testing Multiple Languages
-[Travis CI](https://travis-ci.org) assumes that each github project has only
-a single language. That language is specified in the [.travis.yml](.travis.yml)
-file (`language: node_js`).
-
-This shouldn't be a problem, since prerequisites can still be loaded in the
-`before_script` section, and then commands executed in
-[`run_tests.sh`](run_tests.sh). However in the event that you can't resolve a
-problem, leave a comment in the issue or push request and we'll see if someone
-can figure out a solution.
+Simply add a new section to the `.travis.yml` file with the appropriate language,
+and either the native test command or install the bazel software and call the
+`bazel test` like the other examples.
