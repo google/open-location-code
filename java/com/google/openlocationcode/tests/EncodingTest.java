@@ -5,6 +5,8 @@ import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Tests encoding and decoding between Open Location Code and latitude/longitude pair. */
+@RunWith(JUnit4.class)
 public class EncodingTest {
 
   public static final double PRECISION = 1e-10;
@@ -44,11 +47,13 @@ public class EncodingTest {
     }
   }
 
+  private static final String TEST_PATH =
+      System.getenv("JAVA_RUNFILES") + "/openlocationcode/test_data";
   private final List<TestData> testDataList = new ArrayList<>();
 
   @Before
   public void setUp() throws Exception {
-    File testFile = new File(System.getenv("JAVA_RUNFILES"), "openlocationcode/test_data/encodingTests.csv");
+    File testFile = new File(TEST_PATH, "encodingTests.csv");
     InputStream testDataStream = new FileInputStream(testFile);
     BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream));
     String line;
