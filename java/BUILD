@@ -22,21 +22,6 @@ java_test(
 )
 
 java_test(
-    name = "precision_test",
-    srcs = [
-        "com/google/openlocationcode/tests/PrecisionTest.java",
-    ],
-    test_class = "com.google.openlocationcode.tests.PrecisionTest",
-    size = "small",
-    deps = [
-        ":openlocationcode",
-    ],
-    data = [
-        "//test_data:test_data"
-    ],
-)
-
-java_test(
     name = "shortening_test",
     srcs = [
         "com/google/openlocationcode/tests/ShorteningTest.java",
@@ -63,5 +48,29 @@ java_test(
     ],
     data = [
         "//test_data:test_data"
+    ],
+)
+
+java_test(
+    name = "precision_test",
+    srcs = [
+        "com/google/openlocationcode/tests/PrecisionTest.java",
+    ],
+    test_class = "com.google.openlocationcode.tests.PrecisionTest",
+    size = "small",
+    deps = [
+        ":openlocationcode",
+    ],
+)
+
+java_test(
+    name = "recover_test",
+    srcs = [
+        "com/google/openlocationcode/tests/RecoverTest.java",
+    ],
+    test_class = "com.google.openlocationcode.tests.RecoverTest",
+    size = "small",
+    deps = [
+        ":openlocationcode",
     ],
 )
