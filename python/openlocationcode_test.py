@@ -11,7 +11,7 @@ class TestValidity(unittest.TestCase):
         tests_fn = 'test_data/validityTests.csv'
         with open(tests_fn, 'r') as fin:
             for line in fin:
-                line = line.decode('utf-8')
+                line = str(line)
                 if line.startswith('#'):
                     continue
                 td = line.strip().split(',')
@@ -41,7 +41,7 @@ class TestShorten(unittest.TestCase):
         tests_fn = 'test_data/shortCodeTests.csv'
         with open(tests_fn, 'r') as fin:
             for line in fin:
-                line = line.decode('utf-8')
+                line = str(line)
                 if line.startswith('#'):
                     continue
                 td = line.strip().split(',')
@@ -65,7 +65,7 @@ class TestEncoding(unittest.TestCase):
         tests_fn = 'test_data/encodingTests.csv'
         with open(tests_fn, 'r') as fin:
             for line in fin:
-                line = line.decode('utf-8')
+                line = str(line)
                 if line.startswith('#'):
                     continue
                 td = line.strip().split(',')
