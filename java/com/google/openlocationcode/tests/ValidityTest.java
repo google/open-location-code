@@ -5,6 +5,8 @@ import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +21,7 @@ import java.util.List;
  * {@link com.google.openlocationcode.OpenLocationCode#isShortCode(String)}} and
  * {@link com.google.openlocationcode.OpenLocationCode#isFullCode(String)} Open Location Code.
  */
+@RunWith(JUnit4.class)
 public class ValidityTest {
 
   private class TestData {
