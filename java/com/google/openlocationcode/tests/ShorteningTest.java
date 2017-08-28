@@ -5,6 +5,8 @@ import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Tests shortening functionality of Open Location Code. */
+@RunWith(JUnit4.class)
 public class ShorteningTest {
 
   private class TestData {
