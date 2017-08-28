@@ -9,8 +9,9 @@ class TestValidity(unittest.TestCase):
         self.testdata = []
         headermap = {0: 'code', 1: 'isValid', 2: 'isShort', 3: 'isFull'}
         tests_fn = 'test_data/validityTests.csv'
-        with open(tests_fn, 'r', encoding='utf-8') as fin:
+        with open(tests_fn, 'r') as fin:
             for line in fin:
+                line = line.decode('utf-8')
                 if line.startswith('#'):
                     continue
                 td = line.strip().split(',')
@@ -38,8 +39,9 @@ class TestShorten(unittest.TestCase):
         self.testdata = []
         headermap = {0: 'fullcode', 1: 'lat', 2: 'lng', 3: 'shortcode', 4:'testtype'}
         tests_fn = 'test_data/shortCodeTests.csv'
-        with open(tests_fn, 'r', encoding='utf-8') as fin:
+        with open(tests_fn, 'r') as fin:
             for line in fin:
+                line = line.decode('utf-8')
                 if line.startswith('#'):
                     continue
                 td = line.strip().split(',')
@@ -61,8 +63,9 @@ class TestEncoding(unittest.TestCase):
         self.testdata = []
         headermap = {0: 'code', 1: 'lat', 2: 'lng', 3: 'latLo', 4: 'lngLo', 5: 'latHi', 6: 'longHi'}
         tests_fn = 'test_data/encodingTests.csv'
-        with open(tests_fn, 'r', encoding='utf-8') as fin:
+        with open(tests_fn, 'r') as fin:
             for line in fin:
+                line = line.decode('utf-8')
                 if line.startswith('#'):
                     continue
                 td = line.strip().split(',')
