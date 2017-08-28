@@ -50,7 +50,7 @@ public class ShorteningTest {
   public void setUp() throws Exception {
     File testFile = new File(TEST_PATH, "shortCodeTests.csv");
     InputStream testDataStream = new FileInputStream(testFile);
-    BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream), UTF_8);
+    BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream, UTF_8));
     String line;
     while ((line = reader.readLine()) != null) {
       if (line.startsWith("#")) {
