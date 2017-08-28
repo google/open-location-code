@@ -5,16 +5,18 @@ from io import open
 import unittest
 import openlocationcode as olc
 
+# Location of test data files.
+_TEST_DATA = 'test_data'
+
 
 class TestValidity(unittest.TestCase):
 
   def setUp(self):
     self.testdata = []
     headermap = {0: 'code', 1: 'isValid', 2: 'isShort', 3: 'isFull'}
-    tests_fn = 'third_party/golang/openlocationcode/test_data/validityTests.csv'
-    with open(tests_fn, 'r') as fin:
+    tests_fn = _TEST_DATA + '/validityTests.csv'
+    with open(tests_fn, mode='r', encoding='utf-8') as fin:
       for line in fin:
-        line = str(line)
         if line.startswith('#'):
           continue
         td = line.strip().split(',')
@@ -49,10 +51,9 @@ class TestShorten(unittest.TestCase):
         3: 'shortcode',
         4: 'testtype'
     }
-    tests_fn = 'third_party/golang/openlocationcode/test_data/shortCodeTests.csv'
-    with open(tests_fn, 'r') as fin:
+    tests_fn = _TEST_DATA + '/shortCodeTests.csv'
+    with open(tests_fn, mode='r', encoding='utf-8') as fin:
       for line in fin:
-        line = str(line)
         if line.startswith('#'):
           continue
         td = line.strip().split(',')
@@ -86,10 +87,9 @@ class TestEncoding(unittest.TestCase):
         5: 'latHi',
         6: 'longHi'
     }
-    tests_fn = 'third_party/golang/openlocationcode/test_data/encodingTests.csv'
-    with open(tests_fn, 'r') as fin:
+    tests_fn = _TEST_DATA + '/encodingTests.csv'
+    with open(tests_fn, mode='r', encoding='utf-8') as fin:
       for line in fin:
-        line = str(line)
         if line.startswith('#'):
           continue
         td = line.strip().split(',')
