@@ -77,16 +77,15 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
   std::vector<EncodingTestData> data_results;
   std::vector<std::vector<std::string>> csv_records =
       ParseCsv(kEncodingTestsFile);
-  char *stopstring;
   for (size_t i = 0; i < csv_records.size(); i++) {
     EncodingTestData test_data = {};
     test_data.code = csv_records[i][0];
-    test_data.lat_deg = strtod(csv_records[i][1].c_str(), &stopstring);
-    test_data.lng_deg = strtod(csv_records[i][2].c_str(), &stopstring);
-    test_data.lo_lat_deg = strtod(csv_records[i][3].c_str(), &stopstring);
-    test_data.lo_lng_deg = strtod(csv_records[i][4].c_str(), &stopstring);
-    test_data.hi_lat_deg = strtod(csv_records[i][5].c_str(), &stopstring);
-    test_data.hi_lng_deg = strtod(csv_records[i][6].c_str(), &stopstring);
+    test_data.lat_deg = strtod(csv_records[i][1].c_str(), nullptr);
+    test_data.lng_deg = strtod(csv_records[i][2].c_str(), nullptr);
+    test_data.lo_lat_deg = strtod(csv_records[i][3].c_str(), nullptr);
+    test_data.lo_lng_deg = strtod(csv_records[i][4].c_str(), nullptr);
+    test_data.hi_lat_deg = strtod(csv_records[i][5].c_str(), nullptr);
+    test_data.hi_lng_deg = strtod(csv_records[i][6].c_str(), nullptr);
     data_results.push_back(test_data);
   }
   return data_results;
@@ -164,12 +163,11 @@ std::vector<ShortCodeTestData> GetShortCodeDataFromCsv() {
   std::vector<ShortCodeTestData> data_results;
   std::vector<std::vector<std::string>> csv_records =
       ParseCsv(kShortCodeTestsFile);
-  char *stopstring;
   for (size_t i = 0; i < csv_records.size(); i++) {
     ShortCodeTestData test_data = {};
     test_data.full_code = csv_records[i][0];
-    test_data.reference_lat = strtod(csv_records[i][1].c_str(), &stopstring);
-    test_data.reference_lng = strtod(csv_records[i][2].c_str(), &stopstring);
+    test_data.reference_lat = strtod(csv_records[i][1].c_str(), nullptr);
+    test_data.reference_lng = strtod(csv_records[i][2].c_str(), nullptr);
     test_data.short_code = csv_records[i][3];
     test_data.test_type = csv_records[i][4];
     data_results.push_back(test_data);
