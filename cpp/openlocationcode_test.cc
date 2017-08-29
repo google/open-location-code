@@ -1,11 +1,11 @@
 #include "openlocationcode.h"
-#include "codearea.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
 #include <string>
 
+#include "codearea.h"
 #include "gtest/gtest.h"
 
 namespace openlocationcode {
