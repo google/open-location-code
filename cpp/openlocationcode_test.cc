@@ -55,6 +55,7 @@ std::vector<std::vector<std::string>> ParseCsv(std::string path_to_file) {
     }
     csv_records.push_back(line_records);
   }
+  EXPECT_GT(csv_records.size(), 0);
   return csv_records;
 }
 
