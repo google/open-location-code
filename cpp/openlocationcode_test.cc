@@ -80,12 +80,12 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
   for (size_t i = 0; i < csv_records.size(); i++) {
     EncodingTestData test_data = {};
     test_data.code = csv_records[i][0];
-    test_data.lat_deg = atof(csv_records[i][1].c_str());
-    test_data.lng_deg = atof(csv_records[i][2].c_str());
-    test_data.lo_lat_deg = atof(csv_records[i][3].c_str());
-    test_data.lo_lng_deg = atof(csv_records[i][4].c_str());
-    test_data.hi_lat_deg = atof(csv_records[i][5].c_str());
-    test_data.hi_lng_deg = atof(csv_records[i][6].c_str());
+    test_data.lat_deg = safe_strtod(csv_records[i][1].c_str());
+    test_data.lng_deg = safe_strtod(csv_records[i][2].c_str());
+    test_data.lo_lat_deg = safe_strtod(csv_records[i][3].c_str());
+    test_data.lo_lng_deg = safe_strtod(csv_records[i][4].c_str());
+    test_data.hi_lat_deg = safe_strtod(csv_records[i][5].c_str());
+    test_data.hi_lng_deg = safe_strtod(csv_records[i][6].c_str());
     data_results.push_back(test_data);
   }
   return data_results;
@@ -166,8 +166,8 @@ std::vector<ShortCodeTestData> GetShortCodeDataFromCsv() {
   for (size_t i = 0; i < csv_records.size(); i++) {
     ShortCodeTestData test_data = {};
     test_data.full_code = csv_records[i][0];
-    test_data.reference_lat = atof(csv_records[i][1].c_str());
-    test_data.reference_lng = atof(csv_records[i][2].c_str());
+    test_data.reference_lat = safe_strtod(csv_records[i][1].c_str());
+    test_data.reference_lng = safe_strtod(csv_records[i][2].c_str());
     test_data.short_code = csv_records[i][3];
     test_data.test_type = csv_records[i][4];
     data_results.push_back(test_data);
