@@ -24,7 +24,7 @@
 # Reference location is in the 4 digit cell to the east.
 8FR9GXGG+GG,46.526,8.026,GXGG+GG,B
 # Reference location is in the 4 digit cell to the west.
-8FRCG2GG+GG,46.526,7.976,B
+8FRCG2GG+GG,46.526,7.976,G2GG+GG,B
 # Added to detect errors recovering codes near the poles.
 # This tests recovery function, but these codes won't shorten.
 CFX22222+22,89.6,0.0,2222+22,R
