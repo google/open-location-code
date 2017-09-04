@@ -17,6 +17,14 @@
 # Added to detect error in recoverNearest functionality
 8FJFW222+,42.899,9.012,22+,B
 796RXG22+,14.95125,-23.5001,22+,B
+# Reference location is in the 4 digit cell to the south.
+8FVC2GGG+GG,46.976,8.526,2GGG+GG,B
+# Reference location is in the 4 digit cell to the north.
+8FRCXGGG+GG,47.026,8.526,XGGG+GG,B
+# Reference location is in the 4 digit cell to the east.
+8FR9GXGG+GG,46.526,8.026,GXGG+GG,B
+# Reference location is in the 4 digit cell to the west.
+8FRCG2GG+GG,46.526,7.976,G2GG+GG,B
 # Added to detect errors recovering codes near the poles.
 # This tests recovery function, but these codes won't shorten.
 CFX22222+22,89.6,0.0,2222+22,R

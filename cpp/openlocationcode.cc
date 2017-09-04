@@ -328,7 +328,7 @@ std::string RecoverNearest(const std::string &short_code,
   // within -90 to 90 degrees.
   double center_lat = code_rect.GetCenter().latitude;
   double center_lng = code_rect.GetCenter().longitude;
-  if (latitude + half_res < center_lat && center_lat - resolution > internal::kLatitudeMaxDegrees) {
+  if (latitude + half_res < center_lat && center_lat - resolution > -internal::kLatitudeMaxDegrees) {
     // If the proposed code is more than half a cell north of the reference location,
     // it's too far, and the best match will be one cell south.
     center_lat -= resolution;
