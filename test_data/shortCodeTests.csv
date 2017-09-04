@@ -17,6 +17,8 @@
 # Added to detect error in recoverNearest functionality
 8FJFW222+,42.899,9.012,22+,B
 796RXG22+,14.95125,-23.5001,22+,B
+# Added to detect error in recoverNearest - latitude needs south adjustment
+8FRCXGRF+PM,47.00,8.55,XGRF+PM
 # Added to detect errors recovering codes near the poles.
 # This tests recovery function, but these codes won't shorten.
 CFX22222+22,89.6,0.0,2222+22,R
