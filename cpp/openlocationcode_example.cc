@@ -13,26 +13,26 @@ int main() {
 
   // Decodes a Plus+Code back into coordinates.
   openlocationcode::CodeArea code_area = openlocationcode::Decode(code);
-  cout << "Code length: " << cout.precision(15) << endl;
-  cout << code_area.GetLatitudeLo() << endl;   // 47.000062496
-  cout << code_area.GetLongitudeLo() << endl;  // 8.00006250000001
-  cout << code_area.GetLatitudeHi() << endl;   // 47.000062504
-  cout << code_area.GetLongitudeHi() << endl;  // 8.0000625305176
-  cout << code_area.GetCodeLength() << endl;   // 16
+  std::cout << "Code length: " << std::cout.precision(15) << std::endl;
+  std::cout << code_area.GetLatitudeLo() << std::endl;   // 47.000062496
+  std::cout << code_area.GetLongitudeLo() << std::endl;  // 8.00006250000001
+  std::cout << code_area.GetLatitudeHi() << std::endl;   // 47.000062504
+  std::cout << code_area.GetLongitudeHi() << std::endl;  // 8.0000625305176
+  std::cout << code_area.GetCodeLength() << std::endl;   // 16
 
   // Checks if a Plus+Code is valid.
   bool isValid = openlocationcode::IsValid(code);
-  cout << "Is valid? " << isValid << endl;
+  std::cout << "Is valid? " << isValid << std::endl;
   // => true
 
   // Checks if a Plus+Code is full.
   bool isFull = openlocationcode::IsFull(code);
-  cout << "Is full? " << isFull << endl;
+  std::cout << "Is full? " << isFull << std::endl;
   // => true
 
   // Checks if a Plus+Code is short.
   bool isShort = openlocationcode::IsShort(code);
-  cout << "Is short? " << isShort << endl;
+  std::cout << "Is short? " << isShort << std::endl;
   // => false
 
   // Shorten a Plus+Codes if possible by the given reference latitude and
