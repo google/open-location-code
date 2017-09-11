@@ -7,12 +7,12 @@ cc_library(
         "codearea.h",
         "openlocationcode.h",
     ],
-    deps = [
-        ":codearea",
-    ],
     copts = ["-pthread"],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
+    deps = [
+        ":codearea",
+    ],
 )
 
 cc_library(
@@ -30,15 +30,18 @@ cc_test(
     name = "openlocationcode_test",
     size = "small",
     srcs = ["openlocationcode_test.cc"],
+    copts = [
+        "-pthread",
+        "-Iexternal/gtest/include",
+    ],
     data = [
-        "//test_data:test_data",
+        "//test_data",
     ],
-    deps = [
-        "@gtest//:main",
-        ":openlocationcode",
-    ],
-    copts = ["-pthread", "-Iexternal/gtest/include"],
     linkopts = ["-pthread"],
+    deps = [
+        ":openlocationcode",
+        "@gtest//:main",
+    ],
 )
 
 cc_binary(
