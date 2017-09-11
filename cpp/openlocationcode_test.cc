@@ -37,7 +37,8 @@ TEST(ParameterChecks, ShortenDegreesValid) {
 
 namespace {
 
-std::vector<std::vector<std::string>> ParseCsv(std::string path_to_file) {
+std::vector<std::vector<std::string>> ParseCsv(
+    const std::string& path_to_file) {
   std::vector<std::vector<std::string>> csv_records;
   std::string line;
 
