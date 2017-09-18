@@ -54,7 +54,8 @@ std::string Shorten(const std::string &code, const LatLng &reference_location);
 //
 // If the code isn't a valid short code, it cannot be recovered and the code
 // is returned as-is.
-std::string RecoverNearest(const std::string &short_code, const LatLng &location);
+std::string RecoverNearest(const std::string &short_code,
+                           const LatLng &reference_location);
 
 // Returns the number of valid Open Location Code characters in a string. This
 // excludes invalid characters and separators.
