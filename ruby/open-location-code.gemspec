@@ -5,7 +5,7 @@ require "date"
 
 Gem::Specification.new do |s|
   s.name          = "open-location-code"
-  s.version       = "0.0.1"
+  s.version       = "1.0.2"
   s.authors       = ["Wei-Ming Wu"]
   s.date          = Date.today.to_s
   s.email         = ["wnameless@gmail.com"]
