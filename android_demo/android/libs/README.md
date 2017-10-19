@@ -5,11 +5,22 @@ Using the source in the
 [Java](https://github.com/google/open-location-code/blob/master/java/com/google/openlocationcode/OpenLocationCode.java)
 implementation, build a JAR file and put it in this location.
 
-Assuming you've downloaded this repository locally, run:
+--
 
-```
-jar cf openlocationcode.jar ../../../java/com/google/openlocationcode/OpenLocationCode.java
-```
+Assuming you've downloaded this repository locally:
+
+--
+cd into open-location-code-master/java
+
+######run:
+
+javac com/google/openlocationcode/OpenLocationCode.java
+
+jar -cfM ./openlocationcode.jar com/google/openlocationcode/OpenLocationCode\$CodeArea.class com/google/openlocationcode/OpenLocationCode.class
+
+the jar file is in the java directory
+
+add openlocationcode.jar to /{PROJECT_NAME}/{APP}/libs *( you may need to create /libs folder)* 
 
 Why don't we include a JAR file here?
 --
