@@ -9,18 +9,15 @@ implementation, build a JAR file and put it in this location.
 
 Assuming you've downloaded this repository locally:
 
---
-cd into open-location-code-master/java
-
-######run:
-
+```
+cd open-location-code-master/java
 javac com/google/openlocationcode/OpenLocationCode.java
-
 jar -cfM ./openlocationcode.jar com/google/openlocationcode/OpenLocationCode\$CodeArea.class com/google/openlocationcode/OpenLocationCode.class
+```
 
-the jar file is in the java directory
+The `.jar` file is in the `open-location-code-master/java` directory
 
-add openlocationcode.jar to /{PROJECT_NAME}/{APP}/libs *( you may need to create /libs folder)* 
+If working with Android Studio, add `openlocationcode.jar` to `/{PROJECT_NAME}/{APP}/libs` *(you may need to create the `/libs` folder)* 
 
 Why don't we include a JAR file here?
 --
