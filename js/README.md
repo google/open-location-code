@@ -16,7 +16,7 @@ and push requests and visible at https://travis-ci.org/google/open-location-code
 
 Example web pages illustrating converting map clicks to Open Location Codes,
 and using Googles Maps API to extend place codes to full codes are in the
-examples/ directory.
+`examples/` directory.
 
 More examples are on [jsfiddle](https://jsfiddle.net/user/openlocationcode/fiddles/).
 
