@@ -606,8 +606,13 @@ function encodeGrid(latitude, longitude, codeLength) {
   var lngPlaceValue = GRID_SIZE_DEGREES;
   // Adjust latitude and longitude so they fall into positive ranges and
   // get the offset for the required places.
-  var adjustedLatitude = (latitude + LATITUDE_MAX) % latPlaceValue;
-  var adjustedLongitude = (longitude + LONGITUDE_MAX) % lngPlaceValue;
+  latitude += LATITUDE_MAX_;
+  longitude += LONGITUDE_MAX_;
+  // To avoid problems with floating point, get rid of the degrees.
+  latitude = latitude % 1.0;
+  longitude = longitude % 1.0;
+  var adjustedLatitude = latitude % latPlaceValue;
+  var adjustedLongitude = longitude % lngPlaceValue;
   for (var i = 0; i < codeLength; i++) {
     // Work out the row and column.
     var row = Math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS));

@@ -451,8 +451,13 @@ def encodeGrid(latitude, longitude, codeLength):
     lngPlaceValue = GRID_SIZE_DEGREES_
     # Adjust latitude and longitude so they fall into positive ranges and
     # get the offset for the required places.
-    adjustedLatitude = (latitude + LATITUDE_MAX_) % latPlaceValue
-    adjustedLongitude = (longitude + LONGITUDE_MAX_) % lngPlaceValue
+    latitude += LATITUDE_MAX_
+    longitude += LONGITUDE_MAX_
+    # To avoid problems with floating point, get rid of the degrees.
+    latitude = latitude % 1.0
+    longitude = longitude % 1.0
+    adjustedLatitude = latitude % latPlaceValue
+    adjustedLongitude = longitude % lngPlaceValue
     for i in range(codeLength):
         # Work out the row and column.
         row = int(math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_)))

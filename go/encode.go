@@ -137,12 +137,18 @@ func encodePairs(code []byte, lat, lng float64, codeLen int) []byte {
 // single character to refine the area. This allows default accuracy OLC codes
 // to be refined with just a single character.
 func encodeGrid(code []byte, lat, lng float64, codeLen int) ([]byte, error) {
+	// Adjust to positive ranges.
+	lat += latMax
+	lng += lngMax
+	// To avoid problems with floating point, get rid of the degrees.
+	lat = math.Remainder(lat, 1.0)
+	lng = math.Remainder(lng, 1.0)
 	latPlaceValue, lngPlaceValue := gridSizeDegrees, gridSizeDegrees
-	lat = math.Remainder((lat + latMax), latPlaceValue)
+	lat = math.Remainder(lat, latPlaceValue)
 	if lat < 0 {
 		lat += latPlaceValue
 	}
-	lng = math.Remainder((lng + lngMax), lngPlaceValue)
+	lng = math.Remainder(lng, lngPlaceValue)
 	if lng < 0 {
 		lng += lngPlaceValue
 	}
