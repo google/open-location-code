@@ -134,7 +134,7 @@ num clipLatitude(num latitude) => latitude.clamp(-90.0, 90.0);
 /// Lengths <= 10 have the same precision for latitude and longitude, but
 /// lengths > 10 have different precisions due to the grid method having fewer
 /// columns than rows.
-int computeLatitudePrecision(int codeLength) {
+num computeLatitudePrecision(int codeLength) {
   if (codeLength <= 10) {
     return pow(encodingBase, (codeLength ~/ -2) + 2);
   }
