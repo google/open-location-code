@@ -81,18 +81,10 @@ double adjust_latitude(double latitude_degrees, size_t code_length) {
   if (latitude_degrees < internal::kLatitudeMaxDegrees) {
     return latitude_degrees;
   }
-  // Subtract a fraction of the code resolution.
-  if (code_length <= internal::kPairCodeLength) {
-    double resolution = pow_neg(
-        internal::kEncodingBase,
-        code_length / 2 - (internal::kInitialExponent + 1));
-    return latitude_degrees - resolution / internal::kEncodingBase;
-  }
-  // lat and lng resolution are not equal but we can find the minimum.
-  double resolution = internal::kGridSizeDegrees /
-                      pow(std::max(internal::kGridRows, internal::kGridColumns),
-                          code_length - internal::kPairCodeLength);
-  return latitude_degrees - resolution;
+  // Subtract half the code precision to get the latitude into the code
+  // area.
+  double precision = compute_precision_for_length(code_length);
+  return latitude_degrees - precision / 2;
 }
 
 
