@@ -143,6 +143,9 @@ std::string EncodeGrid(double lat, double lng, size_t code_length) {
   code.reserve(code_length + 1);
   double lat_grid_size = internal::kGridSizeDegrees;
   double lng_grid_size = internal::kGridSizeDegrees;
+  // To avoid problems with floating point, get rid of the degrees.
+  lat = fmod(lat, 1);
+  lng = fmod(lng, 1);
   lat = fmod(lat, lat_grid_size);
   lng = fmod(lng, lng_grid_size);
   for (size_t i = 0; i < code_length; i++) {

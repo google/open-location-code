@@ -472,8 +472,13 @@ String encodeGrid(num latitude, num longitude, int codeLength) {
   var lngPlaceValue = gridSizeDegrees;
   // Adjust latitude and longitude so they fall into positive ranges and
   // get the offset for the required places.
-  var adjustedLatitude = (latitude + latitudeMax) % latPlaceValue;
-  var adjustedLongitude = (longitude + longitudeMax) % lngPlaceValue;
+  latitude += latitudeMax;
+  longitude += longitudeMax;
+  // To avoid problems with floating point, get rid of the degrees.
+  latitude = latitude % 1.0;
+  longitude = longitude % 1.0;
+  var adjustedLatitude = latitude % latPlaceValue;
+  var adjustedLongitude = longitude % lngPlaceValue;
   for (var i = 0; i < codeLength; i++) {
     // Work out the row and column.
     var row = (adjustedLatitude / (latPlaceValue / gridRows)).floor();
