@@ -606,8 +606,8 @@ function encodeGrid(latitude, longitude, codeLength) {
   var lngPlaceValue = GRID_SIZE_DEGREES;
   // Adjust latitude and longitude so they fall into positive ranges and
   // get the offset for the required places.
-  latitude += LATITUDE_MAX_;
-  longitude += LONGITUDE_MAX_;
+  latitude += LATITUDE_MAX;
+  longitude += LONGITUDE_MAX;
   // To avoid problems with floating point, get rid of the degrees.
   latitude = latitude % 1.0;
   longitude = longitude % 1.0;
