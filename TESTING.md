@@ -1,7 +1,7 @@
 # Testing
 The preferred mechanism for testing is using the [Bazel](https://bazel.build/)
 build system. This uses files called `BUILD` ([example](https://github.com/google/open-location-code/blob/master/BUILD)
-to provide rules to build code and run tests.
+to provide rules to build code and run tests).
 
 Create a `BUILD` file in your code directory with a [test rule](https://bazel.build/versions/master/docs/test-encyclopedia.html).
 You can then test your code by running:
