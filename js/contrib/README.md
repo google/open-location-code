@@ -26,9 +26,9 @@ The options object specification is as follows:
 |---|---|
 | **map** | **Type: [Map](https://developers.google.com/maps/documentation/javascript/3.exp/reference#Map)** Map on which to display the overlay. |
 | **minorGridDisplay** |**Type: boolean** Whether to display the minor grid and row/column grid labels. Defaults to **true**. |
-| **roadMapColor** |**Type: String** The stroke color to use for the grid lines over road or terrain maps. All CSS3 colors are supported except for extended named colors. Defaults to #7BAAF7. |
+| **roadMapColor** |**Type: String** The stroke color to use for the grid lines over road or terrain maps. All CSS3 colors are supported except for extended named colors. Defaults to **#7BAAF7**. |
 | **roadMapLabelClass** | **Type: String** The CSS class name to use for text labels over road or terrain maps. Defaults to **olc_overlay_text**. |
-| **satelliteMapColor** | **Type: String** The stroke color to use for the grid lines over satellite or hybrid maps. All CSS3 colors are supported except for extended named colors. Defaults to #7BAAF7. |
+| **satelliteMapColor** | **Type: String** The stroke color to use for the grid lines over satellite or hybrid maps. All CSS3 colors are supported except for extended named colors. Defaults to **#7BAAF7**. |
 | **satelliteMapLabelClass** | **Type: String** The CSS class name to use for text labels over satellite or hybrid maps. Defaults to **olc_overlay_text**. |
 
 ### Styling labels

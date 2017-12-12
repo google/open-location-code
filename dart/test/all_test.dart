@@ -57,10 +57,15 @@ checkShortCode(String csvLine) {
   num lat = double.parse(elements[1]);
   num lng = double.parse(elements[2]);
   String shortCode = elements[3];
-  String short = olc.shorten(code, lat, lng);
-  expect(short, equals(shortCode));
-  String expanded = olc.recoverNearest(short, lat, lng);
-  expect(expanded, equals(code));
+  String testType = elements[4];
+  if (testType == "B" || testType == "S") {
+    String short = olc.shorten(code, lat, lng);
+    expect(short, equals(shortCode));
+  }
+  if (testType == "B" || testType == "R") {
+    String expanded = olc.recoverNearest(shortCode, lat, lng);
+    expect(expanded, equals(code));
+  }
 }
 
 List<String> getCsvLines(String fileName) {

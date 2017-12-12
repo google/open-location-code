@@ -256,6 +256,10 @@ testSuite({
       assertEquals('Test ' + i, recovered, td[0]);
     }
   },
+  testRecoveryNearPoles: function() {
+    assertEquals("2CXXXXXX+XX", OpenLocationCode.recoverNearest("XXXXXX+XX", -81.0, 0.0));
+    assertEquals("CFX22222+22", OpenLocationCode.recoverNearest("2222+22", 89.6, 0.0));
+  },
   testValidity: function() {
     var tests = [
       //   code,isValid,isShort,isFull

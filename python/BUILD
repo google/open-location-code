@@ -1,12 +1,12 @@
 py_library(
-    name = 'openlocationcode',
-    srcs = ['openlocationcode.py'],
+    name = "openlocationcode",
+    srcs = ["openlocationcode.py"],
 )
 
 py_test(
-    name = 'openlocationcode_test',
-    srcs = ['openlocationcode_test.py'],
-    size = 'small',
-    deps = [':openlocationcode'],
-    data = ['//test_data:test_data'],
+    name = "openlocationcode_test",
+    size = "small",
+    srcs = ["openlocationcode_test.py"],
+    data = ["//test_data:test_data"],
+    deps = [":openlocationcode"],
 )

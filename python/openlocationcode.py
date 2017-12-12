@@ -270,7 +270,7 @@ def decode(code):
  Note that short codes with an odd number of characters will have their
  last character decoded using the grid refinement algorithm.
  Args:
-   shortCode: A valid short OLC character sequence.
+   code: A valid OLC character sequence.
    referenceLatitude: The latitude (in signed decimal degrees) to use to
        find the nearest matching full code.
    referenceLongitude: The longitude (in signed decimal degrees) to use
@@ -278,24 +278,28 @@ def decode(code):
  Returns:
    The nearest full Open Location Code to the reference location that matches
    the short code. If the passed code was not a valid short code, but was a
-   valid full code, it is returned unchanged.
+   valid full code, it is returned with proper capitalization but otherwise
+   unchanged.
 """
-def recoverNearest(shortcode, referenceLatitude, referenceLongitude):
-    if not isShort(shortcode):
-        raise ValueError('Passed short code is not valid - ' + str(shortcode))
+def recoverNearest(code, referenceLatitude, referenceLongitude):
+    # if code is a valid full code, return it properly capitalized
+    if isFull(code):
+        return code.upper()
+    if not isShort(code):
+        raise ValueError('Passed short code is not valid - ' + str(code))
     # Ensure that latitude and longitude are valid.
     referenceLatitude = clipLatitude(referenceLatitude)
     referenceLongitude = normalizeLongitude(referenceLongitude)
     # Clean up the passed code.
-    shortcode = shortcode.upper()
+    code = code.upper()
     # Compute the number of digits we need to recover.
-    paddingLength = SEPARATOR_POSITION_ - shortcode.find(SEPARATOR_)
+    paddingLength = SEPARATOR_POSITION_ - code.find(SEPARATOR_)
     # The resolution (height and width) of the padded area in degrees.
     resolution = pow(20, 2 - (paddingLength / 2))
     # Distance from the center to an edge (in degrees).
     halfResolution = resolution / 2.0
     # Use the reference location to pad the supplied short code and decode it.
-    codeArea = decode(encode(referenceLatitude, referenceLongitude)[0:paddingLength] + shortcode)
+    codeArea = decode(encode(referenceLatitude, referenceLongitude)[0:paddingLength] + code)
     # How many degrees latitude is the code from the reference? If it is more
     # than half the resolution, we need to move it north or south but keep it
     # within -90 to 90 degrees.
@@ -451,8 +455,13 @@ def encodeGrid(latitude, longitude, codeLength):
     lngPlaceValue = GRID_SIZE_DEGREES_
     # Adjust latitude and longitude so they fall into positive ranges and
     # get the offset for the required places.
-    adjustedLatitude = (latitude + LATITUDE_MAX_) % latPlaceValue
-    adjustedLongitude = (longitude + LONGITUDE_MAX_) % lngPlaceValue
+    latitude += LATITUDE_MAX_
+    longitude += LONGITUDE_MAX_
+    # To avoid problems with floating point, get rid of the degrees.
+    latitude = latitude % 1.0
+    longitude = longitude % 1.0
+    adjustedLatitude = latitude % latPlaceValue
+    adjustedLongitude = longitude % lngPlaceValue
     for i in range(codeLength):
         # Work out the row and column.
         row = int(math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_)))

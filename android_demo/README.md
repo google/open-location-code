@@ -15,5 +15,5 @@ locating an entered address will work offline.
 This project has been structured to be used with
 [Android Studio](https://developer.android.com/studio/index.html).
 
-An Open Location Code JAR file is in the directory android/libs. If the core library
+An Open Location Code JAR file is in the directory `android/libs`. If the core library
 is updated, you will need to update this JAR file.

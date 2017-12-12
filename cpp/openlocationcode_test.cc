@@ -1,11 +1,11 @@
 #include "openlocationcode.h"
-#include "codearea.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
 #include <string>
 
+#include "codearea.h"
 #include "gtest/gtest.h"
 
 namespace openlocationcode {
@@ -37,7 +37,8 @@ TEST(ParameterChecks, ShortenDegreesValid) {
 
 namespace {
 
-std::vector<std::vector<std::string>> ParseCsv(std::string path_to_file) {
+std::vector<std::vector<std::string>> ParseCsv(
+    const std::string& path_to_file) {
   std::vector<std::vector<std::string>> csv_records;
   std::string line;
 
@@ -55,6 +56,7 @@ std::vector<std::vector<std::string>> ParseCsv(std::string path_to_file) {
     }
     csv_records.push_back(line_records);
   }
+  EXPECT_GT(csv_records.size(), 0);
   return csv_records;
 }
 
@@ -79,12 +81,12 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
   for (size_t i = 0; i < csv_records.size(); i++) {
     EncodingTestData test_data = {};
     test_data.code = csv_records[i][0];
-    test_data.lat_deg = atof(csv_records[i][1].c_str());
-    test_data.lng_deg = atof(csv_records[i][2].c_str());
-    test_data.lo_lat_deg = atof(csv_records[i][3].c_str());
-    test_data.lo_lng_deg = atof(csv_records[i][4].c_str());
-    test_data.hi_lat_deg = atof(csv_records[i][5].c_str());
-    test_data.hi_lng_deg = atof(csv_records[i][6].c_str());
+    test_data.lat_deg = strtod(csv_records[i][1].c_str(), nullptr);
+    test_data.lng_deg = strtod(csv_records[i][2].c_str(), nullptr);
+    test_data.lo_lat_deg = strtod(csv_records[i][3].c_str(), nullptr);
+    test_data.lo_lng_deg = strtod(csv_records[i][4].c_str(), nullptr);
+    test_data.hi_lat_deg = strtod(csv_records[i][5].c_str(), nullptr);
+    test_data.hi_lng_deg = strtod(csv_records[i][6].c_str(), nullptr);
     data_results.push_back(test_data);
   }
   return data_results;
@@ -151,6 +153,7 @@ struct ShortCodeTestData {
   double reference_lat;
   double reference_lng;
   std::string short_code;
+  std::string test_type;
 };
 
 class ShortCodeChecks : public ::testing::TestWithParam<ShortCodeTestData> {};
@@ -164,9 +167,10 @@ std::vector<ShortCodeTestData> GetShortCodeDataFromCsv() {
   for (size_t i = 0; i < csv_records.size(); i++) {
     ShortCodeTestData test_data = {};
     test_data.full_code = csv_records[i][0];
-    test_data.reference_lat = atof(csv_records[i][1].c_str());
-    test_data.reference_lng = atof(csv_records[i][2].c_str());
+    test_data.reference_lat = strtod(csv_records[i][1].c_str(), nullptr);
+    test_data.reference_lng = strtod(csv_records[i][2].c_str(), nullptr);
     test_data.short_code = csv_records[i][3];
+    test_data.test_type = csv_records[i][4];
     data_results.push_back(test_data);
   }
   return data_results;
@@ -177,11 +181,15 @@ TEST_P(ShortCodeChecks, ShortCode) {
   LatLng reference_loc =
       LatLng{test_data.reference_lat, test_data.reference_lng};
   // Shorten the code using the reference location and check.
-  std::string actual_short = Shorten(test_data.full_code, reference_loc);
-  EXPECT_EQ(test_data.short_code, actual_short);
+  if (test_data.test_type == "B" || test_data.test_type == "S") {
+    std::string actual_short = Shorten(test_data.full_code, reference_loc);
+    EXPECT_EQ(test_data.short_code, actual_short);
+  }
   // Now extend the code using the reference location and check.
-  std::string actual_full = RecoverNearest(test_data.short_code, reference_loc);
-  EXPECT_EQ(test_data.full_code, actual_full);
+  if (test_data.test_type == "B" || test_data.test_type == "R") {
+    std::string actual_full = RecoverNearest(test_data.short_code, reference_loc);
+    EXPECT_EQ(test_data.full_code, actual_full);
+  }
 }
 
 INSTANTIATE_TEST_CASE_P(OLC_Tests, ShortCodeChecks,

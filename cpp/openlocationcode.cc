@@ -81,18 +81,10 @@ double adjust_latitude(double latitude_degrees, size_t code_length) {
   if (latitude_degrees < internal::kLatitudeMaxDegrees) {
     return latitude_degrees;
   }
-  // Subtract a fraction of the code resolution.
-  if (code_length <= internal::kPairCodeLength) {
-    double resolution = pow_neg(
-        internal::kEncodingBase,
-        code_length / 2 - (internal::kInitialExponent + 1));
-    return latitude_degrees - resolution / internal::kEncodingBase;
-  }
-  // lat and lng resolution are not equal but we can find the minimum.
-  double resolution = internal::kGridSizeDegrees /
-                      pow(std::max(internal::kGridRows, internal::kGridColumns),
-                          code_length - internal::kPairCodeLength);
-  return latitude_degrees - resolution;
+  // Subtract half the code precision to get the latitude into the code
+  // area.
+  double precision = compute_precision_for_length(code_length);
+  return latitude_degrees - precision / 2;
 }
 
 
@@ -151,6 +143,9 @@ std::string EncodeGrid(double lat, double lng, size_t code_length) {
   code.reserve(code_length + 1);
   double lat_grid_size = internal::kGridSizeDegrees;
   double lng_grid_size = internal::kGridSizeDegrees;
+  // To avoid problems with floating point, get rid of the degrees.
+  lat = fmod(lat, 1);
+  lng = fmod(lng, 1);
   lat = fmod(lat, lat_grid_size);
   lng = fmod(lng, lng_grid_size);
   for (size_t i = 0; i < code_length; i++) {
@@ -316,7 +311,7 @@ std::string RecoverNearest(const std::string &short_code,
   double resolution = pow_neg(
       internal::kEncodingBase, 2.0 - (padding_length / 2.0));
   // Distance from the center to an edge (in degrees).
-  double area_to_edge = resolution / 2.0;
+  double half_res = resolution / 2.0;
   // Use the reference location to pad the supplied short code and decode it.
   LatLng latlng = {latitude, longitude};
   std::string padding_code = Encode(latlng);
@@ -324,22 +319,23 @@ std::string RecoverNearest(const std::string &short_code,
       Decode(std::string(padding_code.substr(0, padding_length)) +
              std::string(short_code));
   // How many degrees latitude is the code from the reference? If it is more
-  // than half the resolution, we need to move it east or west.
+  // than half the resolution, we need to move it north or south but keep it
+  // within -90 to 90 degrees.
   double center_lat = code_rect.GetCenter().latitude;
   double center_lng = code_rect.GetCenter().longitude;
-  if (center_lat - latitude > area_to_edge) {
-    // If the center of the short code is more than half a cell east,
-    // then the best match will be one position west.
+  if (latitude + half_res < center_lat && center_lat - resolution > -internal::kLatitudeMaxDegrees) {
+    // If the proposed code is more than half a cell north of the reference location,
+    // it's too far, and the best match will be one cell south.
     center_lat -= resolution;
-  } else if (center_lat - latitude < -area_to_edge) {
-    // If the center of the short code is more than half a cell west,
-    // then the best match will be one position east.
+  } else if (latitude - half_res > center_lat && center_lat + resolution < internal::kLatitudeMaxDegrees) {
+    // If the proposed code is more than half a cell south of the reference location,
+    // it's too far, and the best match will be one cell north.
     center_lat += resolution;
   }
   // How many degrees longitude is the code from the reference?
-  if (center_lng - longitude > area_to_edge) {
+  if (longitude + half_res < center_lng) {
     center_lng -= resolution;
-  } else if (center_lng - longitude < -area_to_edge) {
+  } else if (longitude - half_res > center_lng) {
     center_lng += resolution;
   }
   LatLng center_latlng = {center_lat, center_lng};
