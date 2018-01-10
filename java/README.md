@@ -17,7 +17,7 @@ INFO: Elapsed time: 3.107s, Critical Path: 0.22s
 $
 ```
 
-The JAR file is accessable using the path shown in the output.
+The JAR file is accessible using the path shown in the output.
 
 If you cannot install Bazel, you can build the JAR file manually with:
 
@@ -26,7 +26,7 @@ mkdir build
 javac -d build com/google/openlocationcode/OpenLocationCode.java
 ```
 
-This will  create a JAR file in the `build` directory. Change that to a suitable location.
+This will create a JAR file in the `build` directory. Change that to a suitable location.
 
 ### Running tests
 
