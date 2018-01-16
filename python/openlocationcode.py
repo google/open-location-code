@@ -31,7 +31,7 @@
 # a 2.8x3.5 meter area.
 #
 # Two encoding algorithms are used. The first 10 characters are pairs of
-# characters, one for latitude and one for latitude, using base 20. Each pair
+# characters, one for latitude and one for longitude, using base 20. Each pair
 # reduces the area of the code by a factor of 400. Only even code lengths are
 # sensible, since an odd-numbered length would have sides in a ratio of 20:1.
 #
