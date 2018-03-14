@@ -77,7 +77,7 @@ public final class OpenLocationCode {
   // The maximum value for longitude in degrees.
   private static final BigDecimal LONGITUDE_MAX = new BigDecimal(180);
 
-  // Maxiumum code length using just lat/lng pair encoding.
+  // Maximum code length using just lat/lng pair encoding.
   private static final int PAIR_CODE_LENGTH = 10;
 
   // Number of columns in the grid refinement method.

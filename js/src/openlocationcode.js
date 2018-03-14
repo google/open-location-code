@@ -108,7 +108,7 @@
   // The maximum value for longitude in degrees.
   var LONGITUDE_MAX_ = 180;
 
-  // Maxiumum code length using lat/lng pair encoding. The area of such a
+  // Maximum code length using lat/lng pair encoding. The area of such a
   // code is approximately 13x13 meters (at the equator), and should be suitable
   // for identifying buildings. This excludes prefix and separator characters.
   var PAIR_CODE_LENGTH_ = 10;

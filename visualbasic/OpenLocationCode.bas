@@ -90,7 +90,7 @@ Private Const LATITUDE_MAX_ As Double = 90
 ' The maximum value for longitude in degrees.
 Private Const LONGITUDE_MAX_ As Double = 180
 
-' Maxiumum code length using lat/lng pair encoding. The area of such a
+' Maximum code length using lat/lng pair encoding. The area of such a
 ' code is approximately 13x13 meters (at the equator), and should be suitable
 ' for identifying buildings. This excludes prefix and separator characters.
 Private Const PAIR_CODE_LENGTH_ As Integer = 10
