@@ -65,7 +65,7 @@ public final class OpenLocationCode {
 
   // Note: The double type can't be used because of the rounding arithmetic due to floating point
   // implementation. Eg. "8.95 - 8" can give result 0.9499999999999 instead of 0.95 which
-  // incorrectly classify the points on the border of a cell. Therefore all the calcuation is done
+  // incorrectly classify the points on the border of a cell. Therefore all the calculation is done
   // using BigDecimal.
 
   // The base to use to convert numbers to/from.
