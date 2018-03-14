@@ -37,7 +37,7 @@ import java.math.BigDecimal;
  * Recover the nearest match (if the code was a short code):
  * code.recover(27.176, 78.05)
  *
- * Or decode a code into it's coordinates, returning a CodeArea object.
+ * Or decode a code into its coordinates, returning a CodeArea object.
  * code.decode()
  *
  * @author Jiri Semecky
