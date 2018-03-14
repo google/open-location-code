@@ -1,5 +1,5 @@
-# Open Location Code Javascript API
-This is the Javascript implementation of the Open Location Code API.
+# Open Location Code JavaScript API
+This is the JavaScript implementation of the Open Location Code API.
 
 The library file is in `src/openlocationcode.js`. There is also a minified version, and both are also available using the following CDNs:
 
