@@ -216,7 +216,7 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
     # Latitude 90 needs to be adjusted to be just less, so the returned code
     # can also be decoded.
     if latitude == 90:
-        latitude = latitude - computeLatitutePrecision(codeLength)
+        latitude = latitude - computeLatitudePrecision(codeLength)
     code = encodePairs(latitude, longitude, min(codeLength, PAIR_CODE_LENGTH_))
     # If the requested length indicates we want grid refined codes.
     if codeLength > PAIR_CODE_LENGTH_:
@@ -379,7 +379,7 @@ def clipLatitude(latitude):
  have different precisions due to the grid method having fewer columns than
  rows.
 """
-def computeLatitutePrecision(codeLength):
+def computeLatitudePrecision(codeLength):
     if codeLength <= 10:
         return pow(20, math.floor((codeLength / -2) + 2))
     return pow(20, -3) / pow(GRID_ROWS_, codeLength - 10)
