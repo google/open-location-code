@@ -20,7 +20,7 @@ use private::{
 pub fn is_valid(_code: &str) -> bool {
     let mut code: String = _code.to_string();
     if code.len() < 3 {
-        // A code must have at-least a separater character + 1 lat/lng pair
+        // A code must have at-least a separator character + 1 lat/lng pair
         return false;
     }
 
