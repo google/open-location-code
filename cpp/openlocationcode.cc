@@ -42,7 +42,7 @@ double pow_neg(double base, double exponent) {
   } else if (exponent > 0) {
     return pow(base, exponent);
   }
-  return 1 / pow(base, fabs(exponent));
+  return 1 / pow(base, -exponent);
 }
 
 // Compute the latitude precision value for a given code length. Lengths <= 10
