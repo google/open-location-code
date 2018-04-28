@@ -153,11 +153,12 @@ public final class OpenLocationCode {
    * @constructor
   */
   public OpenLocationCode(String code) throws IllegalArgumentException {
-    if (!isValidCode(code.toUpperCase())) {
+    String newCode = code.toUpperCase();
+    if (!isValidCode(newCode)) {
       throw new IllegalArgumentException(
           "The provided code '" + code + "' is not a valid Open Location Code.");
     }
-    this.code = code.toUpperCase();
+    this.code = newCode;
   }
 
   /**
