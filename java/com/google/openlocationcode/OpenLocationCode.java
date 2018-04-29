@@ -150,7 +150,6 @@ public final class OpenLocationCode {
    * Creates Open Location Code object for the provided code.
    * @param code A valid OLC code. Can be a full code or a shortened code.
    * @throws IllegalArgumentException when the passed code is not valid.
-   * @constructor
   */
   public OpenLocationCode(String code) throws IllegalArgumentException {
     if (!isValidCode(code.toUpperCase())) {
@@ -166,7 +165,6 @@ public final class OpenLocationCode {
    * @param longitude The longitude in decimal degrees.
    * @param codeLength The desired number of digits in the code.
    * @throws IllegalArgumentException if the code length is not valid.
-   * @constructor
    */
   public OpenLocationCode(double latitude, double longitude, int codeLength)
       throws IllegalArgumentException {
@@ -239,7 +237,6 @@ public final class OpenLocationCode {
    * Creates Open Location Code with the default precision length.
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
-   * @constructor
    */
   public OpenLocationCode(double latitude, double longitude) {
     this(latitude, longitude, CODE_PRECISION_NORMAL);
