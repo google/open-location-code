@@ -15,6 +15,7 @@
 package com.google.openlocationcode;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 /**
  * Convert locations to and from convenient short codes.
@@ -153,7 +154,7 @@ public final class OpenLocationCode {
    * @constructor
   */
   public OpenLocationCode(String code) throws IllegalArgumentException {
-    String newCode = code.toUpperCase();
+    String newCode = code.toUpperCase(Locale.ROOT);
     if (!isValidCode(newCode)) {
       throw new IllegalArgumentException(
           "The provided code '" + code + "' is not a valid Open Location Code.");
@@ -497,7 +498,7 @@ public final class OpenLocationCode {
     if (code == null || code.length() < 2) {
       return false;
     }
-    code = code.toUpperCase();
+    code = code.toUpperCase(Locale.ROOT);
 
     // There must be exactly one separator.
     int separatorPosition = code.indexOf(SEPARATOR);
