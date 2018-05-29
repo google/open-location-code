@@ -25,7 +25,7 @@ pub const LATITUDE_MAX: f64 = 90f64;
 // The maximum value for longitude in degrees.
 pub const LONGITUDE_MAX: f64 = 180f64;
 
-// Maxiumum code length using lat/lng pair encoding. The area of such a
+// Maximum code length using lat/lng pair encoding. The area of such a
 // code is approximately 13x13 meters (at the equator), and should be suitable
 // for identifying buildings. This excludes prefix and separator characters.
 pub const PAIR_CODE_LENGTH: usize = 10;

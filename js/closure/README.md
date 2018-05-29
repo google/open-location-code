@@ -13,7 +13,7 @@ You can use it in Closure projects like this:
 
 ## Building and Testing
 
-Included is a `BUILD` file that uses the [Bazel](https://bazel.build/) build system to produce a Javascript library and to run tests. You will need to install Bazel on your system to run the tests.
+Included is a `BUILD` file that uses the [Bazel](https://bazel.build/) build system to produce a JavaScript library and to run tests. You will need to install Bazel on your system to run the tests.
 
 The tests use the [Closure Rules for Basel](https://github.com/bazelbuild/rules_closure) project although this is retrieved automatically and you don't have to install anything.
 

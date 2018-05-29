@@ -37,7 +37,7 @@ import java.math.BigDecimal;
  * Recover the nearest match (if the code was a short code):
  * code.recover(27.176, 78.05)
  *
- * Or decode a code into it's coordinates, returning a CodeArea object.
+ * Or decode a code into its coordinates, returning a CodeArea object.
  * code.decode()
  *
  * @author Jiri Semecky
@@ -65,7 +65,7 @@ public final class OpenLocationCode {
 
   // Note: The double type can't be used because of the rounding arithmetic due to floating point
   // implementation. Eg. "8.95 - 8" can give result 0.9499999999999 instead of 0.95 which
-  // incorrectly classify the points on the border of a cell. Therefore all the calcuation is done
+  // incorrectly classify the points on the border of a cell. Therefore all the calculation is done
   // using BigDecimal.
 
   // The base to use to convert numbers to/from.
@@ -77,7 +77,7 @@ public final class OpenLocationCode {
   // The maximum value for longitude in degrees.
   private static final BigDecimal LONGITUDE_MAX = new BigDecimal(180);
 
-  // Maxiumum code length using just lat/lng pair encoding.
+  // Maximum code length using just lat/lng pair encoding.
   private static final int PAIR_CODE_LENGTH = 10;
 
   // Number of columns in the grid refinement method.
@@ -150,7 +150,6 @@ public final class OpenLocationCode {
    * Creates Open Location Code object for the provided code.
    * @param code A valid OLC code. Can be a full code or a shortened code.
    * @throws IllegalArgumentException when the passed code is not valid.
-   * @constructor
   */
   public OpenLocationCode(String code) throws IllegalArgumentException {
     if (!isValidCode(code.toUpperCase())) {
@@ -166,7 +165,6 @@ public final class OpenLocationCode {
    * @param longitude The longitude in decimal degrees.
    * @param codeLength The desired number of digits in the code.
    * @throws IllegalArgumentException if the code length is not valid.
-   * @constructor
    */
   public OpenLocationCode(double latitude, double longitude, int codeLength)
       throws IllegalArgumentException {
@@ -239,7 +237,6 @@ public final class OpenLocationCode {
    * Creates Open Location Code with the default precision length.
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
-   * @constructor
    */
   public OpenLocationCode(double latitude, double longitude) {
     this(latitude, longitude, CODE_PRECISION_NORMAL);

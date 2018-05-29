@@ -215,7 +215,7 @@ A 10 digit code will be precise enough for many locations. However, in
 areas where building density is high (such as informal settlements,
 semi-detached houses or apartment blocks), such an area could extend over
 several dwellings. A 12 digit code would be less than 1 square meter. An
-11 digit code would be preferable because it it shorter, and a slightly
+11 digit code would be preferable because it is shorter, and a slightly
 lower precision area could be acceptable.
 
 From 11 digits on, a different algorithm is used. The areas are slightly
@@ -279,7 +279,7 @@ two key functions:
 - It allows us to recognise shortened code fragments such as MQPX+9G. Because
 we know that the "+" is after the eighth digit, we know that there are four
 digits to be recovered for this code.
-- It allows us to distinguise four or six digit codes from postal codes.
+- It allows us to distinguish four or six digit codes from postal codes.
 
 But this means that we have a problem if we want to represent the 1x1 degree
 area 6GCR. The solution here is to use zero, as a padding symbol, giving us

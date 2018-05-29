@@ -7,13 +7,13 @@ Create a `BUILD` file in your code directory with a [test rule](https://bazel.bu
 You can then test your code by running:
 
 ```sh
-blaze test <dir>:<rule>
+bazel test <dir>:<rule>
 ```
 
 All tests can be run with:
 
 ```sh
-blaze test ...:all
+bazel test ...:all
 ```
 
 ## Automated Integration Testing
