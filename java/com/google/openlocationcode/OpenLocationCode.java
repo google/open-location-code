@@ -43,7 +43,7 @@ import java.math.BigDecimal;
  * @author Jiri Semecky
  * @author Doug Rinckes
  */
-public class OpenLocationCode {
+public final class OpenLocationCode {
 
   // Provides a normal precision code, approximately 14x14 meters.
   public static final int CODE_PRECISION_NORMAL = 10;
