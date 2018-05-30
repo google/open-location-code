@@ -51,17 +51,17 @@ public final class OpenLocationCode {
   // Provides an extra precision code, approximately 2x3 meters.
   public static final int CODE_PRECISION_EXTRA = 11;
 
+  // The character set used to encode the values.
+  public static final String CODE_ALPHABET = "23456789CFGHJMPQRVWX";
+
   // A separator used to break the code into two parts to aid memorability.
-  private static final char SEPARATOR = '+';
+  public static final char SEPARATOR = '+';
+
+  // The character used to pad codes.
+  public static final char PADDING_CHARACTER = '0';
 
   // The number of characters to place before the separator.
   private static final int SEPARATOR_POSITION = 8;
-
-  // The character used to pad codes.
-  private static final char PADDING_CHARACTER = '0';
-
-  // The character set used to encode the values.
-  private static final String CODE_ALPHABET = "23456789CFGHJMPQRVWX";
 
   // Note: The double type can't be used because of the rounding arithmetic due to floating point
   // implementation. Eg. "8.95 - 8" can give result 0.9499999999999 instead of 0.95 which
