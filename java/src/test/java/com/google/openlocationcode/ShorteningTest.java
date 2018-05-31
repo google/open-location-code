@@ -1,4 +1,4 @@
-package com.google.openlocationcode.tests;
+package com.google.openlocationcode;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -42,14 +42,11 @@ public class ShorteningTest {
     }
   }
 
-  private static final String TEST_PATH =
-      System.getenv("JAVA_RUNFILES") + "/openlocationcode/test_data";
   private final List<TestData> testDataList = new ArrayList<>();
 
   @Before
   public void setUp() throws Exception {
-    File testFile = new File(TEST_PATH, "shortCodeTests.csv");
-    InputStream testDataStream = new FileInputStream(testFile);
+    InputStream testDataStream = new FileInputStream(getTestFile());
     BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream, UTF_8));
     String line;
     while ((line = reader.readLine()) != null) {
@@ -58,6 +55,20 @@ public class ShorteningTest {
       }
       testDataList.add(new TestData(line));
     }
+  }
+
+  // Gets the test file, factoring in whether it's being built from Maven or Bazel.
+  private File getTestFile() {
+    String testPath;
+    String bazelRootPath = System.getenv("JAVA_RUNFILES");
+    System.out.println("bazel root path" + bazelRootPath);
+    if (bazelRootPath == null) {
+      File userDir = new File(System.getProperty("user.dir"));
+      testPath = userDir.getParent() + "/test_data";
+    } else {
+      testPath = bazelRootPath + "/openlocationcode/test_data";
+    }
+    return new File(testPath, "shortCodeTests.csv");
   }
 
   @Test
