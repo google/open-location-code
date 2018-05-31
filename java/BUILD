@@ -1,7 +1,7 @@
 java_library(
     name = "openlocationcode",
     srcs = [
-        "com/google/openlocationcode/OpenLocationCode.java",
+        "src/main/java/com/google/openlocationcode/OpenLocationCode.java",
     ],
 )
 
@@ -9,12 +9,12 @@ java_test(
     name = "EncodingTest",
     size = "small",
     srcs = [
-        "com/google/openlocationcode/tests/EncodingTest.java",
+        "src/test/java/com/google/openlocationcode/EncodingTest.java",
     ],
     data = [
         "//test_data:test_data"
     ],
-    test_class = "com.google.openlocationcode.tests.EncodingTest",
+    test_class = "com.google.openlocationcode.EncodingTest",
     deps = [
         ":openlocationcode",
     ],
@@ -24,12 +24,12 @@ java_test(
     name = "ShorteningTest",
     size = "small",
     srcs = [
-        "com/google/openlocationcode/tests/ShorteningTest.java",
+        "src/test/java/com/google/openlocationcode/ShorteningTest.java",
     ],
     data = [
         "//test_data:test_data"
     ],
-    test_class = "com.google.openlocationcode.tests.ShorteningTest",
+    test_class = "com.google.openlocationcode.ShorteningTest",
     deps = [
         ":openlocationcode",
     ],
@@ -39,12 +39,12 @@ java_test(
     name = "ValidityTest",
     size = "small",
     srcs = [
-        "com/google/openlocationcode/tests/ValidityTest.java",
+        "src/test/java/com/google/openlocationcode/ValidityTest.java",
     ],
     data = [
         "//test_data:test_data"
     ],
-    test_class = "com.google.openlocationcode.tests.ValidityTest",
+    test_class = "com.google.openlocationcode.ValidityTest",
     deps = [
         ":openlocationcode",
     ],
@@ -54,9 +54,9 @@ java_test(
     name = "PrecisionTest",
     size = "small",
     srcs = [
-        "com/google/openlocationcode/tests/PrecisionTest.java",
+        "src/test/java/com/google/openlocationcode/PrecisionTest.java",
     ],
-    test_class = "com.google.openlocationcode.tests.PrecisionTest",
+    test_class = "com.google.openlocationcode.PrecisionTest",
     deps = [
         ":openlocationcode",
     ],
@@ -66,9 +66,9 @@ java_test(
     name = "RecoverTest",
     size = "small",
     srcs = [
-        "com/google/openlocationcode/tests/RecoverTest.java",
+        "src/test/java/com/google/openlocationcode/RecoverTest.java",
     ],
-    test_class = "com.google.openlocationcode.tests.RecoverTest",
+    test_class = "com.google.openlocationcode.RecoverTest",
     deps = [
         ":openlocationcode",
     ],

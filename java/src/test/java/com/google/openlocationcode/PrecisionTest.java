@@ -1,4 +1,4 @@
-package com.google.openlocationcode.tests;
+package com.google.openlocationcode;
 
 import com.google.openlocationcode.OpenLocationCode;
 
