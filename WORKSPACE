@@ -14,9 +14,12 @@ new_http_archive(
 # See https://github.com/bazelbuild/rules_closure
 http_archive(
     name = "io_bazel_rules_closure",
-    url = "http://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/0.4.1.tar.gz",
-    sha256 = "ba5e2e10cdc4027702f96e9bdc536c6595decafa94847d08ae28c6cb48225124",
-    strip_prefix = "rules_closure-0.4.1",
+    sha256 = "a80acb69c63d5f6437b099c111480a4493bad4592015af2127a2f49fb7512d8d",
+    strip_prefix = "rules_closure-0.7.0",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/0.7.0.tar.gz",
+        "https://github.com/bazelbuild/rules_closure/archive/0.7.0.tar.gz",
+    ],
 )
 
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_repositories")
