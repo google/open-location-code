@@ -1,3 +1,4 @@
 # Makes Protocol Buffers build 2x faster.
+
 # See https://github.com/bazelbuild/rules_closure#tips
 build --distinct_host_configuration=false
