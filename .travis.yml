@@ -3,6 +3,7 @@
 
 sudo: false
 dist: trusty
+
 matrix:
   include:
     # C++ implementation. Lives in cpp/, tested with bazel.
@@ -40,13 +41,14 @@ matrix:
     
     # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
+    # 
     - language: c
       env: OLC_PATH=js/closure
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.12.0/bazel-0.12.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - ~/bin/bazel test --loading_phase_threads=2 --test_output=all ${OLC_PATH}:all
     
     # Javascript implementation. Lives in js/.
     - language: node_js
