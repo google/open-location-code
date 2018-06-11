@@ -15,21 +15,21 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-    
+
     # Dart implementation. Lives in dart/
     - language: dart
       dart: stable
       env: OLC_PATH=dart
       script:
         - cd dart && pub get && pub run test
-    
+
     # Go implementation. Lives in go/
     - language: go
       go: stable
       env: OLC_PATH=go
       script:
         - go test ./go
-    
+
     # Java implementation. Lives in java/, tested with bazel.
     - language: java
       jdk: oraclejdk8
@@ -39,25 +39,32 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-    
+
     # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
-    # 
+    #
     - language: c
       env: OLC_PATH=js/closure
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --loading_phase_threads=2 --test_output=all ${OLC_PATH}:all
-    
+        - ~/bin/bazel test --worker_max_instances=2 \
+                           --host_jvm_args=-Xmx500m \
+                           --host_jvm_args=-Xms500m \
+                           --host_jvm_args=-XX:-UseParallelGC \
+                           --distinct_host_configuration=false \
+                           --local_resources=400,2,1.0 \
+                           --test_output=all \
+                           ${OLC_PATH}:all
+
     # Javascript implementation. Lives in js/.
     - language: node_js
       node_js: "node"
       env: OLC_PATH=js
       script:
         - cd js && npm install && npm test
-    
+
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 2.7
@@ -67,7 +74,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-    
+
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.4
@@ -77,7 +84,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-        
+
     # Ruby implementation. Lives in ruby/
     - language: ruby
       rvm: 2.2
@@ -85,11 +92,11 @@ matrix:
       script:
         - gem install test-unit
         - cd ruby && ruby test/plus_codes_test.rb
-    
+
     # Rust implementation. Lives in rust/
     - language: rust
       env: OLC_PATH=rust
-      script: 
+      script:
         - cd rust/
         - cargo build --verbose --all
         - cargo test --verbose --all
