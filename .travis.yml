@@ -44,19 +44,11 @@ matrix:
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
     #
     - language: c
-      env: OLC_PATH=js/closure
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --worker_max_instances=2 \
-                           --host_jvm_args=-Xmx500m \
-                           --host_jvm_args=-Xms500m \
-                           --host_jvm_args=-XX:-UseParallelGC \
-                           --distinct_host_configuration=false \
-                           --local_resources=400,2,1.0 \
-                           --test_output=all \
-                           ${OLC_PATH}:all
+        - ~/bin/bazel test js/closure:all
 
     # Javascript implementation. Lives in js/.
     - language: node_js
