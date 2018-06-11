@@ -16,8 +16,6 @@
  * @fileoverview Tests for the closure implementation of Open Location Code.
  * This uses the test data from the github project,
  * http://github.com/google/openlocationcode/test_data
- * The test data is duplicated here because using bazel to run the tests doesn't
- * allow synchronous loading of the data files.
  */
 goog.module('openlocationcode_test');
 goog.setTestOnly('openlocationcode_test');
