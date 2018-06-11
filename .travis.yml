@@ -44,11 +44,17 @@ matrix:
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
     #
     - language: c
+      env: OLC_PATH=js/closure
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test js/closure:all
+        - cp .bazelrc ~/.bazelrc
+        - cat ~/.bazelrc
+        # Storing build artifacts in this directory helps Travis cache them. This
+        # will sometimes cut latency in half, when we're lucky.
+        - echo "startup --output_base=${HOME}/.bazel-output-base" >>~/.bazelrc
+        - ~/bin/bazel test ${OLC_PATH}:all
 
     # Javascript implementation. Lives in js/.
     - language: node_js
