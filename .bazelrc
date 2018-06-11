@@ -9,5 +9,5 @@ build --worker_max_instances=2
 # See https://github.com/bazelbuild/rules_closure#tips
 build --distinct_host_configuration=false
 
-# Configure tests - increase timeout, print errors and timeout warnings
-test --verbose_failures --test_output=errors --test_verbose_timeout_warnings
+# Configure tests - increase timeout, print everything and timeout warnings
+test --verbose_failures --test_output=all --test_verbose_timeout_warnings
