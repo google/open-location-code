@@ -1,0 +1,13 @@
+# Reduce OOM errors on TravisCI
+startup --host_jvm_args=-Xms500m
+startup --host_jvm_args=-Xmx500m
+startup --host_jvm_args=-XX:-UseParallelGC
+build --local_resources=400,2,1.0
+build --worker_max_instances=2
+
+# Makes Protocol Buffers build 2x faster.
+# See https://github.com/bazelbuild/rules_closure#tips
+build --distinct_host_configuration=false
+
+# Configure tests - increase timeout, print everything and timeout warnings
+test --verbose_failures --test_output=all --test_verbose_timeout_warnings

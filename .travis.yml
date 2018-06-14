@@ -1,80 +1,83 @@
 # Travis CI configuration.
 # Each implementation is listed using the matrix:include configuration.
 
-sudo: false
+# Use sudo: required slows boot time but gives us 7.5GB of ram to prevent Bazel running OOM.
+sudo: required
 dist: trusty
+
 matrix:
   include:
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
       env: OLC_PATH=cpp
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-    
+
     # Dart implementation. Lives in dart/
     - language: dart
       dart: stable
       env: OLC_PATH=dart
       script:
         - cd dart && pub get && pub run test
-    
+
     # Go implementation. Lives in go/
     - language: go
       go: stable
       env: OLC_PATH=go
       script:
         - go test ./go
-    
+
     # Java implementation. Lives in java/, tested with bazel.
     - language: java
       jdk: oraclejdk8
       env: OLC_PATH=java
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-    
+
     # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
-    # We use language "c" because bazel will install all the dependencies we need.
+    # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
+    #
     - language: c
       env: OLC_PATH=js/closure
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-    
+        - ~/bin/bazel test ${OLC_PATH}:all
+
     # Javascript implementation. Lives in js/.
     - language: node_js
       node_js: "node"
       env: OLC_PATH=js
       script:
         - cd js && npm install && npm test
-    
+
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 2.7
       env: OLC_PATH=python
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-    
+
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.4
       env: OLC_PATH=python
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-        
+
     # Ruby implementation. Lives in ruby/
     - language: ruby
       rvm: 2.2
@@ -82,11 +85,11 @@ matrix:
       script:
         - gem install test-unit
         - cd ruby && ruby test/plus_codes_test.rb
-    
+
     # Rust implementation. Lives in rust/
     - language: rust
       env: OLC_PATH=rust
-      script: 
+      script:
         - cd rust/
         - cargo build --verbose --all
         - cargo test --verbose --all

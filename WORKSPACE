@@ -21,8 +21,5 @@ http_archive(
         "https://github.com/bazelbuild/rules_closure/archive/0.7.0.tar.gz",
     ],
 )
-
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_repositories")
-
 closure_repositories()
-

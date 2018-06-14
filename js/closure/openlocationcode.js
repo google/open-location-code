@@ -59,51 +59,91 @@
 
 goog.module('openlocationcode.OpenLocationCode');
 
-// A separator used to break the code into two parts to aid memorability.
+/**
+ * A separator used to break the code into two parts to aid memorability.
+ * @const {string}
+ */
 var SEPARATOR = '+';
 
-// The number of characters to place before the separator.
+/**
+ * The number of characters to place before the separator.
+ * @const {number}
+ */
 var SEPARATOR_POSITION = 8;
 
-// The character used to pad codes.
+/**
+ * The character used to pad codes.
+ * @const {string}
+ */
 var PADDING_CHARACTER = '0';
 
-// The character set used to encode the values.
+/**
+ * The character set used to encode the values.
+ * @const {string}
+ */
 var CODE_ALPHABET = '23456789CFGHJMPQRVWX';
 
-// The base to use to convert numbers to/from.
+/**
+ * The base to use to convert numbers to/from.
+ * @const {number}
+ */
 var ENCODING_BASE = CODE_ALPHABET.length;
 
-// The maximum value for latitude in degrees.
+/**
+ * The maximum value for latitude in degrees.
+ * @const {number}
+ */
 var LATITUDE_MAX = 90;
 
-// The maximum value for longitude in degrees.
+/**
+ * The maximum value for longitude in degrees.
+ * @const {number}
+ */
 var LONGITUDE_MAX = 180;
 
-// Maximum code length using lat/lng pair encoding. The area of such a
-// code is approximately 13x13 meters (at the equator), and should be suitable
-// for identifying buildings. This excludes prefix and separator characters.
+/**
+ * Maximum code length using lat/lng pair encoding. The area of such a
+ * code is approximately 13x13 meters (at the equator), and should be suitable
+ * for identifying buildings. This excludes prefix and separator characters.
+ * @const {number}
+ */
 var PAIR_CODE_LENGTH = 10;
 
-// The resolution values in degrees for each position in the lat/lng pair
-// encoding. These give the place value of each position, and therefore the
-// dimensions of the resulting area.
+/**
+ * The resolution values in degrees for each position in the lat/lng pair
+ * encoding. These give the place value of each position, and therefore the
+ * dimensions of the resulting area.
+ * @const {!Array<number>}
+ */
 var PAIR_RESOLUTIONS = [20.0, 1.0, .05, .0025, .000125];
 
-// Number of columns in the grid refinement method.
+/**
+ * Number of columns in the grid refinement method.
+ * @const {number}
+ */
 var GRID_COLUMNS = 4;
 
-// Number of rows in the grid refinement method.
+/**
+ * Number of rows in the grid refinement method.
+ * @const {number}
+ */
 var GRID_ROWS = 5;
 
-// Size of the initial grid in degrees.
+/**
+ * Size of the initial grid in degrees.
+ * @const {number}
+ */
 var GRID_SIZE_DEGREES = 0.000125;
 
-// Minimum length of a code that can be shortened.
+/**
+ * Minimum length of a code that can be shortened.
+ * @const {number}
+ */
 var MIN_TRIMMABLE_CODE_LEN = 6;
 
 /**
-  @return {string} the OLC alphabet.
+ * Returns the characters used to produce the codes.
+ * @return {string} the OLC alphabet.
  */
 exports.getAlphabet = function() {
   return CODE_ALPHABET;
@@ -292,7 +332,7 @@ exports.encode = encode;
   box - the lower left, center and upper right.
 
   @param {string} code The Open Location Code to decode.
-  @return {Object} An object that provides the latitude and longitude of two
+  @return {!CodeArea} An object that provides the latitude and longitude of two
   of the corners of the area, the center, and the length of the original code.
  */
 function decode(code) {
@@ -307,7 +347,7 @@ function decode(code) {
   code = code.replace(SEPARATOR, '');
   code = code.replace(new RegExp(PADDING_CHARACTER + '+'), '');
   code = code.toUpperCase();
-  var precision = ENCODING_BASE;
+  var /** @type {number} */ precision = ENCODING_BASE;
   var latitude = 0.0;
   var longitude = 0.0;
   var latitude_high = 0.0;
@@ -411,7 +451,7 @@ function recoverNearest(
   var halfResolution = resolution / 2.0;
 
   // Use the reference location to pad the supplied short code and decode it.
-  var codeArea = decode(
+  var /** @type {!CodeArea} */ codeArea = decode(
       encode(referenceLatitude, referenceLongitude).substr(0, paddingLength) + shortCode);
   // How many degrees latitude is the code from the reference? If it is more
   // than half the resolution, we need to move it north or south but keep it
@@ -643,14 +683,14 @@ function encodeGrid(latitude, longitude, codeLength) {
  */
 function CodeArea(
     latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) {
-  this.latitudeLo = latitudeLo;
-  this.longitudeLo = longitudeLo;
-  this.latitudeHi = latitudeHi;
-  this.longitudeHi = longitudeHi;
-  this.codeLength = codeLength;
-  this.latitudeCenter =
+  /** @type {number} */ this.latitudeLo = latitudeLo;
+  /** @type {number} */ this.longitudeLo = longitudeLo;
+  /** @type {number} */ this.latitudeHi = latitudeHi;
+  /** @type {number} */ this.longitudeHi = longitudeHi;
+  /** @type {number} */ this.codeLength = codeLength;
+  /** @type {number} */ this.latitudeCenter =
       Math.min(latitudeLo + (latitudeHi - latitudeLo) / 2, LATITUDE_MAX);
-  this.longitudeCenter =
+  /** @type {number} */ this.longitudeCenter =
       Math.min(longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX);
 }
 exports.CodeArea = CodeArea;
