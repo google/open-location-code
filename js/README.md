@@ -7,8 +7,8 @@ The library file is in `src/openlocationcode.js`. There is also a minified versi
   * https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.js
   * https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.min.js
 * [cdnjs](https://cdnjs.com/)
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/latest/openlocationcode.js
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/latest/openlocationcode.min.js
+  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.js
+  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.js
 
 Unit tests are included and can be executed by installing gulp, gulp-qunit
 and gulp-util and running gulp. Unit tests are automatically run on pull
