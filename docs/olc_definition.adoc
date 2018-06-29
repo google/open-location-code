@@ -458,6 +458,10 @@ location.
   Code given a reference location
   - a method to recover a full Open Location Code from a short code and a
   reference location.
+  
+. Open Location Code implementations must handle RTL (right-to-left) languages as follows:
+  - The code portion (e.g. 6C8F+GG) is always LTR
+  - When displaying the code with a locality, the code may be before OR after the locality
 
 [bibliography]
 == Notes
