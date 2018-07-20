@@ -59,9 +59,10 @@ int get_alphabet_position(char c) {
   // Lookup table of alphabet positions of characters 'C' through 'X'.
   static const int kPositionLUT['X' - 'C' + 1] = { 8, -1, -1, 9, 10, 11, -1, 12,
       -1, -1, 13, -1, -1, 14, 15, 16, -1, -1, -1, 17, 18, 19 };
-  if (c >= '2' && c <= '9') return c - '2';
   if (c >= 'C' && c <= 'X') return kPositionLUT[c - 'C'];
-  return (c >= 'c' && c <= 'x') ? kPositionLUT[c - 'c'] : -1;
+  if (c >= 'c' && c <= 'x') return kPositionLUT[c - 'c'];
+  if (c >= '2' && c <= '9') return c - '2';
+  return -1;
 }
 
 // Normalize a longitude into the range -180 to 180, not including 180.
