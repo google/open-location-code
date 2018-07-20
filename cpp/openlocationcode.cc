@@ -405,11 +405,10 @@ bool IsValid(const std::string &code) {
     return false;
   }
   // Are there any invalid characters?
+  const char* end = internal::kAlphabet + internal::kEncodingBase;
   for (char c : code) {
     if (c != internal::kSeparator && c != internal::kPaddingCharacter &&
-        std::find(std::begin(internal::kAlphabet),
-                  std::end(internal::kAlphabet),
-                  (char)toupper(c)) == std::end(internal::kAlphabet)) {
+        std::find(internal::kAlphabet, end, (char)toupper(c)) == end) {
       return false;
     }
   }
