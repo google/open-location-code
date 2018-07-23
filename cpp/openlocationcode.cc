@@ -1,6 +1,5 @@
 #include "openlocationcode.h"
 
-#include <ctype.h>
 #include <float.h>
 #include <algorithm>
 #include <cmath>
@@ -14,6 +13,10 @@ const size_t kSeparatorPosition = 8;
 const size_t kMaximumDigitCount = 32;
 const char kPaddingCharacter = '0';
 const char kAlphabet[] = "23456789CFGHJMPQRVWX";
+// Lookup table of the alphabet positions of characters 'C' through 'X',
+// inclusive. A value of -1 means the character isn't part of the alphabet.
+const int kPositionLUT['X' - 'C' + 1] = { 8, -1, -1, 9, 10, 11, -1, 12, -1, -1,
+    13, -1, -1, 14, 15, 16, -1, -1, -1, 17, 18, 19 };
 const size_t kEncodingBase = 20;
 const size_t kPairCodeLength = 10;
 const size_t kGridColumns = 4;
@@ -55,11 +58,13 @@ double compute_precision_for_length(int code_length) {
   return pow_neg(internal::kEncodingBase, -3) / pow(5, code_length - 10);
 }
 
-// Finds the position of a char in the encoding alphabet.
+// Returns the position of a char in the encoding alphabet, or -1 if invalid.
 int get_alphabet_position(char c) {
-  const char* end = internal::kAlphabet + internal::kEncodingBase;
-  const char* match = std::find(internal::kAlphabet, end, c);
-  return (end == match)? -1 : (match - internal::kAlphabet);
+  // We use a lookup table for performance reasons (e.g. over std::find).
+  if (c >= 'C' && c <= 'X') return internal::kPositionLUT[c - 'C'];
+  if (c >= 'c' && c <= 'x') return internal::kPositionLUT[c - 'c'];
+  if (c >= '2' && c <= '9') return c - '2';
+  return -1;
 }
 
 // Normalize a longitude into the range -180 to 180, not including 180.
@@ -214,7 +219,7 @@ CodeArea Decode(const std::string &code) {
        i += 2, resolution_degrees /= internal::kEncodingBase) {
     // The character at i represents latitude. Retrieve it and convert to
     // degrees (positive range).
-    double value = get_alphabet_position(toupper(clean_code[i]));
+    double value = get_alphabet_position(clean_code[i]);
     value *= resolution_degrees;
     latitude += value;
     latitude_high = latitude + resolution_degrees;
@@ -224,7 +229,7 @@ CodeArea Decode(const std::string &code) {
     }
     // The character at i + 1 represents longitude. Retrieve it and convert to
     // degrees (positive range).
-    value = get_alphabet_position(toupper(clean_code[i + 1]));
+    value = get_alphabet_position(clean_code[i + 1]);
     value *= resolution_degrees;
     longitude += value;
     longitude_high = longitude + resolution_degrees;
@@ -241,7 +246,7 @@ CodeArea Decode(const std::string &code) {
     for (size_t i = internal::kPairCodeLength;
          i < std::min(internal::kMaximumDigitCount, clean_code.size()); i++) {
       // Get the value of the character at i and convert it to the degree value.
-      size_t value = get_alphabet_position(toupper(clean_code[i]));
+      size_t value = get_alphabet_position(clean_code[i]);
       size_t row = value / internal::kGridColumns;
       size_t col = value % internal::kGridColumns;
       // Lat and lng grid sizes shouldn't underflow due to maximum code length
@@ -405,10 +410,9 @@ bool IsValid(const std::string &code) {
     return false;
   }
   // Are there any invalid characters?
-  const char* end = internal::kAlphabet + internal::kEncodingBase;
   for (char c : code) {
     if (c != internal::kSeparator && c != internal::kPaddingCharacter &&
-        std::find(internal::kAlphabet, end, (char)toupper(c)) == end) {
+        get_alphabet_position(c) < 0) {
       return false;
     }
   }
@@ -436,7 +440,7 @@ bool IsFull(const std::string &code) {
     return false;
   }
   // Work out what the first latitude character indicates for latitude.
-  size_t firstLatValue = get_alphabet_position(toupper(code.at(0)));
+  size_t firstLatValue = get_alphabet_position(code.at(0));
   firstLatValue *= internal::kEncodingBase;
   if (firstLatValue >= internal::kLatitudeMaxDegrees * 2) {
     // The code would decode to a latitude of >= 90 degrees.
@@ -444,7 +448,7 @@ bool IsFull(const std::string &code) {
   }
   if (code.size() > 1) {
     // Work out what the first longitude character indicates for longitude.
-    size_t firstLngValue = get_alphabet_position(toupper(code.at(1)));
+    size_t firstLngValue = get_alphabet_position(code.at(1));
     firstLngValue *= internal::kEncodingBase;
     if (firstLngValue >= internal::kLongitudeMaxDegrees * 2) {
       // The code would decode to a longitude of >= 180 degrees.
