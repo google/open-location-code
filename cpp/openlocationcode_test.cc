@@ -1,5 +1,6 @@
 #include "openlocationcode.h"
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
