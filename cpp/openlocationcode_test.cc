@@ -1,5 +1,6 @@
 #include "openlocationcode.h"
 
+#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
@@ -21,6 +22,24 @@ TEST(ParameterChecks, AlphabetIsOrdered) {
   for (size_t i = 0; i < internal::kEncodingBase; i++) {
     EXPECT_TRUE(internal::kAlphabet[i] > last);
     last = internal::kAlphabet[i];
+  }
+}
+
+TEST(ParameterChecks, PositionLUTMatchesAlphabet) {
+  // Loop over all elements of the lookup table.
+  for (size_t i = 0;
+       i < sizeof(internal::kPositionLUT) / sizeof(internal::kPositionLUT[0]);
+       ++i) {
+    const int pos = internal::kPositionLUT[i];
+    const char c = 'C' + i;
+    if (pos != -1) {
+      // If the LUT entry indicates this character is in kAlphabet, verify it.
+      EXPECT_LT(pos, internal::kEncodingBase);
+      EXPECT_EQ(c, internal::kAlphabet[pos]);
+    } else {
+      // Otherwise, verify this character is not in kAlphabet.
+      EXPECT_EQ(std::strchr(internal::kAlphabet, c), nullptr);
+    }
   }
 }
 
