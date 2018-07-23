@@ -24,6 +24,25 @@ TEST(ParameterChecks, AlphabetIsOrdered) {
   }
 }
 
+TEST(ParameterChecks, PositionLUTMatchesAlphabet) {
+  // Loop over all elements of the lookup table.
+  for (size_t i = 0;
+       i < sizeof(internal::kPositionLUT) / sizeof(internal::kPositionLUT[0]);
+       ++i) {
+    const int pos = internal::kPositionLUT[i];
+    const char c = 'C' + i;
+    if (pos != -1) {
+      // If the LUT entry indicates this character is in kAlphabet, verify it.
+      EXPECT_LT(pos, internal::kEncodingBase);
+      EXPECT_EQ(c, internal::kAlphabet[pos]);
+    } else {
+      // Otherwise, verify this character is not in kAlphabet.
+      const char* end = internal::kAlphabet + internal::kEncodingBase;
+      EXPECT_EQ(std::find(internal::kAlphabet, end, c), end);
+    }
+  }
+}
+
 TEST(ParameterChecks, SeparatorPositionValid) {
   EXPECT_TRUE(internal::kSeparatorPosition <= internal::kPairCodeLength);
 }
