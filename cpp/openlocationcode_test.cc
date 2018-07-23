@@ -1,6 +1,6 @@
 #include "openlocationcode.h"
 
-#include <algorithm>
+#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
@@ -38,8 +38,7 @@ TEST(ParameterChecks, PositionLUTMatchesAlphabet) {
       EXPECT_EQ(c, internal::kAlphabet[pos]);
     } else {
       // Otherwise, verify this character is not in kAlphabet.
-      const char* end = internal::kAlphabet + internal::kEncodingBase;
-      EXPECT_EQ(std::find(internal::kAlphabet, end, c), end);
+      EXPECT_EQ(std::strchr(internal::kAlphabet, c), nullptr);
     }
   }
 }
