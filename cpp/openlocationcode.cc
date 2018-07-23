@@ -13,6 +13,10 @@ const size_t kSeparatorPosition = 8;
 const size_t kMaximumDigitCount = 32;
 const char kPaddingCharacter = '0';
 const char kAlphabet[] = "23456789CFGHJMPQRVWX";
+// Lookup table of the alphabet positions of characters 'C' through 'X',
+// inclusive. A value of -1 means the character isn't part of the alphabet.
+const int kPositionLUT['X' - 'C' + 1] = { 8, -1, -1, 9, 10, 11, -1, 12, -1, -1,
+    13, -1, -1, 14, 15, 16, -1, -1, -1, 17, 18, 19 };
 const size_t kEncodingBase = 20;
 const size_t kPairCodeLength = 10;
 const size_t kGridColumns = 4;
@@ -56,11 +60,9 @@ double compute_precision_for_length(int code_length) {
 
 // Returns the position of a char in the encoding alphabet, or -1 if invalid.
 int get_alphabet_position(char c) {
-  // Lookup table of alphabet positions of characters 'C' through 'X'.
-  static const int kPositionLUT['X' - 'C' + 1] = { 8, -1, -1, 9, 10, 11, -1, 12,
-      -1, -1, 13, -1, -1, 14, 15, 16, -1, -1, -1, 17, 18, 19 };
-  if (c >= 'C' && c <= 'X') return kPositionLUT[c - 'C'];
-  if (c >= 'c' && c <= 'x') return kPositionLUT[c - 'c'];
+  // We use a lookup table for performance reasons (e.g. over std::find).
+  if (c >= 'C' && c <= 'X') return internal::kPositionLUT[c - 'C'];
+  if (c >= 'c' && c <= 'x') return internal::kPositionLUT[c - 'c'];
   if (c >= '2' && c <= '9') return c - '2';
   return -1;
 }
