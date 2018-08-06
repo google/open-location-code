@@ -122,6 +122,7 @@ TEST_P(EncodingChecks, Encode) {
   EXPECT_EQ(test_data.code, actual_code);
   // Now decode the code and check we get the correct coordinates.
   CodeArea actual_rect = Decode(test_data.code);
+  EXPECT_TRUE(actual_rect.IsValid());
   EXPECT_NEAR(expected_rect.GetCenter().latitude,
               actual_rect.GetCenter().latitude, 1e-10);
   EXPECT_NEAR(expected_rect.GetCenter().longitude,
@@ -130,6 +131,15 @@ TEST_P(EncodingChecks, Encode) {
 
 INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
                         ::testing::ValuesIn(GetEncodingDataFromCsv()));
+
+TEST(DecodingChecks, DecodeOutOfRange) {
+  // Leading longitude digit "W" is out of range.
+  EXPECT_FALSE(Decode(std::string("9W4Q0000+")).IsValid());
+  // Leading latitude digit "F" is out of range.
+  EXPECT_FALSE(Decode(std::string("F2+")).IsValid());
+  // Invalid digits in post-separator portion.
+  EXPECT_FALSE(Decode(std::string("7Q7Q7Q7Q+5Z")).IsValid());
+}
 
 struct ValidityTestData {
   std::string code;
