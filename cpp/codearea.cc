@@ -4,8 +4,11 @@
 
 namespace openlocationcode {
 
+namespace {
 const double kLatitudeMaxDegrees = 90;
 const double kLongitudeMaxDegrees = 180;
+const CodeArea kInvalidCodeArea(0.0, 0.0, 0.0, 0.0, 0);
+}  // anonymous namespace
 
 CodeArea::CodeArea(double latitude_lo, double longitude_lo, double latitude_hi,
                    double longitude_hi, size_t code_length) {
@@ -44,4 +47,15 @@ LatLng CodeArea::GetCenter() const {
   return center;
 }
 
-} // namespace openlocationcode
+bool CodeArea::IsValid() const {
+  return code_length_ > 0 &&
+      latitude_lo_ < latitude_hi_ && longitude_lo_ < longitude_hi_ &&
+      latitude_lo_ >= -90.0 && latitude_hi_ <= 90.0 &&
+      longitude_lo_ >= -180.0 && longitude_hi_ <= 180.0;
+}
+
+const CodeArea& CodeArea::InvalidCodeArea() {
+  return kInvalidCodeArea;
+}
+
+}  // namespace openlocationcode
