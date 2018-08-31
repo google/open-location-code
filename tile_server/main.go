@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"./gridserver"
+	"github.com/google/open-location-code/tile_server/gridserver"
 )
 
 var (
