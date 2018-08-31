@@ -10,9 +10,9 @@
  
   <groupId>com.google.openlocationcode</groupId>
   <artifactId>openlocationcode</artifactId>
-  <version>1.0</version>
-  <packaging>pom</packaging>
- 
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
   <name>Open Location Code</name>
   <url>https://github.com/google/open-location-code</url>
  
