@@ -41,7 +41,7 @@ func Decode(code string) (CodeArea, error) {
 	}
 	area = decodePairs(code[:pairCodeLen])
 	grid := decodeGrid(code[pairCodeLen:])
-	debug("Decode %s + %s area=%s grid=%s", code[:pairCodeLen], code[pairCodeLen:], area, grid)
+	debug("Decode %v + %v area=%v grid=%v", code[:pairCodeLen], code[pairCodeLen:], area, grid)
 	return CodeArea{
 		LatLo: area.LatLo + grid.LatLo,
 		LngLo: area.LngLo + grid.LngLo,
