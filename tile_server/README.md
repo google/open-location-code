@@ -49,7 +49,7 @@ var imageMap = new ol.Map({
     new ol.layer.Tile({
       source: new ol.source.XYZ({
         attributions: 'lus.codes grid</a>',
-        url: 'http://localhost:8080/grid/image/xyz/{z}/{x}/{y}'
+        url: 'http://localhost:8080/grid/image/tms/{z}/{x}/{y}'
       }),
     }),
   ],
@@ -79,7 +79,7 @@ RGBA value.
 An example tile request could be:
 
 ```
-http://localhost:8080/grid/image/xyz/{z}/{x}/{y}?zoomadjust=1&linecol=0xff0000ff&labelcol=0xff000060
+http://localhost:8080/grid/image/tms/{z}/{x}/{y}?zoomadjust=1&linecol=0xff0000ff&labelcol=0xff000060
 ```
 
 ## Tile Details
