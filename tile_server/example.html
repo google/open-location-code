@@ -68,7 +68,7 @@
           attributions: 'plus.codes',
           format: new ol.format.GeoJSON(),
           // Using WMS tile numbering.
-          url: gridServer + 'geojson/wms/{z}/{x}/{y}?zoomadjust=2'
+          url: gridServer + 'wms/{z}/{x}/{y}.json?zoomadjust=2'
         }),
       });
       // Create the map, with Openstreetmap map tiles and the vector layer.
@@ -115,7 +115,7 @@
             source: new ol.source.XYZ({
               attributions: 'plus.codes',
               // XYZ layers use WMS tile numbering, use -y for TMS.
-              url: gridServer + 'image/tms/{z}/{x}/{-y}?linecol=0xff0000ff&labelcol=0xff000060'
+              url: gridServer + 'tms/{z}/{x}/{-y}.png?linecol=0xff0000ff&labelcol=0xff000060'
             }),
           }),
         ],
@@ -138,7 +138,7 @@
         {attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'}
       ).addTo(llImageMap);
       L.tileLayer(
-        gridServer + 'image/tms/{z}/{x}/{y}',
+        gridServer + 'tms/{z}/{x}/{y}.png',
         {
           tms: true,
           attribution: 'grid by plus codes'
@@ -158,8 +158,8 @@
         });
       var googleImageTiles = new google.maps.ImageMapType({
         getTileUrl: function(coord, zoom) {
-          return [gridServer, 'image/wms/',
-              zoom, '/', coord.x, '/', coord.y].join('');
+          return [gridServer, 'wms/',
+              zoom, '/', coord.x, '/', coord.y, '.png'].join('');
         },
         tileSize: new google.maps.Size(256, 256)
       });

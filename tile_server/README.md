@@ -20,14 +20,28 @@ image.
 The format of the requests is:
 
 ```
-//hostname:port/grid/[format]/[tilespec]/z/x/y
+//hostname:port/grid/[tilespec]/z/x/y.[format]?[options]
 ```
 
-*   `format` can be either `geojson` for a GeoJSON FeatureCollection, or `image`
-    for a PNG image.
-*   `tilespec` can be either `wms` or `tms`. The only difference in these is
+*   `tilespec` must be either `wms` or `tms`. The only difference in these is
     that the Y tiles are numbered from north to south (`wms`) or from south to
     north (`tms`).
+*   `format` must be either `json` for a GeoJSON FeatureCollection, or `png`
+    for a PNG image tile.
+*   The optional parameters are:
+    *   `linecol`: this defines the RGBA colour to use for lines in the PNG
+        tiles.
+    *   `labelcol`: this defines the RGBA colour to use for the labels in the
+        PNG tiles.
+    *   `zoomadjust`: this is added to the map zoom value, to cause the returned
+        grid to be finer or coarser. This affects both GeoJSON and image tiles.
+
+An example request could be:
+
+```
+http://localhost:8080/grid/tms/16/35694/42164.png?linecol=0xff0000ff&labelcol=0xff000060&zoomadjust=1
+```
+
 
 Start the server with:
 
@@ -49,7 +63,7 @@ var imageMap = new ol.Map({
     new ol.layer.Tile({
       source: new ol.source.XYZ({
         attributions: 'lus.codes grid</a>',
-        url: 'http://localhost:8080/grid/image/tms/{z}/{x}/{y}'
+        url: 'http://localhost:8080/grid/tms/{z}/{x}/{y}.png'
       }),
     }),
   ],
@@ -58,28 +72,6 @@ var imageMap = new ol.Map({
     zoom: 4
   })
 });
-```
-
-### Tile Request Options
-
-You can adjust the level of the grid that is generated. For image tiles, you can
-also set the color of the lines and labels.
-
-The grid level is influenced with the parameter `zoomadjust`. The grid level
-generated depends on the map zoom level. This parameter is added to the map zoom
-level before the grid is generated.
-
-The line color is set with the parameter `linecol`, and giving it an RGBA value.
-(You must include the A value.) For example, solid white would be `0xffffffff`
-and solid black `0x00000000`.
-
-The label color is set with the parameter `labelcol` and the value is also an
-RGBA value.
-
-An example tile request could be:
-
-```
-http://localhost:8080/grid/image/tms/{z}/{x}/{y}?zoomadjust=1&linecol=0xff0000ff&labelcol=0xff000060
 ```
 
 ## Tile Details

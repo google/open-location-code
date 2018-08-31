@@ -18,8 +18,8 @@ const (
 	contentTypeHeader  = "Content-Type"
 	contentTypeGeoJSON = "application/vnd.geo+json"
 	contentTypePNG     = "image/png"
-	outputGeoJSON      = "geojson"
-	outputImage        = "image"
+	outputGeoJSON      = "json"
+	outputPNG          = "png"
 	tileNumberingWMS   = "wms"
 	tileNumberingTMS   = "tms"
 	lineColorOption    = "linecol"
@@ -28,7 +28,7 @@ const (
 )
 
 var (
-	pathSpec = regexp.MustCompile(fmt.Sprintf(`^/grid/(%s|%s)/(%s|%s)/(\d+)/(\d+)/(\d+).*`, outputGeoJSON, outputImage, tileNumberingWMS, tileNumberingTMS))
+	pathSpec = regexp.MustCompile(fmt.Sprintf(`^/grid/(%s|%s)/(\d+)/(\d+)/(\d+)\.(%s|%s)`, tileNumberingWMS, tileNumberingTMS, outputGeoJSON, outputPNG))
 )
 
 // LatLng represents a latitude and longitude in degrees.
@@ -104,32 +104,32 @@ func parseRequest(r *http.Request) (*request, error) {
 	if len(g) == 0 {
 		return nil, errors.New("Request is not formatted correctly")
 	}
-	if g[1] == outputGeoJSON {
-		req.format = jsonTile
-	} else if g[1] == outputImage {
-		req.format = imageTile
-	} else {
-		return nil, errors.New("Tile output type not specified")
-	}
 	// The regex requires these values to be digits, so the conversions should succeed.
 	// But we'll check for errors just in case someone messes with the regex.
 	var err error
-	z, err := strconv.Atoi(g[3])
+	z, err := strconv.Atoi(g[2])
 	if err != nil {
 		return nil, errors.New("zoom is not a number")
 	}
-	x, err := strconv.Atoi(g[4])
+	x, err := strconv.Atoi(g[3])
 	if err != nil {
 		return nil, errors.New("x is not a number")
 	}
-	y, err := strconv.Atoi(g[5])
+	y, err := strconv.Atoi(g[4])
 	if err != nil {
 		return nil, errors.New("y is not a number")
 	}
 	// The classes assume the Y coordinate is numbered according to the TMS standard (north to south).
 	// If it uses the WMS standard (south to north) we need to modify the tile's Y coordinate.
-	if g[2] == tileNumberingWMS {
+	if g[1] == tileNumberingWMS {
 		y = (1 << uint(z)) - y - 1
+	}
+	if g[5] == outputGeoJSON {
+		req.format = jsonTile
+	} else if g[5] == outputPNG {
+		req.format = imageTile
+	} else {
+		return nil, fmt.Errorf("Tile output type not specified: %v", g[5])
 	}
 	// Check for optional form values.
 	opts := NewTileOptions()
