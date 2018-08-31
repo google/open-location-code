@@ -29,6 +29,7 @@ matrix:
       env: OLC_PATH=go
       script:
         - go test ./go
+        - go test ./tile_server/gridserver
 
     # Java implementation. Lives in java/, tested with bazel.
     - language: java
