@@ -30,7 +30,6 @@ var (
 )
 
 const (
-	sepPos  = 8
 	encBase = len(Alphabet)
 
 	minTrimmableCodeLen = 6

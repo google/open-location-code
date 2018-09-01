@@ -30,7 +30,7 @@ func Decode(code string) (CodeArea, error) {
 	// Strip out separator character (we've already established the code is
 	// valid so the maximum is one), padding characters and convert to upper
 	// case.
-	code = stripCode(code)
+	code = StripCode(code)
 	n := len(code)
 	if n < 2 {
 		return area, errors.New("code too short")
@@ -40,8 +40,11 @@ func Decode(code string) (CodeArea, error) {
 		return area, nil
 	}
 	area = decodePairs(code[:pairCodeLen])
-	grid := decodeGrid(code[pairCodeLen:])
-	debug("Decode %v + %v area=%v grid=%v", code[:pairCodeLen], code[pairCodeLen:], area, grid)
+	if n > maxCodeLen {
+		n = maxCodeLen
+	}
+	grid := decodeGrid(code[pairCodeLen:n])
+	debug("Decode %v + %v area=%v grid=%v", code[:pairCodeLen], code[pairCodeLen:n], area, grid)
 	return CodeArea{
 		LatLo: area.LatLo + grid.LatLo,
 		LngLo: area.LngLo + grid.LngLo,
