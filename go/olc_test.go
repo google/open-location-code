@@ -107,8 +107,12 @@ func TestEncode(t *testing.T) {
 	for i, elt := range encoding {
 		n := len(olc.StripCode(elt.code))
 		code := olc.Encode(elt.lat, elt.lng, n)
-		if code != elt.code {
-			t.Errorf("%d. got %q for (%v,%v,%d), awaited %q.", i, code, elt.lat, elt.lng, n, elt.code)
+		want := elt.code
+		if len(want) > 16 {
+			want = want[:16]
+		}
+		if code != want {
+			t.Errorf("%d. got %q for (%v,%v,%d), awaited %q.", i, code, elt.lat, elt.lng, n, want)
 			t.FailNow()
 		}
 	}
@@ -128,8 +132,12 @@ func TestDecode(t *testing.T) {
 			continue
 		}
 		code := olc.Encode(elt.lat, elt.lng, area.Len)
-		if code != elt.code {
-			t.Errorf("%d. encode (%f,%f) got %q, awaited %q", i, elt.lat, elt.lng, code, elt.code)
+		want := elt.code
+		if len(want) > 16 {
+			want = want[:16]
+		}
+		if code != want {
+			t.Errorf("%d. encode (%f,%f) got %q, awaited %q", i, elt.lat, elt.lng, code, want)
 		}
 		C := func(name string, got, want float64) {
 			check(i, elt.code, name, got, want)

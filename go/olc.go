@@ -171,7 +171,7 @@ func upper(b byte) byte {
 
 // StripCode strips the padding and separator characters from the code.
 func StripCode(code string) string {
-	return strings.Map(
+	code = strings.Map(
 		func(r rune) rune {
 			if r == Separator || r == Padding {
 				return -1
@@ -179,6 +179,10 @@ func StripCode(code string) string {
 			return rune(upper(byte(r)))
 		},
 		code)
+	if len(code) > maxCodeLen {
+		return code[:maxCodeLen]
+	}
+	return code
 }
 
 // Because the OLC codes are an area, they can't start at 180 degrees, because they would then have something > 180 as their upper bound.

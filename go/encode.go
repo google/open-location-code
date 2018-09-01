@@ -58,6 +58,8 @@ func Encode(lat, lng float64, codeLen int) string {
 		codeLen = 2
 	} else if codeLen < pairCodeLen && codeLen%2 == 1 {
 		codeLen++
+	} else if codeLen > maxCodeLen {
+		codeLen = maxCodeLen
 	}
 	lat, lng = clipLatitude(lat), normalizeLng(lng)
 	// Latitude 90 needs to be adjusted to be just less, so the returned code
