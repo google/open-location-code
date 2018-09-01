@@ -222,13 +222,11 @@ TEST(MaxCodeLengthChecks, MaxCodeLength) {
   EXPECT_EQ(long_code.size(), 1 + internal::kMaximumDigitCount);
   EXPECT_TRUE(IsValid(long_code));
   Decode(long_code);
-  // Extend the code and make sure it is no longer valid.
+  // Extend the code with a valid character and make sure it is still valid.
   std::string too_long_code = long_code + "W";
-  EXPECT_FALSE(IsValid(too_long_code));
-  // Ensure too many characters after the separator also causes a fail, even if
-  // the total number of characters is ok.
-  too_long_code = long_code.substr(6) + "WW";
-  EXPECT_TRUE(too_long_code.size() < internal::kMaximumDigitCount);
+  EXPECT_TRUE(IsValid(too_long_code));
+  // Extend the code with an invalid character and make sure it is invalid.
+  too_long_code = long_code + "U";
   EXPECT_FALSE(IsValid(too_long_code));
 }
 
