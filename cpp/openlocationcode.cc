@@ -10,7 +10,8 @@ namespace openlocationcode {
 namespace internal {
 const char kSeparator = '+';
 const size_t kSeparatorPosition = 8;
-const size_t kMaximumDigitCount = 32;
+// The max number of digits returned in a plus code. Roughly 1 x 0.5 cm.
+const size_t kMaximumDigitCount = 15;
 const char kPaddingCharacter = '0';
 const char kAlphabet[] = "23456789CFGHJMPQRVWX";
 // Lookup table of the alphabet positions of characters 'C' through 'X',
@@ -396,17 +397,6 @@ bool IsValid(const std::string &code) {
   // If there are characters after the separator, make sure there isn't just
   // one of them (not legal).
   if (code.size() - code.find(internal::kSeparator) - 1 == 1) {
-    return false;
-  }
-  // Make sure the code does not have too many digits in total.
-  if (code.size() - 1 > internal::kMaximumDigitCount) {
-    return false;
-  }
-  // Make sure the code does not have too many digits after the separator.
-  // The number of digits is the length of the code, minus the position of the
-  // separator, minus one because the separator position is zero indexed.
-  if (code.size() - code.find(internal::kSeparator) - 1 >
-      internal::kMaximumDigitCount - internal::kSeparatorPosition) {
     return false;
   }
   // Are there any invalid characters?
