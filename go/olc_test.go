@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package olc
+package olc_test
 
 import (
 	"bytes"
@@ -22,6 +22,8 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+
+	olc "github.com/google/open-location-code/go"
 )
 
 var (
@@ -67,7 +69,11 @@ func init() {
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range mustReadLines("encoding") {
+		for _, cols := range append(
+			mustReadLines("encoding"),
+			bytes.Split([]byte("6GFRP39C+5HG4QWR,-0.2820710399999935,36.07145996093760,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
+			bytes.Split([]byte("6GFRP39C+5HG4QWRV,-0.2820710399999935,36.07145996093760,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
+		) {
 			encoding = append(encoding, encodingTest{
 				code: string(cols[0]),
 				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
@@ -93,7 +99,7 @@ func init() {
 
 func TestCheck(t *testing.T) {
 	for i, elt := range validity {
-		err := Check(elt.code)
+		err := olc.Check(elt.code)
 		got := err == nil
 		if got != elt.isValid {
 			t.Errorf("%d. %q validity is %t (err=%v), awaited %t.", i, elt.code, got, err, elt.isValid)
@@ -103,10 +109,14 @@ func TestCheck(t *testing.T) {
 
 func TestEncode(t *testing.T) {
 	for i, elt := range encoding {
-		n := len(stripCode(elt.code))
-		code := Encode(elt.lat, elt.lng, n)
-		if code != elt.code {
-			t.Errorf("%d. got %q for (%v,%v,%d), awaited %q.", i, code, elt.lat, elt.lng, n, elt.code)
+		n := len(olc.StripCode(elt.code))
+		code := olc.Encode(elt.lat, elt.lng, n)
+		want := elt.code
+		if len(want) > 16 {
+			want = want[:16]
+		}
+		if code != want {
+			t.Errorf("%d. got %q for (%v,%v,%d), awaited %q.", i, code, elt.lat, elt.lng, n, want)
 			t.FailNow()
 		}
 	}
@@ -120,14 +130,18 @@ func TestDecode(t *testing.T) {
 		}
 	}
 	for i, elt := range encoding {
-		area, err := Decode(elt.code)
+		area, err := olc.Decode(elt.code)
 		if err != nil {
 			t.Errorf("%d. %q: %v", i, elt.code, err)
 			continue
 		}
-		code := Encode(elt.lat, elt.lng, area.Len)
-		if code != elt.code {
-			t.Errorf("%d. encode (%f,%f) got %q, awaited %q", i, elt.lat, elt.lng, code, elt.code)
+		code := olc.Encode(elt.lat, elt.lng, area.Len)
+		want := elt.code
+		if len(want) > 16 {
+			want = want[:16]
+		}
+		if code != want {
+			t.Errorf("%d. encode (%f,%f) got %q, awaited %q", i, elt.lat, elt.lng, code, want)
 		}
 		C := func(name string, got, want float64) {
 			check(i, elt.code, name, got, want)
@@ -142,7 +156,7 @@ func TestDecode(t *testing.T) {
 func TestShorten(t *testing.T) {
 	for i, elt := range shorten {
 		if elt.tType == "B" || elt.tType == "S" {
-			got, err := Shorten(elt.code, elt.lat, elt.lng)
+			got, err := olc.Shorten(elt.code, elt.lat, elt.lng)
 			if err != nil {
 				t.Errorf("%d. shorten %q: %v", i, elt.code, err)
 				t.FailNow()
@@ -154,7 +168,7 @@ func TestShorten(t *testing.T) {
 		}
 
 		if elt.tType == "B" || elt.tType == "R" {
-			got, err := RecoverNearest(elt.short, elt.lat, elt.lng)
+			got, err := olc.RecoverNearest(elt.short, elt.lat, elt.lng)
 			if err != nil {
 				t.Errorf("%d. nearest %q: %v", i, got, err)
 				t.FailNow()
@@ -205,9 +219,39 @@ func mustFloat(a []byte) float64 {
 	return f
 }
 
+func TestPrecision(t *testing.T) {
+	const c15 = "6GFRP39C+5HG4QWR"
+	const c16 = "6GFRP39C+5HG4QWRV"
+	want := olc.CodeArea{
+		LatLo: -0.2820710399999935, LatHi: -0.2820709999999935,
+		LngLo: 36.07145996093752, LngHi: 36.07146008300783,
+		Len: 15,
+	}
+
+	a15, err := olc.Decode(c15)
+	if err != nil {
+		t.Errorf("%q Decode: %v", c15, err)
+	}
+	if a15 != want {
+		t.Errorf("got %v, wanted %v", a15, want)
+	}
+
+	a16, err := olc.Decode(c16)
+	if err != nil {
+		t.Errorf("%q Decode: %v", c16, err)
+	}
+
+	if a16 != a15 {
+		t.Errorf("got %v, wanted %v", a15, a16)
+	}
+
+	t.Logf("15: %v, 16: %v", a15, a16)
+
+}
+
 func TestFuzzCrashers(t *testing.T) {
 	for i, code := range []string{
-		"+975722X988X29qqX297" +
+		"975722X9+88X29qqX297" +
 			"5722X888X2975722X888" +
 			"X2975722X988X29qqX29" +
 			"75722X888X2975722X88" +
@@ -231,48 +275,19 @@ func TestFuzzCrashers(t *testing.T) {
 			"29qqX2975722X888X297" +
 			"5722X888X2975722X988" +
 			"X20",
-
-		"+qqX2975722X888X2975" +
-			"722X888X2975722X988X" +
-			"29qqX2975722X888X297" +
-			"5722X888X2975722X988" +
-			"X29qqX2975722X888X29" +
-			"75722X888X2975722X98" +
-			"8X29qqX2975722X88qqX" +
-			"2975722X888X2975722X" +
-			"888X2975722X988X29qq" +
-			"X2975722X888X2975722" +
-			"X888X2975722X988X29q" +
-			"qX2975722X888X297572" +
-			"2X888X2975722X988X29" +
-			"qqX2975722X88qqX2975" +
-			"722X888X2975722X888X" +
-			"2975722X988X29qqX297" +
-			"5722X888X2975722X888" +
-			"X2975722X988X29qqX29" +
-			"75722X888X2975722X88" +
-			"8X2975722X988X29qqX2" +
-			"975722X88qqX2975722X" +
-			"888X2975722X888X2975" +
-			"722X988X29qqX2975722" +
-			"X888X2975722X888X297" +
-			"5722X988X29qqX297572" +
-			"2X888X2975722X888X29" +
-			"75722X988X29qqX29757" +
-			"2",
 	} {
-		if err := Check(code); err != nil {
+		if err := olc.Check(code); err != nil {
 			t.Logf("%d. %q Check: %v", i, code, err)
 		}
-		area, err := Decode(code)
+		area, err := olc.Decode(code)
 		if err != nil {
-			t.Logf("%d. %q Decode: %v", i, code, err)
+			t.Errorf("%d. %q Decode: %v", i, code, err)
 		}
-		if _, err = Decode(Encode(area.LatLo, area.LngLo, len(code))); err != nil {
-			t.Logf("%d. Lo Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatLo, area.LngLo, len(code), err)
+		if _, err = olc.Decode(olc.Encode(area.LatLo, area.LngLo, len(code))); err != nil {
+			t.Errorf("%d. Lo Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatLo, area.LngLo, len(code), err)
 		}
-		if _, err = Decode(Encode(area.LatHi, area.LngHi, len(code))); err != nil {
-			t.Logf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
+		if _, err = olc.Decode(olc.Encode(area.LatHi, area.LngHi, len(code))); err != nil {
+			t.Errorf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
 		}
 
 	}

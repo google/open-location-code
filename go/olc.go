@@ -42,12 +42,15 @@ const (
 	Alphabet = "23456789CFGHJMPQRVWX"
 
 	pairCodeLen     = 10
+	maxCodeLen      = 15
 	gridCols        = 4
 	gridRows        = 5
 	gridSizeDegrees = 0.000125
 
 	latMax = 90
 	lngMax = 180
+
+	sepPos = 8
 )
 
 // CodeArea is the area represented by a location code.
@@ -142,11 +145,10 @@ func CheckShort(code string) error {
 // CheckFull checks the code whether it is a valid full code.
 // If it is short, it returns ErrShort.
 func CheckFull(code string) error {
-	if err := Check(code); err != nil {
-		return err
-	}
 	if err := CheckShort(code); err == nil {
 		return ErrShort
+	} else if err != ErrNotShort {
+		return err
 	}
 	if firstLat := strings.IndexByte(Alphabet, upper(code[0])) * encBase; firstLat >= latMax*2 {
 		return errors.New("latitude outside range")
@@ -167,9 +169,12 @@ func upper(b byte) byte {
 	return b
 }
 
-// stripCode strips the padding and separator characters from the code.
-func stripCode(code string) string {
-	return strings.Map(
+// StripCode strips the padding and separator characters from the code.
+//
+// The code is truncated to the first 15 digits, as Decode won't use more,
+// to avoid underflow errors.
+func StripCode(code string) string {
+	code = strings.Map(
 		func(r rune) rune {
 			if r == Separator || r == Padding {
 				return -1
@@ -177,6 +182,10 @@ func stripCode(code string) string {
 			return rune(upper(byte(r)))
 		},
 		code)
+	if len(code) > maxCodeLen {
+		return code[:maxCodeLen]
+	}
+	return code
 }
 
 // Because the OLC codes are an area, they can't start at 180 degrees, because they would then have something > 180 as their upper bound.
