@@ -69,7 +69,11 @@ func init() {
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range mustReadLines("encoding") {
+		for _, cols := range append(
+			mustReadLines("encoding"),
+			bytes.Split([]byte("6GFRP39C+5HG4QWR,-0.2820710399999935,36.07145996093760,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
+			bytes.Split([]byte("6GFRP39C+5HG4QWRV,-0.2820710399999935,36.07145996093760,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
+		) {
 			encoding = append(encoding, encodingTest{
 				code: string(cols[0]),
 				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
