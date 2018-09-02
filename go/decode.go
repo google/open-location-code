@@ -23,7 +23,7 @@ import (
 // Returns a CodeArea object that includes the coordinates of the bounding
 // box - the lower left, center and upper right.
 //
-// To avoid underflow errors, he precision is limited to 15 digits.
+// To avoid underflow errors, the precision is limited to 15 digits.
 // Longer codes are allowed, but only the first 15 is decoded.
 func Decode(code string) (CodeArea, error) {
 	var area CodeArea
