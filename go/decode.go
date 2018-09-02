@@ -22,6 +22,9 @@ import (
 // Decode decodes an Open Location Code into the location coordinates.
 // Returns a CodeArea object that includes the coordinates of the bounding
 // box - the lower left, center and upper right.
+//
+// To avoid underflow errors, he precision is limited to 15 digits.
+// Longer codes are allowed, but only the first 15 is decoded.
 func Decode(code string) (CodeArea, error) {
 	var area CodeArea
 	if err := CheckFull(code); err != nil {

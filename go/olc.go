@@ -170,6 +170,9 @@ func upper(b byte) byte {
 }
 
 // StripCode strips the padding and separator characters from the code.
+//
+// The code is truncated to the first 15 digits, as Decode won't use more,
+// to avoid underflow errors.
 func StripCode(code string) string {
 	code = strings.Map(
 		func(r rune) rune {
