@@ -8,9 +8,9 @@ import (
 
 	log "github.com/golang/glog"
 	// Use the production gridserver.
-	// "github.com/google/open-location-code/tile_server/gridserver"
+	"github.com/google/open-location-code/tile_server/gridserver"
 	// In development, use this import.
-	"./gridserver"
+	// "./gridserver"
 	"golang.org/x/image/font/gofont/goregular"
 )
 
