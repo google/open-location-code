@@ -288,8 +288,8 @@ public final class OpenLocationCode {
     BigDecimal latPrecision = ENCODING_BASE.multiply(ENCODING_BASE);
     BigDecimal lngPrecision = ENCODING_BASE.multiply(ENCODING_BASE);
     // Save the coordinates.
-    BigDecimal southLatitude = new BigDecimal(0);
-    BigDecimal westLongitude = new BigDecimal(0);
+    BigDecimal southLatitude = BigDecimal.ZERO;
+    BigDecimal westLongitude = BigDecimal.ZERO;
 
     // Decode the digits.
     while (digit < decoded.length()) {
