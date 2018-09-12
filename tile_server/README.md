@@ -78,7 +78,7 @@ var imageMap = new ol.Map({
 
 The labels on the image tiles use the Go font
 [goregular](https://blog.golang.org/go-fonts). The grid lines are black, the
-text uses black with half-opacity.
+text uses black with half-opacity, but these can be changed.
 
 The GeoJSON responses consist of a `FeatureCollection`, consisting of one
 `Feature` for each OLC grid cell that overlaps the tile. The `Feature` consists
@@ -120,7 +120,7 @@ An example of the GeoJSON output for one feature is:
 }
 ```
 
-## Options
+## Server Options
 
 The server will listen on port 8080. You can change this with the `--port` flag.
 
@@ -132,7 +132,7 @@ The projection code has some tests to confirm that coordinates are correctly
 processed. You can run the tests with:
 
 ```
-go test ./tile_server/gridserver --logtostderr
+go test ./tile_server/gridserver -v --logtostderr
 ```
 
 ## Dependencies
@@ -144,13 +144,6 @@ the GeoJSON response objects. Install with:
 
 ```
 go get github.com/paulmach/go.geojson
-```
-
-[Draw2D](https://github.com/llgcode/draw2d) is used for creating the PNG tiles.
-Install with:
-
-```
-go get github.com/llgcode/draw2d
 ```
 
 [Freetype](https://github.com/golang/freetype) is used for the labels in the PNG

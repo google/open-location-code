@@ -3,7 +3,7 @@ package gridserver
 import (
 	"math"
 
-	"github.com/golang/glog"
+	log "github.com/golang/glog"
 	olc "github.com/google/open-location-code/go"
 	geojson "github.com/paulmach/go.geojson"
 )
@@ -11,7 +11,7 @@ import (
 // GeoJSON returns a GeoJSON object for the tile.
 // Objects (lines etc) may extend outside the tile dimensions, so clipping objects to match tile boundaries is up to the client.
 func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
-	glog.Infof("Producing geojson for tile z/x/y %v/%v/%v", t.Z, t.X, t.Y)
+	log.Infof("Producing geojson for tile z/x/y %v/%v/%v", t.Z, t.X, t.Y)
 	cl, latp, lngp := olcPrecision(t.Z + t.opts.zoomAdjust)
 	lo, hi := expand(t.SW, t.NE, latp, lngp)
 	fc := geojson.NewFeatureCollection()
@@ -50,6 +50,20 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 	return fc, nil
 }
 
+// featureLabels returns the two string labels. Either may be empty.
+func featureLabels(f *geojson.Feature) (string, string) {
+	a, aok := f.Properties["area_code"]
+	l, lok := f.Properties["local_code"]
+	if aok && lok {
+		return a.(string), l.(string)
+	}
+	n, nok := f.Properties["name"]
+	if nok {
+		return n.(string), ""
+	}
+	return "", ""
+}
+
 // olcPrecision computes the OLC grid precision parameters for the zoom level.
 func olcPrecision(z int) (codeLen int, latPrecision float64, lngPrecision float64) {
 	codeLen = 2
@@ -71,7 +85,7 @@ func olcPrecision(z int) (codeLen int, latPrecision float64, lngPrecision float6
 		lngPrecision = area.LngHi - area.LngLo
 	} else {
 		// Go bang since if this fails something is badly wrong with the olc library.
-		glog.Fatalf("Failed encoding 0,0 for codeLen %v", codeLen)
+		log.Fatalf("Failed encoding 0,0 for codeLen %v", codeLen)
 	}
 	return
 }
