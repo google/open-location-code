@@ -41,21 +41,21 @@
 # Examples:
 #
 #   Encode a location, default accuracy:
-#   var code = olc.encode(47.365590, 8.524997);
+#   encode(47.365590, 8.524997)
 #
 #   Encode a location using one stage of additional refinement:
-#   var code = olc.encode(47.365590, 8.524997, 11);
+#   encode(47.365590, 8.524997, 11)
 #
 #   Decode a full code:
-#   var coord = olc.decode(code);
-#   var msg = 'Center is ' + coord.latitudeCenter + ',' + coord.longitudeCenter;
+#   coord = decode(code);
+#   msg = "Center is {lat}, {lon}".format(lat=coord.latitudeCenter, lon=coord.longitudeCenter)
 #
 #   Attempt to trim the first characters from a code:
-#   var shortCode = olc.shorten('8FVC9G8F+6X', 47.5, 8.5);
+#   shorten('8FVC9G8F+6X', 47.5, 8.5)
 #
 #   Recover the full code from a short code:
-#   var code = olc.recoverNearest('9G8F+6X', 47.4, 8.6);
-#   var code = olc.recoverNearest('8F+6X', 47.4, 8.6);
+#   recoverNearest('9G8F+6X', 47.4, 8.6)
+#   recoverNearest('8F+6X', 47.4, 8.6)
 
 import re
 import math
