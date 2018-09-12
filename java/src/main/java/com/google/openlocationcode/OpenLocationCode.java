@@ -15,6 +15,7 @@
 package com.google.openlocationcode;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Convert locations to and from convenient short codes.
@@ -472,7 +473,7 @@ public final class OpenLocationCode {
       return false;
     }
     OpenLocationCode that = (OpenLocationCode) o;
-    return hashCode() == that.hashCode();
+    return Objects.equals(code, that.code);
   }
 
   @Override
