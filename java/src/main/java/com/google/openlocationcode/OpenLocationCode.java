@@ -151,7 +151,7 @@ public final class OpenLocationCode {
    * @param code A valid OLC code. Can be a full code or a shortened code.
    * @throws IllegalArgumentException when the passed code is not valid.
   */
-  public OpenLocationCode(String code) throws IllegalArgumentException {
+  public OpenLocationCode(String code) {
     if (!isValidCode(code.toUpperCase())) {
       throw new IllegalArgumentException(
           "The provided code '" + code + "' is not a valid Open Location Code.");
@@ -166,8 +166,7 @@ public final class OpenLocationCode {
    * @param codeLength The desired number of digits in the code.
    * @throws IllegalArgumentException if the code length is not valid.
    */
-  public OpenLocationCode(double latitude, double longitude, int codeLength)
-      throws IllegalArgumentException {
+  public OpenLocationCode(double latitude, double longitude, int codeLength) {
     // Check that the code length requested is valid.
     if (codeLength < 4 || (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
