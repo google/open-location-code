@@ -10,25 +10,21 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/golang/glog"
+	log "github.com/golang/glog"
 )
 
 const (
-	originHeader       = "Access-Control-Allow-Origin"
-	contentTypeHeader  = "Content-Type"
-	contentTypeGeoJSON = "application/vnd.geo+json"
-	contentTypePNG     = "image/png"
-	outputGeoJSON      = "json"
-	outputPNG          = "png"
-	tileNumberingWMS   = "wms"
-	tileNumberingTMS   = "tms"
-	lineColorOption    = "linecol"
-	labelColorOption   = "labelcol"
-	zoomAdjustOption   = "zoomadjust"
+	outputJSON       = "json"
+	outputPNG        = "png"
+	tileNumberingWMS = "wms"
+	tileNumberingTMS = "tms"
+	lineColorOption  = "linecol"
+	labelColorOption = "labelcol"
+	zoomAdjustOption = "zoomadjust"
 )
 
 var (
-	pathSpec = regexp.MustCompile(fmt.Sprintf(`^/grid/(%s|%s)/(\d+)/(\d+)/(\d+)\.(%s|%s)`, tileNumberingWMS, tileNumberingTMS, outputGeoJSON, outputPNG))
+	pathSpec = regexp.MustCompile(fmt.Sprintf(`^/grid/(%s|%s)/(\d+)/(\d+)/(\d+)\.(%s|%s)`, tileNumberingWMS, tileNumberingTMS, outputJSON, outputPNG))
 )
 
 // LatLng represents a latitude and longitude in degrees.
@@ -42,64 +38,8 @@ func (l *LatLng) String() string {
 	return fmt.Sprintf("%.6f,%.6f", l.Lat, l.Lng)
 }
 
-// Init reads in the font.
-func Init() {
-	if err := readImageFont(); err != nil {
-		glog.Fatalf("Failed reading font: %v", err)
-	}
-}
-
-// Handler processes a request for a single tile and writes either the GeoJSON or image as a response.
-func Handler(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		glog.Errorf("Bad request: %v: %v", r.URL, err)
-		http.Error(w, err.Error(), 400)
-		return
-	}
-	request, err := parseRequest(r)
-	if err != nil {
-		glog.Errorf("Bad request: %v: %v", r.URL, err)
-		http.Error(w, err.Error(), 400)
-		return
-	}
-	w.Header().Set(originHeader, "*")
-	if request.format == jsonTile {
-		if json, err := request.tile.GeoJSON(); err != nil {
-			glog.Errorf("Error producing geojson tile: %v", err)
-			http.Error(w, err.Error(), 500)
-		} else if blob, err := json.MarshalJSON(); err != nil {
-			glog.Errorf("Error marshaling geojson tile: %v", err)
-			http.Error(w, err.Error(), 500)
-		} else {
-			w.Header().Set(contentTypeHeader, contentTypeGeoJSON)
-			w.Write(blob)
-		}
-	}
-	if request.format == imageTile {
-		if blob, err := request.tile.Image(); err != nil {
-			glog.Errorf("Error producing image tile: %v", err)
-			http.Error(w, err.Error(), 500)
-		} else {
-			w.Header().Set(contentTypeHeader, contentTypePNG)
-			w.Write(blob)
-		}
-	}
-}
-
-type tileFormat int
-
-const (
-	jsonTile  tileFormat = 0
-	imageTile tileFormat = 1
-)
-
-type request struct {
-	tile   *TileRef
-	format tileFormat
-}
-
-func parseRequest(r *http.Request) (*request, error) {
-	req := request{}
+// Parse extracts information from an HTTP request.
+func Parse(r *http.Request) (*TileRef, error) {
 	g := pathSpec.FindStringSubmatch(r.URL.Path)
 	if len(g) == 0 {
 		return nil, errors.New("Request is not formatted correctly")
@@ -124,10 +64,11 @@ func parseRequest(r *http.Request) (*request, error) {
 	if g[1] == tileNumberingWMS {
 		y = (1 << uint(z)) - y - 1
 	}
-	if g[5] == outputGeoJSON {
-		req.format = jsonTile
+	format := JSONTile // default
+	if g[5] == outputJSON {
+		format = JSONTile
 	} else if g[5] == outputPNG {
-		req.format = imageTile
+		format = ImageTile
 	} else {
 		return nil, fmt.Errorf("Tile output type not specified: %v", g[5])
 	}
@@ -137,26 +78,25 @@ func parseRequest(r *http.Request) (*request, error) {
 		if rgba, err := strconv.ParseUint(r.FormValue(lineColorOption), 0, 64); err == nil {
 			opts.lineColor = int32ToRGBA(uint32(rgba))
 		} else {
-			glog.Warningf("Incorrect value for %s: %v", lineColorOption, r.FormValue(lineColorOption))
+			log.Warningf("Incorrect value for %q: %v", lineColorOption, r.FormValue(lineColorOption))
 		}
 	}
 	if r.FormValue(labelColorOption) != "" {
 		if rgba, err := strconv.ParseUint(r.FormValue(labelColorOption), 0, 64); err == nil {
 			opts.labelColor = int32ToRGBA(uint32(rgba))
 		} else {
-			glog.Warningf("Incorrect value for %s: %v", labelColorOption, r.FormValue(labelColorOption))
+			log.Warningf("Incorrect value for %q: %v", labelColorOption, r.FormValue(labelColorOption))
 		}
 	}
 	if r.FormValue(zoomAdjustOption) != "" {
 		if za, err := strconv.ParseInt(r.FormValue(zoomAdjustOption), 0, 64); err == nil {
 			opts.zoomAdjust = int(za)
 		} else {
-			glog.Warningf("Incorrect value for %s: %v", zoomAdjustOption, r.FormValue(zoomAdjustOption))
+			log.Warningf("Incorrect value for %q: %v", zoomAdjustOption, r.FormValue(zoomAdjustOption))
 		}
 	}
 	// TODO: Add projection as an optional parameter.
-	req.tile = MakeTileRef(x, y, z, opts)
-	return &req, nil
+	return MakeTileRef(x, y, z, format, opts), nil
 }
 
 // int32ToRGBA converts a 32-bit unsigned int into an RGBA color.

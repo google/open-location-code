@@ -14,6 +14,7 @@ type Projection interface {
 	TileOrigin(tx, ty, zoom int) (float64, float64)
 	TileLatLngBounds(tx, ty, zoom int) (float64, float64, float64, float64)
 	LatLngToRaster(float64, float64, float64) (x, y float64)
+	String() string
 }
 
 // MercatorTMS provides a spherical mercator projection using TMS tile specifications.
@@ -75,6 +76,11 @@ func (m *MercatorTMS) LatLngToRaster(lat, lng float64, zoom float64) (x, y float
 		y = float64(int(m.tileSize)<<uint(zoom)) - y
 	}
 	return
+}
+
+// String provides the name of the projection.
+func (m *MercatorTMS) String() string {
+	return "mercator"
 }
 
 // latLngToMeters converts given lat/lon in WGS84 Datum to XY in Spherical MercatorTMS EPSG:900913.
@@ -143,4 +149,9 @@ func (g *GeodeticTMS) LatLngToRaster(lat, lng float64, zoom float64) (x, y float
 	x = (180 + lng) / res
 	y = (90 + lat) / res
 	return
+}
+
+// String provides the name of the projection.
+func (g *GeodeticTMS) String() string {
+	return "geodetic"
 }
