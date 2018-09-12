@@ -45,10 +45,28 @@ type TileOptions struct {
 }
 
 // String returns a string representation of the options.
-func (t TileOptions) String() string {
-	line := fmt.Sprintf("#%02x%02x%02x%02x", t.lineColor.R, t.lineColor.G, t.lineColor.B, t.lineColor.A)
-	label := fmt.Sprintf("#%02x%02x%02x%02x", t.labelColor.R, t.labelColor.G, t.labelColor.B, t.labelColor.A)
-	return fmt.Sprintf("%s_%s_%s_%d", line, label, t.proj, t.zoomAdjust)
+func (o TileOptions) String() string {
+	line := fmt.Sprintf("#%02x%02x%02x%02x", o.lineColor.R, o.lineColor.G, o.lineColor.B, o.lineColor.A)
+	label := fmt.Sprintf("#%02x%02x%02x%02x", o.labelColor.R, o.labelColor.G, o.labelColor.B, o.labelColor.A)
+	return fmt.Sprintf("%s_%s_%s_%d", line, label, o.proj, o.zoomAdjust)
+}
+
+// LineColor sets the color to use for the lines.
+func (o *TileOptions) LineColor (c color.RGBA) *TileOptions {
+	o.lineColor = c
+	return o
+}
+
+// LabelColor sets the color to use for the labels.
+func (o *TileOptions) LabelColor (c color.RGBA) *TileOptions {
+	o.labelColor = c
+	return o
+}
+
+// Zoom sets the zoom adjust level.
+func (o *TileOptions) Zoom (z int) *TileOptions {
+	o.zoomAdjust = z
+	return o
 }
 
 // NewTileOptions returns a default set of options.
