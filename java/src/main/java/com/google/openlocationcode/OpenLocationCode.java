@@ -49,9 +49,6 @@ public final class OpenLocationCode {
   // Provides a normal precision code, approximately 14x14 meters.
   public static final int CODE_PRECISION_NORMAL = 10;
 
-  // Provides an extra precision code, approximately 2x3 meters.
-  public static final int CODE_PRECISION_EXTRA = 11;
-
   // The character set used to encode the values.
   public static final String CODE_ALPHABET = "23456789CFGHJMPQRVWX";
 
