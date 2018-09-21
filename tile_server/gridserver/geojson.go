@@ -11,7 +11,7 @@ import (
 // GeoJSON returns a GeoJSON object for the tile.
 // Objects (lines etc) may extend outside the tile dimensions, so clipping objects to match tile boundaries is up to the client.
 func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
-	log.Infof("Producing geojson for tile z/x/y %v/%v/%v", t.Z, t.X, t.Y)
+	log.Infof("Producing geojson for tile z/x/y %v/%v/%v (%s)", t.Z, t.X, t.Y, t.Path())
 	cl, latp, lngp := olcPrecision(t.Z + t.opts.zoomAdjust)
 	lo, hi := expand(t.SW, t.NE, latp, lngp)
 	fc := geojson.NewFeatureCollection()

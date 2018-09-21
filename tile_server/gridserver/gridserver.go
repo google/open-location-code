@@ -20,6 +20,7 @@ const (
 	tileNumberingTMS = "tms"
 	lineColorOption  = "linecol"
 	labelColorOption = "labelcol"
+	projectionOption = "projection"
 	zoomAdjustOption = "zoomadjust"
 )
 
@@ -64,39 +65,48 @@ func Parse(r *http.Request) (*TileRef, error) {
 	if g[1] == tileNumberingWMS {
 		y = (1 << uint(z)) - y - 1
 	}
-	format := JSONTile // default
+	// Check for optional form values.
+	opts := NewTileOptions()
 	if g[5] == outputJSON {
-		format = JSONTile
+		opts.format = JSONTile
 	} else if g[5] == outputPNG {
-		format = ImageTile
+		opts.format = ImageTile
 	} else {
 		return nil, fmt.Errorf("Tile output type not specified: %v", g[5])
 	}
-	// Check for optional form values.
-	opts := NewTileOptions()
-	if r.FormValue(lineColorOption) != "" {
-		if rgba, err := strconv.ParseUint(r.FormValue(lineColorOption), 0, 64); err == nil {
+	if o := r.FormValue(lineColorOption); o != "" {
+		if rgba, err := strconv.ParseUint(o, 0, 64); err == nil {
 			opts.lineColor = int32ToRGBA(uint32(rgba))
 		} else {
-			log.Warningf("Incorrect value for %q: %v", lineColorOption, r.FormValue(lineColorOption))
+			log.Warningf("Incorrect value for %q: %v", lineColorOption, o)
 		}
 	}
-	if r.FormValue(labelColorOption) != "" {
-		if rgba, err := strconv.ParseUint(r.FormValue(labelColorOption), 0, 64); err == nil {
+	if o := r.FormValue(labelColorOption); o != "" {
+		if rgba, err := strconv.ParseUint(o, 0, 64); err == nil {
 			opts.labelColor = int32ToRGBA(uint32(rgba))
 		} else {
-			log.Warningf("Incorrect value for %q: %v", labelColorOption, r.FormValue(labelColorOption))
+			log.Warningf("Incorrect value for %q: %v", labelColorOption, o)
 		}
 	}
-	if r.FormValue(zoomAdjustOption) != "" {
-		if za, err := strconv.ParseInt(r.FormValue(zoomAdjustOption), 0, 64); err == nil {
+	if o := r.FormValue(zoomAdjustOption); o != "" {
+		if za, err := strconv.ParseInt(o, 0, 64); err == nil {
 			opts.zoomAdjust = int(za)
 		} else {
-			log.Warningf("Incorrect value for %q: %v", zoomAdjustOption, r.FormValue(zoomAdjustOption))
+			log.Warningf("Incorrect value for %q: %v", zoomAdjustOption, o)
 		}
 	}
-	// TODO: Add projection as an optional parameter.
-	return MakeTileRef(x, y, z, format, opts), nil
+	if o := r.FormValue(projectionOption); o != "" {
+		if o == "mercator" || o == "epsg:3857" {
+			// Mercator was the default.
+			opts.proj = NewMercatorTMS()
+		} else if o == "geodetic" || o == "epsg:4326" {
+			opts.proj = NewGeodeticTMS()
+		} else {
+			log.Warningf("Incorrect value for %q: %v", projectionOption, o)
+			return nil, fmt.Errorf("%q is not a valid value for %q", o, projectionOption)
+		}
+	}
+	return MakeTileRef(x, y, z, opts), nil
 }
 
 // int32ToRGBA converts a 32-bit unsigned int into an RGBA color.

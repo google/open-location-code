@@ -28,10 +28,10 @@ func init() {
 }
 
 func main() {
-  log.Infof("Starting...")
+	log.Infof("Starting...")
 	gridserver.SetImageFont(goregular.TTF)
 	http.HandleFunc("/", Handler)
-  log.Infof("Ready")
+	log.Infof("Ready")
 	if err := http.ListenAndServe(fmt.Sprintf(":%v", *port), nil); err != nil {
 		panic(err)
 	}
@@ -52,14 +52,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set(originHeader, "*")
 
-	ctype := contentTypeGeoJSON
-	if tile.Format == gridserver.ImageTile {
-		ctype = contentTypePNG
-	}
-
 	// Response content. May be a tile or JSON.
+	ctype := contentTypeGeoJSON
 	blob := []byte("")
-	if tile.Format == gridserver.JSONTile {
+	if tile.Format() == gridserver.JSONTile {
 		json, err := tile.GeoJSON()
 		if err != nil {
 			log.Errorf("Error producing geojson tile: %v", err)
@@ -71,7 +67,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-	} else if tile.Format == gridserver.ImageTile {
+	} else if tile.Format() == gridserver.ImageTile {
+		ctype = contentTypePNG
 		if blob, err = tile.Image(); err != nil {
 			log.Errorf("Error producing image tile: %v", err)
 			http.Error(w, err.Error(), 500)

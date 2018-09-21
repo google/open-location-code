@@ -32,7 +32,7 @@ var (
 
 // Image returns the tile as a 256x256 pixel PNG image.
 func (t *TileRef) Image() ([]byte, error) {
-	log.Infof("Producing image for tile z/x/y %v/%v/%v", t.Z, t.X, t.Y)
+	log.Infof("Producing image for tile z/x/y %v/%v/%v (%s)", t.Z, t.X, t.Y, t.Path())
 	gj, err := t.GeoJSON()
 	if err != nil {
 		return nil, err
