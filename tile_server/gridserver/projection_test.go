@@ -17,6 +17,18 @@ func TestTileLatLngBounds(t *testing.T) {
 			sw: &LatLng{-85.051128, -180},
 			ne: &LatLng{0, 0},
 		},
+		{
+			x: 0, y: 0, z: 0,
+			p:  NewGeodeticTMS(),
+			sw: &LatLng{-90, -180},
+			ne: &LatLng{90, 0},
+		},
+		{
+			x: 1, y: 0, z: 0,
+			p:  NewGeodeticTMS(),
+			sw: &LatLng{-90, 0},
+			ne: &LatLng{90, 180},
+		},
 	}
 	for _, test := range tests {
 		latlo, lnglo, lathi, lnghi := test.p.TileLatLngBounds(test.x, test.y, test.z)

@@ -18,8 +18,7 @@ type Projection interface {
 }
 
 // MercatorTMS provides a spherical mercator projection using TMS tile specifications.
-// Specifically, this means that the tiles are numbered from south to north.
-// (The pixel raster is, however, normally oriented from north to south.)
+// Although TMS tiles are numbered from south to north, raster coordinates are numbered from north to south.
 // This code is indebted to the gdal2tiles.py from OSGEO GDAL.
 type MercatorTMS struct {
 	tileSize       float64
@@ -56,6 +55,7 @@ func (m *MercatorTMS) TileLatLngBounds(tx, ty, zoom int) (latlo, lnglo, lathi, l
 }
 
 // LatLngToRaster converts a WGS84 latitude and longitude to absolute pixel values.
+// Note that the pixel origin is at top left.
 func (m *MercatorTMS) LatLngToRaster(lat, lng float64, zoom float64) (x, y float64) {
 	var mx, my float64
 	if lat < 0 {
@@ -108,6 +108,8 @@ func (m *MercatorTMS) pixelsToMeters(px, py, zoom float64) (mx, my float64) {
 }
 
 // GeodeticTMS provides a EPSG:4326 projection.
+// The top zoom level is scaled to two tiles. Zoom levels are not square but rectangular.
+// Although TMS tiles are numbered from south to north, raster coordinates are numbered from north to south.
 // This code is indebted to the gdal2tiles.py from OSGEO GDAL.
 type GeodeticTMS struct {
 	tileSize    float64
@@ -119,7 +121,7 @@ type GeodeticTMS struct {
 func NewGeodeticTMS() *GeodeticTMS {
 	g := GeodeticTMS{
 		tileSize: tileSize,
-		resFact:  360.0 / tileSize,
+		resFact:  180.0 / tileSize,
 	}
 	return &g
 }
@@ -136,18 +138,20 @@ func (g *GeodeticTMS) TileOrigin(tx, ty, zoom int) (x, y float64) {
 // TileLatLngBounds returns bounds of a TMS tile in latitude/longitude using WGS84 datum.
 func (g *GeodeticTMS) TileLatLngBounds(tx, ty, zoom int) (latlo, lnglo, lathi, lnghi float64) {
 	res := g.resFact / math.Pow(2, float64(zoom))
-	latlo = float64(tx)*tileSize*res - 180
-	lnglo = float64(ty)*tileSize*res - 90
-	lathi = float64(tx+1)*tileSize*res - 180
-	lnghi = float64(ty+1)*tileSize*res - 90
+	lnglo = float64(tx)*tileSize*res - 180
+	latlo = float64(ty)*tileSize*res - 90
+	lnghi = float64(tx+1)*tileSize*res - 180
+	lathi = float64(ty+1)*tileSize*res - 90
 	return
 }
 
 // LatLngToRaster converts a WGS84 latitude and longitude to absolute pixel values.
+// Note that the pixel origin is at top left.
 func (g *GeodeticTMS) LatLngToRaster(lat, lng float64, zoom float64) (x, y float64) {
 	res := g.resFact / math.Pow(2, float64(zoom))
 	x = (180 + lng) / res
-	y = (90 + lat) / res
+	// Use -lat because we want the pixel origin to be at the top, not at the bottom.
+	y = (90 - lat) / res
 	return
 }
 

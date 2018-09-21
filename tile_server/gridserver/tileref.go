@@ -5,8 +5,6 @@ import (
 	"image/color"
 )
 
-
-
 // TileFormat specifies the types of tiles to generate.
 type TileFormat int
 
@@ -27,7 +25,6 @@ type TileRef struct {
 	origin *origin
 	SW     *LatLng
 	NE     *LatLng
-	Format TileFormat
 }
 
 // origin gives the pixel coordinates of the tile origin.
@@ -38,6 +35,7 @@ type origin struct {
 
 // TileOptions are settings to adjust how the tiles are generated.
 type TileOptions struct {
+	format     TileFormat
 	lineColor  color.RGBA
 	labelColor color.RGBA
 	proj       Projection
@@ -52,34 +50,46 @@ func (o TileOptions) String() string {
 }
 
 // LineColor sets the color to use for the lines.
-func (o *TileOptions) LineColor (c color.RGBA) *TileOptions {
+func (o *TileOptions) LineColor(c color.RGBA) *TileOptions {
 	o.lineColor = c
 	return o
 }
 
 // LabelColor sets the color to use for the labels.
-func (o *TileOptions) LabelColor (c color.RGBA) *TileOptions {
+func (o *TileOptions) LabelColor(c color.RGBA) *TileOptions {
 	o.labelColor = c
 	return o
 }
 
 // Zoom sets the zoom adjust level.
-func (o *TileOptions) Zoom (z int) *TileOptions {
+func (o *TileOptions) Zoom(z int) *TileOptions {
 	o.zoomAdjust = z
+	return o
+}
+
+// Projection changes the projection.
+func (o *TileOptions) Projection(p Projection) *TileOptions {
+	o.proj = p
+	return o
+}
+
+// Format changes the output format.
+func (o *TileOptions) Format(f TileFormat) *TileOptions {
+	o.format = f
 	return o
 }
 
 // NewTileOptions returns a default set of options.
 func NewTileOptions() *TileOptions {
-	return &TileOptions{zoomAdjust: 0, lineColor: lineColor, labelColor: labelColor, proj: NewMercatorTMS()}
+	return &TileOptions{format: JSONTile, lineColor: lineColor, labelColor: labelColor, proj: NewMercatorTMS(), zoomAdjust: 0}
 }
 
 // MakeTileRef constructs the tile reference.
-func MakeTileRef(x, y, z int, f TileFormat, opts *TileOptions) *TileRef {
+func MakeTileRef(x, y, z int, opts *TileOptions) *TileRef {
 	if opts == nil {
 		opts = NewTileOptions()
 	}
-	t := TileRef{X: x, Y: y, Z: z, Format: f, opts: opts}
+	t := TileRef{X: x, Y: y, Z: z, opts: opts}
 	latlo, lnglo, lathi, lnghi := t.opts.proj.TileLatLngBounds(x, y, z)
 	t.SW = &LatLng{latlo, lnglo}
 	t.NE = &LatLng{lathi, lnghi}
@@ -101,4 +111,9 @@ func (t *TileRef) LatLngToPixel(lat, lng float64, tileSize float64) (x float64, 
 // Path converts a tile reference into a file path using zoom/x/y/options
 func (t *TileRef) Path() string {
 	return fmt.Sprintf("%d/%d/%d/%d:%d:%d_%s", t.Z, t.X, t.Y, t.Z, t.X, t.Y, t.opts)
+}
+
+// Format returns the output format.
+func (t *TileRef) Format() TileFormat {
+	return t.opts.format
 }

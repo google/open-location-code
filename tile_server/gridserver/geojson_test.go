@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	testDataPath   = "./testdata/"
+	testDataPath = "./testdata/"
 )
 
 func readTestData(p string) []byte {
@@ -34,7 +34,21 @@ func TestGeoJSON(t *testing.T) {
 			opts:     NewTileOptions().Zoom(2),
 			testFile: testDataPath + "5_17_19_zoom_2.json",
 		},
-		{x: 1098232, y: 1362659, z: 21, testFile: testDataPath + "21_1098232_1362659.json"},
+		{
+			x: 1098232, y: 1362659, z: 21,
+			opts:     NewTileOptions(),
+			testFile: testDataPath + "21_1098232_1362659.json",
+		},
+		{
+			x: 17, y: 19, z: 5,
+			opts:     NewTileOptions().Projection(NewGeodeticTMS()),
+			testFile: testDataPath + "5_17_19_geodetic.json",
+		},
+		{
+			x: 1098232, y: 1362659, z: 21,
+			opts:     NewTileOptions().Projection(NewGeodeticTMS()),
+			testFile: testDataPath + "21_1098232_1362659_geodetic.json",
+		},
 	}
 	for n, test := range tests {
 		// Read the test data, convert to struct.
@@ -43,7 +57,7 @@ func TestGeoJSON(t *testing.T) {
 			t.Errorf("Test %d: data unmarshal failed: %v", n, err)
 		}
 		// Make the tile reference and get the geojson struct.
-		tr := MakeTileRef(test.x, test.y, test.z, JSONTile, test.opts)
+		tr := MakeTileRef(test.x, test.y, test.z, test.opts)
 		got, err := tr.GeoJSON()
 		if err != nil {
 			t.Errorf("Test %d: GeoJSON generation failed: %v", n, err)
@@ -57,4 +71,3 @@ func TestGeoJSON(t *testing.T) {
 		}
 	}
 }
-

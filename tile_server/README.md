@@ -7,7 +7,6 @@ which can be added as an overlay to a map.
 
 ## Limitations
 
-1.  The only projection currently implemented is spherical Mercator (EPSG:3857).
 1.  This server does not implement any GetCapabilities methods.
 1.  A fixed image tile size of 256x256 pixels is used.
 
@@ -35,11 +34,15 @@ The format of the requests is:
         PNG tiles.
     *   `zoomadjust`: this is added to the map zoom value, to cause the returned
         grid to be finer or coarser. This affects both GeoJSON and image tiles.
+    *   `projection`: this can be used to change the map projection from the
+        default, spherical mercator, to geodetic. Valid values are:
+        *   `mercator` or `epsg:3857`: selects spherical mercator (default)
+        *   `geodetic` or `epsg:4326`: selects geodetic projection
 
 An example request could be:
 
 ```
-http://localhost:8080/grid/tms/16/35694/42164.png?linecol=0xff0000ff&labelcol=0xff000060&zoomadjust=1
+http://localhost:8080/grid/tms/16/35694/42164.png?linecol=0xff0000ff&labelcol=0xff000060&zoomadjust=1&projection=epsg:4326
 ```
 
 
