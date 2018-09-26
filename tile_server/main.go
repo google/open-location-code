@@ -55,7 +55,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	// Response content. May be a tile or JSON.
 	ctype := contentTypeGeoJSON
 	blob := []byte("")
-	if tile.Format == gridserver.JSONTile {
+	if tile.Options.Format == gridserver.JSONTile {
 		json, err := tile.GeoJSON()
 		if err != nil {
 			log.Errorf("Error producing geojson tile: %v", err)
@@ -67,7 +67,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-	} else if tile.Format == gridserver.ImageTile {
+	} else if tile.Options.Format == gridserver.ImageTile {
 		ctype = contentTypePNG
 		if blob, err = tile.Image(); err != nil {
 			log.Errorf("Error producing image tile: %v", err)
