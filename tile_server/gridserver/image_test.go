@@ -17,7 +17,7 @@ func TestImage(t *testing.T) {
 		},
 		{
 			x: 17, y: 19, z: 5,
-			opts:     NewTileOptions().Zoom(2).LineColor(white).LabelColor(white),
+			opts:     &TileOptions{Format: ImageTile, LineColor: white, LabelColor: white, Projection: NewMercatorTMS(), ZoomAdjust: 2},
 			testFile: testDataPath + "5_17_19_white_zoom_2.png",
 		},
 		{
@@ -25,7 +25,7 @@ func TestImage(t *testing.T) {
 		},
 		{
 			x: 1098232, y: 1362659, z: 21,
-			opts:     NewTileOptions().Projection(NewGeodeticTMS()),
+			opts:     &TileOptions{Format: ImageTile, LineColor: lineColor, LabelColor: labelColor, Projection: NewGeodeticTMS(), ZoomAdjust: 0},
 			testFile: testDataPath + "21_1098232_1362659_geodetic.png",
 		},
 	}

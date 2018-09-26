@@ -48,7 +48,7 @@ func (t *TileRef) Image() ([]byte, error) {
 	ctx := freetype.NewContext()
 	ctx.SetDst(img)
 	ctx.SetClip(image.Rect(-tileSize, -tileSize, tileSize, tileSize))
-	ctx.SetSrc(image.NewUniform(t.opts.labelColor))
+	ctx.SetSrc(image.NewUniform(t.Options.LabelColor))
 	ctx.SetFont(imageTileFont)
 	// Draw and label each feature that is returned in the geojson for this tile.
 	for _, ft := range gj.Features {
@@ -59,14 +59,14 @@ func (t *TileRef) Image() ([]byte, error) {
 			cp = append(cp, []float64{vx, vy})
 		}
 		// Draw the cell outline.
-		drawRect(img, t.opts.lineColor, int(cp[0][0]), int(cp[2][1]), int(cp[2][0]), int(cp[0][1]))
+		drawRect(img, t.Options.LineColor, int(cp[0][0]), int(cp[2][1]), int(cp[2][0]), int(cp[0][1]))
 		// Get the cell's center x and y, and the width.
 		cx := (cp[0][0] + cp[2][0]) / 2
 		cy := (cp[0][1] + cp[2][1]) / 2
 		cw := cp[2][0] - cp[0][0]
 		// Get and draw the labels.
 		l1, l2 := featureLabels(ft)
-		centerLabels(ctx, t.opts.labelColor, cx, cy, cw, l1, l2)
+		centerLabels(ctx, t.Options.LabelColor, cx, cy, cw, l1, l2)
 	}
 	buf := new(bytes.Buffer)
 	png.Encode(buf, img)

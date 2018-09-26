@@ -68,29 +68,29 @@ func Parse(r *http.Request) (*TileRef, error) {
 	// Check for optional form values.
 	opts := NewTileOptions()
 	if g[5] == outputJSON {
-		opts.format = JSONTile
+		opts.Format = JSONTile
 	} else if g[5] == outputPNG {
-		opts.format = ImageTile
+		opts.Format = ImageTile
 	} else {
 		return nil, fmt.Errorf("Tile output type not specified: %v", g[5])
 	}
 	if o := r.FormValue(lineColorOption); o != "" {
 		if rgba, err := strconv.ParseUint(o, 0, 64); err == nil {
-			opts.lineColor = int32ToRGBA(uint32(rgba))
+			opts.LineColor = int32ToRGBA(uint32(rgba))
 		} else {
 			log.Warningf("Incorrect value for %q: %v", lineColorOption, o)
 		}
 	}
 	if o := r.FormValue(labelColorOption); o != "" {
 		if rgba, err := strconv.ParseUint(o, 0, 64); err == nil {
-			opts.labelColor = int32ToRGBA(uint32(rgba))
+			opts.LabelColor = int32ToRGBA(uint32(rgba))
 		} else {
 			log.Warningf("Incorrect value for %q: %v", labelColorOption, o)
 		}
 	}
 	if o := r.FormValue(zoomAdjustOption); o != "" {
 		if za, err := strconv.ParseInt(o, 0, 64); err == nil {
-			opts.zoomAdjust = int(za)
+			opts.ZoomAdjust = int(za)
 		} else {
 			log.Warningf("Incorrect value for %q: %v", zoomAdjustOption, o)
 		}
@@ -98,9 +98,9 @@ func Parse(r *http.Request) (*TileRef, error) {
 	if o := r.FormValue(projectionOption); o != "" {
 		if o == "mercator" || o == "epsg:3857" {
 			// Mercator was the default.
-			opts.proj = NewMercatorTMS()
+			opts.Projection = NewMercatorTMS()
 		} else if o == "geodetic" || o == "epsg:4326" {
-			opts.proj = NewGeodeticTMS()
+			opts.Projection = NewGeodeticTMS()
 		} else {
 			log.Warningf("Incorrect value for %q: %v", projectionOption, o)
 			return nil, fmt.Errorf("%q is not a valid value for %q", o, projectionOption)
