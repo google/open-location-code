@@ -18,13 +18,13 @@ const (
 // TileRef represents a TMS tile reference, based on x/y/z values.
 // It provides the tile bounding box, and a function to convert lat/lng into pixel references.
 type TileRef struct {
-	Z      int
-	X      int
-	Y      int
-	Options   *TileOptions
-	origin *origin
-	SW     *LatLng
-	NE     *LatLng
+	Z       int
+	X       int
+	Y       int
+	Options *TileOptions
+	origin  *origin
+	SW      *LatLng
+	NE      *LatLng
 }
 
 // origin gives the pixel coordinates of the tile origin.
@@ -38,12 +38,16 @@ type TileOptions struct {
 	Format     TileFormat
 	LineColor  color.RGBA
 	LabelColor color.RGBA
-	Projection       Projection
+	Projection Projection
 	ZoomAdjust int
 }
 
 // String returns a string representation of the options.
 func (o TileOptions) String() string {
+	if o.Format == JSONTile {
+		// Colour settings aren't used for JSON tiles - they just mess up the caching.
+		return fmt.Sprintf("%s_%d", o.Projection, o.ZoomAdjust)
+	}
 	line := fmt.Sprintf("#%02x%02x%02x%02x", o.LineColor.R, o.LineColor.G, o.LineColor.B, o.LineColor.A)
 	label := fmt.Sprintf("#%02x%02x%02x%02x", o.LabelColor.R, o.LabelColor.G, o.LabelColor.B, o.LabelColor.A)
 	return fmt.Sprintf("%s_%s_%s_%d", line, label, o.Projection, o.ZoomAdjust)
