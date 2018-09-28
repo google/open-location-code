@@ -101,8 +101,8 @@ func centerLabels(ctx *freetype.Context, c color.Color, cx, cy, cw float64, labe
 	fs1 := scaleFontSize(ctx, cw, strings.Repeat("W", len(label1)))
 	fs2 := scaleFontSize(ctx, cw, strings.Repeat("W", len(label2)))
 	// If the second line will be smaller than the first, reduce the first label size.
-	if fs2 < fs1 {
-		fs1 = fs2 * 0.8
+	if fs2 <= fs1 {
+		fs1 = fs2 * 0.9
 	}
 	l1y := int(cy + fs1/2)
 	if len(label2) != 0 {
