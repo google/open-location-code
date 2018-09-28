@@ -50,16 +50,20 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 	return fc, nil
 }
 
-// featureLabels returns the two string labels. Either may be empty.
+// featureLabels returns the two string labels.
+// It splits up the code into two strings - the first contains the first four
+// digits of the code, the second contains the rest.
 func featureLabels(f *geojson.Feature) (string, string) {
-	a, aok := f.Properties["area_code"]
-	l, lok := f.Properties["local_code"]
-	if aok && lok {
-		return a.(string), l.(string)
-	}
-	n, nok := f.Properties["name"]
-	if nok {
-		return n.(string), ""
+	if n, ok := f.Properties["name"]; ok {
+		ns := n.(string)
+		switch {
+		case len(ns) <= 4:
+			return ns, ""
+		case len(ns) == 8:
+			return ns[0:4], ns[4:] + "+"
+		default:
+			return ns[0:4], ns[4:]
+		}
 	}
 	return "", ""
 }

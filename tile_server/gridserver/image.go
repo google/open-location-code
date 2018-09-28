@@ -6,7 +6,6 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"math"
 	"strings"
 
 	"github.com/golang/freetype"
@@ -98,25 +97,28 @@ func drawRect(img *image.RGBA, c color.Color, x1, y1, x2, y2 int) {
 // centerLabels draws a one or two-line label in the center of the cell - not tile, but grid cell.
 // The font size is scaled for the longer label to fit.
 func centerLabels(ctx *freetype.Context, c color.Color, cx, cy, cw float64, label1, label2 string) {
-	// Get the smaller suitable font size for the two labels.
-	fs := math.Min(
-		scaleFontSize(ctx, cw, strings.Repeat("W", len(label1))),
-		scaleFontSize(ctx, cw, strings.Repeat("W", len(label2))),
-	)
-	ctx.SetFontSize(fs)
-	// Get the widths of each label with the current font size.
-	w1 := getStringWidth(ctx, label1)
-	w2 := getStringWidth(ctx, label2)
-	// Add the labels.
-	if len(label2) == 0 {
-		if _, err := ctx.DrawString(label1, freetype.Pt(int(cx-w1/2), int(cy+fs/2))); err != nil {
-			log.Errorf("Error drawing label1: %v", err)
-		}
-	} else {
-		if _, err := ctx.DrawString(label1, freetype.Pt(int(cx-w1/2), int(cy-fs*0.8))); err != nil {
-			log.Errorf("Error drawing label1: %v", err)
-		}
-		if _, err := ctx.DrawString(label2, freetype.Pt(int(cx-w2/2), int(cy+fs*0.8))); err != nil {
+	// Get the font size for each of the two labels.
+	fs1 := scaleFontSize(ctx, cw, strings.Repeat("W", len(label1)))
+	fs2 := scaleFontSize(ctx, cw, strings.Repeat("W", len(label2)))
+	// If the second line will be smaller than the first, reduce the first label size.
+	if fs2 <= fs1 {
+		fs1 = fs2 * 0.9
+	}
+	l1y := int(cy + fs1/2)
+	if len(label2) != 0 {
+		l1y = int(cy - fs1)
+	}
+	// Draw the first label.
+	ctx.SetFontSize(fs1)
+	w := getStringWidth(ctx, label1) / 2
+	if _, err := ctx.DrawString(label1, freetype.Pt(int(cx-w), l1y)); err != nil {
+		log.Errorf("Error drawing label1: %v", err)
+	}
+	if len(label2) != 0 {
+		// Draw the second label.
+		ctx.SetFontSize(fs2)
+		w := getStringWidth(ctx, label2) / 2
+		if _, err := ctx.DrawString(label2, freetype.Pt(int(cx-w), int(cy+fs2*0.5))); err != nil {
 			log.Errorf("Error drawing label2: %v", err)
 		}
 	}
@@ -131,7 +133,7 @@ func scaleFontSize(ctx *freetype.Context, cw float64, label string) float64 {
 	ctx.SetFontSize(fontSize)
 	lw := getStringWidth(ctx, label)
 	// Scale the font to make the label fit in the cell width.
-	return (cw / lw) * fontSize * 0.9
+	return (cw / lw) * fontSize
 }
 
 // SetImageFont parses a TTF font and uses it for the image labels.
