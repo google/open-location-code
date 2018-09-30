@@ -76,3 +76,9 @@ INFO: Elapsed time: 0.657s, Critical Path: 0.46s
 Executed 4 out of 4 tests: 4 tests pass.
 $
 ```
+
+## MavenCentral
+
+The library is available to import/download via [Maven Central](https://search.maven.org/search?q=g:com.google.openlocationcode).
+
+To update the library, bump the version number in pom.xml and run "mvn clean deploy" from the java folder. See the [docs](https://central.sonatype.org/pages/apache-maven.html) for more info.
