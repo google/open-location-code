@@ -170,4 +170,25 @@ public class EncodingTest {
           olc.contains(decoded.getNorthLatitude(), decoded.getWestLongitude()));
     }
   }
+
+  @Test
+  public void testMaxCodeLength() {
+    // Check that we do not return a code longer than is valid.
+    String code = OpenLocationCode.encode(51.3701125, -10.202665625, 1000000);
+    Assert.assertEquals(
+      "Encoded code should have a length of MAX_DIGIT_COUNT + 1 for the plus symbol",
+      OpenLocationCode.MAX_DIGIT_COUNT + 1,
+      code.length());
+    Assert.assertTrue("Code should be valid.", OpenLocationCode.isValidCode(code));
+    // Extend the code with a valid character and make sure it is still valid.
+    String tooLongCode = code + "W";
+    Assert.assertTrue(
+      "Too long code with all valid characters should be valid.",
+      OpenLocationCode.isValidCode(tooLongCode));
+    // Extend the code with an invalid character and make sure it is invalid.
+    tooLongCode = code + "U";
+    Assert.assertFalse(
+      "Too long code with invalid character should be invalid.",
+      OpenLocationCode.isValidCode(tooLongCode));
+  }
 }
