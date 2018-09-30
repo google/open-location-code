@@ -61,6 +61,9 @@ public final class OpenLocationCode {
   // The number of characters to place before the separator.
   private static final int SEPARATOR_POSITION = 8;
 
+  // The max number of digits to process in a plus code.
+  public static final int MAX_DIGIT_COUNT = 15;
+
   // Note: The double type can't be used because of the rounding arithmetic due to floating point
   // implementation. Eg. "8.95 - 8" can give result 0.9499999999999 instead of 0.95 which
   // incorrectly classify the points on the border of a cell. Therefore all the calculation is done
@@ -165,6 +168,8 @@ public final class OpenLocationCode {
    * @throws IllegalArgumentException if the code length is not valid.
    */
   public OpenLocationCode(double latitude, double longitude, int codeLength) {
+    // Limit the maximum number of digits in the code.
+    codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
     // Check that the code length requested is valid.
     if (codeLength < 4 || (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
@@ -289,7 +294,7 @@ public final class OpenLocationCode {
     BigDecimal westLongitude = BigDecimal.ZERO;
 
     // Decode the digits.
-    while (digit < decoded.length()) {
+    while (digit < Math.min(decoded.length(), MAX_DIGIT_COUNT)) {
       if (digit < PAIR_CODE_LENGTH) {
         // Decode a pair of digits, the first being latitude and the second being longitude.
         latPrecision = latPrecision.divide(ENCODING_BASE);
