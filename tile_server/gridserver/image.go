@@ -104,7 +104,7 @@ func makeGridCell(ctx *freetype.Context, t *TileRef, f *geojson.Feature) *gridCe
 	return o
 }
 
-// drawRect draws a rectangle utilizing HLine() and VLine()
+// drawRect draws a rectangle around the cell.
 func (c *gridCell) drawRect(img *image.RGBA, col color.Color) {
 	c.drawHoriz(img, col, c.y1)
 	c.drawHoriz(img, col, c.y2)
@@ -143,7 +143,7 @@ func (c *gridCell) drawVert(img *image.RGBA, col color.Color, x float64) {
 }
 
 // label draws a multi-line label in the center of the cell - not tile, but grid cell.
-// The font size of each line is scaled to fit.
+// The font size of each line is scaled to fit the cell width.
 func (c *gridCell) label(label string) {
 	// Split the label into it's lines and get the font sizes for each line.
 	lines := strings.Split(label, "\n")
@@ -176,7 +176,7 @@ func (c *gridCell) label(label string) {
 	}
 }
 
-// scaleFontSize returns the scaled font size so the label fits within the cell width.
+// scaleFontSize returns the scaled font size to fit the label within the available width.
 func scaleFontSize(ctx *freetype.Context, cw float64, label string) float64 {
 	if len(label) == 0 {
 		return 1000
