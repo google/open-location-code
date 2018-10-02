@@ -11,6 +11,7 @@ import (
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	log "github.com/golang/glog"
+	geojson "github.com/paulmach/go.geojson"
 	"golang.org/x/image/font/gofont/goregular"
 )
 
@@ -49,78 +50,129 @@ func (t *TileRef) Image() ([]byte, error) {
 	ctx.SetClip(image.Rect(-tileSize, -tileSize, tileSize, tileSize))
 	ctx.SetSrc(image.NewUniform(t.Options.LabelColor))
 	ctx.SetFont(imageTileFont)
-	// Draw and label each feature that is returned in the geojson for this tile.
+
+	// Create a colour for the sub-grid, using half-alpha of the label colour.
+	r, g, b, a := t.Options.LabelColor.RGBA()
+	a = a / 2
+	gridCol := color.RGBA{
+		uint8(min(r, a)),
+		uint8(min(g, a)),
+		uint8(min(b, a)),
+		uint8(a),
+	}
+	// Draw and label each OLC grid cell that is returned in the geojson (i.e. feature).
 	for _, ft := range gj.Features {
-		// Convert the grid cell vertices from lng/lat to pixels.
-		var cp [][]float64
-		for _, v := range ft.Geometry.Polygon[0] {
-			vx, vy := t.LatLngToPixel(v[1], v[0], tileSize)
-			cp = append(cp, []float64{vx, vy})
+		cell := makeGridCell(ctx, t, ft)
+		// Decide if we want to draw the sub-grid, depending on the code length and the pixel width.
+		if len(ft.Properties["global_code"].(string)) <= 10 && cell.width > 200 {
+			cell.drawGrid(t, img, gridCol, 20, 20)
+		} else if len(ft.Properties["global_code"].(string)) > 10 && cell.width > 100 {
+			cell.drawGrid(t, img, gridCol, 4, 5)
 		}
 		// Draw the cell outline.
-		drawRect(img, t.Options.LineColor, int(cp[0][0]), int(cp[2][1]), int(cp[2][0]), int(cp[0][1]))
-		// Get the cell's center x and y, and the width.
-		cx := (cp[0][0] + cp[2][0]) / 2
-		cy := (cp[0][1] + cp[2][1]) / 2
-		cw := cp[2][0] - cp[0][0]
-		// Get and draw the labels.
-		l1, l2 := featureLabels(ft)
-		centerLabels(ctx, t.Options.LabelColor, cx, cy, cw, l1, l2)
+		cell.drawRect(img, t.Options.LineColor)
+		// Draw the label.
+		cell.label(featureLabel(ft))
 	}
 	buf := new(bytes.Buffer)
 	png.Encode(buf, img)
 	return buf.Bytes(), nil
 }
 
-// drawHoriz draws a horizontal line
-func drawHoriz(img *image.RGBA, c color.Color, x1, y, x2 int) {
-	for ; x1 <= x2; x1++ {
-		img.Set(x1, y, c)
-	}
+// gridCell represents an OLC grid cell.
+type gridCell struct {
+	ctx *freetype.Context
+	// Latlng coordinates.
+	latlo, lnglo, lathi, lnghi float64
+	// Pixel coordinates.
+	x1, y1, x2, y2 float64
+	cx, cy, width  float64
 }
 
-// drawVert draws a veritcal line
-func drawVert(img *image.RGBA, c color.Color, x, y1, y2 int) {
-	for ; y1 <= y2; y1++ {
-		img.Set(x, y1, c)
-	}
+// makeGridCell creates a gridCell structure.
+func makeGridCell(ctx *freetype.Context, t *TileRef, f *geojson.Feature) *gridCell {
+	o := &gridCell{ctx: ctx}
+	// Get the bounds and create the pixel coordinates.
+	o.latlo, o.lnglo, o.lathi, o.lnghi = bounds(f)
+	// The pixels go from top to bottom so the y-coordinates are swapped.
+	o.x1, o.y2 = t.LatLngToPixel(o.latlo, o.lnglo, tileSize)
+	o.x2, o.y1 = t.LatLngToPixel(o.lathi, o.lnghi, tileSize)
+	// Get the pixel center and the width.
+	o.cx = (o.x1 + o.x2) / 2
+	o.cy = (o.y1 + o.y2) / 2
+	o.width = o.x2 - o.x1
+	return o
 }
 
 // drawRect draws a rectangle utilizing HLine() and VLine()
-func drawRect(img *image.RGBA, c color.Color, x1, y1, x2, y2 int) {
-	drawHoriz(img, c, x1, y1, x2)
-	drawHoriz(img, c, x1, y2, x2)
-	drawVert(img, c, x1, y1, y2)
-	drawVert(img, c, x2, y1, y2)
+func (c *gridCell) drawRect(img *image.RGBA, col color.Color) {
+	c.drawHoriz(img, col, c.y1)
+	c.drawHoriz(img, col, c.y2)
+	c.drawVert(img, col, c.x1)
+	c.drawVert(img, col, c.x2)
 }
 
-// centerLabels draws a one or two-line label in the center of the cell - not tile, but grid cell.
-// The font size is scaled for the longer label to fit.
-func centerLabels(ctx *freetype.Context, c color.Color, cx, cy, cw float64, label1, label2 string) {
-	// Get the font size for each of the two labels.
-	fs1 := scaleFontSize(ctx, cw, strings.Repeat("W", len(label1)))
-	fs2 := scaleFontSize(ctx, cw, strings.Repeat("W", len(label2)))
-	// If the second line will be smaller than the first, reduce the first label size.
-	if fs2 <= fs1 {
-		fs1 = fs2 * 0.9
+// drawGrid draws a grid within the cell of xdiv horizontal and ydiv vertical divisions.
+func (c *gridCell) drawGrid(t *TileRef, img *image.RGBA, col color.Color, xdiv, ydiv float64) {
+	// Draw the horizontal sub grid. We need to use the lat/lng coordinates for the horizontal lines
+	// because the divisions are regular in degrees but not pixels.
+	s := (c.lathi - c.latlo) / ydiv
+	for i := 1; i <= 19; i++ {
+		_, y := t.LatLngToPixel(c.latlo+float64(i)*s, c.lnglo, tileSize)
+		c.drawHoriz(img, col, y)
 	}
-	l1y := int(cy + fs1/2)
-	if len(label2) != 0 {
-		l1y = int(cy - fs1)
+	// Draw the vertical sub grid.
+	s = (c.x2 - c.x1) / xdiv
+	for i := 1; i <= 19; i++ {
+		c.drawVert(img, col, c.x1+float64(i)*s)
 	}
-	// Draw the first label.
-	ctx.SetFontSize(fs1)
-	w := getStringWidth(ctx, label1) / 2
-	if _, err := ctx.DrawString(label1, freetype.Pt(int(cx-w), l1y)); err != nil {
-		log.Errorf("Error drawing label1: %v", err)
+}
+
+// drawHoriz draws a horizontal line across the cell.
+func (c *gridCell) drawHoriz(img *image.RGBA, col color.Color, y float64) {
+	for x := c.x1; x <= c.x2; x++ {
+		img.Set(int(x), int(y), col)
 	}
-	if len(label2) != 0 {
-		// Draw the second label.
-		ctx.SetFontSize(fs2)
-		w := getStringWidth(ctx, label2) / 2
-		if _, err := ctx.DrawString(label2, freetype.Pt(int(cx-w), int(cy+fs2*0.5))); err != nil {
-			log.Errorf("Error drawing label2: %v", err)
+}
+
+// drawVert draws a vertical line across the cell.
+func (c *gridCell) drawVert(img *image.RGBA, col color.Color, x float64) {
+	for y := c.y1; y <= c.y2; y++ {
+		img.Set(int(x), int(y), col)
+	}
+}
+
+// label draws a multi-line label in the center of the cell - not tile, but grid cell.
+// The font size of each line is scaled to fit.
+func (c *gridCell) label(label string) {
+	// Split the label into it's lines and get the font sizes for each line.
+	lines := strings.Split(label, "\n")
+	fontSizes := make([]float64, len(lines))
+	var total float64
+	for n, l := range lines {
+		// Get the font size for the label.
+		var fs float64
+		// If it's the first line, and there are more, then the font size is reduced.
+		if n == 0 && len(lines) > 1 {
+			fs = scaleFontSize(c.ctx, c.width, strings.Repeat("W", 5)) * 0.9
+		} else {
+			fs = scaleFontSize(c.ctx, c.width, strings.Repeat("W", len(l)))
 		}
+		fontSizes[n] = fs
+		total += fs
+	}
+	// Work out the y coordinate for the _last_ line. The y coordinate is the bottom of the line,
+	// measured from the top of the cell.
+	y := c.cy + total/2
+	// Draw the last line, and work backwards to the first line.
+	for i := len(lines) - 1; i >= 0; i-- {
+		c.ctx.SetFontSize(fontSizes[i])
+		w := getStringWidth(c.ctx, lines[i]) / 2
+		if _, err := c.ctx.DrawString(lines[i], freetype.Pt(int(c.cx-w), int(y))); err != nil {
+			log.Errorf("Error drawing label: %v", err)
+		}
+		// Reduce the y coordinate by the font size.
+		y -= fontSizes[i]
 	}
 }
 
@@ -158,4 +210,11 @@ func getStringWidth(ctx *freetype.Context, s string) float64 {
 	}
 	w := float64(val.X.Round() - st.X.Round())
 	return w
+}
+
+func min(a, b uint32) uint32 {
+	if a < b {
+		return a
+	}
+	return b
 }

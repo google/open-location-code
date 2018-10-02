@@ -110,10 +110,10 @@ func Parse(r *http.Request) (*TileRef, error) {
 }
 
 // int32ToRGBA converts a 32-bit unsigned int into an RGBA color.
-func int32ToRGBA(i uint32) color.RGBA {
+func int32ToRGBA(i uint32) color.Color {
 	r := uint8((i >> 24) & 0xFF)
 	g := uint8((i >> 16) & 0xFF)
 	b := uint8((i >> 8) & 0xFF)
 	a := uint8(i & 0xFF)
-	return color.RGBA{r, g, b, a}
+	return color.NRGBA{r, g, b, a}
 }

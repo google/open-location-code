@@ -52,7 +52,7 @@ Start the server with:
 go run tile_server/main.go
 ```
 
-Review `example.html` for how to integrate the layer server with
+Review `example.html` for how to integrate the tile server with
 [Openlayers](https://openlayers.org/), [Leaflet](https://leafletjs.com/) or
 [Google Maps API](https://developers.google.com/maps/documentation/javascript/tutorial).
 
@@ -122,6 +122,11 @@ An example of the GeoJSON output for one feature is:
    }
 }
 ```
+
+### Image Tile Grid
+
+If the grid size is large enough, then the next detail level is also drawn. This
+uses the same colour as the label but with the alpha channel reduced.
 
 ## Server Options
 
