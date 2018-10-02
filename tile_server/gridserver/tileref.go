@@ -36,8 +36,8 @@ type origin struct {
 // TileOptions are settings to adjust how the tiles are generated.
 type TileOptions struct {
 	Format     TileFormat
-	LineColor  color.RGBA
-	LabelColor color.RGBA
+	LineColor  color.Color
+	LabelColor color.Color
 	Projection Projection
 	ZoomAdjust int
 }
@@ -48,8 +48,10 @@ func (o TileOptions) String() string {
 		// Colour settings aren't used for JSON tiles - they just mess up the caching.
 		return fmt.Sprintf("%s_%d", o.Projection, o.ZoomAdjust)
 	}
-	line := fmt.Sprintf("#%02x%02x%02x%02x", o.LineColor.R, o.LineColor.G, o.LineColor.B, o.LineColor.A)
-	label := fmt.Sprintf("#%02x%02x%02x%02x", o.LabelColor.R, o.LabelColor.G, o.LabelColor.B, o.LabelColor.A)
+	r, g, b, a := o.LineColor.RGBA()
+	line := fmt.Sprintf("#%02x%02x%02x%02x", uint8(r), uint8(g), uint8(b), uint8(a))
+	r, g, b, a = o.LabelColor.RGBA()
+	label := fmt.Sprintf("#%02x%02x%02x%02x", uint8(r), uint8(g), uint8(b), uint8(a))
 	return fmt.Sprintf("%s_%s_%s_%d", line, label, o.Projection, o.ZoomAdjust)
 }
 

@@ -50,22 +50,31 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 	return fc, nil
 }
 
-// featureLabels returns the two string labels.
-// It splits up the code into two strings - the first contains the first four
-// digits of the code, the second contains the rest.
-func featureLabels(f *geojson.Feature) (string, string) {
+// bounds returns the lat/lng bounding box for the feature.
+func bounds(f *geojson.Feature) (latlo, lnglo, lathi, lnghi float64) {
+	latlo = f.Geometry.Polygon[0][0][1]
+	lnglo = f.Geometry.Polygon[0][0][0]
+	lathi = f.Geometry.Polygon[0][2][1]
+	lnghi = f.Geometry.Polygon[0][2][0]
+	return
+}
+
+// featureLabel returns the label for the cell. This can be a multi-line string.
+func featureLabel(f *geojson.Feature) string {
 	if n, ok := f.Properties["name"]; ok {
 		ns := n.(string)
 		switch {
 		case len(ns) <= 4:
-			return ns, ""
+			return ns
+		case len(ns) < 8:
+			return ns[0:4] + "\n" + ns[4:]
 		case len(ns) == 8:
-			return ns[0:4], ns[4:] + "+"
+			return ns[0:4] + "\n" + ns[4:] + "+"
 		default:
-			return ns[0:4], ns[4:]
+			return ns[0:4] + "\n" + ns[4:9] + "\n" + ns[9:]
 		}
 	}
-	return "", ""
+	return ""
 }
 
 // olcPrecision computes the OLC grid precision parameters for the zoom level.

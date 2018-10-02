@@ -8,7 +8,8 @@ import (
 
 	log "github.com/golang/glog"
 	// Use the production gridserver. In development, change to just "./gridserver".
-	"github.com/google/open-location-code/tile_server/gridserver"
+	"./gridserver"
+	// "github.com/google/open-location-code/tile_server/gridserver"
 	"golang.org/x/image/font/gofont/goregular"
 )
 
