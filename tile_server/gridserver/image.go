@@ -63,7 +63,7 @@ func (t *TileRef) Image() ([]byte, error) {
 	// Draw and label each OLC grid cell that is returned in the geojson (i.e. feature).
 	for _, ft := range gj.Features {
 		cell := makeGridCell(ctx, t, ft)
-		// Decide if we want to draw the sub-grid.
+		// Decide if we want to draw the sub-grid, depending on the code length and the pixel width.
 		if len(ft.Properties["global_code"].(string)) <= 10 && cell.width > 200 {
 			cell.drawGrid(t, img, gridCol, 20, 20)
 		} else if len(ft.Properties["global_code"].(string)) > 10 && cell.width > 100 {
