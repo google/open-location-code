@@ -1,6 +1,3 @@
-use std::result::Result;
-use std::ascii::AsciiExt;
-
 use geo::Point;
 
 use codearea::CodeArea;
