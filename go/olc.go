@@ -72,7 +72,8 @@ func (area CodeArea) Center() (lat, lng float64) {
 		math.Min(area.LngLo+(area.LngHi-area.LngLo)/2, lngMax)
 }
 
-// Check checks the code whether it is a valid code, or not.
+// Check checks whether the passed string is a valid OLC code.
+// It could be a full code (8FVC9G8F+6W), a padded code (8FVC0000+) or a code fragment (9G8F+6W).
 func Check(code string) error {
 	if code == "" || len(code) == 1 && code[0] == Separator {
 		return errors.New("empty code")
@@ -137,8 +138,8 @@ func Check(code string) error {
 	return nil
 }
 
-// CheckShort checks the code whether it is a valid short code, or not.
-// If it is a valid, but not short code, then it returns ErrNotShort.
+// CheckShort checks whether the passed string is a valid short code.
+// If it is valid full code, then it returns ErrNotShort.
 func CheckShort(code string) error {
 	if err := Check(code); err != nil {
 		return err
@@ -149,7 +150,7 @@ func CheckShort(code string) error {
 	return ErrNotShort
 }
 
-// CheckFull checks the code whether it is a valid full code.
+// CheckFull checks whether the passed string is a valid full code.
 // If it is short, it returns ErrShort.
 func CheckFull(code string) error {
 	if err := CheckShort(code); err == nil {
