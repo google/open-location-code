@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package olc implements Open Location Code.
+// Package olc implements the Open Location Code algorithm to convert latitude and longitude coordinates
+// into a shorter sequence of letters and numbers.
 //
-// See https://github.com/google/open-location-code .
+// The aim is to provide something that can be used like an address in locations that lack them, because
+// the streets are unnamed.
+//
+// Codes represent areas, and the size of the area depends on the length of the code. The typical code
+// length is 10 digits, and represents an area of 1/8000 x 1/8000 degrees, or roughly 13.75 x 13.75 meters.
+//
+// See https://github.com/google/open-location-code.
 package olc
 
 import (
