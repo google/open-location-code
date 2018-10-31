@@ -1,27 +1,26 @@
 # Open Location Code C API
 This is the C implementation of the Open Location Code API.
 
-# Usage
+# Building
+
+For now we have a simple Makefile.  Usual targets work:
+```
+make clean
+make all
+```
+
+# Examples
 
 See example.cc for how to use the library. To run the example, use:
-
 ```
-bazel run example
-```
-
-# Development
-
-The library is built/tested using [Bazel](https://bazel.build). To build the library, use:
-
-```
-bazel build olc
+./example
 ```
 
-To run the tests, use:
+# Testing
 
+To test the library, use:
 ```
-bazel test --test_output=all olc_test
+make test
 ```
 
-The tests use the CSV files in the test_data folder. Make sure you copy this folder to the
-root of your local workspace.
+The tests use the CSV files in the parent's test_data folder.
