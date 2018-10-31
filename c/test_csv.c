@@ -14,6 +14,7 @@ static int test_encoding(char* cp[], int cn);
 static int test_validity(char* cp[], int cn);
 
 static int process_file(const char* file, TestFunc func);
+static int to_boolean(const char* s);
 
 int main(int argc, char* argv[])
 {
@@ -41,8 +42,8 @@ static int process_file(const char* file, TestFunc func)
         printf("Could not open [%s]\n", full);
         return 0;
     }
-    int count = 0;
-    printf("============ %s ============\n", file);
+    int total = 0;
+    int valid = 0;
     while (1) {
         char line[1024];
         if (!fgets(line, 1024, fp)) {
@@ -79,12 +80,13 @@ static int process_file(const char* file, TestFunc func)
         if (cn <= 0) {
             continue;
         }
-        func(cp, cn);
-        ++count;
+        valid += func(cp, cn);
+        ++total;
     }
     fclose(fp);
-    printf("============ %s => %d records ============\n", file, count);
-    return count;
+    printf("%30.30s => %3d records, %3d OK, %3d BAD\n",
+           file, total, valid, total - valid);
+    return total;
 }
 
 static int test_encoding(char* cp[], int cn)
@@ -95,6 +97,7 @@ static int test_encoding(char* cp[], int cn)
     }
 
     // code,lat,lng,latLo,lngLo,latHi,lngHi
+    int valid = 1;
     int ok = 0;
 
     char* code = cp[0];
@@ -106,7 +109,8 @@ static int test_encoding(char* cp[], int cn)
     char encoded[256];
     OLC_Encode(&data_pos, len, encoded, 256);
     ok = strcmp(code, encoded) == 0;
-    printf("%-3.3s ENC_CODE [%s:%s] [%s] [%s]\n", ok ? "OK" : "BAD", cp[1], cp[2], encoded, code);
+    valid = valid && ok;
+    fprintf(stderr, "%-3.3s ENC_CODE [%s:%s] [%s] [%s]\n", ok ? "OK" : "BAD", cp[1], cp[2], encoded, code);
 
     // Now decode the code and check we get the correct coordinates.
     OLC_CodeArea data_area = {
@@ -125,11 +129,13 @@ static int test_encoding(char* cp[], int cn)
     OLC_GetCenter(&decoded_area, &decoded_center);
 
     ok = fabs(data_center.lat - decoded_center.lat) < 1e-10;
-    printf("%-3.3s ENC_LAT [%f:%f]\n", ok ? "OK" : "BAD", decoded_center.lat, data_center.lat);
+    valid = valid && ok;
+    fprintf(stderr, "%-3.3s ENC_LAT [%f:%f]\n", ok ? "OK" : "BAD", decoded_center.lat, data_center.lat);
     ok = fabs(data_center.lon - decoded_center.lon) < 1e-10;
-    printf("%-3.3s ENC_LON [%f:%f]\n", ok ? "OK" : "BAD", decoded_center.lon, data_center.lon);
+    valid = valid && ok;
+    fprintf(stderr, "%-3.3s ENC_LON [%f:%f]\n", ok ? "OK" : "BAD", decoded_center.lon, data_center.lon);
 
-    return 0;
+    return valid;
 }
 
 static int test_short_code(char* cp[], int cn)
@@ -141,6 +147,7 @@ static int test_short_code(char* cp[], int cn)
 
     // full code,lat,lng,shortcode,test_type
     // test_type is R for recovery only, S for shorten only, or B for both.
+    int valid = 1;
     int ok = 0;
     char code[256];
     char* full_code = cp[0];
@@ -153,17 +160,53 @@ static int test_short_code(char* cp[], int cn)
     if (strcmp(type, "B") == 0 || strcmp(type, "S") == 0) {
         OLC_Shorten(full_code, 0, &reference, code, 256);
         ok = strcmp(short_code, code) == 0;
-        printf("%-3.3s SHORTEN [%s] [%s:%s]: [%s] [%s]\n", ok ? "OK" : "BAD", full_code, cp[1], cp[2], code, short_code);
+        valid = valid && ok;
+        fprintf(stderr, "%-3.3s SHORTEN [%s] [%s:%s]: [%s] [%s]\n", ok ? "OK" : "BAD", full_code, cp[1], cp[2], code, short_code);
     }
 
     // Now extend the code using the reference location and check.
     if (strcmp(type, "B") == 0 || strcmp(type, "R") == 0) {
         OLC_RecoverNearest(short_code, 0, &reference, code, 256);
         ok = strcmp(full_code, code) == 0;
-        printf("%-3.3s RECOVER [%s] [%s:%s]: [%s] [%s]\n", ok ? "OK" : "BAD", short_code, cp[1], cp[2], code, full_code);
+        valid = valid && ok;
+        fprintf(stderr, "%-3.3s RECOVER [%s] [%s:%s]: [%s] [%s]\n", ok ? "OK" : "BAD", short_code, cp[1], cp[2], code, full_code);
     }
 
-    return 0;
+    return valid;
+}
+
+static int test_validity(char* cp[], int cn)
+{
+    if (cn != 4) {
+        printf("test_validity needs 4 columns per row, not %d\n", cn);
+        return 0;
+    }
+
+    // code,isValid,isShort,isFull
+    int valid = 1;
+    int ok = 0;
+    int got;
+    char* code = cp[0];
+    int is_valid = to_boolean(cp[1]);
+    int is_short = to_boolean(cp[2]);
+    int is_full = to_boolean(cp[3]);
+
+    got = OLC_IsValid(code, 0);
+    ok = got == is_valid;
+    valid = valid && ok;
+    fprintf(stderr, "%-3.3s IsValid [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_valid);
+
+    got = OLC_IsFull(code, 0);
+    ok = got == is_full;
+    valid = valid && ok;
+    fprintf(stderr, "%-3.3s IsFull [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_full);
+
+    got = OLC_IsShort(code, 0);
+    ok = got == is_short;
+    valid = valid && ok;
+    fprintf(stderr, "%-3.3s IsShort [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_short);
+
+    return valid;
 }
 
 static int to_boolean(const char* s)
@@ -179,34 +222,4 @@ static int to_boolean(const char* s)
         return 0;
     }
     return 1;
-}
-
-static int test_validity(char* cp[], int cn)
-{
-    if (cn != 4) {
-        printf("test_validity needs 4 columns per row, not %d\n", cn);
-        return 0;
-    }
-
-    // code,isValid,isShort,isFull
-    int ok = 0;
-    int got;
-    char* code = cp[0];
-    int is_valid = to_boolean(cp[1]);
-    int is_short = to_boolean(cp[2]);
-    int is_full = to_boolean(cp[3]);
-
-    got = OLC_IsValid(code, 0);
-    ok = got == is_valid;
-    printf("%-3.3s IsValid [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_valid);
-
-    got = OLC_IsFull(code, 0);
-    ok = got == is_full;
-    printf("%-3.3s IsFull [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_full);
-
-    got = OLC_IsShort(code, 0);
-    ok = got == is_short;
-    printf("%-3.3s IsShort [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_short);
-
-    return 0;
 }

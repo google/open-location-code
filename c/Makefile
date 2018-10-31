@@ -23,3 +23,6 @@ clean:
 	rm -fr *.dSYM
 	rm -f example
 	rm -f test_csv
+
+test: test_csv
+	./test_csv 2>/dev/null
