@@ -11,7 +11,7 @@ make all
 
 # Examples
 
-See example.cc for how to use the library. To run the example, use:
+See example.c for how to use the library. To run the example, use:
 ```
 ./example
 ```
@@ -23,4 +23,4 @@ To test the library, use:
 make test
 ```
 
-The tests use the CSV files in the parent's test_data folder.
+The tests use the CSV files in the parent's `test_data` folder.
