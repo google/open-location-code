@@ -1,4 +1,4 @@
-all: example test_csv
+all: example olc_test
 
 CPPFLAGS += -DMEM_CHECK=1
 
@@ -15,14 +15,14 @@ ALL_FLAGS += -g
 example: olc.o example.o
 	$(CC) $(ALL_FLAGS) $^ -o $@
 
-test_csv: olc.o test_csv.o
+olc_test: olc.o olc_test.o
 	$(CC) $(ALL_FLAGS) $^ -o $@
 
 clean:
 	rm -f *.o crash-* slow-unit-*
 	rm -fr *.dSYM
 	rm -f example
-	rm -f test_csv
+	rm -f olc_test
 
-test: test_csv
-	./test_csv 2>/dev/null
+test: olc_test
+	./olc_test 2>/dev/null
