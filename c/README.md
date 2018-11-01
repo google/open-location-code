@@ -29,4 +29,4 @@ The tests use the CSV files in the parent's `test_data` folder.
 # Authors
 
 * The authors of the C++ implementation, on which this is based.
-* [Gonzalo Diethelm](gonzalo.diethelm@gmail.com)
+* [Gonzalo Diethelm](mailto:gonzalo.diethelm@gmail.com)
