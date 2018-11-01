@@ -101,9 +101,6 @@ extern const size_t kPairCodeLength;
 extern const size_t kGridColumns;
 // Number of rows in the grid refinement method.
 extern const size_t kGridRows;
-// Defines the minimum pair resolution (in degrees) to remove when shortening a
-// code.
-extern const double kMinShortenDegrees;
 // Gives the exponent used for the first pair.
 extern const size_t kInitialExponent;
 // Size of the initial grid in degrees. This is the size of the area represented

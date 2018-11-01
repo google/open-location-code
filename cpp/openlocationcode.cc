@@ -22,7 +22,6 @@ const size_t kEncodingBase = 20;
 const size_t kPairCodeLength = 10;
 const size_t kGridColumns = 4;
 const size_t kGridRows = kEncodingBase / kGridColumns;
-const double kMinShortenDegrees = 0.05;
 // Work out the encoding base exponent necessary to represent 360 degrees.
 const size_t kInitialExponent = floor(log(360) / log(kEncodingBase));
 // Work out the enclosing resolution (in degrees) for the grid algorithm.

@@ -47,10 +47,6 @@ TEST(ParameterChecks, SeparatorPositionValid) {
   EXPECT_TRUE(internal::kSeparatorPosition <= internal::kPairCodeLength);
 }
 
-TEST(ParameterChecks, ShortenDegreesValid) {
-  EXPECT_TRUE(internal::kMinShortenDegrees >= internal::kGridSizeDegrees);
-}
-
 }  // namespace
 }  // namespace internal
 
