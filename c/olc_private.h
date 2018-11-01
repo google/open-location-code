@@ -29,3 +29,10 @@ static const double kLonMaxDegreesT2   = 2 * kLonMaxDegrees;
 static size_t kInitialExponent          = 0;
 static double kGridSizeDegrees          = 0.0;
 static double kInitialResolutionDegrees = 0.0;
+
+// Lookup table of the alphabet positions of characters 'C' through 'X',
+// inclusive. A value of -1 means the character isn't part of the alphabet.
+static const int kPositionLUT['X' - 'C' + 1] = {
+    8, -1, -1, 9, 10, 11, -1, 12, -1, -1,
+    13, -1, -1, 14, 15, 16, -1, -1, -1, 17, 18, 19,
+};

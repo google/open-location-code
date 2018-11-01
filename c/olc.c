@@ -567,15 +567,14 @@ static double compute_precision_for_length(int length)
     return pow_neg(kEncodingBase, -3) / pow(5, length - kPairCodeLength);
 }
 
-// Finds the position of a char in the encoding alphabet.
+// Returns the position of a char in the encoding alphabet, or -1 if invalid.
 static int get_alphabet_position(char c)
 {
-    for (int j = 0; j < kEncodingBase; ++j) {
-        if (c == kAlphabet[j]) {
-            return j;
-        }
-    }
-    return -1;
+  // We use a lookup table for performance reasons.
+  if (c >= 'C' && c <= 'X') return kPositionLUT[c - 'C'];
+  if (c >= 'c' && c <= 'x') return kPositionLUT[c - 'c'];
+  if (c >= '2' && c <= '9') return c - '2';
+  return -1;
 }
 
 // Normalize a longitude into the range -180 to 180, not including 180.
