@@ -64,7 +64,7 @@ static int process_file(const char* file, TestFunc func)
         char* cp[100];
         int cn = 0;
         int first = -1;
-        for (int j = 0; line[j] != '\0'; ++j) {
+        for (int j = 0; ; ++j) {
             if (isspace(line[j]) && blanks) {
                 continue;
             }
@@ -83,6 +83,8 @@ static int process_file(const char* file, TestFunc func)
             }
             if (line[j] == '\n') {
                 line[j] = '\0';
+            }
+            if (line[j] == '\0') {
                 cp[cn++] = line + first;
                 first = -1;
                 break;
