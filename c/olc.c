@@ -384,18 +384,6 @@ static int analyse(const char* code, size_t size, CodeInfo* info)
         return 0;
     }
 
-    // Make sure the code does not have too many digits in total.
-    if (info->len - 1 > kMaximumDigitCount) {
-        return 0;
-    }
-
-    // Make sure the code does not have too many digits after the separator.
-    // The number of digits is the length of the code, minus the position of
-    // the separator, minus one because the separator position is zero indexed.
-    if (info->len - info->sep_first - 1 > kMaximumDigitCount - kSeparatorPosition) {
-        return 0;
-    }
-
     return info->len;
 }
 
