@@ -1,7 +1,5 @@
 all: example olc_test
 
-CPPFLAGS += -DMEM_CHECK=1
-
 CFLAGS += -std=c99
 CFLAGS += -Wall
 # CFLAGS += -Wextra
