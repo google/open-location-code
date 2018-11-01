@@ -7,6 +7,17 @@
 
 #define BASE_PATH "../test_data"
 
+#define CHECK_COLUMNS(name, needed, cp, cn) \
+    do { \
+        if (cn != needed) { \
+            printf("%s needs %d columns per row, not %d\n", name, needed, cn); \
+            for (int j = 0; j < cn; ++j) { \
+                printf(" column %2d: [%s]\n", j, cp[j]); \
+            } \
+            return 0; /* or maybe abort() */ \
+        } \
+    } while (0)
+
 typedef int (TestFunc)(char* cp[], int cn);
 
 static int test_short_code(char* cp[], int cn);
@@ -91,10 +102,7 @@ static int process_file(const char* file, TestFunc func)
 
 static int test_encoding(char* cp[], int cn)
 {
-    if (cn != 7) {
-        printf("test_encoding needs 7 columns per row, not %d\n", cn);
-        return 0;
-    }
+    CHECK_COLUMNS("test_encoding", 7, cp, cn);
 
     // code,lat,lng,latLo,lngLo,latHi,lngHi
     int valid = 1;
@@ -140,10 +148,7 @@ static int test_encoding(char* cp[], int cn)
 
 static int test_short_code(char* cp[], int cn)
 {
-    if (cn != 5) {
-        printf("test_short_code needs 5 columns per row, not %d\n", cn);
-        return 0;
-    }
+    CHECK_COLUMNS("test_short_code", 5, cp, cn);
 
     // full code,lat,lng,shortcode,test_type
     // test_type is R for recovery only, S for shorten only, or B for both.
@@ -177,10 +182,7 @@ static int test_short_code(char* cp[], int cn)
 
 static int test_validity(char* cp[], int cn)
 {
-    if (cn != 4) {
-        printf("test_validity needs 4 columns per row, not %d\n", cn);
-        return 0;
-    }
+    CHECK_COLUMNS("test_validity", 4, cp, cn);
 
     // code,isValid,isShort,isFull
     int valid = 1;
