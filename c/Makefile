@@ -23,4 +23,4 @@ clean:
 	rm -f olc_test
 
 test: olc_test
-	./olc_test 2>/dev/null
+	./olc_test 2>&1 | egrep -v '^OK '

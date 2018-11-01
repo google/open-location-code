@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "olc.h"
+#include "olc_private.h"
+#include "tests.h"
 
-#define BASE_PATH "../test_data"
+#define OLC_BASE_PATH "test_data"
 
 #define CHECK_COLUMNS(name, needed, cp, cn) \
     do { \
@@ -19,37 +21,61 @@
 
 typedef int (TestFunc)(char* cp[], int cn);
 
-static int test_short_code(char* cp[], int cn);
-static int test_encoding(char* cp[], int cn);
-static int test_validity(char* cp[], int cn);
-
-static int process_file(const char* file, TestFunc func);
-static int to_boolean(const char* s);
-
-int main(int argc, char* argv[])
+TEST(ParameterChecks, PairCodeLengthIsEven)
 {
-    struct Data {
-        const char* file;
-        TestFunc* func;
-    } data[] = {
-        { "shortCodeTests.csv", test_short_code },
-        { "encodingTests.csv" , test_encoding   },
-        { "validityTests.csv" , test_validity   },
-    };
-    for (int j = 0; j < sizeof(data) / sizeof(data[0]); ++j) {
-        process_file(data[j].file, data[j].func);
-    }
+    EXPECT_EQ(0, kPairCodeLength % 2);
+}
 
-    return 0;
+TEST(ParameterChecks, AlphabetIsOrdered)
+{
+    char last = 0;
+    for (size_t i = 0; i < kEncodingBase; i++) {
+        EXPECT_GT(kAlphabet[i], last);
+        last = kAlphabet[i];
+    }
+}
+
+TEST(ParameterChecks, PositionLUTMatchesAlphabet)
+{
+    // Loop over all elements of the lookup table.
+    for (size_t i = 0;
+            i < sizeof(kPositionLUT) / sizeof(kPositionLUT[0]);
+            ++i) {
+        const int pos = kPositionLUT[i];
+        const char c = 'C' + i;
+        if (pos != -1) {
+            // If the LUT entry indicates this character is in kAlphabet, verify it.
+            EXPECT_LT(pos, kEncodingBase);
+            EXPECT_EQ(c, kAlphabet[pos]);
+        } else {
+            // Otherwise, verify this character is not in kAlphabet.
+            EXPECT_EQ(strchr(kAlphabet, c), 0);
+        }
+    }
+}
+
+TEST(ParameterChecks, SeparatorPositionValid)
+{
+  EXPECT_LE(kSeparatorPosition, kPairCodeLength);
 }
 
 static int process_file(const char* file, TestFunc func)
 {
-    char full[1024];
-    sprintf(full, "%s/%s", BASE_PATH, file);
-    FILE* fp = fopen(full, "r");
+    static char* base_dir[] = {
+        "..",
+        ".",
+    };
+    FILE* fp = 0;
+    for (int j = 0; j < sizeof(base_dir) / sizeof(base_dir[0]); ++j) {
+        char full[1024];
+        sprintf(full, "%s/%s/%s", base_dir[j], OLC_BASE_PATH, file);
+        fp = fopen(full, "r");
+        if (fp) {
+            break;
+        }
+    }
     if (!fp) {
-        printf("Could not open [%s]\n", full);
+        printf("Could not open [%s]\n", file);
         return 0;
     }
     int total = 0;
@@ -99,6 +125,21 @@ static int process_file(const char* file, TestFunc func)
     printf("%30.30s => %3d records, %3d OK, %3d BAD\n",
            file, total, valid, total - valid);
     return total;
+}
+
+static int to_boolean(const char* s)
+{
+    if (!s || s[0] == '\0') {
+        return 0;
+    }
+    if (strcasecmp(s, "false") == 0 ||
+        strcasecmp(s, "no") == 0 ||
+        strcasecmp(s, "f") == 0 ||
+        strcasecmp(s, ".f.") == 0 ||
+        strcasecmp(s, "n") == 0) {
+        return 0;
+    }
+    return 1;
 }
 
 static int test_encoding(char* cp[], int cn)
@@ -212,17 +253,29 @@ static int test_validity(char* cp[], int cn)
     return valid;
 }
 
-static int to_boolean(const char* s)
+static void test_csv_files(void)
 {
-    if (!s || s[0] == '\0') {
-        return 0;
+    struct Data {
+        const char* file;
+        TestFunc* func;
+    } data[] = {
+        { "shortCodeTests.csv", test_short_code },
+        { "encodingTests.csv" , test_encoding   },
+        { "validityTests.csv" , test_validity   },
+    };
+    for (int j = 0; j < sizeof(data) / sizeof(data[0]); ++j) {
+        process_file(data[j].file, data[j].func);
     }
-    if (strcasecmp(s, "false") == 0 ||
-        strcasecmp(s, "no") == 0 ||
-        strcasecmp(s, "f") == 0 ||
-        strcasecmp(s, ".f.") == 0 ||
-        strcasecmp(s, "n") == 0) {
-        return 0;
-    }
-    return 1;
+}
+
+int main(int argc, char* argv[])
+{
+    test_ParameterChecks_PairCodeLengthIsEven();
+    test_ParameterChecks_AlphabetIsOrdered();
+    test_ParameterChecks_PositionLUTMatchesAlphabet();
+    test_ParameterChecks_SeparatorPositionValid();
+
+    test_csv_files();
+
+    return 0;
 }
