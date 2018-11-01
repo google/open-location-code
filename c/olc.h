@@ -1,6 +1,8 @@
 #ifndef OLC_OPENLOCATIONCODE_H_
 #define OLC_OPENLOCATIONCODE_H_
 
+#include <stdlib.h>
+
 // A pair of doubles representing latitude / longitude
 typedef struct OLC_LatLon {
     double lat;

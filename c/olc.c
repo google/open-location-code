@@ -2,7 +2,6 @@
 #include <float.h>
 #include <math.h>
 #include <memory.h>
-#include <stdlib.h>
 #include "olc.h"
 
 #define CORRECT_IF_SEPARATOR(var, info) \
