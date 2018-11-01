@@ -2,36 +2,11 @@
 #include <float.h>
 #include <math.h>
 #include <memory.h>
-#include <stdlib.h>
 #include "olc.h"
+#include "olc_private.h"
 
 #define CORRECT_IF_SEPARATOR(var, info) \
     do { (var) += (info)->sep_first >= 0 ? 1 : 0; } while (0)
-
-static const char   kSeparator         = '+';
-static const size_t kSeparatorPosition = 8;
-static const size_t kMaximumDigitCount = 32;
-static const char   kPaddingCharacter  = '0';
-static const char   kAlphabet[]        = "23456789CFGHJMPQRVWX";
-static const size_t kEncodingBase      = 20;
-static const size_t kPairCodeLength    = 10;
-static const size_t kGridCols          = 4;
-static const size_t kGridRows          = kEncodingBase / kGridCols;
-
-// Latitude bounds are -kLatMaxDegrees degrees and +kLatMaxDegrees degrees
-// which we transpose to 0 and 180 degrees.
-static const double kLatMaxDegrees     = 90;
-static const double kLatMaxDegreesT2   = 2 * kLatMaxDegrees;
-
-// Longitude bounds are -kLonMaxDegrees degrees and +kLonMaxDegrees degrees
-// which we transpose to 0 and 360 degrees.
-static const double kLonMaxDegrees     = 180;
-static const double kLonMaxDegreesT2   = 2 * kLonMaxDegrees;
-
-// These will be defined later, during runtime.
-static size_t kInitialExponent          = 0;
-static double kGridSizeDegrees          = 0.0;
-static double kInitialResolutionDegrees = 0.0;
 
 typedef struct CodeInfo {
     const char* code;
@@ -385,18 +360,6 @@ static int analyse(const char* code, size_t size, CodeInfo* info)
         return 0;
     }
 
-    // Make sure the code does not have too many digits in total.
-    if (info->len - 1 > kMaximumDigitCount) {
-        return 0;
-    }
-
-    // Make sure the code does not have too many digits after the separator.
-    // The number of digits is the length of the code, minus the position of
-    // the separator, minus one because the separator position is zero indexed.
-    if (info->len - info->sep_first - 1 > kMaximumDigitCount - kSeparatorPosition) {
-        return 0;
-    }
-
     return info->len;
 }
 
@@ -604,15 +567,14 @@ static double compute_precision_for_length(int length)
     return pow_neg(kEncodingBase, -3) / pow(5, length - kPairCodeLength);
 }
 
-// Finds the position of a char in the encoding alphabet.
+// Returns the position of a char in the encoding alphabet, or -1 if invalid.
 static int get_alphabet_position(char c)
 {
-    for (int j = 0; j < kEncodingBase; ++j) {
-        if (c == kAlphabet[j]) {
-            return j;
-        }
-    }
-    return -1;
+  // We use a lookup table for performance reasons.
+  if (c >= 'C' && c <= 'X') return kPositionLUT[c - 'C'];
+  if (c >= 'c' && c <= 'x') return kPositionLUT[c - 'c'];
+  if (c >= '2' && c <= '9') return c - '2';
+  return -1;
 }
 
 // Normalize a longitude into the range -180 to 180, not including 180.
