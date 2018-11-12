@@ -8,13 +8,14 @@ For now we have a simple `Makefile`.  Usual targets work:
 ```
 make clean
 make all
+make install
 ```
 
 # Examples
 
 See `example.c` for how to use the library. To run the example, use:
 ```
-./example
+make example && ./example
 ```
 
 # Testing
