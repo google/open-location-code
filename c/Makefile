@@ -1,26 +1,49 @@
-all: example olc_test
+all: lib
 
-CFLAGS += -std=c99
-CFLAGS += -Wall
-# CFLAGS += -Wextra
-CFLAGS += -Wno-comment
+LIB_NAME = olc
 
+LIB_C_FILES = \
+	olc.c  \
+
+C_FLAGS += -Wall
+# C_FLAGS += -Wextra
+C_FLAGS += -Wno-comment
+
+ALL_FLAGS += -std=c99
 ALL_FLAGS += -g
 
+# everything below here should be taken care of automatically
+# no need to edit these lines, except to add new binary targets
+
+LIB_H_FILES = $(LIB_C_FILES:.c=.h)
+LIB_OBJ_FILES = $(LIB_C_FILES:.c=.o)
+LIB_A_FILE = lib$(LIB_NAME).a
+
 %.o : %.c
-	$(CC) -c $(ALL_FLAGS) $(CFLAGS) $(CPPFLAGS) -o $@ $<
+	$(CC) -c $(ALL_FLAGS) $(C_FLAGS) $(CPP_FLAGS) -o $@ $<
 
-example: olc.o example.o
-	$(CC) $(ALL_FLAGS) $^ -o $@
+$(LIB_A_FILE): $(LIB_OBJ_FILES)
+	ar rvs $@ $^
 
-olc_test: olc.o olc_test.o
-	$(CC) $(ALL_FLAGS) $^ -o $@
+example: example.o $(LIB_A_FILE)
+	$(CC) $(ALL_FLAGS) -o $@ example.o -L. -l$(LIB_NAME)
 
-clean:
-	rm -f *.o crash-* slow-unit-*
-	rm -fr *.dSYM
-	rm -f example
-	rm -f olc_test
+olc_test: olc_test.o $(LIB_A_FILE)
+	$(CC) $(ALL_FLAGS) -o $@ olc_test.o -L. -l$(LIB_NAME)
+
+lib: $(LIB_A_FILE)
 
 test: olc_test
 	./olc_test 2>&1 | egrep -v '^OK '
+
+clean:
+	rm -f crash-* slow-unit-* *.dSYM
+	rm -f $(LIB_OBJ_FILES) $(LIB_A_FILE)
+	rm -f example
+	rm -f olc_test
+
+install: libolc.a olc.h
+	mkdir -p /usr/local/lib
+	cp $(LIB_A_FILE) /usr/local/lib
+	mkdir -p /usr/local/include
+	cp $(LIB_H_FILES) /usr/local/include
