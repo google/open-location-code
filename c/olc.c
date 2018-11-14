@@ -270,7 +270,7 @@ static int analyse(const char* code, size_t size, CodeInfo* info)
     info->pad_first = -1;
     info->pad_last = -1;
     int j = 0;
-    for (j = 0; j < size && code[j] != '\0'; ++j) {
+    for (j = 0; j <= size && code[j] != '\0'; ++j) {
         int ok = 0;
 
         // if this is a padding character, remember it
@@ -476,6 +476,7 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded)
         top = info->len;
         if (top > kMaximumDigitCount) {
             top = kMaximumDigitCount;
+            CORRECT_IF_SEPARATOR(top, info);
         }
         int bot = kPairCodeLength;
         CORRECT_IF_SEPARATOR(bot, info);

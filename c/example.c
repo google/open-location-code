@@ -17,12 +17,12 @@ int main(int argc, char* argv[])
     // Encodes latitude and longitude into a Plus+Code with a preferred length.
     len = OLC_Encode(&location, 16, code, 256);
     printf("%s (%d)\n", code, len);
-    // => "8FVC2222+22GCCCCC"
+    // => "8FVC2222+22GCCCC"
 
     // Decodes a Plus+Code back into coordinates.
     OLC_CodeArea code_area;
     OLC_Decode(code, 0, &code_area);
-    printf("Code length: %14.10f : %14.10f to %14.10f : %14.10f (%lu)\n",
+    printf("Code length: %.15f : %.15f to %.15f : %.15f (%lu)\n",
            code_area.lo.lat,
            code_area.lo.lon,
            code_area.hi.lat,

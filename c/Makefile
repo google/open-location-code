@@ -39,7 +39,8 @@ test: olc_test
 clean:
 	rm -f crash-* slow-unit-* *.dSYM
 	rm -f $(LIB_OBJ_FILES) $(LIB_A_FILE)
-	rm -f example
+	rm -f example. olc_test.o
+	rm -f example olc_test
 	rm -f olc_test
 
 install: libolc.a olc.h
