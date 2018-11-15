@@ -73,7 +73,7 @@ TEST(Extra, LongCodes)
     EXPECT_STR_EQ(code, "8FVC2222+22");
 
     // Encodes latitude and longitude into a Plus+Code with a preferred length.
-    len = OLC_Encode(&location, 16, code, 256);
+    len = OLC_Encode(&location, 15, code, 256);
     EXPECT_NUM_EQ(len, 16);
     EXPECT_STR_EQ(code, "8FVC2222+22GCCCC");
 
