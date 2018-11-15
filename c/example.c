@@ -7,6 +7,11 @@ int main(int argc, char* argv[])
     int len;
     OLC_LatLon location;
 
+    // Show current version
+    printf("=== OLC version [%s] -- %d -- [%d] [%d] [%d] ===\n",
+           OLC_VERSION_STR, OLC_VERSION_NUM,
+           OLC_VERSION_MAJOR, OLC_VERSION_MINOR, OLC_VERSION_PATCH);
+
     // Encodes latitude and longitude into a Plus+Code.
     location.lat = 47.0000625;
     location.lon =  8.0000625;

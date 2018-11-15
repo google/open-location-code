@@ -91,11 +91,11 @@ TEST(Extra, LongCodes)
     EXPECT_NUM_EQ(code_area.hi.lon,  8.000062622070317);
 }
 
-TEST(ParameterChecks, SilenceWarningsForConstants)
+TEST(Extra, Version)
 {
-  EXPECT_NUM_EQ(kInitialExponent, 0);
-  EXPECT_NUM_EQ(kGridSizeDegrees, 0.0);
-  EXPECT_NUM_EQ(kInitialResolutionDegrees, 0.0);
+    int current_version = OLC_VERSION_NUM;
+    int minimum_version = OLC_MAKE_VERSION_NUM(1, 0, 2);
+    EXPECT_NUM_GE(current_version, minimum_version);
 }
 
 static int process_file(const char* file, TestFunc func)
@@ -309,6 +309,7 @@ static void test_csv_files(void)
 
 int main(int argc, char* argv[])
 {
+    test_Extra_Version();
     test_ParameterChecks_PairCodeLengthIsEven();
     test_ParameterChecks_AlphabetIsOrdered();
     test_ParameterChecks_PositionLUTMatchesAlphabet();
