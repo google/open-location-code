@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include "olc.h"
 #include "olc_private.h"
 #include "tests.h"
@@ -88,6 +89,13 @@ TEST(Extra, LongCodes)
     EXPECT_NUM_EQ(code_area.lo.lon,  8.000062500000013);
     EXPECT_NUM_EQ(code_area.hi.lat, 47.000062520000000);
     EXPECT_NUM_EQ(code_area.hi.lon,  8.000062622070317);
+}
+
+TEST(ParameterChecks, SilenceWarningsForConstants)
+{
+  EXPECT_NUM_EQ(kInitialExponent, 0);
+  EXPECT_NUM_EQ(kGridSizeDegrees, 0.0);
+  EXPECT_NUM_EQ(kInitialResolutionDegrees, 0.0);
 }
 
 static int process_file(const char* file, TestFunc func)
@@ -305,6 +313,7 @@ int main(int argc, char* argv[])
     test_ParameterChecks_AlphabetIsOrdered();
     test_ParameterChecks_PositionLUTMatchesAlphabet();
     test_ParameterChecks_SeparatorPositionValid();
+    test_ParameterChecks_SilenceWarningsForConstants();
     test_Extra_LongCodes();
 
     test_csv_files();
