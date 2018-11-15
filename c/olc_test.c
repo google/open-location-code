@@ -77,6 +77,9 @@ TEST(Extra, LongCodes)
     EXPECT_NUM_EQ(len, 16);
     EXPECT_STR_EQ(code, "8FVC2222+22GCCCC");
 
+    len = OLC_CodeLength(code, 256);
+    EXPECT_NUM_EQ(len, 15);
+
     // Decodes a Plus+Code back into coordinates.
     OLC_CodeArea code_area;
     len = OLC_Decode(code, 0, &code_area);
