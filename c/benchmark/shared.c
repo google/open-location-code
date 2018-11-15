@@ -114,7 +114,7 @@ static int run(int argc, char* argv[])
         double t1 = now_us();
         double elapsed = t1 - t0;
         double per_ms = 1000.0 * runs / elapsed;
-        printf("%-20.20s: %10d runs, %10lu us, %10lu runs/ms\n", name, runs, (unsigned long) elapsed, (unsigned long) per_ms);
+        printf("%-10.10s %-20.20s %10d runs %10lu us %10lu runs/ms\n", argv[0], name, runs, (unsigned long) elapsed, (unsigned long) per_ms);
     }
     return 0;
 }
