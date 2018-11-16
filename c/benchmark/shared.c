@@ -74,14 +74,14 @@ typedef struct Data {
 } Data;
 
 static struct Data data[] = {
+    { "decode"    , decode     },
     { "encode"    , encode     },
     { "encode_len", encode_len },
-    { "decode"    , decode     },
-    { "is_valid"  , is_valid   },
     { "is_full"   , is_full    },
     { "is_short"  , is_short   },
-    { "shorten"   , shorten    },
+    { "is_valid"  , is_valid   },
     { "recover"   , recover    },
+    { "shorten"   , shorten    },
 };
 
 static double now_us(void)
