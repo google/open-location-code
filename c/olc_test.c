@@ -27,6 +27,11 @@ TEST(ParameterChecks, PairCodeLengthIsEven)
     EXPECT_NUM_EQ(0, kPairCodeLength % 2);
 }
 
+TEST(ParameterChecks, AlphabetHashRightLength)
+{
+    EXPECT_NUM_EQ(strlen(kAlphabet), kEncodingBase);
+}
+
 TEST(ParameterChecks, AlphabetIsOrdered)
 {
     char last = 0;
@@ -40,17 +45,17 @@ TEST(ParameterChecks, PositionLUTMatchesAlphabet)
 {
     // Loop over all elements of the lookup table.
     for (size_t i = 0;
-            i < sizeof(kPositionLUT) / sizeof(kPositionLUT[0]);
+            i < sizeof(kAlphabetPositionLUT) / sizeof(kAlphabetPositionLUT[0]);
             ++i) {
-        const int pos = kPositionLUT[i];
-        const char c = 'C' + i;
+        const int pos = kAlphabetPositionLUT[i];
         if (pos != -1) {
             // If the LUT entry indicates this character is in kAlphabet, verify it.
             EXPECT_NUM_LT(pos, kEncodingBase);
-            EXPECT_NUM_EQ(c, kAlphabet[pos]);
-        } else {
+        } else if (i > 0) {
             // Otherwise, verify this character is not in kAlphabet.
-            EXPECT_NUM_EQ(strchr(kAlphabet, c), 0);
+            EXPECT_NUM_EQ(strchr(kAlphabet, i), 0);
+        } else {
+            EXPECT_NUM_EQ(i, 0);
         }
     }
 }
@@ -318,6 +323,7 @@ int main(int argc, char* argv[])
 {
     test_Extra_Version();
     test_ParameterChecks_PairCodeLengthIsEven();
+    test_ParameterChecks_AlphabetHashRightLength();
     test_ParameterChecks_AlphabetIsOrdered();
     test_ParameterChecks_PositionLUTMatchesAlphabet();
     test_ParameterChecks_SeparatorPositionValid();

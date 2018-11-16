@@ -11,6 +11,12 @@ make all
 make install
 ```
 
+If you need to regenerate the lookup table, you can do:
+```
+make lug
+```
+and then check any changes that might need to be committed to git.
+
 # Examples
 
 See `example.c` for how to use the library. To run the example, use:

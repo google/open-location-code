@@ -23,7 +23,7 @@ LIB_OBJ_FILES = $(LIB_C_FILES:.c=.o)
 LIB_A_FILE = lib$(LIB_NAME).a
 
 %.o : %.c
-	$(CC) -c $(ALL_FLAGS) $(C_FLAGS) $(CPP_FLAGS) -o $@ $< $(LD_FLAGS)
+	$(CC) -c $(ALL_FLAGS) $(C_FLAGS) $(CPP_FLAGS) -o $@ $<
 
 $(LIB_A_FILE): $(LIB_OBJ_FILES)
 	ar rvs $@ $^
@@ -38,6 +38,10 @@ lib: $(LIB_A_FILE)
 
 test: olc_test
 	./olc_test 2>&1 | egrep -v '^OK '
+
+lug:
+	make -Ctools clean all
+	tools/lug > ./olc_lookup.h
 
 clean:
 	rm -f crash-* slow-unit-* *.dSYM gmon.out

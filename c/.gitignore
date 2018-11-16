@@ -1,5 +1,7 @@
 *.o
+*.log
 libolc.a
 example
 olc_test
 gmon.out
+prof_output
