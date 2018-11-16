@@ -7,6 +7,12 @@ dist: trusty
 
 matrix:
   include:
+    # C implementation. Lives in c/, tested with make.
+    - language: c
+      env: OLC_PATH=c
+      script:
+        - cd ${OLC_PATH};make test
+
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
       env: OLC_PATH=cpp
