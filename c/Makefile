@@ -22,7 +22,7 @@ LIB_OBJ_FILES = $(LIB_C_FILES:.c=.o)
 LIB_A_FILE = lib$(LIB_NAME).a
 
 %.o : %.c
-	$(CC) -c $(ALL_FLAGS) $(C_FLAGS) $(CPP_FLAGS) -o $@ $<
+	$(CC) -c $(ALL_FLAGS) $(C_FLAGS) $(CPP_FLAGS) $(LD_FLAGS) -o $@ $<
 
 $(LIB_A_FILE): $(LIB_OBJ_FILES)
 	ar rvs $@ $^
