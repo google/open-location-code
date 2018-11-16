@@ -28,10 +28,10 @@ $(LIB_A_FILE): $(LIB_OBJ_FILES)
 	ar rvs $@ $^
 
 example: example.o $(LIB_A_FILE)
-	$(CC) $(ALL_FLAGS) -o $@ example.o $(LD_FLAGS) -L. -l$(LIB_NAME)
+	$(CC) $(ALL_FLAGS) -o $@ example.o -L. -l$(LIB_NAME) $(LD_FLAGS)
 
 olc_test: olc_test.o $(LIB_A_FILE)
-	$(CC) $(ALL_FLAGS) -o $@ olc_test.o $(LD_FLAGS) -L. -l$(LIB_NAME)
+	$(CC) $(ALL_FLAGS) -o $@ olc_test.o -L. -l$(LIB_NAME) $(LD_FLAGS)
 
 lib: $(LIB_A_FILE)
 
