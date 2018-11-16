@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include "olc.h"
 #include "olc_private.h"
 #include "tests.h"
@@ -23,14 +24,14 @@ typedef int (TestFunc)(char* cp[], int cn);
 
 TEST(ParameterChecks, PairCodeLengthIsEven)
 {
-    EXPECT_EQ(0, kPairCodeLength % 2);
+    EXPECT_NUM_EQ(0, kPairCodeLength % 2);
 }
 
 TEST(ParameterChecks, AlphabetIsOrdered)
 {
     char last = 0;
     for (size_t i = 0; i < kEncodingBase; i++) {
-        EXPECT_GT(kAlphabet[i], last);
+        EXPECT_NUM_GT(kAlphabet[i], last);
         last = kAlphabet[i];
     }
 }
@@ -45,18 +46,56 @@ TEST(ParameterChecks, PositionLUTMatchesAlphabet)
         const char c = 'C' + i;
         if (pos != -1) {
             // If the LUT entry indicates this character is in kAlphabet, verify it.
-            EXPECT_LT(pos, kEncodingBase);
-            EXPECT_EQ(c, kAlphabet[pos]);
+            EXPECT_NUM_LT(pos, kEncodingBase);
+            EXPECT_NUM_EQ(c, kAlphabet[pos]);
         } else {
             // Otherwise, verify this character is not in kAlphabet.
-            EXPECT_EQ(strchr(kAlphabet, c), 0);
+            EXPECT_NUM_EQ(strchr(kAlphabet, c), 0);
         }
     }
 }
 
 TEST(ParameterChecks, SeparatorPositionValid)
 {
-  EXPECT_LE(kSeparatorPosition, kPairCodeLength);
+    EXPECT_NUM_LE(kSeparatorPosition, kPairCodeLength);
+}
+
+TEST(Extra, LongCodes)
+{
+    char code[256];
+    int len;
+    OLC_LatLon location;
+
+    // Encodes latitude and longitude into a Plus+Code.
+    location.lat = 47.0000625;
+    location.lon =  8.0000625;
+    len = OLC_EncodeDefault(&location, code, 256);
+    EXPECT_NUM_EQ(len, 11);
+    EXPECT_STR_EQ(code, "8FVC2222+22");
+
+    // Encodes latitude and longitude into a Plus+Code with a preferred length.
+    len = OLC_Encode(&location, 15, code, 256);
+    EXPECT_NUM_EQ(len, 16);
+    EXPECT_STR_EQ(code, "8FVC2222+22GCCCC");
+
+    len = OLC_CodeLength(code, 256);
+    EXPECT_NUM_EQ(len, 15);
+
+    // Decodes a Plus+Code back into coordinates.
+    OLC_CodeArea code_area;
+    len = OLC_Decode(code, 0, &code_area);
+    EXPECT_NUM_EQ(len, 15);
+    EXPECT_NUM_EQ(code_area.lo.lat, 47.000062479999997);
+    EXPECT_NUM_EQ(code_area.lo.lon,  8.000062500000013);
+    EXPECT_NUM_EQ(code_area.hi.lat, 47.000062520000000);
+    EXPECT_NUM_EQ(code_area.hi.lon,  8.000062622070317);
+}
+
+TEST(ParameterChecks, SilenceWarningsForConstants)
+{
+  EXPECT_NUM_EQ(kInitialExponent, 0);
+  EXPECT_NUM_EQ(kGridSizeDegrees, 0.0);
+  EXPECT_NUM_EQ(kInitialResolutionDegrees, 0.0);
 }
 
 static int process_file(const char* file, TestFunc func)
@@ -274,6 +313,8 @@ int main(int argc, char* argv[])
     test_ParameterChecks_AlphabetIsOrdered();
     test_ParameterChecks_PositionLUTMatchesAlphabet();
     test_ParameterChecks_SeparatorPositionValid();
+    test_ParameterChecks_SilenceWarningsForConstants();
+    test_Extra_LongCodes();
 
     test_csv_files();
 

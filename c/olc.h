@@ -28,10 +28,12 @@ int OLC_IsShort(const char* code, size_t size);
 int OLC_IsFull(const char* code, size_t size);
 
 // Encode location with given code length (indicates precision) into an OLC
+// Return the string length of the code
 int OLC_Encode(const OLC_LatLon* location, size_t code_length,
                char* code, int maxlen);
 
 // Encode location with default code length into an OLC
+// Return the string length of the code
 int OLC_EncodeDefault(const OLC_LatLon* location,
                       char* code, int maxlen);
 
