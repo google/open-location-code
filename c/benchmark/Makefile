@@ -5,6 +5,8 @@ RUNS = 1000000
 C_MAIN = bm-c.c
 CC_MAIN = bm-cpp.cc
 
+LD_FLAGS += -lm
+
 # C compilation
 C_FLAGS += -Wall
 C_FLAGS += -Wno-comment
@@ -44,10 +46,10 @@ CC_EXE = $(CC_MAIN:.cc=)
 	c++ -c $(CC_ALL_FLAGS) $(CC_FLAGS) -o $@ $<
 
 $(C_EXE): $(C_OBJ)
-	cc $(C_ALL_FLAGS) -o $(C_EXE) $(C_OBJ) -L../../c -l$(LIB_NAME)
+	cc $(C_ALL_FLAGS) -o $(C_EXE) $(LD_FLAGS) $(C_OBJ) -L../../c -l$(LIB_NAME)
 
 $(CC_EXE): $(CC_OBJ)
-	c++ $(CC_ALL_FLAGS) -o $(CC_EXE) $(CC_OBJ) -L../../cpp -l$(LIB_NAME)
+	c++ $(CC_ALL_FLAGS) -o $(CC_EXE) $(LD_FLAGS) $(CC_OBJ) -L../../cpp -l$(LIB_NAME)
 
 run: bm-c bm-cpp
 	./$(C_EXE) $(RUNS)
