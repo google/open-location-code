@@ -31,9 +31,6 @@ $(LIB_A_FILE): $(LIB_OBJ_FILES)
 example: example.o $(LIB_A_FILE)
 	$(CC) $(ALL_FLAGS) -o $@ example.o $(LD_FLAGS) -L. -l$(LIB_NAME)
 
-gonzo: gonzo.o $(LIB_A_FILE)
-	$(CC) $(ALL_FLAGS) -o $@ gonzo.o $(LD_FLAGS) -L. -l$(LIB_NAME)
-
 olc_test: olc_test.o $(LIB_A_FILE)
 	$(CC) $(ALL_FLAGS) -o $@ olc_test.o $(LD_FLAGS) -L. -l$(LIB_NAME)
 
