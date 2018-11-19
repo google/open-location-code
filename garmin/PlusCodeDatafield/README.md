@@ -22,7 +22,7 @@ For example, it might display:
 | ------- |
 | **8FXR+QH** |
 
-To tell someone within 30-50 km (20-30 miles), you can just tell them 8FXR+QH.
+To tell someone within 30-50 km (20-30 miles), you can just tell them 8FXR.
 If they are further away, you can tell them the whole code, or you can give
 them the second part and a nearby town or city. (For example, 8FXR+QH Zurich.)
 
