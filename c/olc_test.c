@@ -98,6 +98,13 @@ TEST(Extra, Version)
     EXPECT_NUM_GE(current_version, minimum_version);
 }
 
+TEST(ParameterChecks, SilenceWarningsForConstants)
+{
+  EXPECT_NUM_EQ(kInitialExponent, 0);
+  EXPECT_NUM_EQ(kGridSizeDegrees, 0.0);
+  EXPECT_NUM_EQ(kInitialResolutionDegrees, 0.0);
+}
+
 static int process_file(const char* file, TestFunc func)
 {
     static char* base_dir[] = {
