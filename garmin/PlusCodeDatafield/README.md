@@ -79,11 +79,14 @@ Create an issue on the project site by
 
 ## Using Connect IQ on Linux
 
-See [this overview](http://blog.aaronboman.com/programming/connectiq/2014/11/13/the-garmin-connect-iq-sdk-on-ubuntu-linux/)
-for general information.
+The Garmin Connect IQ SDK is now available for Linux. Depending on your exact version the simulator may or may not run (it has specific dependencies) but the compiler appears to be reliable.
 
-There seem to have been some changes to the `monkeyc` command since that blog
-article was published:
+Install the SDK from the [SDK page](http://developer.garmin.com/connect-iq/sdk/), and unzip it somewhere handy (like `~/connectiq`).
 
-* You must include your [developer key](https://developer.garmin.com/connect-iq/programmers-guide/getting-started/#generatingadeveloperkeyciq1.3) with the `-y` option
-* You must include the source files on the command line 
+You'll need a developer key, see [Generating a Developer Key](https://developer.garmin.com/connect-iq/programmers-guide/getting-started/#generatingadeveloperkeyciq1.3).
+
+Then from this directory in your GitHub repo, you should be able to run:
+
+```shell
+~/connectiq/bin/monkeyc -w -y ~/Downloads/developer_key -f monkey.jungle -o bin/PlusCodeDatafield.prg
+``` 
