@@ -2,3 +2,4 @@
 libolc.a
 example
 olc_test
+gmon.out

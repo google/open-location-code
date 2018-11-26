@@ -13,6 +13,7 @@ LD_FLAGS += -lm
 
 ALL_FLAGS += -std=c99
 ALL_FLAGS += -g
+ALL_FLAGS += -pg
 
 # everything below here should be taken care of automatically
 # no need to edit these lines, except to add new binary targets
@@ -39,7 +40,7 @@ test: olc_test
 	./olc_test 2>&1 | egrep -v '^OK '
 
 clean:
-	rm -f crash-* slow-unit-* *.dSYM
+	rm -f crash-* slow-unit-* *.dSYM gmon.out
 	rm -f $(LIB_OBJ_FILES) $(LIB_A_FILE)
 	rm -f example.o olc_test.o
 	rm -f example olc_test

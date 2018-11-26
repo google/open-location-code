@@ -3,6 +3,11 @@
  * include the file in both the library and the tests.
  */
 
+#include <ctype.h>
+#include <float.h>
+#include <math.h>
+#include <memory.h>
+
 #define OLC_kEncodingBase      20
 #define OLC_kGridCols          4
 #define OLC_kLatMaxDegrees     90
@@ -41,3 +46,13 @@ static const int kPositionLUT['X' - 'C' + 1] = {
     8, -1, -1, 9, 10, 11, -1, 12, -1, -1,
     13, -1, -1, 14, 15, 16, -1, -1, -1, 17, 18, 19,
 };
+
+// Returns the position of a char in the encoding alphabet, or -1 if invalid.
+static int get_alphabet_position(char c)
+{
+  // We use a lookup table for performance reasons.
+  if (c >= 'C' && c <= 'X') return kPositionLUT[c - 'C'];
+  if (c >= 'c' && c <= 'x') return kPositionLUT[c - 'c'];
+  if (c >= '2' && c <= '9') return c - '2';
+  return -1;
+}
