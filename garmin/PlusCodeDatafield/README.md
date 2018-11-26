@@ -88,5 +88,13 @@ You'll need a developer key, see [Generating a Developer Key](https://developer.
 Then from this directory in your GitHub repo, you should be able to run:
 
 ```shell
-~/connectiq/bin/monkeyc -w -y ~/Downloads/developer_key -f monkey.jungle -o bin/PlusCodeDatafield.prg
+~/connectiq/bin/monkeyc -w -y ~/developer_key -f monkey.jungle -o bin/PlusCodeDatafield.prg
 ``` 
+
+That gives you a `.prg` file that can be run in the simulator.
+
+To build the `.iq` file with a binary for each device (this is the Export Wizard's function), you need to run (this assumes the SDK is in `~/connectiq` and your develper key is in `~/developer_key`):
+
+```shell
+~/connectiq/bin/monkeyc -w -y ~/developer_key -f monkey.jungle -e -a ~/connectiq/bin/api.db -i ~/connectiq/bin/api.debug.xml -o PlusCodeDataField.iq -w -u ~/connectiq/bin/devices.xml -p ~/connectiq/bin/projectInfo.xml
+```
