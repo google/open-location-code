@@ -94,7 +94,7 @@ TEST(Extra, LongCodes)
 TEST(Extra, Version)
 {
     int current_version = OLC_VERSION_NUM;
-    int minimum_version = OLC_MAKE_VERSION_NUM(1, 0, 2);
+    int minimum_version = OLC_MAKE_VERSION_NUM(1, 0, 0);
     EXPECT_NUM_GE(current_version, minimum_version);
 }
 
