@@ -3,6 +3,29 @@
 
 #include <stdlib.h>
 
+#define OLC_VERSION_MAJOR 1
+#define OLC_VERSION_MINOR 0
+#define OLC_VERSION_PATCH 0
+
+// OLC version number: 2.3.4 => 2003004
+// Useful for checking against a particular version or above:
+//
+// #if OLC_VERSION_NUM < OLC_MAKE_VERSION_NUM(1, 0, 2)
+// #error UNSUPPORTED OLC VERSION
+// #endif
+#define OLC_MAKE_VERSION_NUM(major, minor, patch) \
+    ((major * 1000 + minor) * 1000 + patch)
+
+// OLC version string: 2.3.4 => "2.3.4"
+#define OLC_MAKE_VERSION_STR_IMPL(major, minor, patch) \
+    (#major "." #minor  "." #patch)
+#define OLC_MAKE_VERSION_STR(major, minor, patch) \
+    OLC_MAKE_VERSION_STR_IMPL(major, minor, patch)
+
+// Current version, as a number and a string
+#define OLC_VERSION_NUM OLC_MAKE_VERSION_NUM(OLC_VERSION_MAJOR, OLC_VERSION_MINOR, OLC_VERSION_PATCH)
+#define OLC_VERSION_STR OLC_MAKE_VERSION_STR(OLC_VERSION_MAJOR, OLC_VERSION_MINOR, OLC_VERSION_PATCH)
+
 // A pair of doubles representing latitude / longitude
 typedef struct OLC_LatLon {
     double lat;
