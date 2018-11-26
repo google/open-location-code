@@ -5,7 +5,7 @@
 
 #define OLC_VERSION_MAJOR 1
 #define OLC_VERSION_MINOR 0
-#define OLC_VERSION_PATCH 2
+#define OLC_VERSION_PATCH 0
 
 // OLC version number: 2.3.4 => 2003004
 // Useful for checking against a particular version or above:
