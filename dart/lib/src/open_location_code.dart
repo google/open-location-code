@@ -40,9 +40,9 @@ const latitudeMax = 90;
 const longitudeMax = 180;
 
 /// Maximum code length using lat/lng pair encoding. The area of such a
-/// code is approximately 13x13 meters (at the equator), and should be suitable
-/// for identifying buildings. This excludes prefix and separator characters.
-const pairCodeLength = 10;
+/// code is approximately 1cm x 0.5cm and should be suitable for all 
+/// possible use cases. This excludes prefix and separator characters.
+const pairCodeLength = 15;
 
 /// The resolution values in degrees for each position in the lat/lng pair
 /// encoding. These give the place value of each position, and therefore the
