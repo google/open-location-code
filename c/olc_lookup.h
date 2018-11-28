@@ -1,5 +1,13 @@
-// THIS FILE WAS GENERATED AUTOMATICALLY
-// DO NOT EDIT IT UNLESS YOU KNOW WHAT YOU ARE DOING
+// THIS FILE WAS GENERATED AUTOMATICALLY.
+// DO NOT EDIT IT UNLESS YOU KNOW WHAT YOU ARE DOING.
+//
+// Original code had a series of 'if' checks for certain character ranges;
+// depending on the range, it used a specific offset in a lookup table.
+// We unroll all of that and create a direct lookup table,
+// with precomputes the explicit values for all characters.
+//
+// For the original algorithm, please see function get_alphabet_position()
+// in file tools/lug.c (C implementation).
 
 static int kAlphabetPositionLUT[256] = {
 //   0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f

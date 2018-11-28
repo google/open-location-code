@@ -15,6 +15,8 @@ static const int kPositionLUT['X' - 'C' + 1] = {
 };
 
 // Returns the position of a char in the encoding alphabet, or -1 if invalid.
+// This is the original lookup algorithm, which we now use to actually generate
+// the unrolled lookup table.
 static int get_alphabet_position(char c)
 {
   // We use a lookup table for performance reasons.
@@ -26,8 +28,16 @@ static int get_alphabet_position(char c)
 
 int main(int argc, char* argv[])
 {
-    printf("// THIS FILE WAS GENERATED AUTOMATICALLY\n");
-    printf("// DO NOT EDIT IT UNLESS YOU KNOW WHAT YOU ARE DOING\n");
+    printf("// THIS FILE WAS GENERATED AUTOMATICALLY.\n");
+    printf("// DO NOT EDIT IT UNLESS YOU KNOW WHAT YOU ARE DOING.\n");
+    printf("//\n");
+    printf("// Original code had a series of 'if' checks for certain character ranges;\n");
+    printf("// depending on the range, it used a specific offset in a lookup table.\n");
+    printf("// We unroll all of that and create a direct lookup table,\n");
+    printf("// with precomputes the explicit values for all characters.\n");
+    printf("//\n");
+    printf("// For the original algorithm, please see function get_alphabet_position()\n");
+    printf("// in file tools/lug.c (C implementation).\n");
     printf("\n");
     printf("static int kAlphabetPositionLUT[%d] = {\n", MAX_ROW * MAX_COL);
     printf("/");
