@@ -18,10 +18,12 @@ import (
 	"bytes"
 	"io/ioutil"
 	"math"
+	"math/rand"
 	"path/filepath"
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 
 	olc "github.com/google/open-location-code/go"
 )
@@ -296,15 +298,15 @@ func BenchmarkEncode(b *testing.B) {
 	const codelen = 16
 	// Build the random lat/lngs
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	var lat [b.N]float64
-	var lng [b.N]float64
+	lat := make([]float64, b.N)
+	lng := make([]float64, b.N)
 	for i := 0; i < b.N; i++ {
 		lat[i] = r.Float64()*180-90
 		lng[i] = r.Float64()*360-180
 	}
   b.ResetTimer()
 	b.ReportAllocs()
-	for i := 0; i < bmsize; i++ {
-		codes[i] = olc.Encode(lat[i], lng[i], codelen)
+	for i := 0; i < b.N; i++ {
+		olc.Encode(lat[i], lng[i], codelen)
 	}
 }
