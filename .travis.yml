@@ -34,7 +34,7 @@ matrix:
       go: stable
       env: OLC_PATH=go
       script:
-        - go test ./go/olc -v
+        - go test ./go/olc_test.go -v
         - go test ./tile_server/gridserver -v
         - go run ./go/benchmark.go
 
