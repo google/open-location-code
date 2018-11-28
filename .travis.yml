@@ -36,6 +36,7 @@ matrix:
       script:
         - go test ./go -v
         - go test ./tile_server/gridserver -v
+        - go run ./go/benchmark.go
 
     # Java implementation. Lives in java/, tested with bazel.
     - language: java
