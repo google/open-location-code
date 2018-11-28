@@ -289,6 +289,22 @@ func TestFuzzCrashers(t *testing.T) {
 		if _, err = olc.Decode(olc.Encode(area.LatHi, area.LngHi, len(code))); err != nil {
 			t.Errorf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
 		}
+	}
+}
 
+func BenchmarkEncode(b *testing.B) {
+	const codelen = 16
+	// Build the random lat/lngs
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var lat [b.N]float64
+	var lng [b.N]float64
+	for i := 0; i < b.N; i++ {
+		lat[i] = r.Float64()*180-90
+		lng[i] = r.Float64()*360-180
+	}
+  b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < bmsize; i++ {
+		codes[i] = olc.Encode(lat[i], lng[i], codelen)
 	}
 }
