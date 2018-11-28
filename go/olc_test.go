@@ -316,7 +316,7 @@ func BenchmarkDecode(b *testing.B) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	codes := make([]string, b.N)
 	for i := 0; i < b.N; i++ {
-		codes[i] = olc.Encode(r.Float64()*180-90, lng[i] = r.Float64()*360-180, 16)
+		codes[i] = olc.Encode(r.Float64()*180-90, r.Float64()*360-180, 16)
 	}
 	// Reset the timer and run the benchmark.
   b.ResetTimer()
