@@ -99,8 +99,12 @@ TEST(Extra, LongCodes)
 TEST(Extra, Version)
 {
     int current_version = OLC_VERSION_NUM;
+    int expected_version = OLC_MAKE_VERSION_NUM(1, 0, 1);
     int minimum_version = OLC_MAKE_VERSION_NUM(1, 0, 0);
+    int maximum_version = OLC_MAKE_VERSION_NUM(1, 0, 1);
+    EXPECT_NUM_EQ(current_version, expected_version);
     EXPECT_NUM_GE(current_version, minimum_version);
+    EXPECT_NUM_LE(current_version, maximum_version);
 }
 
 TEST(ParameterChecks, SilenceWarningsForConstants)
