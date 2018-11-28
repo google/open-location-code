@@ -12,8 +12,9 @@ C_FLAGS += -Wno-comment
 LD_FLAGS += -lm
 
 ALL_FLAGS += -std=c99
-ALL_FLAGS += -g
-ALL_FLAGS += -pg
+# ALL_FLAGS += -g
+# ALL_FLAGS += -pg
+ALL_FLAGS += -O
 
 # everything below here should be taken care of automatically
 # no need to edit these lines, except to add new binary targets

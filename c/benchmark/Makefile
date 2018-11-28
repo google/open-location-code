@@ -1,4 +1,4 @@
-all: run
+all: benchmarks
 
 RUNS = 1000000
 
@@ -51,7 +51,9 @@ $(C_EXE): $(C_OBJ)
 $(CC_EXE): $(CC_OBJ)
 	c++ $(CC_ALL_FLAGS) -o $(CC_EXE) $(LD_FLAGS) $(CC_OBJ) -L../../cpp -l$(LIB_NAME)
 
-run: bm-c bm-cpp
+benchmarks: bm-c bm-cpp
+
+run: benchmarks
 	./$(C_EXE) $(RUNS)
 	./$(CC_EXE) $(RUNS)
 
