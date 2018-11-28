@@ -23,7 +23,7 @@ import (
 	"sync"
 	"testing"
 
-	olc "github.com/google/open-location-code/go"
+	olc "github.com/google/open-location-code/go/olc"
 )
 
 var (
