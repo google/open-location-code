@@ -18,10 +18,12 @@ import (
 	"bytes"
 	"io/ioutil"
 	"math"
+	"math/rand"
 	"path/filepath"
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 
 	olc "github.com/google/open-location-code/go"
 )
@@ -289,6 +291,37 @@ func TestFuzzCrashers(t *testing.T) {
 		if _, err = olc.Decode(olc.Encode(area.LatHi, area.LngHi, len(code))); err != nil {
 			t.Errorf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
 		}
+	}
+}
 
+func BenchmarkEncode(b *testing.B) {
+	// Build the random lat/lngs.
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	lat := make([]float64, b.N)
+	lng := make([]float64, b.N)
+	for i := 0; i < b.N; i++ {
+		lat[i] = r.Float64()*180-90
+		lng[i] = r.Float64()*360-180
+	}
+	// Reset the timer and run the benchmark.
+  b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		olc.Encode(lat[i], lng[i], 16)
+	}
+}
+
+func BenchmarkDecode(b *testing.B) {
+	// Build random lat/lngs and encode them.
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	codes := make([]string, b.N)
+	for i := 0; i < b.N; i++ {
+		codes[i] = olc.Encode(r.Float64()*180-90, r.Float64()*360-180, 16)
+	}
+	// Reset the timer and run the benchmark.
+  b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		olc.Decode(codes[i])
 	}
 }

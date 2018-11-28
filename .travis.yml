@@ -34,7 +34,7 @@ matrix:
       go: stable
       env: OLC_PATH=go
       script:
-        - go test ./go -v
+        - go test -bench=. ./go -v
         - go test ./tile_server/gridserver -v
 
     # Java implementation. Lives in java/, tested with bazel.
