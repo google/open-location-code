@@ -10,6 +10,14 @@ The library file is in `src/openlocationcode.js`. There is also a minified versi
   * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.js
   * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.min.js
 
+## Releasing
+
+Once changes have been made, update the `package.json` file.
+
+To update the CDNs, you will have to add a new release tag. Note that release tags are applied globally to the repository, so if you are making a change across multiple implementations, consider waiting until all are updated before adding the release tag.
+
+# Tests
+
 Unit tests are included and can be executed by installing gulp, gulp-qunit
 and gulp-util and running gulp. Unit tests are automatically run on pull
 and push requests and visible at https://travis-ci.org/google/open-location-code.
