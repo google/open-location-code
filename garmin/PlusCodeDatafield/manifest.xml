@@ -2,26 +2,36 @@
     <iq:application entry="PlusCodeDatafield" id="81C7E83C447948789C2B1F6BCA03787F" launcherIcon="@Drawables.LauncherIcon" minSdkVersion="1.2.0" name="@Strings.AppName" type="datafield">
 
         <iq:products>
-            <iq:product id="fenix5"/>
-            <iq:product id="fenix5x"/>
-            <iq:product id="fenix5s"/>
-            <iq:product id="fr630"/>
-            <iq:product id="fr235"/>
-            <iq:product id="fr735xt"/>
-            <iq:product id="vivoactive"/>
-            <iq:product id="fenix3"/>
-            <iq:product id="fenix3_hr"/>
-            <iq:product id="fenixchronos"/>
             <iq:product id="d2bravo"/>
             <iq:product id="d2bravo_titanium"/>
-            <iq:product id="fr920xt"/>
-            <iq:product id="epix"/>
+            <iq:product id="edge1030"/>
+            <iq:product id="edge1030bontrager"/>
+            <iq:product id="edge130"/>
+            <iq:product id="edge520plus"/>
+            <iq:product id="edge820"/>
             <iq:product id="edge_1000"/>
             <iq:product id="edge_520"/>
-            <iq:product id="vivoactive_hr"/>
-            <iq:product id="edge820"/>
+            <iq:product id="epix"/>
+            <iq:product id="fenix3"/>
+            <iq:product id="fenix3_hr"/>
+            <iq:product id="fenix5"/>
+            <iq:product id="fenix5plus"/>
+            <iq:product id="fenix5s"/>
+            <iq:product id="fenix5x"/>
+            <iq:product id="fenixchronos"/>
+            <iq:product id="fr235"/>
+            <iq:product id="fr630"/>
+            <iq:product id="fr645"/>
+            <iq:product id="fr645m"/>
+            <iq:product id="fr735xt"/>
+            <iq:product id="fr920xt"/>
+            <iq:product id="fr935"/>
             <iq:product id="oregon7xx"/>
             <iq:product id="rino7xx"/>
+            <iq:product id="vivoactive"/>
+            <iq:product id="vivoactive3"/>
+            <iq:product id="vivoactive3m"/>
+            <iq:product id="vivoactive_hr"/>
         </iq:products>
 
         <iq:permissions>
