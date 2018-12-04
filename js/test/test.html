@@ -80,6 +80,30 @@
   </script>
 
   <script type="text/javascript">
+    QUnit.test('MaxCodeLength', function(assert) {
+      // Check that we do not return a code longer than is valid.
+      var code = OpenLocationCode.encode(51.3701125, -10.202665625, 1000000);
+      assert.strictEqual(
+          code.length, 
+          16, 
+          "Encoded code should have length of MAX_DIGIT_COUNT + 1 for the plus symbol.");
+      assert.strictEqual(OpenLocationCode.isValid(code), true, "Code should be valid.");
+      // Extend the code with a valid character and make sure it is still valid.
+      var tooLongCode = code + "W";
+      assert.strictEqual(
+          OpenLocationCode.isValid(tooLongCode), 
+          true, 
+          "Too long code with all valid characters should be valid.");
+      // Extend the code with an invalid character and make sure it is invalid.
+      tooLongCode = code + "U";
+      assert.strictEqual(
+          OpenLocationCode.isValid(tooLongCode), 
+          false, 
+          "Too long code with invalid character should be invalid.");
+    });
+  </script>
+
+  <script type="text/javascript">
     QUnit.test('Validity', function(assert) {
       var done = assert.async();
 

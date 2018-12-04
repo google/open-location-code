@@ -108,6 +108,9 @@
   // The maximum value for longitude in degrees.
   var LONGITUDE_MAX_ = 180;
 
+  // The max number of digits to process in a plus code.
+  var MAX_DIGIT_COUNT = 15;
+
   // Maximum code length using lat/lng pair encoding. The area of such a
   // code is approximately 13x13 meters (at the equator), and should be suitable
   // for identifying buildings. This excludes prefix and separator characters.
@@ -280,7 +283,7 @@
     if (typeof codeLength == 'undefined') {
       codeLength = OpenLocationCode.CODE_PRECISION_NORMAL;
     } else {
-      codeLength = Number(codeLength);
+      codeLength = Math.min(MAX_DIGIT_COUNT, Number(codeLength));
     }
     if (isNaN(latitude) || isNaN(longitude) || isNaN(codeLength)) {
       throw ('ValueError: Parameters are not numbers');
@@ -335,7 +338,7 @@
     if (code.length <= PAIR_CODE_LENGTH_) {
       return codeArea;
     }
-    var gridArea = decodeGrid(code.substring(PAIR_CODE_LENGTH_));
+    var gridArea = decodeGrid(code.substring(PAIR_CODE_LENGTH_, MAX_DIGIT_COUNT));
     return CodeArea(
       codeArea.latitudeLo + gridArea.latitudeLo,
       codeArea.longitudeLo + gridArea.longitudeLo,
