@@ -90,6 +90,9 @@ Private Const LATITUDE_MAX_ As Double = 90
 ' The maximum value for longitude in degrees.
 Private Const LONGITUDE_MAX_ As Double = 180
 
+' The max number of digits to process in a plus code.
+Private Const MAX_DIGIT_COUNT_ As Integer = 15
+
 ' Maximum code length using lat/lng pair encoding. The area of such a
 ' code is approximately 13x13 meters (at the equator), and should be suitable
 ' for identifying buildings. This excludes prefix and separator characters.
@@ -211,6 +214,9 @@ Public Function OLCEncode(ByVal latitude As Double, ByVal longitude As Double, O
   If codeLength < 2 Then
     Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
   End If
+  If codeLength > MAX_DIGIT_COUNT_ Then
+    codeLength = MAX_DIGIT_COUNT_
+  End If
   Dim lat, lng As Double
   Dim latCode, lngCode, gridCode As String
   Dim code As String
@@ -264,7 +270,7 @@ Public Function OLCDecode(ByVal code As String) As OLCArea
   ' If there is a grid refinement component, decode that.
   If Len(c) > PAIR_CODE_LENGTH_ Then
     Dim gridArea As OLCArea
-    gridArea = decodeGrid(Mid(c, PAIR_CODE_LENGTH_ + 1))
+gridArea = decodeGrid(Mid(c, PAIR_CODE_LENGTH_ + 2, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_))
     codeArea.LatHi = codeArea.LatLo + gridArea.LatHi
     codeArea.LngHi = codeArea.LngLo + gridArea.LngHi
     codeArea.LatLo = codeArea.LatLo + gridArea.LatLo
