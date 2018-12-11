@@ -385,11 +385,11 @@ shown. Repeat as many times as necessary.
 +
 [options="autowidth"]
 |=======================
-|R|V|W|X
-|J|M|P|Q
-|C|F|G|H
-|6|7|8|9
-|2|3|4|5
+|M|R|W|X
+|F|H|P|V
+|7|8|G|Q
+|4|5|9|J
+|2|3|6|C
 |=======================
 +
 
