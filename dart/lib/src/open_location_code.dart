@@ -87,7 +87,7 @@ bool isValid(String code) {
   if (separatorIndex == -1 ||
       separatorIndex != code.lastIndexOf(separator) ||
       separatorIndex > separatorPosition ||
-      separatorIndex % 2 == 1) {
+      separatorIndex.isOdd) {
     return false;
   }
 
@@ -103,12 +103,12 @@ bool isValid(String code) {
     if (padMatch.length != 1) {
       return false;
     }
-    var match = padMatch[0].group(0);
-    if (match.length % 2 == 1 || match.length > separatorPosition - 2) {
+    var matchLength = padMatch.first.group(0).length;
+    if (matchLength.isOdd || matchLength > separatorPosition - 2) {
       return false;
     }
     // If the code is long enough to end with a separator, make sure it does.
-    if (code[code.length - 1] != separator) {
+    if (!code.endsWith(separator)) {
       return false;
     }
   }
@@ -219,7 +219,7 @@ bool isFull(String code) {
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
-  if (codeLength < 2 || (codeLength < pairCodeLength && codeLength % 2 == 1)) {
+  if (codeLength < 2 || (codeLength < pairCodeLength && codeLength.isOdd)) {
     throw ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   // Ensure that latitude and longitude are valid.
