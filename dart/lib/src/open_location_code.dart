@@ -18,6 +18,8 @@ library open_location_code.src.open_location_code;
 
 import 'dart:math';
 
+import 'utils.dart';
+
 /// A separator used to break the code into two parts to aid memorability.
 const separator = '+'; // 43 Ascii
 
@@ -93,7 +95,7 @@ bool isValid(String code) {
 
   // We can have an even number of padding characters before the separator,
   // but then it must be the final character.
-  if (code.indexOf(padding) > -1) {
+  if (indexOfMatch(code, padding)) {
     // Not allowed to start with them!
     if (code.indexOf(padding) == 0) {
       return false;
@@ -162,7 +164,7 @@ bool isShort(String code) {
     return false;
   }
   // If there are less characters than expected before the SEPARATOR.
-  if (code.indexOf(separator) >= 0 &&
+  if (indexOfMatch(code, separator) &&
       code.indexOf(separator) < separatorPosition) {
     return true;
   }
@@ -378,7 +380,7 @@ String shorten(String code, num latitude, num longitude) {
   if (!isFull(code)) {
     throw ArgumentError('Passed code is not valid and full: $code');
   }
-  if (code.indexOf(padding) != -1) {
+  if (indexOfMatch(code, padding)) {
     throw ArgumentError('Cannot shorten padded codes: $code');
   }
   code = code.toUpperCase();
