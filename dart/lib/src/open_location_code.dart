@@ -219,8 +219,7 @@ bool isFull(String code) {
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength: pairCodeLength}) {
-  if (codeLength < 2 ||
-      (codeLength < pairCodeLength && codeLength % 2 == 1)) {
+  if (codeLength < 2 || (codeLength < pairCodeLength && codeLength % 2 == 1)) {
     throw new ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   // Ensure that latitude and longitude are valid.
@@ -327,9 +326,9 @@ String recoverNearest(
   var halfResolution = resolution / 2.0;
 
   // Use the reference location to pad the supplied short code and decode it.
-  var codeArea = decode(
-      encode(referenceLatitude, referenceLongitude)
-          .substring(0, paddingLength) + shortCode);
+  var codeArea = decode(encode(referenceLatitude, referenceLongitude)
+          .substring(0, paddingLength) +
+      shortCode);
   var centerLatitude = codeArea.center.latitude;
   var centerLongitude = codeArea.center.longitude;
 
@@ -342,7 +341,7 @@ String recoverNearest(
     // it's too far, and the best match will be one cell south.
     centerLatitude -= resolution;
   } else if (referenceLatitude - halfResolution > centerLatitude &&
-             centerLatitude + resolution <= latitudeMax) {
+      centerLatitude + resolution <= latitudeMax) {
     // If the proposed code is more than half a cell south of the reference location,
     // it's too far, and the best match will be one cell north.
     centerLatitude += resolution;
@@ -594,7 +593,8 @@ class CodeArea {
         east = east,
         center = new LatLng((south + north) / 2, (west + east) / 2);
 
-  @override String toString() =>
+  @override
+  String toString() =>
       'CodeArea(south:$south, west:$west, north:$north, , east:$east, codelen: $codeLength)';
 }
 
@@ -603,5 +603,6 @@ class CodeArea {
 class LatLng {
   final num latitude, longitude;
   LatLng(this.latitude, this.longitude);
-  @override String toString() => 'LatLng($latitude, $longitude)';
+  @override
+  String toString() => 'LatLng($latitude, $longitude)';
 }
