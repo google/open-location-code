@@ -228,7 +228,7 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   // Latitude 90 needs to be adjusted to be just less, so the returned code
   // can also be decoded.
   if (latitude == 90) {
-    latitude = latitude - computeLatitudePrecision(codeLength).toDouble();
+    latitude -= computeLatitudePrecision(codeLength).toDouble();
   }
   var code = encodePairs(latitude, longitude, min(codeLength, pairCodeLength));
   // If the requested length indicates we want grid refined codes.
@@ -446,10 +446,10 @@ String encodePairs(num latitude, num longitude, int codeLength) {
   }
   // If necessary, Add padding.
   if (code.length < separatorPosition) {
-    code = code + (padding * (separatorPosition - code.length));
+    code += (padding * (separatorPosition - code.length));
   }
   if (code.length == separatorPosition) {
-    code = code + separator;
+    code += separator;
   }
   return code;
 }
@@ -474,8 +474,8 @@ String encodeGrid(num latitude, num longitude, int codeLength) {
   latitude += latitudeMax;
   longitude += longitudeMax;
   // To avoid problems with floating point, get rid of the degrees.
-  latitude = latitude % 1.0;
-  longitude = longitude % 1.0;
+  latitude %= 1.0;
+  longitude %= 1.0;
   var adjustedLatitude = latitude % latPlaceValue;
   var adjustedLongitude = longitude % lngPlaceValue;
   for (var i = 0; i < codeLength; i++) {
