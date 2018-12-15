@@ -99,7 +99,7 @@ bool isValid(String code) {
       return false;
     }
     // There can only be one group and it must have even length.
-    var padMatch = new RegExp('($padding+)').allMatches(code).toList();
+    var padMatch = RegExp('($padding+)').allMatches(code).toList();
     if (padMatch.length != 1) {
       return false;
     }
@@ -218,9 +218,9 @@ bool isFull(String code) {
 /// to the range -180 to 180.
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
-String encode(num latitude, num longitude, {int codeLength: pairCodeLength}) {
+String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   if (codeLength < 2 || (codeLength < pairCodeLength && codeLength % 2 == 1)) {
-    throw new ArgumentError('Invalid Open Location Code length: $codeLength');
+    throw ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   // Ensure that latitude and longitude are valid.
   latitude = clipLatitude(latitude);
@@ -244,14 +244,14 @@ String encode(num latitude, num longitude, {int codeLength: pairCodeLength}) {
 /// box - the lower left, center and upper right.
 CodeArea decode(String code) {
   if (!isFull(code)) {
-    throw new ArgumentError(
+    throw ArgumentError(
         'Passed Open Location Code is not a valid full code: $code');
   }
   // Strip out separator character (we've already established the code is
   // valid so the maximum is one), padding characters and convert to upper
   // case.
   code = code.replaceAll(separator, '');
-  code = code.replaceAll(new RegExp('$padding+'), '');
+  code = code.replaceAll(RegExp('$padding+'), '');
   code = code.toUpperCase();
   // Decode the lat/lng pair component.
   var codeArea =
@@ -261,7 +261,7 @@ CodeArea decode(String code) {
     return codeArea;
   }
   var gridArea = decodeGrid(code.substring(pairCodeLength));
-  return new CodeArea(
+  return CodeArea(
       codeArea.south + gridArea.south,
       codeArea.west + gridArea.west,
       codeArea.south + gridArea.north,
@@ -309,7 +309,7 @@ String recoverNearest(
     if (isFull(shortCode)) {
       return shortCode;
     } else {
-      throw new ArgumentError('Passed short code is not valid: $shortCode');
+      throw ArgumentError('Passed short code is not valid: $shortCode');
     }
   }
   // Ensure that latitude and longitude are valid.
@@ -376,15 +376,15 @@ String recoverNearest(
 /// close enough, or the .
 String shorten(String code, num latitude, num longitude) {
   if (!isFull(code)) {
-    throw new ArgumentError('Passed code is not valid and full: $code');
+    throw ArgumentError('Passed code is not valid and full: $code');
   }
   if (code.indexOf(padding) != -1) {
-    throw new ArgumentError('Cannot shorten padded codes: $code');
+    throw ArgumentError('Cannot shorten padded codes: $code');
   }
   code = code.toUpperCase();
   var codeArea = decode(code);
   if (codeArea.codeLength < minTrimmableCodeLen) {
-    throw new RangeError('Code length must be at least $minTrimmableCodeLen');
+    throw RangeError('Code length must be at least $minTrimmableCodeLen');
   }
   // Ensure that latitude and longitude are valid.
   latitude = clipLatitude(latitude);
@@ -506,7 +506,7 @@ CodeArea decodePairs(String code) {
   var latitude = decodePairsSequence(code, 0);
   var longitude = decodePairsSequence(code, 1);
   // Correct the values and set them into the CodeArea object.
-  return new CodeArea(latitude[0] - latitudeMax, longitude[0] - longitudeMax,
+  return CodeArea(latitude[0] - latitudeMax, longitude[0] - longitudeMax,
       latitude[1] - latitudeMax, longitude[1] - longitudeMax, code.length);
 }
 
@@ -562,7 +562,7 @@ CodeArea decodeGrid(String code) {
     west += col * lngPlaceValue;
     i += 1;
   }
-  return new CodeArea(
+  return CodeArea(
       south, west, south + latPlaceValue, west + lngPlaceValue, code.length);
 }
 
@@ -591,7 +591,7 @@ class CodeArea {
         west = west,
         north = north,
         east = east,
-        center = new LatLng((south + north) / 2, (west + east) / 2);
+        center = LatLng((south + north) / 2, (west + east) / 2);
 
   @override
   String toString() =>
