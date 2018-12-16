@@ -6,14 +6,11 @@ LIB_C_FILES = \
 	olc.c  \
 
 C_FLAGS += -Wall
-# C_FLAGS += -Wextra
 C_FLAGS += -Wno-comment
 
 LD_FLAGS += -lm
 
 ALL_FLAGS += -std=c99
-# ALL_FLAGS += -g
-# ALL_FLAGS += -pg
 ALL_FLAGS += -O
 
 # everything below here should be taken care of automatically

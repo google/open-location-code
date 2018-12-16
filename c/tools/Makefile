@@ -1,11 +1,10 @@
 all: lug
 
 C_FLAGS += -Wall
-# C_FLAGS += -Wextra
 C_FLAGS += -Wno-comment
 
 ALL_FLAGS += -std=c99
-# ALL_FLAGS += -g
+ALL_FLAGS += -O
 
 %.o : %.c
 	$(CC) -c $(ALL_FLAGS) $(C_FLAGS) $(CPP_FLAGS) -o $@ $<

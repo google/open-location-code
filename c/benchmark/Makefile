@@ -11,22 +11,18 @@ LD_FLAGS += -lm
 C_FLAGS += -Wall
 C_FLAGS += -Wno-comment
 C_FLAGS += -I../../c
-# C_FLAGS += -Wextra
-# C_FLAGS += -DOLC_CHECK_RESULTS
 
 C_ALL_FLAGS += -std=c99
-# C_ALL_FLAGS += -g
+C_ALL_FLAGS += -O
 
 # C++ compilation
 CC_FLAGS += -Wall
 CC_FLAGS += -Wno-comment
 CC_FLAGS += -I../../cpp
-# CC_FLAGS += -Wextra
-# CC_FLAGS += -DOLC_CHECK_RESULTS
 
 CC_ALL_FLAGS += -std=c++11
 CC_ALL_FLAGS += -pthread
-# CC_ALL_FLAGS += -g
+CC_ALL_FLAGS += -O
 
 # everything below here should be taken care of automatically
 # no need to edit these lines, except to add new binary targets
