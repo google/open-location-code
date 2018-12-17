@@ -120,13 +120,9 @@ bool isValid(String code) {
     return false;
   }
 
-  // Check code contains only valid characters.
-  for (var ch in code.codeUnits) {
-    if (ch > _decode.length || _decode[ch] < -1) {
-      return false;
-    }
-  }
-  return true;
+  var filterCallback = (ch) => ch > _decode.length || _decode[ch] < -1;
+
+  return null == code.codeUnits.firstWhere(filterCallback, orElse: () => null);
 }
 
 num clipLatitude(num latitude) => latitude.clamp(-90.0, 90.0);
