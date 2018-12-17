@@ -597,7 +597,7 @@ class CodeArea {
 
   @override
   String toString() =>
-      'CodeArea(south:$south, west:$west, north:$north, , east:$east, codelen: $codeLength)';
+      'CodeArea(south:$south, west:$west, north:$north, east:$east, codelen: $codeLength)';
 }
 
 /// Coordinates of a point identified by its [latitude] and [longitude] in
