@@ -39,6 +39,8 @@ const latitudeMax = 90;
 /// The maximum value for longitude in degrees.
 const longitudeMax = 180;
 
+const maxDigitCount = 15;
+
 /// Maximum code length using lat/lng pair encoding. The area of such a
 /// code is approximately 13x13 meters (at the equator), and should be suitable
 /// for identifying buildings. This excludes prefix and separator characters.
@@ -221,6 +223,7 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   if (codeLength < 2 || (codeLength < pairCodeLength && codeLength.isOdd)) {
     throw ArgumentError('Invalid Open Location Code length: $codeLength');
   }
+  codeLength = min(maxDigitCount, codeLength);
   // Ensure that latitude and longitude are valid.
   latitude = clipLatitude(latitude);
   longitude = normalizeLongitude(longitude);
@@ -259,7 +262,9 @@ CodeArea decode(String code) {
   if (code.length <= pairCodeLength) {
     return codeArea;
   }
-  var gridArea = decodeGrid(code.substring(pairCodeLength));
+  var _maxDigitCount =
+      code.length < maxDigitCount ? code.length : maxDigitCount;
+  var gridArea = decodeGrid(code.substring(pairCodeLength, _maxDigitCount));
   return CodeArea(
       codeArea.south + gridArea.south,
       codeArea.west + gridArea.west,

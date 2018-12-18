@@ -41,4 +41,19 @@ main() {
   test('Check encode decode', () {
     csvLinesFromFile('encodingTests.csv').forEach(checkEncodeDecode);
   });
+
+  test('MaxCodeLength', () {
+    // Check that we do not return a code longer than is valid.
+    var code = olc.encode(51.3701125, -10.202665625, codeLength: 1000000);
+    expect(code.length, 16);
+    expect(olc.isValid(code), true);
+
+    // Extend the code with a valid character and make sure it is still valid.
+    var tooLongCode = code + 'W';
+    expect(olc.isValid(tooLongCode), true);
+
+    // Extend the code with an invalid character and make sure it is invalid.
+    tooLongCode = code + 'U';
+    expect(olc.isValid(tooLongCode), false);
+  });
 }
