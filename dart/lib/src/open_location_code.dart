@@ -120,9 +120,9 @@ bool isValid(String code) {
     return false;
   }
 
-  var filterCallback = (ch) => ch > _decode.length || _decode[ch] < -1;
+  var filterCallback = (ch) => !(ch > _decode.length || _decode[ch] < -1);
 
-  return null == code.codeUnits.firstWhere(filterCallback, orElse: () => null);
+  return code.codeUnits.every(filterCallback);
 }
 
 num clipLatitude(num latitude) => latitude.clamp(-90.0, 90.0);
