@@ -124,8 +124,8 @@ bool isValid(String code) {
     return false;
   }
 
+  // Check code contains only valid characters.
   var filterCallback = (ch) => !(ch > _decode.length || _decode[ch] < -1);
-
   return code.codeUnits.every(filterCallback);
 }
 
@@ -263,9 +263,8 @@ CodeArea decode(String code) {
   if (code.length <= pairCodeLength) {
     return codeArea;
   }
-  var _maxDigitCount =
-      code.length < maxDigitCount ? code.length : maxDigitCount;
-  var gridArea = decodeGrid(code.substring(pairCodeLength, _maxDigitCount));
+  var gridArea = decodeGrid(
+      code.substring(pairCodeLength, min(code.length, maxDigitCount)));
   return CodeArea(
       codeArea.south + gridArea.south,
       codeArea.west + gridArea.west,
