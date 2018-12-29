@@ -226,9 +226,9 @@ cell is identified by a single digit. The digit for the cell
 containing the desired location is added to the code.
 
 Using a single grid refinement step, we have an 11 digit code that
-represents a 1/32000° by 1/40000° area (roughly 3.4 by 2.7 meters).
+represents a 1/32000° by 1/40000° area (roughly 3.4 by 2.7 meters at the equator).
 
-.A 10 digit code divided into its grid. Each small square is approximately 2.6m x 2.8m
+.A 10 digit code divided into its grid. In this location, each small square is approximately 2.6m x 2.8m
 image::images/olc_11_grid.png[width=406,height=272,align="center"]
 
 The first approach (where a pair of digits is added for each step)
