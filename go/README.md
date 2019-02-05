@@ -1,3 +1,5 @@
+[![GoDoc](https://godoc.org/github.com/google/open-location-code/go?status.svg)](http://godoc.org/github.com/google/open-location-code/go)
+
 # Install
 
 	go get github.com/google/open-location-code/go
