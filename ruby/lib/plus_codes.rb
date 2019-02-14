@@ -14,6 +14,9 @@ module PlusCodes
   # for identifying buildings. This excludes prefix and separator characters.
   PAIR_CODE_LENGTH = 10
 
+  # Maximum number of digits to process in a plus code.
+  MAX_CODE_LENGTH = 15
+
   # The character used to pad a code
   PADDING = '0'.freeze
 
