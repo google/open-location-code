@@ -45,6 +45,9 @@ module PlusCodes
       raise ArgumentError,
       "Invalid Open Location Code(Plus+Codes) length: #{code_length}" if invalid_length?(code_length)
 
+      if code_length > MAX_CODE_LENGTH
+        code_length = MAX_CODE_LENGTH
+      end
       latitude = clip_latitude(latitude)
       longitude = normalize_longitude(longitude)
       latitude -= precision_by_length(code_length) if latitude == 90
@@ -82,7 +85,7 @@ module PlusCodes
       lng_resolution = 400.to_r
 
       digit = 0
-      while digit < code.length
+      while digit < [code.length, MAX_CODE_LENGTH].min
         if digit < PAIR_CODE_LENGTH
           lat_resolution /= 20
           lng_resolution /= 20
