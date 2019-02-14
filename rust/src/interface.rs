@@ -4,7 +4,7 @@ use codearea::CodeArea;
 
 use consts::{
     SEPARATOR, SEPARATOR_POSITION, PADDING_CHAR, PADDING_CHAR_STR, CODE_ALPHABET, ENCODING_BASE,
-    LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH, PAIR_RESOLUTIONS, GRID_COLUMNS, GRID_ROWS,
+    LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH, MAX_CODE_LENGTH, PAIR_RESOLUTIONS, GRID_COLUMNS, GRID_ROWS,
     MIN_TRIMMABLE_CODE_LEN,
 };
 
@@ -103,18 +103,23 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     let mut lat = clip_latitude(pt.lat());
     let mut lng = normalize_longitude(pt.lng());
 
+    let mut trimmed_code_length = code_length;
+    if trimmed_code_length > MAX_CODE_LENGTH {
+        trimmed_code_length = MAX_CODE_LENGTH;
+    }
+
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
     if lat > LATITUDE_MAX || (LATITUDE_MAX - lat) < 1e-10f64 {
-        lat -= compute_latitude_precision(code_length);
+        lat -= compute_latitude_precision(trimmed_code_length);
     }
 
     lat += LATITUDE_MAX;
     lng += LONGITUDE_MAX;
 
-    let mut code = String::with_capacity(code_length + 1);
+    let mut code = String::with_capacity(trimmed_code_length + 1);
     let mut digit = 0;
-    while digit < code_length {
+    while digit < trimmed_code_length {
         narrow_region(digit, &mut lat, &mut lng);
 
         let lat_digit = lat as usize;
@@ -169,7 +174,7 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
                 lng_res /= ENCODING_BASE;
                 lng += lng_res * code_value(chr) as f64;
             }
-        } else {
+        } else if idx < MAX_CODE_LENGTH {
             lat_res /= GRID_ROWS;
             lng_res /= GRID_COLUMNS;
             lat += lat_res * (code_value(chr) as f64 / GRID_COLUMNS).trunc();
