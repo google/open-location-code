@@ -30,6 +30,9 @@ pub const LONGITUDE_MAX: f64 = 180f64;
 // for identifying buildings. This excludes prefix and separator characters.
 pub const PAIR_CODE_LENGTH: usize = 10;
 
+// Maximum number of digits to process for plus codes.
+pub const MAX_CODE_LENGTH: usize = 15;
+
 // The resolution values in degrees for each position in the lat/lng pair
 // encoding. These give the place value of each position, and therefore the
 // dimensions of the resulting area.
