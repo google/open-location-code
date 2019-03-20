@@ -94,6 +94,8 @@ function getLocation() {
     document.getElementById('https_retry').href = url.href;
     document.getElementById('fetching').classList.add('hide');
     document.getElementById('not_https_error').classList.remove('hide');
+    // Change window.location.protocol - this should trigger a reload of the page.
+    window.location.protocol = 'https:';
     return;
   }
   if (navigator.geolocation) {
