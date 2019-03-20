@@ -64,8 +64,8 @@ function receivePosition(position) {
   document.getElementById('fetching').classList.add('hide');
   document.getElementById('location').classList.remove('hide');
   if (typeof position.coords.accuracy != 'undefined') {
-    var rounded = Math.round(position.coords.accuracy);
-    document.getElementById('accuracy_meters').textContent = rounded;
+    document.getElementById('accuracy_meters').textContent =
+        position.coords.accuracy;
     // Show the accuracy message.
     document.getElementById('accuracy_not_available').classList.add('hide');
     document.getElementById('accuracy').classList.remove('hide');
@@ -87,6 +87,15 @@ function positionError(err) {
 
 // Request the device location, and display it to the user as a plus code.
 function getLocation() {
+  // Check if we are loaded over https. If not, show a message.
+  if (window.location.protocol != 'https:') {
+    var url = new URL(window.location);
+    url.protocol = 'https:';
+    document.getElementById('https_retry').href = url.href;
+    document.getElementById('fetching').classList.add('hide');
+    document.getElementById('not_https_error').classList.remove('hide');
+    return;
+  }
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
         receivePosition, positionError, locationOptions);
