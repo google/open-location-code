@@ -64,8 +64,8 @@ function receivePosition(position) {
   document.getElementById('fetching').classList.add('hide');
   document.getElementById('location').classList.remove('hide');
   if (typeof position.coords.accuracy != 'undefined') {
-    document.getElementById('accuracy_meters').textContent =
-        position.coords.accuracy;
+    var rounded = Math.round(position.coords.accuracy);
+    document.getElementById('accuracy_meters').textContent = rounded;
     // Show the accuracy message.
     document.getElementById('accuracy_not_available').classList.add('hide');
     document.getElementById('accuracy').classList.remove('hide');
