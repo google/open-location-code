@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Location</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,700" rel="stylesheet">
+    <style type="text/css">
+      html, body {
+        font-family: Open Sans,-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;
+        font-weight: 400;
+        margin: 0;
+        padding: 0;
+      }
+      .hide {
+        display: none;
+      }
+    </style>
+    <script type="text/javascript" src="location.js"></script>
+  </head>
+  <body>
+    <div id="message">
+      <div id="fetching">Fetching your location...<br/>(This could take up to 30 seconds)</div>
+      <div id="permission_error" class="hide">
+        Reload the page, and remember to grant permission to access your location.
+        You may need to clear the settings for this page.
+      </div>
+      <div id="not_supported" class="hide">
+        Location is not supported or not available.
+      </div>
+      <div id="location" class="hide">
+        <div id="code_locality" class="hide">something</div>
+        <div id="code_only">something</div>
+        <div id="accuracy_not_available">(Accuracy not available)</div>
+        <div id="accuracy" class="hide">
+          Location accuracy is +/- <span id="accuracy_meters">?</span> meters
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      // getLocation();
+    </script>
+  </body>
+</html>
