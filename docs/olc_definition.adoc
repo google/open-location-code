@@ -428,9 +428,9 @@ code with at least eight digits may be removed if both the latitude and
 longitude of the reference location are within +/- 0.0125° of the latitude
 and longitude of the Open Location Code center.
 
-. Only Open Location Codes with at least eight digits may be shortened by
-omitting leading digits. Short codes must always include the "+"
-character.
+. Only Open Location Codes with at least eight digits and without padding
+may be shortened by omitting leading digits. Short codes must always include
+the "+" character and must never include padding "0" characters.
 
 . When recovering a full Open Location Code from a short Open Location Code
 the number of digits to recover can be computed from the position of the "+"
