@@ -215,6 +215,7 @@ module PlusCodes
 
     def valid_padding?(code)
       if code.include?(PADDING)
+        return false if code.index(SEPARATOR) < SEPARATOR_POSITION
         return false if code.start_with?(PADDING)
         return false if code[-2..-1] != PADDING + SEPARATOR
 
