@@ -100,6 +100,10 @@ bool isValid(String code) {
   // We can have an even number of padding characters before the separator,
   // but then it must be the final character.
   if (_matchesPattern(code, padding)) {
+    // Short codes cannot have padding
+    if (separatorIndex < separatorPosition) {
+      return false;
+    }
     // Not allowed to start with them!
     if (code.indexOf(padding) == 0) {
       return false;

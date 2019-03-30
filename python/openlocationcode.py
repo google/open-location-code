@@ -127,6 +127,9 @@ def isValid(code):
     # but then it must be the final character.
     pad = code.find(PADDING_CHARACTER_)
     if pad != -1:
+        # Short codes cannot have padding
+        if sep < SEPARATOR_POSITION_:
+            return False
         # Not allowed to start with them!
         if pad == 0:
             return False

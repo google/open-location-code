@@ -373,6 +373,10 @@ bool IsValid(const std::string &code) {
   // but then it must be the final character.
   std::size_t paddingStart = code.find_first_of(internal::kPaddingCharacter);
   if (paddingStart != std::string::npos) {
+    // Short codes cannot have padding
+    if (separatorPos < internal::kSeparatorPosition) {
+      return false;
+    }
     // The first padding character needs to be in an odd position.
     if (paddingStart == 0 || paddingStart % 2) {
       return false;

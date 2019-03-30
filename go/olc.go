@@ -131,6 +131,9 @@ func Check(code string) error {
 		return fmt.Errorf("only one char (%q) after separator", code[firstSep+1:])
 	}
 	if firstPad != -1 {
+		if firstSep < sepPos {
+			return errors.New("short codes cannot have padding")
+		}
 		if len(code)-firstPad-1%2 == 1 {
 			return errors.New("odd number of padding chars")
 		}
