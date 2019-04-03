@@ -95,20 +95,20 @@ func RecoverNearest(code string, lat, lng float64) (string, error) {
 	// than half the resolution, we need to move it south or north but keep it
 	// within -90 to 90 degrees.
 	centerLat, centerLng := area.Center()
-	if lat + halfRes < centerLat && centerLat - resolution >= -latMax {
+	if lat+halfRes < centerLat && centerLat-resolution >= -latMax {
 		// If the proposed code is more than half a cell north of the reference location,
 		// it's too far, and the best match will be one cell south.
 		centerLat -= resolution
-	} else if lat - halfRes > centerLat && centerLat + resolution <= latMax {
+	} else if lat-halfRes > centerLat && centerLat+resolution <= latMax {
 		// If the proposed code is more than half a cell south of the reference location,
 		// it's too far, and the best match will be one cell north.
 		centerLat += resolution
 	}
 
 	// How many degrees longitude is the code from the reference?
-	if lng + halfRes < centerLng {
+	if lng+halfRes < centerLng {
 		centerLng -= resolution
-	} else if lng - halfRes > centerLng {
+	} else if lng-halfRes > centerLng {
 		centerLng += resolution
 	}
 
