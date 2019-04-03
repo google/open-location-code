@@ -300,11 +300,11 @@ func BenchmarkEncode(b *testing.B) {
 	lat := make([]float64, b.N)
 	lng := make([]float64, b.N)
 	for i := 0; i < b.N; i++ {
-		lat[i] = r.Float64()*180-90
-		lng[i] = r.Float64()*360-180
+		lat[i] = r.Float64()*180 - 90
+		lng[i] = r.Float64()*360 - 180
 	}
 	// Reset the timer and run the benchmark.
-  b.ResetTimer()
+	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		olc.Encode(lat[i], lng[i], 16)
@@ -319,7 +319,7 @@ func BenchmarkDecode(b *testing.B) {
 		codes[i] = olc.Encode(r.Float64()*180-90, r.Float64()*360-180, 16)
 	}
 	// Reset the timer and run the benchmark.
-  b.ResetTimer()
+	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		olc.Decode(codes[i])
