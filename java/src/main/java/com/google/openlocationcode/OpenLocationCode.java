@@ -507,22 +507,20 @@ public final class OpenLocationCode {
     if (separatorPosition != code.lastIndexOf(SEPARATOR)) {
       return false;
     }
-
-    if (separatorPosition % 2 != 0) {
+    // There must be an even number of at most 8 characters before the separator.
+    if (separatorPosition % 2 != 0 || separatorPosition > SEPARATOR_POSITION) {
       return false;
     }
 
     // Check first two characters: only some values from the alphabet are permitted.
-    if (separatorPosition == 8) {
+    if (separatorPosition == SEPARATOR_POSITION) {
       // First latitude character can only have first 9 values.
-      Integer index0 = CODE_ALPHABET.indexOf(code.charAt(0));
-      if (index0 == null || index0 > 8) {
+      if (CODE_ALPHABET.indexOf(code.charAt(0)) > 8) {
         return false;
       }
 
       // First longitude character can only have first 18 values.
-      Integer index1 = CODE_ALPHABET.indexOf(code.charAt(1));
-      if (index1 == null || index1 > 17) {
+      if (CODE_ALPHABET.indexOf(code.charAt(1)) > 17) {
         return false;
       }
     }
