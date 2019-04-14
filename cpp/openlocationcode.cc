@@ -209,31 +209,28 @@ CodeArea Decode(const std::string &code) {
         clean_code.find(internal::kPaddingCharacter));
   }
   double resolution_degrees = internal::kEncodingBase;
-  double latitude = 0.0;
-  double longitude = 0.0;
-  double latitude_high = 0.0;
-  double longitude_high = 0.0;
   // Up to the first 10 characters are encoded in pairs. Subsequent characters
   // represent grid squares.
+  double coords[2] = {0.0, 0.0};
+  double highs[2];
   for (size_t i = 0; i < std::min(clean_code.size(), internal::kPairCodeLength);
-       i += 2, resolution_degrees /= internal::kEncodingBase) {
-    // The character at i represents latitude. Retrieve it and convert to
-    // degrees (positive range).
-    double value = get_alphabet_position(clean_code[i]);
-    value *= resolution_degrees;
-    latitude += value;
-    latitude_high = latitude + resolution_degrees;
-    // Checks if there are no more characters.
-    if (i == std::min(clean_code.size(), internal::kPairCodeLength)) {
-      break;
+       ++i) {
+    // Retrieve a digit, convert it to degrees and add it to a coordinate.
+    const int digit = get_alphabet_position(clean_code[i]);
+    if (digit < 0) {
+      return CodeArea::InvalidCodeArea();
     }
-    // The character at i + 1 represents longitude. Retrieve it and convert to
-    // degrees (positive range).
-    value = get_alphabet_position(clean_code[i + 1]);
-    value *= resolution_degrees;
-    longitude += value;
-    longitude_high = longitude + resolution_degrees;
+    const size_t j = i & 1;
+    coords[j] += static_cast<double>(digit) * resolution_degrees;
+    highs[j] = coords[j] + resolution_degrees;
+    if (j != 0) {
+      resolution_degrees /= internal::kEncodingBase;
+    }
   }
+  double latitude = coords[0];
+  double longitude = coords[1];
+  double latitude_high = highs[0];
+  double longitude_high = highs[1];
   if (clean_code.size() > internal::kPairCodeLength) {
     // Now do any grid square characters.
     // Adjust the resolution back a step because we need the resolution of the
@@ -246,9 +243,12 @@ CodeArea Decode(const std::string &code) {
     for (size_t i = internal::kPairCodeLength;
          i < std::min(internal::kMaximumDigitCount, clean_code.size()); i++) {
       // Get the value of the character at i and convert it to the degree value.
-      size_t value = get_alphabet_position(clean_code[i]);
-      size_t row = value / internal::kGridColumns;
-      size_t col = value % internal::kGridColumns;
+      const int digit = get_alphabet_position(clean_code[i]);
+      if (digit < 0) {
+        return CodeArea::InvalidCodeArea();
+      }
+      const size_t row = digit / internal::kGridColumns;
+      const size_t col = digit % internal::kGridColumns;
       // Lat and lng grid sizes shouldn't underflow due to maximum code length
       // enforcement, but a hypothetical underflow won't cause fatal errors
       // here.
@@ -256,9 +256,9 @@ CodeArea Decode(const std::string &code) {
       longitude_resolution /= internal::kGridColumns;
       latitude += row * latitude_resolution;
       longitude += col * longitude_resolution;
-      latitude_high = latitude + latitude_resolution;
-      longitude_high = longitude + longitude_resolution;
     }
+    latitude_high = latitude + latitude_resolution;
+    longitude_high = longitude + longitude_resolution;
   }
   return CodeArea(latitude - internal::kLatitudeMaxDegrees,
                   longitude - internal::kLongitudeMaxDegrees,
@@ -328,13 +328,15 @@ std::string RecoverNearest(const std::string &short_code,
   // within -90 to 90 degrees.
   double center_lat = code_rect.GetCenter().latitude;
   double center_lng = code_rect.GetCenter().longitude;
-  if (latitude + half_res < center_lat && center_lat - resolution > -internal::kLatitudeMaxDegrees) {
-    // If the proposed code is more than half a cell north of the reference location,
-    // it's too far, and the best match will be one cell south.
+  if (latitude + half_res < center_lat &&
+      center_lat - resolution > -internal::kLatitudeMaxDegrees) {
+    // If the proposed code is more than half a cell north of the reference
+    // location, it's too far, and the best match will be one cell south.
     center_lat -= resolution;
-  } else if (latitude - half_res > center_lat && center_lat + resolution < internal::kLatitudeMaxDegrees) {
-    // If the proposed code is more than half a cell south of the reference location,
-    // it's too far, and the best match will be one cell north.
+  } else if (latitude - half_res > center_lat &&
+             center_lat + resolution < internal::kLatitudeMaxDegrees) {
+    // If the proposed code is more than half a cell south of the reference
+    // location, it's too far, and the best match will be one cell north.
     center_lat += resolution;
   }
   // How many degrees longitude is the code from the reference?
