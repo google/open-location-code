@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package olc_test
+package olc
 
 import (
 	"bytes"
@@ -24,8 +24,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-
-	olc "github.com/google/open-location-code/go"
 )
 
 var (
@@ -101,7 +99,7 @@ func init() {
 
 func TestCheck(t *testing.T) {
 	for i, elt := range validity {
-		err := olc.Check(elt.code)
+		err := Check(elt.code)
 		got := err == nil
 		if got != elt.isValid {
 			t.Errorf("%d. %q validity is %t (err=%v), awaited %t.", i, elt.code, got, err, elt.isValid)
@@ -111,8 +109,8 @@ func TestCheck(t *testing.T) {
 
 func TestEncode(t *testing.T) {
 	for i, elt := range encoding {
-		n := len(olc.StripCode(elt.code))
-		code := olc.Encode(elt.lat, elt.lng, n)
+		n := len(StripCode(elt.code))
+		code := Encode(elt.lat, elt.lng, n)
 		want := elt.code
 		if len(want) > 16 {
 			want = want[:16]
@@ -132,12 +130,12 @@ func TestDecode(t *testing.T) {
 		}
 	}
 	for i, elt := range encoding {
-		area, err := olc.Decode(elt.code)
+		area, err := Decode(elt.code)
 		if err != nil {
 			t.Errorf("%d. %q: %v", i, elt.code, err)
 			continue
 		}
-		code := olc.Encode(elt.lat, elt.lng, area.Len)
+		code := Encode(elt.lat, elt.lng, area.Len)
 		want := elt.code
 		if len(want) > 16 {
 			want = want[:16]
@@ -158,7 +156,7 @@ func TestDecode(t *testing.T) {
 func TestShorten(t *testing.T) {
 	for i, elt := range shorten {
 		if elt.tType == "B" || elt.tType == "S" {
-			got, err := olc.Shorten(elt.code, elt.lat, elt.lng)
+			got, err := Shorten(elt.code, elt.lat, elt.lng)
 			if err != nil {
 				t.Errorf("%d. shorten %q: %v", i, elt.code, err)
 				t.FailNow()
@@ -170,7 +168,7 @@ func TestShorten(t *testing.T) {
 		}
 
 		if elt.tType == "B" || elt.tType == "R" {
-			got, err := olc.RecoverNearest(elt.short, elt.lat, elt.lng)
+			got, err := RecoverNearest(elt.short, elt.lat, elt.lng)
 			if err != nil {
 				t.Errorf("%d. nearest %q: %v", i, got, err)
 				t.FailNow()
@@ -224,13 +222,13 @@ func mustFloat(a []byte) float64 {
 func TestPrecision(t *testing.T) {
 	const c15 = "6GFRP39C+5HG4QWR"
 	const c16 = "6GFRP39C+5HG4QWRV"
-	want := olc.CodeArea{
+	want := CodeArea{
 		LatLo: -0.2820710399999935, LatHi: -0.2820709999999935,
 		LngLo: 36.07145996093752, LngHi: 36.07146008300783,
 		Len: 15,
 	}
 
-	a15, err := olc.Decode(c15)
+	a15, err := Decode(c15)
 	if err != nil {
 		t.Errorf("%q Decode: %v", c15, err)
 	}
@@ -238,7 +236,7 @@ func TestPrecision(t *testing.T) {
 		t.Errorf("got %v, wanted %v", a15, want)
 	}
 
-	a16, err := olc.Decode(c16)
+	a16, err := Decode(c16)
 	if err != nil {
 		t.Errorf("%q Decode: %v", c16, err)
 	}
@@ -278,17 +276,17 @@ func TestFuzzCrashers(t *testing.T) {
 			"5722X888X2975722X988" +
 			"X20",
 	} {
-		if err := olc.Check(code); err != nil {
+		if err := Check(code); err != nil {
 			t.Logf("%d. %q Check: %v", i, code, err)
 		}
-		area, err := olc.Decode(code)
+		area, err := Decode(code)
 		if err != nil {
 			t.Errorf("%d. %q Decode: %v", i, code, err)
 		}
-		if _, err = olc.Decode(olc.Encode(area.LatLo, area.LngLo, len(code))); err != nil {
+		if _, err = Decode(Encode(area.LatLo, area.LngLo, len(code))); err != nil {
 			t.Errorf("%d. Lo Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatLo, area.LngLo, len(code), err)
 		}
-		if _, err = olc.Decode(olc.Encode(area.LatHi, area.LngHi, len(code))); err != nil {
+		if _, err = Decode(Encode(area.LatHi, area.LngHi, len(code))); err != nil {
 			t.Errorf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
 		}
 	}
@@ -307,7 +305,7 @@ func BenchmarkEncode(b *testing.B) {
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		olc.Encode(lat[i], lng[i], 16)
+		Encode(lat[i], lng[i], 16)
 	}
 }
 
@@ -316,12 +314,12 @@ func BenchmarkDecode(b *testing.B) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	codes := make([]string, b.N)
 	for i := 0; i < b.N; i++ {
-		codes[i] = olc.Encode(r.Float64()*180-90, r.Float64()*360-180, 16)
+		codes[i] = Encode(r.Float64()*180-90, r.Float64()*360-180, 16)
 	}
 	// Reset the timer and run the benchmark.
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		olc.Decode(codes[i])
+		Decode(codes[i])
 	}
 }
