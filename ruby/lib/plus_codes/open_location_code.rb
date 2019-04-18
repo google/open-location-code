@@ -113,7 +113,7 @@ module PlusCodes
     # @param reference_longitude [Numeric] a reference longitude in degrees
     # @return [String] a plus+codes
     def recover_nearest(short_code, reference_latitude, reference_longitude)
-      return short_code if full?(short_code)
+      return short_code.upcase if full?(short_code)
       raise ArgumentError,
       "Open Location Code(Plus+Codes) is not valid: #{short_code}" unless short?(short_code)
 

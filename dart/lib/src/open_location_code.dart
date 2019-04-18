@@ -311,7 +311,7 @@ String recoverNearest(
     String shortCode, num referenceLatitude, num referenceLongitude) {
   if (!isShort(shortCode)) {
     if (isFull(shortCode)) {
-      return shortCode;
+      return shortCode.toUpperCase();
     } else {
       throw ArgumentError('Passed short code is not valid: $shortCode');
     }

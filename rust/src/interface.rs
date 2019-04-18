@@ -262,7 +262,7 @@ pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
 pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
     if !is_short(_code) {
         if is_full(_code) {
-            return Ok(_code.to_string());
+            return Ok(_code.to_string().to_uppercase());
         } else {
             return Err(format!("Passed short code is not valid: {}", _code));
         }
