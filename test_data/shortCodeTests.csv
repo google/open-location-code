@@ -31,3 +31,5 @@ CFX22222+22,89.6,0.0,2222+22,R
 2CXXXXXX+XX,-81.0,0.0,XXXXXX+XX,R
 # Recovered full codes should be the full code
 8FRCG2GG+GG,46.526,7.976,8FRCG2GG+GG,R
+# Recovered full codes should be the uppercased full code
+8FRCG2GG+GG,46.526,7.976,8frCG2GG+gG,R

@@ -64,10 +64,12 @@ func Shorten(code string, lat, lng float64) (string, error) {
 // Given a short Open Location Code with from four to eight digits missing,
 // this recovers the nearest matching full code to the specified location.
 func RecoverNearest(code string, lat, lng float64) (string, error) {
+	// Return uppercased code if a full code was passed.
+	if err := CheckFull(code); err == nil {
+		return strings.ToUpper(code), nil
+	}
+	// Return error if not a short code
 	if err := CheckShort(code); err != nil {
-		if err = CheckFull(code); err == nil {
-			return code, nil
-		}
 		return code, ErrNotShort
 	}
 	// Ensure that latitude and longitude are valid.

@@ -432,7 +432,7 @@ function recoverNearest(
     shortCode, referenceLatitude, referenceLongitude) {
   if (!isShort(shortCode)) {
     if (isFull(shortCode)) {
-      return shortCode;
+      return shortCode.toUpperCase();
     } else {
       throw 'ValueError: Passed short code is not valid: ' + shortCode;
     }
