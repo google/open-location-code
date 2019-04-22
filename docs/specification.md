@@ -108,6 +108,7 @@ Short codes are used relative to a reference location.
 They allow the code part to be shorter, easier to use and easier to remember.
 
 Short codes have at least two and a maximum of six digits removed from the beginning of the code.
+The resulting code must include the "+" character (the format separator).
 
 Codes that include padding characters must not be shortened.
 
