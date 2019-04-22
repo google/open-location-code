@@ -303,7 +303,9 @@ std::string Shorten(const std::string &code, const LatLng &reference_location) {
 std::string RecoverNearest(const std::string &short_code,
                            const LatLng &reference_location) {
   if (!IsShort(short_code)) {
-    return short_code;
+    std::string code = short_code;
+    std::transform(code.begin(), code.end(), code.begin(), ::toupper);
+    return code;
   }
   // Ensure that latitude and longitude are valid.
   double latitude =

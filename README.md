@@ -69,7 +69,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the wiki.
+Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
