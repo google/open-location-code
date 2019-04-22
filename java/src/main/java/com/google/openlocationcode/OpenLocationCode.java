@@ -540,6 +540,10 @@ public final class OpenLocationCode {
       }
       if (PADDING_CHARACTER == code.charAt(i)) {
         paddingStarted = true;
+        // Short codes cannot have padding
+        if (separatorPosition < SEPARATOR_POSITION) {
+          return false;
+        }
         // Padding can start on even character: 2, 4 or 6.
         if (i != 2 && i != 4 && i != 6) {
           return false;

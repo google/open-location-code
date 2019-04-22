@@ -337,6 +337,11 @@ static int analyse(const char* code, size_t size, CodeInfo* info)
     // We can have an even number of padding characters before the separator,
     // but then it must be the final character.
     if (info->pad_first > 0) {
+        // Short codes cannot have padding
+        if (info->sep_first < kSeparatorPosition) {
+            return 0;
+        }
+
         // The first padding character needs to be in an odd position.
         if (info->pad_first % 2) {
             return 0;
