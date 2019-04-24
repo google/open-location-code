@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "gulp-qunit": "^1.0.0",
-    "gulp-util": "^3.0.0",
     "gulp": "^3.8.9"
   }
 }
