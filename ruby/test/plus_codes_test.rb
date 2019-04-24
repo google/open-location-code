@@ -23,20 +23,26 @@ class PlusCodesTest < Test::Unit::TestCase
     end
   end
 
-  def test_encode_decode
-    read_csv_lines('encodingTests.csv').each do |line|
+  def test_decode
+    read_csv_lines('decoding.csv').each do |line|
       cols = line.split(',')
       code_area = @olc.decode(cols[0])
-      if cols[0].index('0')
-        code = @olc.encode(cols[1].to_f, cols[2].to_f, cols[0].index('0'))
-      else
-        code = @olc.encode(cols[1].to_f, cols[2].to_f, cols[0].length - 1)
+      assert_equal(cols[1].to_i, code_area.code_length, 'Also should be equal')
+      assert((code_area.south_latitude - cols[2].to_f).abs < 0.001, 'South')
+      assert((code_area.west_longitude - cols[3].to_f).abs < 0.001, 'West')
+      assert((code_area.north_latitude - cols[4].to_f).abs < 0.001, 'North')
+      assert((code_area.east_longitude - cols[5].to_f).abs < 0.001, 'East')
+    end
+  end
+
+  def test_encode
+    read_csv_lines('encoding.csv').each do |line|
+      if line.length == 0
+        next
       end
-      assert_equal(cols[0], code)
-      assert((code_area.south_latitude - cols[3].to_f).abs < 0.001)
-      assert((code_area.west_longitude - cols[4].to_f).abs < 0.001)
-      assert((code_area.north_latitude - cols[5].to_f).abs < 0.001)
-      assert((code_area.east_longitude - cols[6].to_f).abs < 0.001)
+      cols = line.split(',')
+      code = @olc.encode(cols[0].to_f, cols[1].to_f, cols[2].to_i)
+      assert_equal(cols[3], code)
     end
   end
 
