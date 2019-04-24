@@ -41,13 +41,13 @@ type (
 
 	encodingTest struct {
 		lat, lng float64
-		length   int64
+		length   int
 		code     string
 	}
 
 	decodingTest struct {
 		code                                 string
-		length                               int64
+		length                               int
 		lat, lng, latLo, lngLo, latHi, lngHi float64
 	}
 
@@ -61,7 +61,7 @@ type (
 
 func init() {
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(4)
 
 	go func() {
 		defer wg.Done()
@@ -79,8 +79,6 @@ func init() {
 		defer wg.Done()
 		for _, cols := range append(
 			mustReadLines("encoding.csv"),
-			bytes.Split([]byte("-0.2820710399999935,36.07145996093760,15,6GFRP39C+5HG4QWR"), []byte(",")),
-			bytes.Split([]byte("-0.2820710399999935,36.07145996093760,16,6GFRP39C+5HG4QWRV"), []byte(",")),
 		) {
 			encoding = append(encoding, encodingTest{
 				lat:    mustFloat(cols[0]),
@@ -95,10 +93,8 @@ func init() {
 		defer wg.Done()
 		for _, cols := range append(
 			mustReadLines("decoding.csv"),
-			bytes.Split([]byte("6GFRP39C+5HG4QWR,15,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
-			bytes.Split([]byte("6GFRP39C+5HG4QWRV,16,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
 		) {
-			encoding = append(encoding, encodingTest{
+			decoding = append(decoding, decodingTest{
 				code:   string(cols[0]),
 				length: mustInt(cols[1]),
 				latLo:  mustFloat(cols[2]),
@@ -145,19 +141,13 @@ func TestEncode(t *testing.T) {
 }
 
 func TestDecode(t *testing.T) {
-	check := func(i int, code, name string, got, want float64) {
-		if !closeEnough(got, want) {
-			t.Errorf("%d. %q want %s=%f, got %f", i, code, name, want, got)
-			t.FailNow()
-		}
-	}
 	for i, elt := range decoding {
 		got, err := Decode(elt.code)
 		if err != nil {
 			t.Errorf("%d. %q: %v", i, elt.code, err)
 			continue
 		}
-		if got.codeLen != elt.length || !closeEnough(got.LatLo, elg.latLo) || !closeEnough(got.LatHi, elg.latHi) || !closeEnough(got.LngLo, elg.lngLo) || !closeEnough(got.LngHi, elg.lngHi) {
+		if got.Len != elt.length || !closeEnough(got.LatLo, elt.latLo) || !closeEnough(got.LatHi, elt.latHi) || !closeEnough(got.LngLo, elt.lngLo) || !closeEnough(got.LngHi, elt.lngHi) {
 			t.Errorf("%d: got (%v) wanted (%v)", i, got, elt)
 		}
 	}
@@ -229,8 +219,8 @@ func mustFloat(a []byte) float64 {
 	return f
 }
 
-func mustInt(a []byte) float64 {
-	f, err := strconv.ParseInt(string(a), 10, 64)
+func mustInt(a []byte) int {
+	f, err := strconv.Atoi(string(a))
 	if err != nil {
 		panic(err)
 	}
