@@ -84,7 +84,7 @@ testSuite({
       }
     });
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
-    xhrIo_.send(ENCODING_TEST_FILE, 'GET');
+    xhrIo_.send(DECODING_TEST_FILE, 'GET');
   },
   testShortCodes: function() {
     const xhrIo_ = new XhrIo();
