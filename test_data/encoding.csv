@@ -5,7 +5,7 @@
 # Format:
 #   latitude,longitude,length,expected code (empty if the input should cause an error)
 
-20.375,2.775,6,7FG49Q00+
+20.375,2.775,6,7FG49Q00+ww
 20.3700625,2.7821875,10,7FG49QCJ+2V
 20.3701125,2.782234375,11,7FG49QCJ+2VX
 20.3701135,2.78223535156,13,7FG49QCJ+2VXGJ
