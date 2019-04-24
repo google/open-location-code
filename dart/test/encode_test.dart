@@ -21,25 +21,17 @@ import 'utils.dart';
 // code,lat,lng,latLo,lngLo,latHi,lngHi
 checkEncodeDecode(String csvLine) {
   List<String> elements = csvLine.split(",");
-  String code = elements[0];
-  num lat = double.parse(elements[1]);
-  num lng = double.parse(elements[2]);
-  num latLo = double.parse(elements[3]);
-  num lngLo = double.parse(elements[4]);
-  num latHi = double.parse(elements[5]);
-  num lngHi = double.parse(elements[6]);
-  olc.CodeArea codeArea = olc.decode(code);
-  String codeOlc = olc.encode(lat, lng, codeLength: codeArea.codeLength);
+  num lat = double.parse(elements[0]);
+  num lng = double.parse(elements[1]);
+  num len = int.parse(elements[2]);
+  String code = elements[3];
+  String codeOlc = olc.encode(lat, lng, codeLength: len);
   expect(code, equals(codeOlc));
-  expect(codeArea.south, closeTo(latLo, 0.001));
-  expect(codeArea.north, closeTo(latHi, 0.001));
-  expect(codeArea.west, closeTo(lngLo, 0.001));
-  expect(codeArea.east, closeTo(lngHi, 0.001));
 }
 
 main() {
   test('Check encode decode', () {
-    csvLinesFromFile('encodingTests.csv').forEach(checkEncodeDecode);
+    csvLinesFromFile('encoding.csv').forEach(checkEncodeDecode);
   });
 
   test('MaxCodeLength', () {
