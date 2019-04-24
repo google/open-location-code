@@ -1,7 +1,8 @@
 # Open Location Code JavaScript API
 This is the JavaScript implementation of the Open Location Code API.
 
-The library file is in `src/openlocationcode.js`. There is also a minified version, and both are also available using the following CDNs:
+The library file is in `src/openlocationcode.js`. There is also a
+minified version, and both are also available using the following CDNs:
 
 * [jsDelivr](https://www.jsdelivr.com)
   * https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.js
@@ -14,13 +15,23 @@ The library file is in `src/openlocationcode.js`. There is also a minified versi
 
 Once changes have been made, update the `package.json` file.
 
-To update the CDNs, you will have to add a new release tag. Note that release tags are applied globally to the repository, so if you are making a change across multiple implementations, consider waiting until all are updated before adding the release tag.
+To update the CDNs, you will have to add a new release tag. Note that release
+tags are applied globally to the repository, so if you are making a change
+across multiple implementations, consider waiting until all are updated before
+adding the release tag.
 
 # Tests
 
-Unit tests are included and can be executed by installing gulp, gulp-qunit
-and gulp-util and running gulp. Unit tests are automatically run on pull
-and push requests and visible at https://travis-ci.org/google/open-location-code.
+Unit tests require [gulp](https://www.npmjs.com/package/gulp) and
+[node-qunit-phantomjs](https://github.com/jonkemp/node-qunit-phantomjs). (These
+and other dependencies can be installed by running `npm install`.)
+
+Execute the tests with `gulp test`.
+
+Unit tests are automatically run on pull and push requests and visible at
+https://travis-ci.org/google/open-location-code.
+
+# Examples
 
 Example web pages illustrating converting map clicks to Open Location Codes,
 and using Googles Maps API to extend place codes to full codes are in the
