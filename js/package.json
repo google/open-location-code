@@ -20,8 +20,9 @@
   "scripts": {
     "test": "cd test && gulp test"
   },
-  "devDependencies": {
-    "gulp-qunit": "^2.0.0",
-    "gulp": "^4.0.0"
+  "dependencies": {
+    "gulp": "^4.0.1",
+    "gulp-cli": "^2.2.0",
+    "node-qunit-phantomjs": "^2.0.1"
   }
 }
