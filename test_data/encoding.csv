@@ -1,0 +1,27 @@
+# Test encoding Open Location Codes.
+#
+# Provides test cases for encoding latitude and longitude to codes.
+#
+# Format:
+#   latitude,longitude,length,expected code (empty if the input should cause an error)
+
+20.375,2.775,6,7FG49Q00+
+20.3700625,2.7821875,10,7FG49QCJ+2V
+20.3701125,2.782234375,11,7FG49QCJ+2VX
+20.3701135,2.78223535156,13,7FG49QCJ+2VXGJ
+47.0000625,8.0000625,10,8FVC2222+22
+-41.2730625,174.7859375,10,4VCPPQGP+Q9
+0.5,-179.5,4,62G20000+
+-89.5,-179.5,4,22220000+
+20.5,2.5,4,7FG40000+
+-89.9999375,-179.9999375,10,22222222+22
+0.5,179.5,4,6VGX0000+
+1,1,11,6FH32222+222
+# Special cases over 90 latitude and 180 longitude
+90,1,4,CFX30000+
+92,1,4,CFX30000+
+1,180,4,62H20000+
+1,181,4,62H30000+
+90,1,10,CFX3X2X2+X2
+# Test non-precise latitude/longitude value
+1.2,3.4,10,6FH56C22+22

@@ -1,6 +1,15 @@
 var gulp = require('gulp');
-var qunit = require('gulp-qunit');
+var phantom = require('node-qunit-phantomjs');
 
-gulp.task('test', function() {
-  return gulp.src('./test.html').pipe(qunit());
-});
+function test(callback) {
+  phantom('./test.html', {'verbose': true}, (result) => {
+    // Called with 0 for successful test completion, 1 for failure(s).
+    if (result === 0) {
+      callback();
+    } else {
+      callback(new Error('tests failed'));
+    }
+  });
+}
+
+exports.test = test;
