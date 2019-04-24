@@ -55,6 +55,7 @@
           if (testCsv[0] === '#' || testCsv.trim().length == 0) {
             continue;
           }
+          console.log('Testing ' + testCsv);
           var testFields = testCsv.split(',');
           // Convert the string numbers to number numbers.
           testFields[0] = parseFloat(testFields[0]);
