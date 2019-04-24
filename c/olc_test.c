@@ -190,7 +190,30 @@ static int to_boolean(const char* s)
 
 static int test_encoding(char* cp[], int cn)
 {
-    CHECK_COLUMNS("test_encoding", 7, cp, cn);
+    CHECK_COLUMNS("test_encoding", 4, cp, cn);
+
+    // lat,lng,len,code
+    int valid = 1;
+    int ok = 0;
+    
+    
+    OLC_LatLon data_pos = { strtod(cp[0], 0), strtod(cp[1], 0) };
+    // Encode the test location and make sure we get the expected code.
+    char encoded[256];
+    OLC_Encode(&data_pos, atoi(cp[2]), encoded, 256);
+
+    char* code = cp[3];
+
+    ok = strcmp(code, encoded) == 0;
+    valid = valid && ok;
+    fprintf(stderr, "%-3.3s ENC_CODE [%s:%s:%s] [%s] [%s]\n", ok ? "OK" : "BAD", cp[0], cp[1], cp[2], encoded, code);
+
+    return valid;
+}
+
+static int test_decoding(char* cp[], int cn)
+{
+    CHECK_COLUMNS("test_decoding", 6, cp, cn);
 
     // code,lat,lng,latLo,lngLo,latHi,lngHi
     int valid = 1;
@@ -206,7 +229,7 @@ static int test_encoding(char* cp[], int cn)
     OLC_Encode(&data_pos, len, encoded, 256);
     ok = strcmp(code, encoded) == 0;
     valid = valid && ok;
-    fprintf(stderr, "%-3.3s ENC_CODE [%s:%s] [%s] [%s]\n", ok ? "OK" : "BAD", cp[1], cp[2], encoded, code);
+    fprintf(stderr, "%-3.3s DECODE [%s:%s] [%s] [%s]\n", ok ? "OK" : "BAD", cp[1], cp[2], encoded, code);
 
     // Now decode the code and check we get the correct coordinates.
     OLC_CodeArea data_area = {
@@ -306,8 +329,9 @@ static void test_csv_files(void)
         TestFunc* func;
     } data[] = {
         { "shortCodeTests.csv", test_short_code },
-        { "encodingTests.csv" , test_encoding   },
-        { "validityTests.csv" , test_validity   },
+        { "encoding.csv" , test_encoding },
+        { "decoding.csv" , test_decoding },
+        { "validityTests.csv" , test_validity },
     };
     for (int j = 0; j < sizeof(data) / sizeof(data[0]); ++j) {
         process_file(data[j].file, data[j].func);
