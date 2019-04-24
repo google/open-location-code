@@ -21,7 +21,7 @@
     "test": "cd test && gulp test"
   },
   "devDependencies": {
-    "gulp-qunit": "^1.0.0",
+    "gulp-qunit": "^2.0.0",
     "gulp": "^4.0.0"
   }
 }
