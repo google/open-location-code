@@ -47,7 +47,35 @@
       var done = assert.async();
 
       // Load the data file.
-      $.get("../../test_data/encodingTests.csv", function(testData) {
+      $.get("../../test_data/encoding.csv", function(testData) {
+        testData = testData.split('\n');
+
+        for (var i = 0; i < testData.length; ++i) {
+          var testCsv = testData[i];
+          if (testCsv[0] === '#' || testCsv.trim().length == 0) {
+            continue;
+          }
+          var testFields = testCsv.split(',');
+          // Convert the string numbers to number numbers.
+          testFields[0] = parseFloat(testFields[0]);
+          testFields[1] = parseFloat(testFields[1]);
+          testFields[2] = parseFloat(testFields[2]);
+          var code = OpenLocationCode.encode(testFields[0], testFields[1], testFields[2]);
+          // Did we get the same code?
+          assert.strictEqual(code, testFields[3], testFields[3] + ': encoding confirm');
+        }
+
+        done();
+      });
+    });
+  </script>
+
+  <script type="text/javascript">
+    QUnit.test('Decoding', function(assert) {
+      var done = assert.async();
+
+      // Load the data file.
+      $.get("../../test_data/decoding.csv", function(testData) {
         testData = testData.split('\n');
 
         for (var i = 0; i < testData.length; ++i) {
@@ -62,16 +90,13 @@
           testFields[3] = parseFloat(testFields[3]);
           testFields[4] = parseFloat(testFields[4]);
           testFields[5] = parseFloat(testFields[5]);
-          testFields[6] = parseFloat(testFields[6]);
           var codeArea = OpenLocationCode.decode(testFields[0]);
-          var code = OpenLocationCode.encode(testFields[1], testFields[2], codeArea.codeLength);
-          // Did we get the same code?
-          assert.strictEqual(code, testFields[0], testFields[0] + ': encoding confirm');
           // Check that it decoded to the correct coordinates.
-          assert.closeEnough(testFields[3], codeArea.latitudeLo, testFields[0] + ': lat lo');
-          assert.closeEnough(testFields[4], codeArea.longitudeLo, testFields[0] + 'lng lo');
-          assert.closeEnough(testFields[5], codeArea.latitudeHi, testFields[0] + 'lat hi');
-          assert.closeEnough(testFields[6], codeArea.longitudeHi, testFields[0] + 'lng hi');
+          assert.strictEqual(testFields[1], codeArea.codeLength, testField[0] + ': code length');
+          assert.closeEnough(testFields[2], codeArea.latitudeLo, testFields[0] + ': lat lo');
+          assert.closeEnough(testFields[3], codeArea.longitudeLo, testFields[0] + 'lng lo');
+          assert.closeEnough(testFields[4], codeArea.latitudeHi, testFields[0] + 'lat hi');
+          assert.closeEnough(testFields[5], codeArea.longitudeHi, testFields[0] + 'lng hi');
         }
 
         done();
