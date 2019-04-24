@@ -29,6 +29,7 @@ import (
 var (
 	validity []validityTest
 	encoding []encodingTest
+	decoding []decodingTest
 	shorten  []shortenTest
 )
 
@@ -39,7 +40,14 @@ type (
 	}
 
 	encodingTest struct {
+		lat, lng float64
+		length   int64
+		code     string
+	}
+
+	decodingTest struct {
 		code                                 string
+		length                               int64
 		lat, lng, latLo, lngLo, latHi, lngHi float64
 	}
 
@@ -57,7 +65,7 @@ func init() {
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range mustReadLines("validity") {
+		for _, cols := range mustReadLines("validityTests.csv") {
 			validity = append(validity, validityTest{
 				code:    string(cols[0]),
 				isValid: cols[1][0] == 't',
@@ -70,25 +78,44 @@ func init() {
 	go func() {
 		defer wg.Done()
 		for _, cols := range append(
-			mustReadLines("encoding"),
-			bytes.Split([]byte("6GFRP39C+5HG4QWR,-0.2820710399999935,36.07145996093760,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
-			bytes.Split([]byte("6GFRP39C+5HG4QWRV,-0.2820710399999935,36.07145996093760,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
+			mustReadLines("encoding.csv"),
+			bytes.Split([]byte("-0.2820710399999935,36.07145996093760,15,6GFRP39C+5HG4QWR"), []byte(",")),
+			bytes.Split([]byte("-0.2820710399999935,36.07145996093760,16,6GFRP39C+5HG4QWRV"), []byte(",")),
 		) {
 			encoding = append(encoding, encodingTest{
-				code: string(cols[0]),
-				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
-				latLo: mustFloat(cols[3]), lngLo: mustFloat(cols[4]),
-				latHi: mustFloat(cols[5]), lngHi: mustFloat(cols[6]),
+				lat:    mustFloat(cols[0]),
+				lng:    mustFloat(cols[1]),
+				length: mustInt(cols[2]),
+				code:   string(cols[3]),
 			})
 		}
 	}()
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range mustReadLines("shortCode") {
+		for _, cols := range append(
+			mustReadLines("decoding.csv"),
+			bytes.Split([]byte("6GFRP39C+5HG4QWR,15,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
+			bytes.Split([]byte("6GFRP39C+5HG4QWRV,16,-0.2820710399999935,36.07145996093752,-0.2820709999999935,36.07146008300783"), []byte(",")),
+		) {
+			encoding = append(encoding, encodingTest{
+				code:   string(cols[0]),
+				length: mustInt(cols[1]),
+				latLo:  mustFloat(cols[2]),
+				lngLo:  mustFloat(cols[3]),
+				latHi:  mustFloat(cols[4]),
+				lngHi:  mustFloat(cols[5]),
+			})
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		for _, cols := range mustReadLines("shortCodeTests.csv") {
 			shorten = append(shorten, shortenTest{
-				code: string(cols[0]),
-				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
+				code:  string(cols[0]),
+				lat:   mustFloat(cols[1]),
+				lng:   mustFloat(cols[2]),
 				short: string(cols[3]),
 				tType: string(cols[4]),
 			})
@@ -102,21 +129,16 @@ func TestCheck(t *testing.T) {
 		err := Check(elt.code)
 		got := err == nil
 		if got != elt.isValid {
-			t.Errorf("%d. %q validity is %t (err=%v), awaited %t.", i, elt.code, got, err, elt.isValid)
+			t.Errorf("%d. %q validity is %t (err=%v), wanted %t.", i, elt.code, got, err, elt.isValid)
 		}
 	}
 }
 
 func TestEncode(t *testing.T) {
 	for i, elt := range encoding {
-		n := len(StripCode(elt.code))
-		code := Encode(elt.lat, elt.lng, n)
-		want := elt.code
-		if len(want) > 16 {
-			want = want[:16]
-		}
-		if code != want {
-			t.Errorf("%d. got %q for (%v,%v,%d), awaited %q.", i, code, elt.lat, elt.lng, n, want)
+		got := Encode(elt.lat, elt.lng, elt.length)
+		if got != elt.code {
+			t.Errorf("%d. got %q for (%v,%v,%d), wanted %q.", i, got, elt.lat, elt.lng, elt.length, elt.code)
 			t.FailNow()
 		}
 	}
@@ -129,27 +151,15 @@ func TestDecode(t *testing.T) {
 			t.FailNow()
 		}
 	}
-	for i, elt := range encoding {
-		area, err := Decode(elt.code)
+	for i, elt := range decoding {
+		got, err := Decode(elt.code)
 		if err != nil {
 			t.Errorf("%d. %q: %v", i, elt.code, err)
 			continue
 		}
-		code := Encode(elt.lat, elt.lng, area.Len)
-		want := elt.code
-		if len(want) > 16 {
-			want = want[:16]
+		if got.codeLen != elt.length || !closeEnough(got.LatLo, elg.latLo) || !closeEnough(got.LatHi, elg.latHi) || !closeEnough(got.LngLo, elg.lngLo) || !closeEnough(got.LngHi, elg.lngHi) {
+			t.Errorf("%d: got (%v) wanted (%v)", i, got, elt)
 		}
-		if code != want {
-			t.Errorf("%d. encode (%f,%f) got %q, awaited %q", i, elt.lat, elt.lng, code, want)
-		}
-		C := func(name string, got, want float64) {
-			check(i, elt.code, name, got, want)
-		}
-		C("latLo", area.LatLo, elt.latLo)
-		C("latHi", area.LatHi, elt.latHi)
-		C("lngLo", area.LngLo, elt.lngLo)
-		C("lngHi", area.LngHi, elt.lngHi)
 	}
 }
 
@@ -186,7 +196,7 @@ func closeEnough(a, b float64) bool {
 }
 
 func mustReadLines(name string) [][][]byte {
-	rows, err := readLines(filepath.Join("..", "test_data", name+"Tests.csv"))
+	rows, err := readLines(filepath.Join("..", "test_data", name))
 	if err != nil {
 		panic(err)
 	}
@@ -213,6 +223,14 @@ func readLines(path string) (rows [][][]byte, err error) {
 
 func mustFloat(a []byte) float64 {
 	f, err := strconv.ParseFloat(string(a), 64)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
+func mustInt(a []byte) float64 {
+	f, err := strconv.ParseInt(string(a), 10, 64)
 	if err != nil {
 		panic(err)
 	}
