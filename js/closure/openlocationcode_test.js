@@ -71,7 +71,6 @@ testSuite({
         const lngLo = parseFloat(fields[3]);
         const latHi = parseFloat(fields[4]);
         const lngHi = parseFloat(fields[5]);
-        const wantCode = fields[0];
 
         const gotCodeArea = OpenLocationCode.decode(code);
         assertEquals('test Decode ' + 1, length, gotCodeArea.codeLength);
