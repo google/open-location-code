@@ -103,7 +103,7 @@ module PlusCodes
         end
       end
 
-      CodeArea.new(south_latitude, west_longitude, lat_resolution, lng_resolution)
+      CodeArea.new(south_latitude, west_longitude, lat_resolution, lng_resolution, digit)
     end
 
     # Recovers a full Open Location Code(Plus+Codes) from a short code and a reference location.
