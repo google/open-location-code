@@ -79,15 +79,45 @@ class TestEncoding(unittest.TestCase):
   def setUp(self):
     self.testdata = []
     headermap = {
-        0: 'code',
-        1: 'lat',
-        2: 'lng',
-        3: 'latLo',
-        4: 'lngLo',
-        5: 'latHi',
-        6: 'longHi'
+        0: 'lat',
+        1: 'lng',
+        2: 'length',
+        3: 'code'
     }
-    tests_fn = _TEST_DATA + '/encodingTests.csv'
+    tests_fn = _TEST_DATA + '/encoding.csv'
+    with open(tests_fn, mode='r', encoding='utf-8') as fin:
+      for line in fin:
+        if line.startswith('#'):
+          continue
+        td = line.strip().split(',')
+        assert len(td) == len(
+            headermap), 'Wrong format of testing data: {0}'.format(line)
+        # first 3 keys should be numbers
+        for i in range(0, 3):
+          td[i] = float(td[i])
+        self.testdata.append({headermap[i]: v for i, v in enumerate(td)})
+
+  def test_encoding(self):
+    for td in self.testdata:
+      codelength = len(td['code']) - 1
+      if '0' in td['code']:
+        codelength = td['code'].index('0')
+      self.assertEqual(td['code'],
+                       olc.encode(td['lat'], td['lng'], codelength), td)
+
+class TestDecoding(unittest.TestCase):
+
+  def setUp(self):
+    self.testdata = []
+    headermap = {
+        0: 'code',
+        1: 'length',
+        2: 'latLo',
+        3: 'lngLo',
+        4: 'latHi',
+        5: 'longHi'
+    }
+    tests_fn = _TEST_DATA + '/decoding.csv'
     with open(tests_fn, mode='r', encoding='utf-8') as fin:
       for line in fin:
         if line.startswith('#'):
@@ -99,14 +129,6 @@ class TestEncoding(unittest.TestCase):
         for i in range(1, len(headermap)):
           td[i] = float(td[i])
         self.testdata.append({headermap[i]: v for i, v in enumerate(td)})
-
-  def test_encoding(self):
-    for td in self.testdata:
-      codelength = len(td['code']) - 1
-      if '0' in td['code']:
-        codelength = td['code'].index('0')
-      self.assertEqual(td['code'],
-                       olc.encode(td['lat'], td['lng'], codelength), td)
 
   def test_decoding(self):
     precision = 10
