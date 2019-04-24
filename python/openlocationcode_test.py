@@ -125,6 +125,30 @@ class TestEncoding(unittest.TestCase):
           round(decoded.longitudeHi, precision),
           round(td['longHi'], precision), td)
 
+  # Validate that codes generated above 15 significant digits return a 15-digit
+  # code
+  def test_maxdigits_encoding(self):
+    for codelength in [15, 16, 17, 100000]:
+      code = olc.encode(37.539669125, -122.375069125, codelength)
+      self.assertEqual(code, "849VGJQF+VX7QR4M")
+
+  # Validate that digits after the first 15 are ignored when decoding
+  def test_maxdigits_decoding(self):
+    maxCharCode = "849VGJQF+VX7QR4M"
+    maxChar = olc.decode(maxCharCode)
+    maxCharExceeded = olc.decode(maxCharCode + "7QR4M")
+    self.assertEqual(maxChar.latitudeCenter, maxCharExceeded.latitudeCenter)
+    self.assertEqual(maxChar.longitudeCenter, maxCharExceeded.longitudeCenter)
+
+  # Validate that codes exceeding 15 digits are still valid when all their
+  # digits are valid, and invalid when not.
+  def test_maxdigits_validity(self):
+    maxCharCode = "849VGJQF+VX7QR4M"
+    self.assertTrue(olc.isValid(maxCharCode))
+    maxCharExceeded = "849VGJQF+VX7QR4M" + "W"
+    self.assertTrue(olc.isValid(maxCharExceeded))
+    maxCharExceededInvalid = "849VGJQF+VX7QR4M" + "U"
+    self.assertFalse(olc.isValid(maxCharExceededInvalid))
 
 if __name__ == '__main__':
   unittest.main()
