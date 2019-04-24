@@ -40,28 +40,47 @@ fn is_valid_test() {
 }
 
 #[test]
-fn encode_decode_test() {
+fn decode_test() {
     let mut tested = 0;
-    for line in CSVReader::new("encodingTests.csv") {
+    for line in CSVReader::new("decoding.csv") {
         let cols: Vec<&str> = line.split(',').collect();
         let code = cols[0];
-        let lat = cols[1].parse::<f64>().unwrap();
-        let lng = cols[2].parse::<f64>().unwrap();
-        let latlo = cols[3].parse::<f64>().unwrap();
-        let lnglo = cols[4].parse::<f64>().unwrap();
-        let lathi = cols[5].parse::<f64>().unwrap();
-        let lnghi = cols[6].parse::<f64>().unwrap();
+        let len = cols[1].parse::<usize>().unwrap();
+        let latlo = cols[2].parse::<f64>().unwrap();
+        let lnglo = cols[3].parse::<f64>().unwrap();
+        let lathi = cols[4].parse::<f64>().unwrap();
+        let lnghi = cols[5].parse::<f64>().unwrap();
 
         let codearea = decode(code).unwrap();
-        assert_eq!(
-            encode(Point::new(lng, lat), codearea.code_length),
-            code,
-            "encoding lat={},lng={}", lat, lng
-        );
+        assert_eq!(codearea.code_length, len, "code length");
         assert!((latlo - codearea.south).abs() < 1e-10f64);
         assert!((lathi - codearea.north).abs() < 1e-10f64);
         assert!((lnglo - codearea.west).abs() < 1e-10f64);
         assert!((lnghi - codearea.east).abs() < 1e-10f64);
+
+        tested += 1;
+    }
+    assert!(tested > 0);
+}
+
+#[test]
+fn encode_test() {
+    let mut tested = 0;
+    for line in CSVReader::new("encoding.csv") {
+        if line.chars().count() == 0 {
+            continue;
+        }
+        let cols: Vec<&str> = line.split(',').collect();
+        let lat = cols[0].parse::<f64>().unwrap();
+        let lng = cols[1].parse::<f64>().unwrap();
+        let len = cols[2].parse::<usize>().unwrap();
+        let code = cols[3];
+
+        assert_eq!(
+            encode(Point::new(lng, lat), len), code,
+            "encoding lat={},lng={},len={}",
+            lat, lng, len
+        );
 
         tested += 1;
     }
