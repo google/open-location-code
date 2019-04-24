@@ -6,6 +6,21 @@ java_library(
 )
 
 java_test(
+    name = "DecodingTest",
+    size = "small",
+    srcs = [
+        "src/test/java/com/google/openlocationcode/DecodingTest.java",
+    ],
+    data = [
+        "//test_data:test_data"
+    ],
+    test_class = "com.google.openlocationcode.DecodingTest",
+    deps = [
+        ":openlocationcode",
+    ],
+)
+
+java_test(
     name = "EncodingTest",
     size = "small",
     srcs = [
@@ -69,6 +84,18 @@ java_test(
         "src/test/java/com/google/openlocationcode/RecoverTest.java",
     ],
     test_class = "com.google.openlocationcode.RecoverTest",
+    deps = [
+        ":openlocationcode",
+    ],
+)
+
+java_test(
+    name = "UtilsTest",
+    size = "small",
+    srcs = [
+        "src/test/java/com/google/openlocationcode/UtilsTest.java",
+    ],
+    test_class = "com.google.openlocationcode.UtilsTest",
     deps = [
         ":openlocationcode",
     ],

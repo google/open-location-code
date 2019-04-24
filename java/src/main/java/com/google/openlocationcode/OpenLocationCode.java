@@ -99,16 +99,19 @@ public final class OpenLocationCode {
     private final BigDecimal westLongitude;
     private final BigDecimal northLatitude;
     private final BigDecimal eastLongitude;
+    private final int length;
 
     public CodeArea(
         BigDecimal southLatitude,
         BigDecimal westLongitude,
         BigDecimal northLatitude,
-        BigDecimal eastLongitude) {
+        BigDecimal eastLongitude,
+        int length) {
       this.southLatitude = southLatitude;
       this.westLongitude = westLongitude;
       this.northLatitude = northLatitude;
       this.eastLongitude = eastLongitude;
+      this.length = length;
     }
 
     public double getSouthLatitude() {
@@ -141,6 +144,10 @@ public final class OpenLocationCode {
 
     public double getEastLongitude() {
       return eastLongitude.doubleValue();
+    }
+
+    public int getLength() {
+      return length;
     }
   }
 
@@ -322,7 +329,8 @@ public final class OpenLocationCode {
         southLatitude.subtract(LATITUDE_MAX),
         westLongitude.subtract(LONGITUDE_MAX),
         southLatitude.subtract(LATITUDE_MAX).add(latPrecision),
-        westLongitude.subtract(LONGITUDE_MAX).add(lngPrecision));
+        westLongitude.subtract(LONGITUDE_MAX).add(lngPrecision),
+        digit);
   }
 
   /**
