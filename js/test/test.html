@@ -93,7 +93,7 @@
           testFields[5] = parseFloat(testFields[5]);
           var codeArea = OpenLocationCode.decode(testFields[0]);
           // Check that it decoded to the correct coordinates.
-          assert.strictEqual(testFields[1], codeArea.codeLength, testField[0] + ': code length');
+          assert.strictEqual(testFields[1], codeArea.codeLength, testFields[0] + ': code length');
           assert.closeEnough(testFields[2], codeArea.latitudeLo, testFields[0] + ': lat lo');
           assert.closeEnough(testFields[3], codeArea.longitudeLo, testFields[0] + 'lng lo');
           assert.closeEnough(testFields[4], codeArea.latitudeHi, testFields[0] + 'lat hi');
