@@ -8,14 +8,14 @@
 #define EXPECT_NUM_BINOP(op, a, b) \
     do { \
         int test_expect_ok = (a) op (b); \
-        fprintf(stderr, "%-3.3s [%s] %s [%s]\n", test_expect_ok ? "OK" : "BAD", #a, #op, #b); \
+        if (!test_expect_ok) fprintf(stderr, "%-3.3s [%s] %s [%s]\n", test_expect_ok ? "OK" : "BAD", #a, #op, #b); \
         /* if (!test_expect_ok) { abort(); } */ \
     } while (0)
 
 #define EXPECT_STR_BINOP(op, a, b) \
     do { \
         int test_expect_ok = strcmp((a), (b)) op 0; \
-        fprintf(stderr, "%-3.3s [%s] %s [%s]\n", test_expect_ok ? "OK" : "BAD", #a, #op, #b); \
+        if (!test_expect_ok) fprintf(stderr, "%-3.3s [%s] %s [%s]\n", test_expect_ok ? "OK" : "BAD", #a, #op, #b); \
         /* if (!test_expect_ok) { abort(); } */ \
     } while (0)
 
