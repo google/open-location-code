@@ -14,7 +14,7 @@ namespace internal {
 namespace {
 
 TEST(ParameterChecks, PairCodeLengthIsEven) {
-  EXPECT_EQ(0, internal::kPairCodeLength % 2);
+  EXPECT_EQ(0, (int)internal::kPairCodeLength % 2);
 }
 
 TEST(ParameterChecks, AlphabetIsOrdered) {
@@ -34,8 +34,8 @@ TEST(ParameterChecks, PositionLUTMatchesAlphabet) {
     const char c = 'C' + i;
     if (pos != -1) {
       // If the LUT entry indicates this character is in kAlphabet, verify it.
-      EXPECT_LT(pos, internal::kEncodingBase);
-      EXPECT_EQ(c, internal::kAlphabet[pos]);
+      EXPECT_LT(pos, (int)internal::kEncodingBase);
+      EXPECT_EQ(c, (int)internal::kAlphabet[pos]);
     } else {
       // Otherwise, verify this character is not in kAlphabet.
       EXPECT_EQ(std::strchr(internal::kAlphabet, c), nullptr);
@@ -59,8 +59,8 @@ std::vector<std::vector<std::string>> ParseCsv(
 
   std::ifstream input_stream(path_to_file, std::ifstream::binary);
   while (std::getline(input_stream, line)) {
-    // Ignore comments in the file
-    if (line.at(0) == '#') {
+    // Ignore blank lines and comments in the file
+    if (line.length() == 0 || line.at(0) == '#') {
       continue;
     }
     std::vector<std::string> line_records;
@@ -71,23 +71,75 @@ std::vector<std::vector<std::string>> ParseCsv(
     }
     csv_records.push_back(line_records);
   }
-  EXPECT_GT(csv_records.size(), 0);
+  EXPECT_GT(csv_records.size(), (size_t)0);
   return csv_records;
 }
 
-struct EncodingTestData {
+struct DecodingTestData {
   std::string code;
-  double lat_deg;
-  double lng_deg;
+  size_t length;
   double lo_lat_deg;
   double lo_lng_deg;
   double hi_lat_deg;
   double hi_lng_deg;
 };
 
+class DecodingChecks : public ::testing::TestWithParam<DecodingTestData> {};
+
+const std::string kDecodingTestsFile = "test_data/decoding.csv";
+
+std::vector<DecodingTestData> GetDecodingDataFromCsv() {
+  std::vector<DecodingTestData> data_results;
+  std::vector<std::vector<std::string>> csv_records =
+      ParseCsv(kDecodingTestsFile);
+  for (size_t i = 0; i < csv_records.size(); i++) {
+    DecodingTestData test_data = {};
+    test_data.code = csv_records[i][0];
+    test_data.length = atoi(csv_records[i][1].c_str());
+    test_data.lo_lat_deg = strtod(csv_records[i][2].c_str(), nullptr);
+    test_data.lo_lng_deg = strtod(csv_records[i][3].c_str(), nullptr);
+    test_data.hi_lat_deg = strtod(csv_records[i][4].c_str(), nullptr);
+    test_data.hi_lng_deg = strtod(csv_records[i][5].c_str(), nullptr);
+    data_results.push_back(test_data);
+  }
+  return data_results;
+}
+
+TEST_P(DecodingChecks, Decode) {
+  DecodingTestData test_data = GetParam();
+  CodeArea expected_rect =
+      CodeArea(test_data.lo_lat_deg, test_data.lo_lng_deg, test_data.hi_lat_deg,
+               test_data.hi_lng_deg, test_data.length);
+  // Decode the code and check we get the correct coordinates.
+  CodeArea actual_rect = Decode(test_data.code);
+  EXPECT_EQ(expected_rect.GetCodeLength(), actual_rect.GetCodeLength());
+  EXPECT_NEAR(expected_rect.GetCenter().latitude,
+              actual_rect.GetCenter().latitude, 1e-10);
+  EXPECT_NEAR(expected_rect.GetCenter().longitude,
+              actual_rect.GetCenter().longitude, 1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeLo(),
+              actual_rect.GetLatitudeLo(), 1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeLo(),
+              actual_rect.GetLongitudeLo(), 1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeHi(),
+              actual_rect.GetLatitudeHi(), 1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeHi(),
+              actual_rect.GetLongitudeHi(), 1e-10);
+}
+
+INSTANTIATE_TEST_CASE_P(OLC_Tests, DecodingChecks,
+                        ::testing::ValuesIn(GetDecodingDataFromCsv()));
+
+struct EncodingTestData {
+  double lat_deg;
+  double lng_deg;
+  size_t length;
+  std::string code;
+};
+
 class EncodingChecks : public ::testing::TestWithParam<EncodingTestData> {};
 
-const std::string kEncodingTestsFile = "test_data/encodingTests.csv";
+const std::string kEncodingTestsFile = "test_data/encoding.csv";
 
 std::vector<EncodingTestData> GetEncodingDataFromCsv() {
   std::vector<EncodingTestData> data_results;
@@ -95,13 +147,10 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
       ParseCsv(kEncodingTestsFile);
   for (size_t i = 0; i < csv_records.size(); i++) {
     EncodingTestData test_data = {};
-    test_data.code = csv_records[i][0];
-    test_data.lat_deg = strtod(csv_records[i][1].c_str(), nullptr);
-    test_data.lng_deg = strtod(csv_records[i][2].c_str(), nullptr);
-    test_data.lo_lat_deg = strtod(csv_records[i][3].c_str(), nullptr);
-    test_data.lo_lng_deg = strtod(csv_records[i][4].c_str(), nullptr);
-    test_data.hi_lat_deg = strtod(csv_records[i][5].c_str(), nullptr);
-    test_data.hi_lng_deg = strtod(csv_records[i][6].c_str(), nullptr);
+    test_data.lat_deg = strtod(csv_records[i][0].c_str(), nullptr);
+    test_data.lng_deg = strtod(csv_records[i][1].c_str(), nullptr);
+    test_data.length = atoi(csv_records[i][2].c_str());
+    test_data.code = csv_records[i][3];
     data_results.push_back(test_data);
   }
   return data_results;
@@ -109,19 +158,10 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
 
 TEST_P(EncodingChecks, Encode) {
   EncodingTestData test_data = GetParam();
-  CodeArea expected_rect =
-      CodeArea(test_data.lo_lat_deg, test_data.lo_lng_deg, test_data.hi_lat_deg,
-               test_data.hi_lng_deg, CodeLength(test_data.code));
   LatLng lat_lng = LatLng{test_data.lat_deg, test_data.lng_deg};
   // Encode the test location and make sure we get the expected code.
-  std::string actual_code = Encode(lat_lng, CodeLength(test_data.code));
+  std::string actual_code = Encode(lat_lng, test_data.length);
   EXPECT_EQ(test_data.code, actual_code);
-  // Now decode the code and check we get the correct coordinates.
-  CodeArea actual_rect = Decode(test_data.code);
-  EXPECT_NEAR(expected_rect.GetCenter().latitude,
-              actual_rect.GetCenter().latitude, 1e-10);
-  EXPECT_NEAR(expected_rect.GetCenter().longitude,
-              actual_rect.GetCenter().longitude, 1e-10);
 }
 
 INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
