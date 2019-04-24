@@ -179,6 +179,14 @@ int OLC_RecoverNearest(const char* short_code, size_t size, const OLC_LatLon* re
     if (analyse(short_code, size, &info) <= 0) {
         return 0;
     }
+    // Check if it is a full code - then we just convert to upper case.
+    if (is_full(&info)) {
+      OLC_CodeArea code_area;
+      decode(&info, &code_area);
+      OLC_LatLon center;
+      OLC_GetCenter(&code_area, &center);
+      return OLC_Encode(&center, code_area.len, code, maxlen);
+    }
     if (!is_short(&info)) {
         return 0;
     }

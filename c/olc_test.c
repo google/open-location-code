@@ -131,6 +131,9 @@ static int process_file(const char* file, TestFunc func)
         if (!fgets(line, 1024, fp)) {
             break;
         }
+        if (line[0] == '\n') {
+          continue;
+        }
         int blanks = 1;
         char* cp[100];
         int cn = 0;
@@ -190,46 +193,55 @@ static int to_boolean(const char* s)
 
 static int test_encoding(char* cp[], int cn)
 {
-    CHECK_COLUMNS("test_encoding", 7, cp, cn);
-
-    // code,lat,lng,latLo,lngLo,latHi,lngHi
-    int valid = 1;
-    int ok = 0;
-
-    char* code = cp[0];
-    int len = OLC_CodeLength(code, 0);
-
-    OLC_LatLon data_pos = { strtod(cp[1], 0), strtod(cp[2], 0) };
+    CHECK_COLUMNS("test_encoding", 4, cp, cn);
 
     // Encode the test location and make sure we get the expected code.
+    // lat,lng,len,code
+    OLC_LatLon data_pos = { strtod(cp[0], 0), strtod(cp[1], 0) };
     char encoded[256];
-    OLC_Encode(&data_pos, len, encoded, 256);
-    ok = strcmp(code, encoded) == 0;
-    valid = valid && ok;
-    fprintf(stderr, "%-3.3s ENC_CODE [%s:%s] [%s] [%s]\n", ok ? "OK" : "BAD", cp[1], cp[2], encoded, code);
+    OLC_Encode(&data_pos, atoi(cp[2]), encoded, 256);
+
+    int ok = strcmp(cp[3], encoded) == 0;
+    if (!ok) {
+      fprintf(stderr, "test_encoding [%s:%s:%s] [%s] [%s]\n", cp[0], cp[1], cp[2], encoded, cp[3]);
+    }
+
+    return ok;
+}
+
+static int test_decoding(char* cp[], int cn)
+{
+    CHECK_COLUMNS("test_decoding", 6, cp, cn);
+
+    // code,length,latLo,lngLo,latHi,lngHi
+    int valid = 1;
+
+    // Check the length function.
+    int len = OLC_CodeLength(cp[0], 0);
+    valid = valid && len == atoi(cp[1]);
+    if (!valid) {
+      fprintf(stderr, "test_decoding length [%s] [%d] [%d]\n", cp[0], atoi(cp[1]), len);
+    }
 
     // Now decode the code and check we get the correct coordinates.
-    OLC_CodeArea data_area = {
-        { strtod(cp[3], 0), strtod(cp[4], 0) },
-        { strtod(cp[5], 0), strtod(cp[6], 0) },
+    OLC_CodeArea want = {
+        { strtod(cp[2], 0), strtod(cp[3], 0) },
+        { strtod(cp[4], 0), strtod(cp[5], 0) },
         len,
     };
+    OLC_CodeArea got;
+    OLC_Decode(cp[0], 0, &got);
 
-    OLC_LatLon data_center;
-    OLC_GetCenter(&data_area, &data_center);
-
-    OLC_CodeArea decoded_area;
-    OLC_Decode(code, 0, &decoded_area);
-
-    OLC_LatLon decoded_center;
-    OLC_GetCenter(&decoded_area, &decoded_center);
-
-    ok = fabs(data_center.lat - decoded_center.lat) < 1e-10;
-    valid = valid && ok;
-    fprintf(stderr, "%-3.3s ENC_LAT [%f:%f]\n", ok ? "OK" : "BAD", decoded_center.lat, data_center.lat);
-    ok = fabs(data_center.lon - decoded_center.lon) < 1e-10;
-    valid = valid && ok;
-    fprintf(stderr, "%-3.3s ENC_LON [%f:%f]\n", ok ? "OK" : "BAD", decoded_center.lon, data_center.lon);
+    valid = valid && fabs(want.lo.lat - got.lo.lat) < 1e-10;
+    valid = valid && fabs(want.lo.lon - got.lo.lon) < 1e-10;
+    valid = valid && fabs(want.hi.lat - got.hi.lat) < 1e-10;
+    valid = valid && fabs(want.hi.lon - got.hi.lon) < 1e-10;
+    valid = valid && want.len == got.len;
+    if (!valid) {
+      fprintf(stderr, "test_decoding [%s] [%f:%f:%f:%f:%li] [%f:%f:%f:%f:%li]\n", cp[0],
+          want.lo.lat, want.lo.lon, want.hi.lat, want.hi.lon, want.len,
+          got.lo.lat, got.lo.lon, got.hi.lat, got.hi.lon, got.len);
+    }
 
     return valid;
 }
@@ -242,7 +254,7 @@ static int test_short_code(char* cp[], int cn)
     // test_type is R for recovery only, S for shorten only, or B for both.
     int valid = 1;
     int ok = 0;
-    char code[256];
+    char got[256];
     char* full_code = cp[0];
     char* short_code = cp[3];
     char* type = cp[4];
@@ -251,18 +263,22 @@ static int test_short_code(char* cp[], int cn)
 
     // Shorten the code using the reference location and check.
     if (strcmp(type, "B") == 0 || strcmp(type, "S") == 0) {
-        OLC_Shorten(full_code, 0, &reference, code, 256);
-        ok = strcmp(short_code, code) == 0;
+        OLC_Shorten(full_code, 0, &reference, got, 256);
+        ok = strcmp(short_code, got) == 0;
         valid = valid && ok;
-        fprintf(stderr, "%-3.3s SHORTEN [%s] [%s:%s]: [%s] [%s]\n", ok ? "OK" : "BAD", full_code, cp[1], cp[2], code, short_code);
+        if (!ok) {
+          fprintf(stderr, "shorten [%s] [%s:%s]: [%s] [%s]\n", full_code, cp[1], cp[2], got, short_code);
+        }
     }
 
     // Now extend the code using the reference location and check.
     if (strcmp(type, "B") == 0 || strcmp(type, "R") == 0) {
-        OLC_RecoverNearest(short_code, 0, &reference, code, 256);
-        ok = strcmp(full_code, code) == 0;
+        OLC_RecoverNearest(short_code, 0, &reference, got, 256);
+        ok = strcmp(full_code, got) == 0;
         valid = valid && ok;
-        fprintf(stderr, "%-3.3s RECOVER [%s] [%s:%s]: [%s] [%s]\n", ok ? "OK" : "BAD", short_code, cp[1], cp[2], code, full_code);
+        if (!ok) {
+          fprintf(stderr, "recover [%s] [%s:%s]: [%s] [%s]\n", short_code, cp[1], cp[2], got, full_code);
+        }
     }
 
     return valid;
@@ -284,17 +300,23 @@ static int test_validity(char* cp[], int cn)
     got = OLC_IsValid(code, 0);
     ok = got == is_valid;
     valid = valid && ok;
-    fprintf(stderr, "%-3.3s IsValid [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_valid);
+    if (!ok) {
+      fprintf(stderr, "IsValid [%s]: [%d] [%d]\n", code, got, is_valid);
+    }
 
     got = OLC_IsFull(code, 0);
     ok = got == is_full;
     valid = valid && ok;
-    fprintf(stderr, "%-3.3s IsFull [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_full);
+    if (!ok) {
+      fprintf(stderr, "IsFull [%s]: [%d] [%d]\n", code, got, is_full);
+    }
 
     got = OLC_IsShort(code, 0);
     ok = got == is_short;
     valid = valid && ok;
-    fprintf(stderr, "%-3.3s IsShort [%s]: [%d] [%d]\n", ok ? "OK" : "BAD", code, got, is_short);
+    if (!ok) {
+      fprintf(stderr, "IsShort [%s]: [%d] [%d]\n", code, got, is_short);
+    }
 
     return valid;
 }
@@ -306,8 +328,9 @@ static void test_csv_files(void)
         TestFunc* func;
     } data[] = {
         { "shortCodeTests.csv", test_short_code },
-        { "encodingTests.csv" , test_encoding   },
-        { "validityTests.csv" , test_validity   },
+        { "encoding.csv" , test_encoding },
+        { "decoding.csv" , test_decoding },
+        { "validityTests.csv" , test_validity },
     };
     for (int j = 0; j < sizeof(data) / sizeof(data[0]); ++j) {
         process_file(data[j].file, data[j].func);
