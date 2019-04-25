@@ -199,7 +199,7 @@ std::string Encode(const LatLng &location) {
 
 CodeArea Decode(const std::string &code) {
   // Make a copy that doesn't have the separator and stops at the first padding
-  // character.
+  // character, and is constrained to the maximum length.
   std::string clean_code(code);
   clean_code.erase(
       std::remove(clean_code.begin(), clean_code.end(), internal::kSeparator),
@@ -207,6 +207,9 @@ CodeArea Decode(const std::string &code) {
   if (clean_code.find(internal::kPaddingCharacter)) {
     clean_code = clean_code.substr(0,
         clean_code.find(internal::kPaddingCharacter));
+  }
+  if (clean_code.size() > internal::kMaximumDigitCount) {
+    clean_code = clean_code.substr(0, internal::kMaximumDigitCount);
   }
   double resolution_degrees = internal::kEncodingBase;
   double latitude = 0.0;
@@ -242,9 +245,8 @@ CodeArea Decode(const std::string &code) {
     // With a grid, the latitude and longitude resolutions are no longer equal.
     double latitude_resolution = resolution_degrees;
     double longitude_resolution = resolution_degrees;
-    // Decode only up to the maximum digit count.
-    for (size_t i = internal::kPairCodeLength;
-         i < std::min(internal::kMaximumDigitCount, clean_code.size()); i++) {
+    // Decode grid square characters.
+    for (size_t i = internal::kPairCodeLength; i < clean_code.size(); i++) {
       // Get the value of the character at i and convert it to the degree value.
       size_t value = get_alphabet_position(clean_code[i]);
       size_t row = value / internal::kGridColumns;
@@ -264,7 +266,7 @@ CodeArea Decode(const std::string &code) {
                   longitude - internal::kLongitudeMaxDegrees,
                   latitude_high - internal::kLatitudeMaxDegrees,
                   longitude_high - internal::kLongitudeMaxDegrees,
-                  CodeLength(code));
+                  clean_code.size());
 }
 
 std::string Shorten(const std::string &code, const LatLng &reference_location) {
