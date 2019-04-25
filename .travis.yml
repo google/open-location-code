@@ -17,7 +17,7 @@ matrix:
     - language: cpp
       env: OLC_PATH=cpp
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
@@ -43,7 +43,7 @@ matrix:
       jdk: oraclejdk8
       env: OLC_PATH=java
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
@@ -53,8 +53,11 @@ matrix:
     #
     - language: c
       env: OLC_PATH=js/closure
+      cache:
+        directories:
+          - $HOME/.cache/bazel
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test ${OLC_PATH}:all
@@ -71,7 +74,7 @@ matrix:
       python: 2.7
       env: OLC_PATH=python
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
@@ -81,7 +84,7 @@ matrix:
       python: 3.4
       env: OLC_PATH=python
       script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.14.0/bazel-0.14.0-installer-linux-x86_64.sh"
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
