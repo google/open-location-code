@@ -50,16 +50,15 @@ matrix:
 
     # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
-    #
+    # The Bazel configuration is cached. This saves about 3-4 minutes in the tests.
     - language: c
       env: OLC_PATH=js/closure
       before_cache:
-        # Do not save the Bazel installation, reinstall each time, it fails to install
-        # if the installation is in the cache.
+        # Bazel will fail to install if the installation is in the cache.
         - rm -fr ${HOME}/.cache/bazel/_bazel_${USER}/install
       cache:
-        # Increase the timeout to fetch and unpack the cache.
-        timeout: 1000
+        # Set the timeout to fetch and unpack the cache.
+        timeout: 300
         directories:
           - ${HOME}/.cache/bazel
       script:
