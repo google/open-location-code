@@ -57,7 +57,7 @@ matrix:
         # Do not save the Bazel installation, reinstall each time, it fails to install
         # if the installation is in the cache.
         - rm -fr ${HOME}/.cache/bazel/_bazel_${USER}/install
-      cache:
+      cache: false
         # Increase the timeout to fetch and unpack the cache.
         timeout: 1000
         directories:
