@@ -57,11 +57,11 @@ matrix:
         # Do not save the Bazel installation, reinstall each time, it fails to install
         # if the installation is in the cache.
         - rm -fr ${HOME}/.cache/bazel/_bazel_${USER}/install
-      cache: false
+      cache:
         # Increase the timeout to fetch and unpack the cache.
-        #timeout: 1000
-        #directories:
-        #  - ${HOME}/.cache/bazel
+        timeout: 1000
+        directories:
+          - ${HOME}/.cache/bazel
       script:
         - rm -fr ${HOME}/.cache/bazel/_bazel_${USER}/install
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
