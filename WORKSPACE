@@ -16,6 +16,7 @@ http_archive(
 # See https://github.com/bazelbuild/rules_closure
 # zlib library is required for com_google_protobuf which is loaded by the closure rules.
 # skylib library required by closure rules.
+# See the Closure WORKSPACE files for the above.
 # Closure rules are pulled in at a specific commit because the current release
 # (0.8.0) doesn't work with Bazel 0.24.1+.
 http_archive(
