@@ -106,6 +106,13 @@ matrix:
     # Rust implementation. Lives in rust/
     - language: rust
       env: OLC_PATH=rust
+      # Need to cache the whole `.cargo` directory to keep .crates.toml for cargo-update to work
+      cache:
+        directories:
+          - ${HOME}/.cargo
+      # But don't cache the cargo registry
+      before_cache:
+        - rm -rf ${HOME}/.cargo/registry
       script:
         - cd rust/
         - cargo build --verbose --all
