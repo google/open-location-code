@@ -27,8 +27,10 @@ const XhrIo = goog.require('goog.net.XhrIo');
 const testSuite = goog.require('goog.testing.testSuite');
 goog.require('goog.testing.asserts');
 
+const /** @const {string} */ DECODING_TEST_FILE =
+    '/filez/openlocationcode/test_data/decoding.csv';
 const /** @const {string} */ ENCODING_TEST_FILE =
-    '/filez/openlocationcode/test_data/encodingTests.csv';
+    '/filez/openlocationcode/test_data/encoding.csv';
 const /** @const {string} */ SHORT_CODE_TEST_FILE =
     '/filez/openlocationcode/test_data/shortCodeTests.csv';
 const /** @const {string} */ VALIDITY_TEST_FILE =
@@ -38,30 +40,47 @@ const /** @const {string} */ VALIDITY_TEST_FILE =
 const /** @const {!AsyncTestCase} */ asyncTestCase = AsyncTestCase.createAndInstall();
 
 testSuite({
-  testEncode: function() {
+  testDecode: function() {
     const xhrIo_ = new XhrIo();
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
       for (var i = 0; i < lines.length; i++) {
         const fields = lines[i].split(',');
         const code = fields[0];
-        const lat = parseFloat(fields[1]);
-        const lng = parseFloat(fields[2]);
-        const latLo = parseFloat(fields[3]);
-        const lngLo = parseFloat(fields[4]);
-        const latHi = parseFloat(fields[5]);
-        const lngHi = parseFloat(fields[6]);
+        const length = parseInt(fields[1], 10);
+        const latLo = parseFloat(fields[2]);
+        const lngLo = parseFloat(fields[3]);
+        const latHi = parseFloat(fields[4]);
+        const lngHi = parseFloat(fields[5]);
 
         const gotCodeArea = OpenLocationCode.decode(code);
-        // Encode the center coordinates.
-        const gotCode = OpenLocationCode.encode(lat, lng, gotCodeArea.codeLength);
-        // Did we get the same code?
-        assertEquals('testEncode ' + 1, code, gotCode);
         // Check that the decode gave the correct coordinates.
+        assertRoughlyEquals('testEncode ' + 1, length, gotCodeArea.codeLength, 1e-10);
         assertRoughlyEquals('testEncode ' + 1, latLo, gotCodeArea.latitudeLo, 1e-10);
         assertRoughlyEquals('testEncode ' + 1, lngLo, gotCodeArea.longitudeLo, 1e-10);
         assertRoughlyEquals('testEncode ' + 1, latHi, gotCodeArea.latitudeHi, 1e-10);
         assertRoughlyEquals('testEncode ' + 1, lngHi, gotCodeArea.longitudeHi, 1e-10);
+
+        asyncTestCase.continueTesting();
+      }
+    });
+    asyncTestCase.waitForAsync('Waiting for xhr to respond');
+    xhrIo_.send(DECODING_TEST_FILE, 'GET');
+  },
+  testEncode: function() {
+    const xhrIo_ = new XhrIo();
+    xhrIo_.listenOnce(EventType.COMPLETE, () => {
+      const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
+      for (var i = 0; i < lines.length; i++) {
+        const fields = lines[i].split(',');
+        const lat = parseFloat(fields[0]);
+        const lng = parseFloat(fields[1]);
+        const length = parseInt(fields[2], 10);
+        const code = fields[3];
+
+        const gotCode = OpenLocationCode.encode(lat, lng, length);
+        // Did we get the same code?
+        assertEquals('testEncode ' + 1, code, gotCode);
 
         asyncTestCase.continueTesting();
       }
