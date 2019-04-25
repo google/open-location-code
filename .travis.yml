@@ -59,9 +59,9 @@ matrix:
         - rm -fr ${HOME}/.cache/bazel/_bazel_${USER}/install
       cache: false
         # Increase the timeout to fetch and unpack the cache.
-        timeout: 1000
-        directories:
-          - ${HOME}/.cache/bazel
+        #timeout: 1000
+        #directories:
+        #  - ${HOME}/.cache/bazel
       script:
         - rm -fr ${HOME}/.cache/bazel/_bazel_${USER}/install
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
