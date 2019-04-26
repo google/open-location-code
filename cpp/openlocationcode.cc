@@ -92,6 +92,19 @@ double adjust_latitude(double latitude_degrees, size_t code_length) {
   return latitude_degrees - precision / 2;
 }
 
+// Remove the separator and padding characters from the code.
+std::string clean_code_chars(const std::string &code) {
+  std::string clean_code(code);
+  clean_code.erase(
+      std::remove(clean_code.begin(), clean_code.end(), internal::kSeparator),
+      clean_code.end());
+  if (clean_code.find(internal::kPaddingCharacter)) {
+    clean_code = clean_code.substr(
+        0, clean_code.find(internal::kPaddingCharacter));
+  }
+  return clean_code;
+}
+
 
 // Encodes positive range lat,lng into a sequence of OLC lat/lng pairs.
 // This uses pairs of characters (latitude and longitude in that order) to
@@ -198,16 +211,8 @@ std::string Encode(const LatLng &location) {
 }
 
 CodeArea Decode(const std::string &code) {
-  // Make a copy that doesn't have the separator and stops at the first padding
-  // character, and is constrained to the maximum length.
-  std::string clean_code(code);
-  clean_code.erase(
-      std::remove(clean_code.begin(), clean_code.end(), internal::kSeparator),
-      clean_code.end());
-  if (clean_code.find(internal::kPaddingCharacter)) {
-    clean_code = clean_code.substr(0,
-        clean_code.find(internal::kPaddingCharacter));
-  }
+  std::string clean_code = clean_code_chars(code);
+  // Constrain to the maximum length.
   if (clean_code.size() > internal::kMaximumDigitCount) {
     clean_code = clean_code.substr(0, internal::kMaximumDigitCount);
   }
@@ -456,15 +461,7 @@ bool IsFull(const std::string &code) {
 }
 
 size_t CodeLength(const std::string &code) {
-  // Remove the separator and any padding characters.
-  std::string clean_code(code);
-  clean_code.erase(
-      std::remove(clean_code.begin(), clean_code.end(), internal::kSeparator),
-      clean_code.end());
-  if (clean_code.find(internal::kPaddingCharacter)) {
-    clean_code = clean_code.substr(
-        0, clean_code.find(internal::kPaddingCharacter));
-  }
+  std::string clean_code = clean_code_chars(code);
   return clean_code.size();
 }
 
