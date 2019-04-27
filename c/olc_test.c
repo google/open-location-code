@@ -105,6 +105,10 @@ TEST(ParameterChecks, SilenceWarningsForConstants)
   EXPECT_NUM_EQ(kInitialResolutionDegrees, 0.0);
 }
 
+/**
+ * Process a CSV file and run it's data through the test function.
+ * Returns true (0) if all tests pass, false (1) if there is a failure.
+ */
 static int process_file(const char* file, TestFunc func)
 {
     static char* base_dir[] = {
@@ -173,7 +177,7 @@ static int process_file(const char* file, TestFunc func)
     fclose(fp);
     printf("%30.30s => %3d records, %3d OK, %3d BAD\n",
            file, total, valid, total - valid);
-    return total;
+    return total - valid == 0;
 }
 
 static int to_boolean(const char* s)
@@ -321,7 +325,7 @@ static int test_validity(char* cp[], int cn)
     return valid;
 }
 
-static void test_csv_files(void)
+static int test_csv_files(void)
 {
     struct Data {
         const char* file;
@@ -332,9 +336,11 @@ static void test_csv_files(void)
         { "decoding.csv" , test_decoding },
         { "validityTests.csv" , test_validity },
     };
+    int valid = 1;
     for (int j = 0; j < sizeof(data) / sizeof(data[0]); ++j) {
-        process_file(data[j].file, data[j].func);
+        valid = valid && process_file(data[j].file, data[j].func);
     }
+    return valid;
 }
 
 int main(int argc, char* argv[])
@@ -347,7 +353,8 @@ int main(int argc, char* argv[])
     test_ParameterChecks_SilenceWarningsForConstants();
     test_Extra_LongCodes();
 
-    test_csv_files();
-
-    return 0;
+    if (test_csv_files()) {
+      return 0;
+    }
+    return 1;
 }
