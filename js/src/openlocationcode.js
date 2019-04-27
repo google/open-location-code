@@ -109,7 +109,7 @@
   var LONGITUDE_MAX_ = 180;
 
   // The max number of digits to process in a plus code.
-  var MAX_DIGIT_COUNT = 15;
+  var MAX_DIGIT_COUNT_ = 15;
 
   // Maximum code length using lat/lng pair encoding. The area of such a
   // code is approximately 13x13 meters (at the equator), and should be suitable
@@ -129,6 +129,14 @@
 
   // Size of the initial grid in degrees.
   var GRID_SIZE_DEGREES_ = 0.000125;
+
+  // Multiply latitude by this much to make it a multiple of the finest
+  // precision.
+  var LAT_PRECISION_FINAL_ = 8000 * Math.pow(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+
+  // Multiply longitude by this much to make it a multiple of the finest
+  // precision.
+  var LNG_PRECISION_FINAL_ = 8000 * Math.pow(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
 
   // Minimum length of a code that can be shortened.
   var MIN_TRIMMABLE_CODE_LEN_ = 6;
@@ -287,7 +295,7 @@
     if (typeof codeLength == 'undefined') {
       codeLength = OpenLocationCode.CODE_PRECISION_NORMAL;
     } else {
-      codeLength = Math.min(MAX_DIGIT_COUNT, Number(codeLength));
+      codeLength = Math.min(MAX_DIGIT_COUNT_, Number(codeLength));
     }
     if (isNaN(latitude) || isNaN(longitude) || isNaN(codeLength)) {
       throw ('ValueError: Parameters are not numbers');
@@ -304,14 +312,43 @@
     if (latitude == 90) {
       latitude = latitude - computeLatitudePrecision(codeLength);
     }
-    var code = encodePairs(
-        latitude, longitude, Math.min(codeLength, PAIR_CODE_LENGTH_));
-    // If the requested length indicates we want grid refined codes.
-    if (codeLength > PAIR_CODE_LENGTH_) {
-      code += encodeGrid(
-          latitude, longitude, codeLength - PAIR_CODE_LENGTH_);
+    // This algorithm starts with the least significant digits, and works it's
+    // way to the front of the code.
+    var code = '';
+    if (extra) {
+      // Use of % 1 works around rounding errors that can occur due to
+      // representing numbers as 64-bit floats.
+      // Without it, we can lose precision resulting in incorrect code
+      // generation at digits 14/15.
+      var latPrecision = Math.floor((latitude + LATITUDE_MAX_) % 1 * LAT_PRECISION_FINAL_);
+      var lngPrecision = Math.floor((longitude + LONGITUDE_MAX_) % 1 * LNG_PRECISION_FINAL_);
+      for (var i = 0; i < MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i++) {
+        code = CODE_ALPHABET_.charAt(
+                   Math.floor(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
+                   Math.floor(lngPrecision % GRID_COLUMNS_)) +
+            code;
+        latPrecision /= GRID_ROWS_;
+        lngPrecision /= GRID_COLUMNS_;
+      }
     }
-    return code;
+    var latPrecision = Math.floor((latitude + LATITUDE_MAX_) * 8e3);
+    var lngPrecision = Math.floor((longitude + LONGITUDE_MAX_) * 8e3);
+    for (var i = 0; i < PAIR_CODE_LENGTH_ / 2; i++) {
+      code = CODE_ALPHABET_.charAt(Math.floor(lngPrecision % ENCODING_BASE_)) + code;
+      code = CODE_ALPHABET_.charAt(Math.floor(latPrecision % ENCODING_BASE_)) + code;
+      latPrecision = latPrecision / ENCODING_BASE_;
+      lngPrecision /= ENCODING_BASE_;
+      if (i == 0) {
+        code = '+' + code;
+      }
+    }
+    // If we don't need to pad the code, return the requested section.
+    if (codeLength >= SEPARATOR_POSITION_) {
+      return code.substring(0, codeLength + 1);
+    }
+    // Pad and return the cdoe
+    return code.substring(0, codeLength) +
+        Array(SEPARATOR_POSITION_ - codeLength + 1).join('0') + '+';
   };
 
   /**
@@ -330,25 +367,48 @@
       throw ('IllegalArgumentException: ' +
           'Passed Open Location Code is not a valid full code: ' + code);
     }
-    // Strip out separator character (we've already established the code is
-    // valid so the maximum is one), padding characters and convert to upper
-    // case.
-    code = code.replace(SEPARATOR_, '');
-    code = code.replace(new RegExp(PADDING_CHARACTER_ + '+'), '');
-    code = code.toUpperCase();
-    // Decode the lat/lng pair component.
-    var codeArea = decodePairs(code.substring(0, PAIR_CODE_LENGTH_));
-    // If there is a grid refinement component, decode that.
-    if (code.length <= PAIR_CODE_LENGTH_) {
-      return codeArea;
+    // This calculates the values for the pair and grid section separately, using
+    // integer arithmetic. Only at the final step are they converted to floating
+    // point and combined.
+    // Strip the '+' and '0' characters from the code and upper case.
+    code = code.replace('+', '').replace(/0/g, '').toLocaleUpperCase('en-US');
+    // Initialise the values for each section.
+    var normalLat = -LATITUDE_MAX_ * PAIR_PRECISION_;
+    var normalLng = -LONGITUDE_MAX_ * PAIR_PRECISION_;
+    var extraLat = 0;
+    var extraLng = 0;
+    // Define the place value for the most significant digit.
+    var pv = Math.pow(ENCODING_BASE_, 4);  // base^4
+    for (var i = 0; i < Math.min(code.length, PAIR_CODE_LENGTH_); i+=2) {
+      normalLat += CODE_ALPHABET_.indexOf(code.charAt(i)) * pv;
+      normalLng += CODE_ALPHABET_.indexOf(code.charAt(i + 1)) * pv;
+      pv /= ENCODING_BASE_;
     }
-    var gridArea = decodeGrid(code.substring(PAIR_CODE_LENGTH_, MAX_DIGIT_COUNT));
-    return CodeArea(
-      codeArea.latitudeLo + gridArea.latitudeLo,
-      codeArea.longitudeLo + gridArea.longitudeLo,
-      codeArea.latitudeLo + gridArea.latitudeHi,
-      codeArea.longitudeLo + gridArea.longitudeHi,
-      codeArea.codeLength + gridArea.codeLength);
+    // Adjust precision. In the for loop it got an extra / 20.
+    var latpv = pv / (PAIR_PRECISION_ / ENCODING_BASE_);
+    var lngpv = pv / (PAIR_PRECISION_ / ENCODING_BASE_);
+    // Process any extra precision digits.
+    if (code.length > PAIR_CODE_LENGTH_) {
+      // Initialise the place values.
+      latpv = Math.pow(GRID_ROWS_, EXTRA_CODE_LENGTH_ - 1);
+      lngpv = Math.pow(GRID_COLUMNS_, EXTRA_CODE_LENGTH_ - 1);
+      for (var i = PAIR_CODE_LENGTH_; i < Math.min(code.length, MAX_DIGIT_COUNT_); i++) {
+        var codeIndex = CODE_ALPHABET_.indexOf(code.charAt(i));
+        var row = Math.floor(codeIndex / GRID_COLUMNS_);
+        var col = codeIndex % GRID_COLUMNS_;
+        extraLat += row * latpv;
+        extraLng += col * lngpv;
+        latpv /= GRID_ROWS_;
+        lngpv /= GRID_COLUMNS_;
+      }
+      // Adjust the precisions from the integer values to degrees.
+      latpv /= PAIR_PRECISION_ * Math.pow(GRID_ROWS_, EXTRA_CODE_LENGTH_ - 1);
+      lngpv /= PAIR_PRECISION_ * Math.pow(GRID_COLUMNS_, EXTRA_CODE_LENGTH_ - 1);
+    }
+    // Merge the values from the normal and extra precision parts of the code.
+    var lat = normalLat / PAIR_PRECISION_ + extraLat / LAT_PRECISION_FINAL_;
+    var lng = normalLng / PAIR_PRECISION_ + extraLng / LNG_PRECISION_FINAL_;
+    return new CodeArea(lat, lng, lat + latpv, lng + lngpv, code.length);
   };
 
   /**
@@ -516,174 +576,6 @@
       longitude = longitude - 360;
     }
     return longitude;
-  };
-
-  /**
-   * Encode a location into a sequence of OLC lat/lng pairs.
-   *
-   * This uses pairs of characters (longitude and latitude in that order) to
-   * represent each step in a 20x20 grid. Each code, therefore, has 1/400th
-   * the area of the previous code.
-   *
-   * This algorithm is used up to 10 digits.
-   *
-   * @param {number} latitude The location to encode.
-   * @param {number} longitude The location to encode.
-   * @param {number} codeLength Requested code length.
-   * @return {string} The up to 10-digit OLC code for the location.
-   */
-  var encodePairs = function(latitude, longitude, codeLength) {
-    var code = '';
-    // Adjust latitude and longitude so they fall into positive ranges.
-    var adjustedLatitude = latitude + LATITUDE_MAX_;
-    var adjustedLongitude = longitude + LONGITUDE_MAX_;
-    // Count digits - can't use string length because it may include a separator
-    // character.
-    var digitCount = 0;
-    while (digitCount < codeLength) {
-      // Provides the value of digits in this place in decimal degrees.
-      var placeValue = PAIR_RESOLUTIONS_[Math.floor(digitCount / 2)];
-      // Do the latitude - gets the digit for this place and subtracts that for
-      // the next digit.
-      var digitValue = Math.floor(adjustedLatitude / placeValue);
-      adjustedLatitude -= digitValue * placeValue;
-      code += CODE_ALPHABET_.charAt(digitValue);
-      digitCount += 1;
-      // And do the longitude - gets the digit for this place and subtracts that
-      // for the next digit.
-      digitValue = Math.floor(adjustedLongitude / placeValue);
-      adjustedLongitude -= digitValue * placeValue;
-      code += CODE_ALPHABET_.charAt(digitValue);
-      digitCount += 1;
-      // Should we add a separator here?
-      if (digitCount == SEPARATOR_POSITION_ && digitCount < codeLength) {
-        code += SEPARATOR_;
-      }
-    }
-    if (code.length < SEPARATOR_POSITION_) {
-      code = code + Array(SEPARATOR_POSITION_ - code.length + 1).join(PADDING_CHARACTER_);
-    }
-    if (code.length == SEPARATOR_POSITION_) {
-      code = code + SEPARATOR_;
-    }
-    return code;
-  };
-
-  /**
-   * Encode a location using the grid refinement method into an OLC string.
-   *
-   * The grid refinement method divides the area into a grid of 4x5, and uses a
-   * single character to refine the area. This allows default accuracy OLC codes
-   * to be refined with just a single character.
-   *
-   * This algorithm is used for codes longer than 10 digits.
-   *
-   * @param {number} latitude The location to encode.
-   * @param {number} longitude The location to encode.
-   * @param {number} codeLength Requested code length.
-   * @return {string} The OLC code digits from the 11th digit on.
-   */
-  var encodeGrid = function(latitude, longitude, codeLength) {
-    var code = '';
-    var latPlaceValue = GRID_SIZE_DEGREES_;
-    var lngPlaceValue = GRID_SIZE_DEGREES_;
-    // Adjust latitude and longitude so they fall into positive ranges and
-    // get the offset for the required places.
-    latitude += LATITUDE_MAX_;
-    longitude += LONGITUDE_MAX_;
-    // To avoid problems with floating point, get rid of the degrees.
-    latitude = latitude % 1.0;
-    longitude = longitude % 1.0;
-    var adjustedLatitude = latitude % latPlaceValue;
-    var adjustedLongitude = longitude % lngPlaceValue;
-    for (var i = 0; i < codeLength; i++) {
-      // Work out the row and column.
-      var row = Math.floor(adjustedLatitude / (latPlaceValue / GRID_ROWS_));
-      var col = Math.floor(adjustedLongitude / (lngPlaceValue / GRID_COLUMNS_));
-      latPlaceValue /= GRID_ROWS_;
-      lngPlaceValue /= GRID_COLUMNS_;
-      adjustedLatitude -= row * latPlaceValue;
-      adjustedLongitude -= col * lngPlaceValue;
-      code += CODE_ALPHABET_.charAt(row * GRID_COLUMNS_ + col);
-    }
-    return code;
-  };
-
-  /**
-   * Decode an OLC code made up of lat/lng pairs.
-   *
-   * This decodes an OLC code made up of alternating latitude and longitude
-   * characters, encoded using base 20.
-   *
-   * @param {string} code The code to decode, assumed to be a valid full code,
-   *     but with the separator removed.
-   * @return {OpenLocationCode.CodeArea} The code area object.
-   */
-  var decodePairs = function(code) {
-    // Get the latitude and longitude values. These will need correcting from
-    // positive ranges.
-    var latitude = decodePairsSequence(code, 0);
-    var longitude = decodePairsSequence(code, 1);
-    // Correct the values and set them into the CodeArea object.
-    return new CodeArea(
-        latitude[0] - LATITUDE_MAX_,
-        longitude[0] - LONGITUDE_MAX_,
-        latitude[1] - LATITUDE_MAX_,
-        longitude[1] - LONGITUDE_MAX_,
-        code.length);
-  };
-
-  /**
-   * Decode either a latitude or longitude sequence.
-   *
-   * This decodes the latitude or longitude sequence of a lat/lng pair encoding.
-   * Starting at the character at position offset, every second character is
-   * decoded and the value returned.
-   *
-   * @param {string} code A valid full OLC code, with the separator removed.
-   * @param {string} offset The character to start from.
-   * @return {[number]} An array of two numbers, representing the lower and
-   *     upper range in decimal degrees. These are in positive ranges and will
-   *     need to be corrected appropriately.
-   */
-  var decodePairsSequence = function(code, offset) {
-    var i = 0;
-    var value = 0;
-    while (i * 2 + offset < code.length) {
-      value += CODE_ALPHABET_.indexOf(code.charAt(i * 2 + offset)) *
-          PAIR_RESOLUTIONS_[i];
-      i += 1;
-    }
-    return [value, value + PAIR_RESOLUTIONS_[i - 1]];
-  };
-
-  /**
-   * Decode the grid refinement portion of an OLC code.
-   *
-   * @param {string} code The grid refinement section of a code.
-   * @return {OpenLocationCode.CodeArea} The area of the code.
-   */
-  var decodeGrid = function(code) {
-    var latitudeLo = 0.0;
-    var longitudeLo = 0.0;
-    var latPlaceValue = GRID_SIZE_DEGREES_;
-    var lngPlaceValue = GRID_SIZE_DEGREES_;
-    var i = 0;
-    while (i < code.length) {
-      var codeIndex = CODE_ALPHABET_.indexOf(code.charAt(i));
-      var row = Math.floor(codeIndex / GRID_COLUMNS_);
-      var col = codeIndex % GRID_COLUMNS_;
-
-      latPlaceValue /= GRID_ROWS_;
-      lngPlaceValue /= GRID_COLUMNS_;
-
-      latitudeLo += row * latPlaceValue;
-      longitudeLo += col * lngPlaceValue;
-      i += 1;
-    }
-    return CodeArea(
-        latitudeLo, longitudeLo, latitudeLo + latPlaceValue,
-        longitudeLo + lngPlaceValue, code.length);
   };
 
   /**
