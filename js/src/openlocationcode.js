@@ -315,7 +315,7 @@
     // This algorithm starts with the least significant digits, and works it's
     // way to the front of the code.
     var code = '';
-    if (extra) {
+    if (codeLength > PAIR_CODE_LENGTH_) {
       // Use of % 1 works around rounding errors that can occur due to
       // representing numbers as 64-bit floats.
       // Without it, we can lose precision resulting in incorrect code
