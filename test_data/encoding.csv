@@ -24,3 +24,5 @@
 90,1,10,CFX3X2X2+X2
 # Test non-precise latitude/longitude value
 1.2,3.4,10,6FH56C22+22
+# Test floating point representation/rounding errors.
+35.6,3.033,10,8F75J22M+24
