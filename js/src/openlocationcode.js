@@ -115,11 +115,12 @@
   // code is approximately 13x13 meters (at the equator), and should be suitable
   // for identifying buildings. This excludes prefix and separator characters.
   var PAIR_CODE_LENGTH_ = 10;
-  
 
-  var EXTRA_CODE_LENGTH_ = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_;
-
+  // Inverse of the precision of the pair section of the code. (20^3)
   var PAIR_PRECISION_ = 8000;
+  
+  // Number of digits in the grid precision part of the code.
+  var GRID_CODE_LENGTH_ = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_;
 
   // The resolution values in degrees for each position in the lat/lng pair
   // encoding. These give the place value of each position, and therefore the
@@ -134,11 +135,13 @@
 
   // Multiply latitude by this much to make it a multiple of the finest
   // precision.
-  var LAT_PRECISION_FINAL_ = 8000 * Math.pow(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+  var LAT_PRECISION_FINAL_ = PAIR_PRECISION_ *
+      Math.pow(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
 
   // Multiply longitude by this much to make it a multiple of the finest
   // precision.
-  var LNG_PRECISION_FINAL_ = 8000 * Math.pow(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+  var LNG_PRECISION_FINAL_ = PAIR_PRECISION_ *
+      Math.pow(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
 
   // Minimum length of a code that can be shortened.
   var MIN_TRIMMABLE_CODE_LEN_ = 6;
@@ -365,51 +368,52 @@
    * @throws {Exception} If the code is not valid.
    */
   var decode = OpenLocationCode.decode = function(code) {
+    // This calculates the values for the pair and grid section separately, using
+    // integer arithmetic. Only at the final step are they converted to floating
+    // point and combined.
     if (!isFull(code)) {
       throw ('IllegalArgumentException: ' +
           'Passed Open Location Code is not a valid full code: ' + code);
     }
-    // This calculates the values for the pair and grid section separately, using
-    // integer arithmetic. Only at the final step are they converted to floating
-    // point and combined.
-    // Strip the '+' and '0' characters from the code and upper case.
+    // Strip the '+' and '0' characters from the code and convert to upper case.
     code = code.replace('+', '').replace(/0/g, '').toLocaleUpperCase('en-US');
     // Initialise the values for each section.
     var normalLat = -LATITUDE_MAX_ * PAIR_PRECISION_;
     var normalLng = -LONGITUDE_MAX_ * PAIR_PRECISION_;
-    var extraLat = 0;
-    var extraLng = 0;
+    var gridLat = 0;
+    var gridLng = 0;
     // Define the place value for the most significant digit.
-    var pv = Math.pow(ENCODING_BASE_, 4);  // base^4
+    var pv = Math.pow(ENCODING_BASE_, PAIR_CODE_LENGTH_ / 2);
+    // Decode the paired digits.
     for (var i = 0; i < Math.min(code.length, PAIR_CODE_LENGTH_); i+=2) {
+      pv /= ENCODING_BASE_;
       normalLat += CODE_ALPHABET_.indexOf(code.charAt(i)) * pv;
       normalLng += CODE_ALPHABET_.indexOf(code.charAt(i + 1)) * pv;
-      pv /= ENCODING_BASE_;
     }
-    // Adjust precision. In the for loop it got an extra / 20.
-    var latpv = pv / (PAIR_PRECISION_ / ENCODING_BASE_);
-    var lngpv = pv / (PAIR_PRECISION_ / ENCODING_BASE_);
+    // Adjust precision.
+    var latpv = pv / PAIR_PRECISION_;
+    var lngpv = pv / PAIR_PRECISION_;
     // Process any extra precision digits.
     if (code.length > PAIR_CODE_LENGTH_) {
       // Initialise the place values.
-      latpv = Math.pow(GRID_ROWS_, EXTRA_CODE_LENGTH_ - 1);
-      lngpv = Math.pow(GRID_COLUMNS_, EXTRA_CODE_LENGTH_ - 1);
+      latpv = Math.pow(GRID_ROWS_, GRID_CODE_LENGTH_);
+      lngpv = Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_);
       for (var i = PAIR_CODE_LENGTH_; i < Math.min(code.length, MAX_DIGIT_COUNT_); i++) {
+        latpv /= GRID_ROWS_;
+        lngpv /= GRID_COLUMNS_;
         var codeIndex = CODE_ALPHABET_.indexOf(code.charAt(i));
         var row = Math.floor(codeIndex / GRID_COLUMNS_);
         var col = codeIndex % GRID_COLUMNS_;
-        extraLat += row * latpv;
-        extraLng += col * lngpv;
-        latpv /= GRID_ROWS_;
-        lngpv /= GRID_COLUMNS_;
+        gridLat += row * latpv;
+        gridLng += col * lngpv;
       }
       // Adjust the precisions from the integer values to degrees.
-      latpv /= PAIR_PRECISION_ * Math.pow(GRID_ROWS_, EXTRA_CODE_LENGTH_ - 1);
-      lngpv /= PAIR_PRECISION_ * Math.pow(GRID_COLUMNS_, EXTRA_CODE_LENGTH_ - 1);
+      latpv /= PAIR_PRECISION_ * Math.pow(GRID_ROWS_, GRID_CODE_LENGTH_);
+      lngpv /= PAIR_PRECISION_ * Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_);
     }
     // Merge the values from the normal and extra precision parts of the code.
-    var lat = normalLat / PAIR_PRECISION_ + extraLat / LAT_PRECISION_FINAL_;
-    var lng = normalLng / PAIR_PRECISION_ + extraLng / LNG_PRECISION_FINAL_;
+    var lat = normalLat / PAIR_PRECISION_ + gridLat / LAT_PRECISION_FINAL_;
+    var lng = normalLng / PAIR_PRECISION_ + gridLng / LNG_PRECISION_FINAL_;
     return new CodeArea(lat, lng, lat + latpv, lng + lngpv, code.length);
   };
 
