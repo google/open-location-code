@@ -142,6 +142,11 @@ var GRID_SIZE_DEGREES = 0.000125;
 var MIN_TRIMMABLE_CODE_LEN = 6;
 
 /**
+ * Maximum length of a code.
+ */
+var MAX_CODE_LEN = 15;
+
+/**
  * Returns the characters used to produce the codes.
  * @return {string} the OLC alphabet.
  */
@@ -311,6 +316,7 @@ function encode(latitude, longitude, opt_length) {
       (opt_length < PAIR_CODE_LENGTH && opt_length % 2 == 1)) {
     throw 'IllegalArgumentException: Invalid Open Location Code length';
   }
+  opt_length = Math.min(opt_length, MAX_CODE_LEN);
   // Ensure that latitude and longitude are valid.
   latitude = clipLatitude(latitude);
   longitude = normalizeLongitude(longitude);
@@ -351,6 +357,10 @@ function decode(code) {
   code = code.replace(SEPARATOR, '');
   code = code.replace(new RegExp(PADDING_CHARACTER + '+'), '');
   code = code.toUpperCase();
+  if (code.length > MAX_CODE_LEN) {
+    code = code.substring(0, MAX_CODE_LEN);
+  }
+
   var /** @type {number} */ precision = ENCODING_BASE;
   var latitude = 0.0;
   var longitude = 0.0;
