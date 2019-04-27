@@ -115,6 +115,11 @@
   // code is approximately 13x13 meters (at the equator), and should be suitable
   // for identifying buildings. This excludes prefix and separator characters.
   var PAIR_CODE_LENGTH_ = 10;
+  
+
+  var EXTRA_CODE_LENGTH_ = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_;
+
+  var PAIR_PRECISION_ = 8000;
 
   // The resolution values in degrees for each position in the lat/lng pair
   // encoding. These give the place value of each position, and therefore the
@@ -126,9 +131,6 @@
 
   // Number of rows in the grid refinement method.
   var GRID_ROWS_ = 5;
-
-  // Size of the initial grid in degrees.
-  var GRID_SIZE_DEGREES_ = 0.000125;
 
   // Multiply latitude by this much to make it a multiple of the finest
   // precision.
