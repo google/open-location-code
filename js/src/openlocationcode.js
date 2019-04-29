@@ -135,12 +135,12 @@
 
   // Multiply latitude by this much to make it a multiple of the finest
   // precision.
-  var LAT_PRECISION_FINAL_ = PAIR_PRECISION_ *
+  var FINAL_LAT_PRECISION_ = PAIR_PRECISION_ *
       Math.pow(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
 
   // Multiply longitude by this much to make it a multiple of the finest
   // precision.
-  var LNG_PRECISION_FINAL_ = PAIR_PRECISION_ *
+  var FINAL_LNG_PRECISION_ = PAIR_PRECISION_ *
       Math.pow(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
 
   // Minimum length of a code that can be shortened.
@@ -325,8 +325,8 @@
       // representing numbers as 64-bit floats.
       // Without it, we can lose precision resulting in incorrect code
       // generation at digits 14/15.
-      var latPrecision = Math.floor((latitude + LATITUDE_MAX_) % 1 * LAT_PRECISION_FINAL_);
-      var lngPrecision = Math.floor((longitude + LONGITUDE_MAX_) % 1 * LNG_PRECISION_FINAL_);
+      var latPrecision = Math.floor((latitude - Math.floor(latitude) + Number.EPSILON) * FINAL_LAT_PRECISION_);
+      var lngPrecision = Math.floor((longitude - Math.floor(longitude) + Number.EPSILON) * FINAL_LNG_PRECISION_);
       for (var i = 0; i < MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i++) {
         code = CODE_ALPHABET_.charAt(
                    Math.floor(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
@@ -351,7 +351,7 @@
     if (codeLength >= SEPARATOR_POSITION_) {
       return code.substring(0, codeLength + 1);
     }
-    // Pad and return the cdoe
+    // Pad and return the code.
     return code.substring(0, codeLength) +
         Array(SEPARATOR_POSITION_ - codeLength + 1).join('0') + '+';
   };
@@ -412,8 +412,8 @@
       lngpv /= PAIR_PRECISION_ * Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_);
     }
     // Merge the values from the normal and extra precision parts of the code.
-    var lat = normalLat / PAIR_PRECISION_ + gridLat / LAT_PRECISION_FINAL_;
-    var lng = normalLng / PAIR_PRECISION_ + gridLng / LNG_PRECISION_FINAL_;
+    var lat = normalLat / PAIR_PRECISION_ + gridLat / FINAL_LAT_PRECISION_;
+    var lng = normalLng / PAIR_PRECISION_ + gridLng / FINAL_LNG_PRECISION_;
     return new CodeArea(lat, lng, lat + latpv, lng + lngpv, code.length);
   };
 
