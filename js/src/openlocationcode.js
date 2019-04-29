@@ -336,8 +336,8 @@
         lngPrecision /= GRID_COLUMNS_;
       }
     }
-    var latPrecision = Math.floor((latitude + LATITUDE_MAX_) * 8e3);
-    var lngPrecision = Math.floor((longitude + LONGITUDE_MAX_) * 8e3);
+    var latPrecision = Math.floor((latitude + LATITUDE_MAX_) * PAIR_PRECISION_);
+    var lngPrecision = Math.floor((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_);
     for (var i = 0; i < PAIR_CODE_LENGTH_ / 2; i++) {
       code = CODE_ALPHABET_.charAt(Math.floor(lngPrecision % ENCODING_BASE_)) + code;
       code = CODE_ALPHABET_.charAt(Math.floor(latPrecision % ENCODING_BASE_)) + code;
