@@ -321,12 +321,12 @@
     // way to the front of the code.
     var code = '';
     if (codeLength > PAIR_CODE_LENGTH_) {
-      // Use of % 1 works around rounding errors that can occur due to
-      // representing numbers as 64-bit floats.
-      // Without it, we can lose precision resulting in incorrect code
-      // generation at digits 14/15.
-      var latPrecision = Math.floor((latitude - Math.floor(latitude) + Number.EPSILON) * FINAL_LAT_PRECISION_);
-      var lngPrecision = Math.floor((longitude - Math.floor(longitude) + Number.EPSILON) * FINAL_LNG_PRECISION_);
+      // Use .toFixed(14) to avoid floating point representation issues causing
+      // incorrect Math.floor values.
+      var latPrecision = Math.floor(
+          (latitude - Math.floor(latitude)).toFixed(14) * FINAL_LAT_PRECISION_);
+      var lngPrecision = Math.floor(
+          (longitude - Math.floor(longitude)).toFixed(14) * FINAL_LNG_PRECISION_);
       for (var i = 0; i < MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i++) {
         code = CODE_ALPHABET_.charAt(
                    Math.floor(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
