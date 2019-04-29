@@ -24,3 +24,8 @@
 90,1,10,CFX3X2X2+X2
 # Test non-precise latitude/longitude value
 1.2,3.4,10,6FH56C22+22
+# Validate that codes generated with a length exceeding 15 significant digits
+# return a 15-digit code
+37.539669125,-122.375069724,15,849VGJQF+VX7QR3J
+37.539669125,-122.375069724,16,849VGJQF+VX7QR3J
+37.539669125,-122.375069724,100,849VGJQF+VX7QR3J
