@@ -17,9 +17,8 @@ package olc
 import (
 	"errors"
 	"fmt"
-	"log"
 	"math"
-	"sync"
+  "strings"
 )
 
 var (
@@ -34,10 +33,6 @@ const (
 
 	minTrimmableCodeLen = 6
 )
-
-var codePool = sync.Pool{
-	New: func() interface{} { return make([]byte, 0, pairCodeLen+1) },
-}
 
 // Encode a location into an Open Location Code.
 //
@@ -71,24 +66,54 @@ func Encode(lat, lng float64, codeLen int) string {
 	if lng == lngMax {
 		lng = normalizeLng(lng + computePrec(codeLen+2, true))
 	}
-	debug("Encode lat=%f lng=%f", lat, lng)
-	n := codeLen
-	if n > pairCodeLen {
-		n = pairCodeLen
-	}
-	code := codePool.Get().([]byte)
-	code = encodePairs(code[:0], lat, lng, n)
-	codeS := string(code)
-	if codeLen > pairCodeLen {
-		finerCode, err := encodeGrid(code, lat, lng, codeLen-pairCodeLen)
-		if err != nil {
-			log.Printf("encodeGrid(%q, %f, %f, %d): %v", code, lat, lng, codeLen-pairCodeLen, err)
-		} else {
-			codeS = string(finerCode)
-		}
-	}
-	codePool.Put(code)
-	return codeS
+	debug("Encode lat=%f lng=%f", lat, lng)  
+  
+  // This algorithm starts with the least significant digits, and works it's
+  // way to the front of the code.
+  code := ""
+  if codeLen > pairCodeLen {
+    // Use of % 1 works around rounding errors that can occur due to
+    // representing numbers as 64-bit floats.
+    // Without it, we can lose precision resulting in incorrect code
+    // generation at digits 14/15.
+		//epsilon := math.Nextafter(lat, math.MaxFloat64) - lat
+		//decimal := lat - math.Floor(lat)
+		//latPrecision := int((decimal + epsilon) * finalLatPrecision)
+		//epsilon = math.Nextafter(lng, math.MaxFloat64) - lng
+		//decimal = lng - math.Floor(lng)
+		//lngPrecision := int((decimal + epsilon) * finalLngPrecision)
+		latPrecision := int((math.Nextafter(lat, math.MaxFloat64) - math.Floor(lat)) * finalLatPrecision)
+		lngPrecision := int((math.Nextafter(lng, math.MaxFloat64) - math.Floor(lng)) * finalLngPrecision)
+    for i := 0; i < gridCodeLen; i++ { 
+      code = string(Alphabet[(latPrecision % gridRows) * gridCols + int(lngPrecision % gridCols)]) + code
+      latPrecision /= gridRows
+      lngPrecision /= gridCols
+    }
+  }
+	//val := (lat + latMax) * pairPrecision
+	//epsilon := math.Nextafter(val, math.MaxFloat64) - val
+	//latPrecision := int(val + epsilon)
+	//val = (lng + lngMax) * pairPrecision
+	//epsilon = math.Nextafter(val, math.MaxFloat64) - val
+	//lngPrecision := int(val + epsilon)
+  
+	latPrecision := int((math.Nextafter(lat, math.MaxFloat64) + latMax) * pairPrecision)
+	lngPrecision := int((math.Nextafter(lng, math.MaxFloat64) + lngMax) * pairPrecision)
+  for i := 0; i < pairCodeLen / 2; i++ {
+    code = string(Alphabet[lngPrecision % encBase]) + code
+    code = string(Alphabet[latPrecision % encBase]) + code
+    latPrecision /= encBase
+    lngPrecision /= encBase
+    if i == 0 {
+      code = string(Separator) + code
+    }
+  }
+  // If we don't need to pad the code, return the requested section.
+  if (codeLen >= sepPos) {
+    return code[:codeLen+1]
+  }
+  // Pad and return the code.
+  return code[:codeLen] + strings.Repeat(string(Padding), sepPos - codeLen) + string(Separator)
 }
 
 // encodePairs encode the location into a sequence of OLC lat/lng pairs.
