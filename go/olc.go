@@ -34,9 +34,6 @@ import (
 
 var (
 	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
-
-	// Debug governs the debug output.
-	Debug = false
 )
 
 const (
@@ -221,10 +218,4 @@ func normalizeLat(value float64) float64 {
 
 func normalizeLng(value float64) float64 {
 	return normalize(value, lngMax)
-}
-
-func debug(format string, args ...interface{}) {
-	if Debug {
-		log.Printf(format, args...)
-	}
 }

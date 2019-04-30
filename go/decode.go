@@ -47,7 +47,6 @@ func Decode(code string) (CodeArea, error) {
 		n = maxCodeLen
 	}
 	grid := decodeGrid(code[pairCodeLen:n])
-	debug("Decode %v + %v area=%v grid=%v", code[:pairCodeLen], code[pairCodeLen:n], area, grid)
 	return CodeArea{
 		LatLo: area.LatLo + grid.LatLo,
 		LngLo: area.LngLo + grid.LngLo,
@@ -85,7 +84,6 @@ func decodePairsSequence(code string, offset int) (lo, hi float64) {
 		i++
 		value += float64(strings.IndexByte(Alphabet, code[j])) * pairResolutions[i]
 	}
-	//debug("decodePairsSequence code=%s offset=%s i=%d value=%v pairRes=%f", code, offset, i, value, pairResolutions[i])
 	return value, value + pairResolutions[i]
 }
 
@@ -97,7 +95,6 @@ func decodePairsSequence(code string, offset int) (lo, hi float64) {
 func decodeGrid(code string) CodeArea {
 	var latLo, lngLo float64
 	var latPlaceValue, lngPlaceValue float64 = gridSizeDegrees, gridSizeDegrees
-	//debug("decodeGrid(%s)", code)
 	fGridRows, fGridCols := float64(gridRows), float64(gridCols)
 	for _, r := range code {
 		i := strings.IndexByte(Alphabet, byte(r))
@@ -105,11 +102,9 @@ func decodeGrid(code string) CodeArea {
 		col := i % gridCols
 		latPlaceValue /= fGridRows
 		lngPlaceValue /= fGridCols
-		//debug("decodeGrid i=%d row=%d col=%d larVal=%f lngVal=%f lat=%.10f, lng=%.10f", i, row, col, latPlaceValue, lngPlaceValue, latLo, lngLo)
 		latLo += float64(row) * latPlaceValue
 		lngLo += float64(col) * lngPlaceValue
 	}
-	//Log.Debug("decodeGrid", "code", code, "latVal", fmt.Sprintf("%f", latPlaceValue), "lngVal", fmt.Sprintf("%f", lngPlaceValue), "lat", fmt.Sprintf("%.10f", latLo), "lng", fmt.Sprintf("%.10f", lngLo))
 	return CodeArea{
 		LatLo: latLo, LatHi: latLo + latPlaceValue,
 		LngLo: lngLo, LngHi: lngLo + lngPlaceValue,

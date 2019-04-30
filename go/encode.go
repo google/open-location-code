@@ -66,39 +66,25 @@ func Encode(lat, lng float64, codeLen int) string {
 	if lng == lngMax {
 		lng = normalizeLng(lng + computePrec(codeLen+2, true))
 	}
-	debug("Encode lat=%f lng=%f", lat, lng)
 
-	// This algorithm starts with the least significant digits, and works it's
-	// way to the front of the code.
+	// This algorithm starts with the least significant digits, and works it's way to the front of the code.
+  // We generate either a max- or default length code, and then shorten/pad it at the end.
 	code := ""
 	if codeLen > pairCodeLen {
-		// Use of % 1 works around rounding errors that can occur due to
-		// representing numbers as 64-bit floats.
-		// Without it, we can lose precision resulting in incorrect code
-		// generation at digits 14/15.
-		//epsilon := math.Nextafter(lat, math.MaxFloat64) - lat
-		//decimal := lat - math.Floor(lat)
-		//latPrecision := int((decimal + epsilon) * finalLatPrecision)
-		//epsilon = math.Nextafter(lng, math.MaxFloat64) - lng
-		//decimal = lng - math.Floor(lng)
-		//lngPrecision := int((decimal + epsilon) * finalLngPrecision)
-		latPrecision := int((math.Nextafter(lat, math.MaxFloat64) - math.Floor(lat)) * finalLatPrecision)
-		lngPrecision := int((math.Nextafter(lng, math.MaxFloat64) - math.Floor(lng)) * finalLngPrecision)
+    // Multiply the decimal part of each coordinate by the final precision and round off to 1e-6 precision.
+    // Convert to integers so the rest of the math is integer based.
+		latPrecision := int(math.Round((lat-math.Floor(lat))*finalLatPrecision*1e6) / 1e6)
+		lngPrecision := int(math.Round((lng-math.Floor(lng))*finalLngPrecision*1e6) / 1e6)
 		for i := 0; i < gridCodeLen; i++ {
 			code = string(Alphabet[(latPrecision%gridRows)*gridCols+int(lngPrecision%gridCols)]) + code
 			latPrecision /= gridRows
 			lngPrecision /= gridCols
 		}
-	}
-	//val := (lat + latMax) * pairPrecision
-	//epsilon := math.Nextafter(val, math.MaxFloat64) - val
-	//latPrecision := int(val + epsilon)
-	//val = (lng + lngMax) * pairPrecision
-	//epsilon = math.Nextafter(val, math.MaxFloat64) - val
-	//lngPrecision := int(val + epsilon)
-
-	latPrecision := int((math.Nextafter(lat, math.MaxFloat64) + latMax) * pairPrecision)
-	lngPrecision := int((math.Nextafter(lng, math.MaxFloat64) + lngMax) * pairPrecision)
+	}  
+	// Multiply each coordinate by the precision and round off to 1e-6 precision.
+  // Convert to integers so the rest of the math is integer based.
+	latPrecision := int(math.Round((lat+latMax)*pairPrecision*1e6) / 1e6)
+	lngPrecision := int(math.Round((lng+lngMax)*pairPrecision*1e6) / 1e6)
 	for i := 0; i < pairCodeLen/2; i++ {
 		code = string(Alphabet[lngPrecision%encBase]) + code
 		code = string(Alphabet[latPrecision%encBase]) + code
