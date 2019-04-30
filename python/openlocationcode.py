@@ -103,6 +103,9 @@ GRID_SIZE_DEGREES_ = 0.000125
 #Minimum length of a code that can be shortened.
 MIN_TRIMMABLE_CODE_LEN_ = 6
 
+#The maximum significant digits in a plus code.
+MAX_CODE_LENGTH = 15
+
 SP = '+0'
 
 
@@ -213,6 +216,7 @@ def isFull(code):
 def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
     if codeLength < 2 or (codeLength < PAIR_CODE_LENGTH_ and codeLength % 2 == 1):
         raise ValueError('Invalid Open Location Code length - ' + str(codeLength))
+    codeLength = min(codeLength, MAX_CODE_LENGTH)
     # Ensure that latitude and longitude are valid.
     latitude = clipLatitude(latitude)
     longitude = normalizeLongitude(longitude)
@@ -240,10 +244,12 @@ def decode(code):
     if not isFull(code):
         raise ValueError('Passed Open Location Code is not a valid full code - ' + str(code))
     # Strip out separator character (we've already established the code is
-    # valid so the maximum is one), padding characters and convert to upper
-    # case.
+    # valid so the maximum is one), and padding characters. Convert to upper
+    # case and constrain to the maximum number of digits.
     code = re.sub('[+0]','',code)
     code = code.upper()
+    code = code[:MAX_CODE_LENGTH]
+
     # Decode the lat/lng pair component.
     codeArea = decodePairs(code[0:PAIR_CODE_LENGTH_])
     if len(code) <= PAIR_CODE_LENGTH_:

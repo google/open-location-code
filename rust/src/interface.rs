@@ -159,10 +159,13 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
     if !is_full(_code) {
         return Err(format!("Code must be a valid full code: {}", _code));
     }
-    let code = _code.to_string()
+    let mut code = _code.to_string()
         .replace(SEPARATOR, "")
         .replace(PADDING_CHAR_STR, "")
         .to_uppercase();
+    if code.len() > MAX_CODE_LENGTH {
+        code = code.chars().take(MAX_CODE_LENGTH).collect();
+    }
 
     let mut lat = -LATITUDE_MAX;
     let mut lng = -LONGITUDE_MAX;
