@@ -27,7 +27,6 @@ package olc
 import (
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"strings"
 )
