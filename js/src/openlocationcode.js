@@ -323,12 +323,10 @@
     if (codeLength > PAIR_CODE_LENGTH_) {
       // Multiply the decimal part of each coordinate by the final precision so
       // we can treat them as integers.
-      // (We use the full value * precision - floor * precision to avoid
-      // floating point rounding errors.
-      var latPrecision = latitude * FINAL_LAT_PRECISION_ -
-          Math.floor(latitude) * FINAL_LAT_PRECISION_;
-      var lngPrecision = longitude * FINAL_LNG_PRECISION_ -
-          Math.floor(longitude) * FINAL_LNG_PRECISION_;
+      var latPrecision = 
+          Math.floor((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_);
+      var lngPrecision =
+          Math.floor((longitude + LONGITUDE_MAX_) *) * FINAL_LNG_PRECISION_);
       for (var i = 0; i < MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i++) {
         code = CODE_ALPHABET_.charAt(
                    Math.floor(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
