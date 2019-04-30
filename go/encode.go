@@ -68,11 +68,11 @@ func Encode(lat, lng float64, codeLen int) string {
 	}
 
 	// This algorithm starts with the least significant digits, and works it's way to the front of the code.
-  // We generate either a max- or default length code, and then shorten/pad it at the end.
+	// We generate either a max- or default length code, and then shorten/pad it at the end.
 	code := ""
 	if codeLen > pairCodeLen {
-    // Multiply the decimal part of each coordinate by the final precision and round off to 1e-6 precision.
-    // Convert to integers so the rest of the math is integer based.
+		// Multiply the decimal part of each coordinate by the final precision and round off to 1e-6 precision.
+		// Convert to integers so the rest of the math is integer based.
 		latPrecision := int(math.Round((lat-math.Floor(lat))*finalLatPrecision*1e6) / 1e6)
 		lngPrecision := int(math.Round((lng-math.Floor(lng))*finalLngPrecision*1e6) / 1e6)
 		for i := 0; i < gridCodeLen; i++ {
@@ -80,9 +80,9 @@ func Encode(lat, lng float64, codeLen int) string {
 			latPrecision /= gridRows
 			lngPrecision /= gridCols
 		}
-	}  
+	}
 	// Multiply each coordinate by the precision and round off to 1e-6 precision.
-  // Convert to integers so the rest of the math is integer based.
+	// Convert to integers so the rest of the math is integer based.
 	latPrecision := int(math.Round((lat+latMax)*pairPrecision*1e6) / 1e6)
 	lngPrecision := int(math.Round((lng+lngMax)*pairPrecision*1e6) / 1e6)
 	for i := 0; i < pairCodeLen/2; i++ {
