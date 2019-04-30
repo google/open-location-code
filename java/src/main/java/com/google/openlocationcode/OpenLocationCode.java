@@ -191,10 +191,8 @@ public final class OpenLocationCode {
     }
 
     // Adjust latitude and longitude to be in positive number ranges.
-    // We add the max values when creating the BigDecimal (as opposed to creating a BigDecimal and
-    // then adding the value) to be consistent with the other implementations.
-    BigDecimal remainingLatitude = new BigDecimal(latitude + LATITUDE_MAX.doubleValue());
-    BigDecimal remainingLongitude = new BigDecimal(longitude + LONGITUDE_MAX.doubleValue());
+    BigDecimal remainingLatitude = new BigDecimal(latitude).add(LATITUDE_MAX);
+    BigDecimal remainingLongitude = new BigDecimal(longitude).add(LONGITUDE_MAX);
 
     // Count how many digits have been created.
     int generatedDigits = 0;
