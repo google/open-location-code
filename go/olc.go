@@ -50,13 +50,13 @@ const (
 
 	pairCodeLen       = 10
 	maxCodeLen        = 15
-  gridCodeLen       = 5
-  pairPrecision     = 8000
+	gridCodeLen       = 5
+	pairPrecision     = 8000
 	gridCols          = 4
 	gridRows          = 5
-  finalLatPrecision = 8000 * 3125  // pairPrecision * gridRows**gridCodeLen
-  finalLngPrecision = 8000 * 1024  // pairPrecision * gridCols**gridCodeLen
-	gridSizeDegrees   = 0.000125     // 1/pairPrecision
+	finalLatPrecision = 8000 * 3125 // pairPrecision * gridRows**gridCodeLen
+	finalLngPrecision = 8000 * 1024 // pairPrecision * gridCols**gridCodeLen
+	gridSizeDegrees   = 0.000125    // 1/pairPrecision
 
 	latMax = 90
 	lngMax = 180
