@@ -16,7 +16,6 @@ package olc
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"strings"
 )
@@ -100,88 +99,6 @@ func Encode(lat, lng float64, codeLen int) string {
 	}
 	// Pad and return the code.
 	return code[:codeLen] + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
-}
-
-// encodePairs encode the location into a sequence of OLC lat/lng pairs.
-//
-// Appends to the given code byte slice!
-//
-// This uses pairs of characters (longitude and latitude in that order) to
-// represent each step in a 20x20 grid. Each code, therefore, has 1/400th
-// the area of the previous code.
-func encodePairs(code []byte, lat, lng float64, codeLen int) []byte {
-	lat += latMax
-	lng += lngMax
-	for digits := 0; digits < codeLen; {
-		// value of digits in this place, in decimal degrees
-		placeValue := pairResolutions[digits/2]
-
-		digitValue := int(lat / placeValue)
-		lat -= float64(digitValue) * placeValue
-		code = append(code, Alphabet[digitValue])
-		digits++
-
-		digitValue = int(lng / placeValue)
-		lng -= float64(digitValue) * placeValue
-		code = append(code, Alphabet[digitValue])
-		digits++
-
-		if digits == sepPos && digits < codeLen {
-			code = append(code, Separator)
-		}
-	}
-	for len(code) < sepPos {
-		code = append(code, Padding)
-	}
-	if len(code) == sepPos {
-		code = append(code, Separator)
-	}
-
-	return code
-}
-
-// encodeGrid encodes a location using the grid refinement method into
-// an OLC string.
-//
-// Appends to the given code byte slice!
-//
-// The grid refinement method divides the area into a grid of 4x5, and uses a
-// single character to refine the area. This allows default accuracy OLC codes
-// to be refined with just a single character.
-func encodeGrid(code []byte, lat, lng float64, codeLen int) ([]byte, error) {
-	// Adjust to positive ranges.
-	lat += latMax
-	lng += lngMax
-	// To avoid problems with floating point, get rid of the degrees.
-	lat = math.Remainder(lat, 1.0)
-	lng = math.Remainder(lng, 1.0)
-	latPlaceValue, lngPlaceValue := gridSizeDegrees, gridSizeDegrees
-	lat = math.Remainder(lat, latPlaceValue)
-	if lat < 0 {
-		lat += latPlaceValue
-	}
-	lng = math.Remainder(lng, lngPlaceValue)
-	if lng < 0 {
-		lng += lngPlaceValue
-	}
-	for i := 0; i < codeLen; i++ {
-		row := int(math.Floor(lat / (latPlaceValue / gridRows)))
-		col := int(math.Floor(lng / (lngPlaceValue / gridCols)))
-		pos := row*gridCols + col
-		if !(0 <= pos && pos < len(Alphabet)) {
-			return nil, fmt.Errorf("pos=%d is out of alphabet", pos)
-		}
-		code = append(code, Alphabet[pos])
-		if i == codeLen-1 {
-			break
-		}
-
-		latPlaceValue /= gridRows
-		lngPlaceValue /= gridCols
-		lat -= float64(row) * latPlaceValue
-		lng -= float64(col) * lngPlaceValue
-	}
-	return code, nil
 }
 
 // computePrec computes the precision value for a given code length.
