@@ -325,7 +325,7 @@
       // we can treat them as integers.
       // (We use the full value * precision - floor * precision to avoid
       // floating point rounding errors.
-      var latPrecision = lat * FINAL_LAT_PRECISION_ -
+      var latPrecision = latitude * FINAL_LAT_PRECISION_ -
           Math.floor(latitude) * FINAL_LAT_PRECISION_;
       var lngPrecision = longitude * FINAL_LNG_PRECISION_ -
           Math.floor(longitude) * FINAL_LNG_PRECISION_;

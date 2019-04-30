@@ -75,7 +75,7 @@ matrix:
       script:
         - cd js
         - npm install
-        - eslint js/openlocationcode.js
+        - eslint openlocationcode.js
         - npm test
 
     # Python implementation. Lives in python/, tested with bazel.
