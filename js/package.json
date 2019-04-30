@@ -24,5 +24,9 @@
     "gulp": "^4.0.1",
     "gulp-cli": "^2.2.0",
     "node-qunit-phantomjs": "^2.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-google": "^0.12.0"
   }
 }

@@ -321,12 +321,14 @@
     // way to the front of the code.
     var code = '';
     if (codeLength > PAIR_CODE_LENGTH_) {
-      // Use .toFixed(14) to avoid floating point representation issues causing
-      // incorrect Math.floor values.
-      var latPrecision = Math.floor(
-          (latitude - Math.floor(latitude)).toFixed(14) * FINAL_LAT_PRECISION_);
-      var lngPrecision = Math.floor(
-          (longitude - Math.floor(longitude)).toFixed(14) * FINAL_LNG_PRECISION_);
+      // Multiply the decimal part of each coordinate by the final precision so
+      // we can treat them as integers.
+      // (We use the full value * precision - floor * precision to avoid
+      // floating point rounding errors.
+      var latPrecision = lat * FINAL_LAT_PRECISION_ -
+          Math.floor(latitude) * FINAL_LAT_PRECISION_;
+      var lngPrecision = longitude * FINAL_LNG_PRECISION_ -
+          Math.floor(longitude) * FINAL_LNG_PRECISION_;
       for (var i = 0; i < MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i++) {
         code = CODE_ALPHABET_.charAt(
                    Math.floor(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
@@ -336,6 +338,7 @@
         lngPrecision /= GRID_COLUMNS_;
       }
     }
+    // Multiple the coordinates by the pair precision and convert to integers.
     var latPrecision = Math.floor((latitude + LATITUDE_MAX_) * PAIR_PRECISION_);
     var lngPrecision = Math.floor((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_);
     for (var i = 0; i < PAIR_CODE_LENGTH_ / 2; i++) {
