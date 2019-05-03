@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-  "strconv"
+	"strconv"
 	"strings"
 )
 
@@ -37,8 +37,8 @@ func main() {
 	var formatted []string
 	for i := 0; i < len(records); i++ {
 		for j := 0; j < len(records[i]); j++ {
-      // Anything that can't be parsed as a float is a string and needs quotes.
-      if _, err := strconv.ParseFloat(records[i][j], 64); err != nil {
+			// Anything that can't be parsed as a float is a string and needs quotes.
+			if _, err := strconv.ParseFloat(records[i][j], 64); err != nil {
 				records[i][j] = "\"" + records[i][j] + "\""
 			}
 		}
