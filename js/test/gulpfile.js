@@ -1,15 +1,21 @@
 var gulp = require('gulp');
-var phantom = require('node-qunit-phantomjs');
+var karma = require('karma');
 
-function test(callback) {
-  phantom('./test.html', {'verbose': true}, (result) => {
-    // Called with 0 for successful test completion, 1 for failure(s).
-    if (result === 0) {
-      callback();
-    } else {
-      callback(new Error('tests failed'));
-    }
-  });
-}
+gulp.task('test', function(done) {
+    var server = new karma.Server({
+        configFile: __dirname + '/karma.config.js',
+        singleRun: true
+    });
 
-exports.test = test;
+    server.on('run_complete', function (browsers, results) {
+        if (results.error || results.failed) {
+            done(new Error('There are test failures'));
+        }
+        else {
+            done();
+        }
+    });
+
+    server.start();
+});
+
