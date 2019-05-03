@@ -72,7 +72,7 @@
     // Browser globals
     root.OpenLocationCode = factory();
   }
-} (this, function() {
+}(this, function() {
   var OpenLocationCode = {};
 
   /**
@@ -312,11 +312,11 @@
       codeLength = Math.min(MAX_DIGIT_COUNT_, Number(codeLength));
     }
     if (isNaN(latitude) || isNaN(longitude) || isNaN(codeLength)) {
-      throw 'ValueError: Parameters are not numbers';
+      throw new Error('ValueError: Parameters are not numbers');
     }
     if (codeLength < 2 ||
         (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
-      throw 'IllegalArgumentException: Invalid Open Location Code length';
+      throw new Error('IllegalArgumentException: Invalid Open Location Code length');
     }
     // Ensure that latitude and longitude are valid.
     latitude = clipLatitude(latitude);
@@ -390,7 +390,7 @@
     // integer arithmetic. Only at the final step are they converted to floating
     // point and combined.
     if (!isFull(code)) {
-      throw ('IllegalArgumentException: ' +
+      throw new Error('IllegalArgumentException: ' +
           'Passed Open Location Code is not a valid full code: ' + code);
     }
     // Strip the '+' and '0' characters from the code and convert to upper case.
@@ -465,19 +465,20 @@
    * @throws {Exception} if the short code is not valid, or the reference
    *     position values are not numbers.
    */
-  var recoverNearest = OpenLocationCode.recoverNearest = function(
+  OpenLocationCode.recoverNearest = function(
       shortCode, referenceLatitude, referenceLongitude) {
     if (!isShort(shortCode)) {
       if (isFull(shortCode)) {
         return shortCode.toUpperCase();
       } else {
-        throw 'ValueError: Passed short code is not valid: ' + shortCode;
+        throw new Error(
+            'ValueError: Passed short code is not valid: ' + shortCode);
       }
     }
     referenceLatitude = Number(referenceLatitude);
     referenceLongitude = Number(referenceLongitude);
     if (isNaN(referenceLatitude) || isNaN(referenceLongitude)) {
-      throw ('ValueError: Reference position are not numbers');
+      throw new Error('ValueError: Reference position are not numbers');
     }
     // Ensure that latitude and longitude are valid.
     referenceLatitude = clipLatitude(referenceLatitude);
@@ -538,25 +539,26 @@
    * @throws {Exception} if the passed code is not a valid full code or the
    *     reference location values are not numbers.
    */
-  var shorten = OpenLocationCode.shorten = function(
+  OpenLocationCode.shorten = function(
       code, latitude, longitude) {
     if (!isFull(code)) {
-      throw 'ValueError: Passed code is not valid and full: ' + code;
+      throw new Error('ValueError: Passed code is not valid and full: ' + code);
     }
     if (code.indexOf(PADDING_CHARACTER_) != -1) {
-      throw 'ValueError: Cannot shorten padded codes: ' + code;
+      throw new Error('ValueError: Cannot shorten padded codes: ' + code);
     }
     code = code.toUpperCase();
     var codeArea = decode(code);
     if (codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN_) {
-      throw 'ValueError: Code length must be at least ' +
-          MIN_TRIMMABLE_CODE_LEN_;
+      throw new Error(
+          'ValueError: Code length must be at least ' +
+          MIN_TRIMMABLE_CODE_LEN_);
     }
     // Ensure that latitude and longitude are valid.
     latitude = Number(latitude);
     longitude = Number(longitude);
     if (isNaN(latitude) || isNaN(longitude)) {
-      throw ('ValueError: Reference position are not numbers');
+      throw new Error('ValueError: Reference position are not numbers');
     }
     latitude = clipLatitude(latitude);
     longitude = normalizeLongitude(longitude);
