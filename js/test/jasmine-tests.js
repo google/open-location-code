@@ -1,6 +1,3 @@
-
-
-
 describe("Open Location Code", function() {
   var precision = 1e-10;
 
@@ -25,10 +22,10 @@ describe("Open Location Code", function() {
       var area = OpenLocationCode.decode(test[0]);
       // Did we get the same values?
       expect(area.codeLength).toBe(test[1]);
-      expect(area.latitudeLo).toBeCloseTo(test[2], precision);
-      expect(area.longitudeLo).toBeCloseTo(test[3], precision);
-      expect(area.latitudeHi).toBeCloseTo(test[4], precision);
-      expect(area.longitudeHi).toBeCloseTo(test[5], precision);
+      expect(area.latitudeLo).toBeCloseTo(test[2], precision, test[0]);
+      expect(area.longitudeLo).toBeCloseTo(test[3], precision, test[0]);
+      expect(area.latitudeHi).toBeCloseTo(test[4], precision, test[0]);
+      expect(area.longitudeHi).toBeCloseTo(test[5], precision, test[0]);
     }
   });
 
@@ -38,9 +35,9 @@ describe("Open Location Code", function() {
     expect(encTests.length).toBeGreaterThan(1);
     for (var i = 0; i < encTests.length; i++) {
       var test = encTests[i];
-      expect(OpenLocationCode.isValid(test[0])).toBe(test[1] === 'true');
-      expect(OpenLocationCode.isShort(test[0])).toBe(test[2] === 'true');
-      expect(OpenLocationCode.isFull(test[0])).toBe(test[3] === 'true');
+      expect(OpenLocationCode.isValid(test[0])).toBe(test[1] === 'true', test[0]);
+      expect(OpenLocationCode.isShort(test[0])).toBe(test[2] === 'true', test[0]);
+      expect(OpenLocationCode.isFull(test[0])).toBe(test[3] === 'true', test[0]);
     }
   });
 
@@ -55,7 +52,7 @@ describe("Open Location Code", function() {
         var shorten = OpenLocationCode.shorten(
             test[0], test[1], test[2]);
         // Confirm we got what we expected.
-        expect(shorten).toBe(test[3]);
+        expect(shorten).toBe(test[3], test[0]);
       }
       if (test[4] == "B" || test[4] == "R") {
         // Now try expanding the shortened code.
