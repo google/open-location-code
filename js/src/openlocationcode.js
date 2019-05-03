@@ -680,7 +680,7 @@
           longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX_);
     },
   };
-  CodeArea.fn.init.prototype = CodeArea.fn;
+  CodeArea.fn.Init.prototype = CodeArea.fn;
 
   return OpenLocationCode;
 }));
