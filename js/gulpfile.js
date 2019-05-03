@@ -3,7 +3,7 @@ var karma = require('karma');
 
 gulp.task('test', function(done) {
     var server = new karma.Server({
-        configFile: __dirname + '/karma.config.js',
+        configFile: __dirname + '/test/karma.config.js',
         singleRun: true
     });
 
@@ -19,3 +19,15 @@ gulp.task('test', function(done) {
     server.start();
 });
 
+const minify = require('gulp-minify');
+gulp.task('minify', function(done) {
+  gulp.src('src/openlocationcode.js')
+    .pipe(minify({
+        ext:{
+            src:'.js',
+            min:'.min.js'
+        },
+    }))
+    .pipe(gulp.dest('src'));
+  done();
+});
