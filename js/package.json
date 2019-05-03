@@ -28,8 +28,7 @@
     "karma": "^4.1.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^2.0.1",
-    "karma-jasmine-jquery": "^0.1.1",
-    "node-qunit-phantomjs": "^2.0.1"
+    "karma-jasmine-jquery": "^0.1.1"
   },
   "devDependencies": {
     "eslint": "^5.16.0",

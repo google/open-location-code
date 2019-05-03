@@ -74,9 +74,7 @@ matrix:
       env: OLC_PATH=js
       script:
         - cd js
-        - npm install
-        - eslint src/openlocationcode.js
-        - npm test
+        - sh test/run_tests.sh
 
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
