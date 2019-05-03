@@ -56,11 +56,11 @@
  *   var code = OpenLocationCode.recoverNearest('9G8F+6X', 47.4, 8.6);
  *   var code = OpenLocationCode.recoverNearest('8F+6X', 47.4, 8.6);
  */
-(function (root, factory) {
+(function(root, factory) {
   /* global define, module */
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['b'], function (b) {
+    define(['b'], function(b) {
       return (root.returnExportsGlobal = factory(b));
     });
   } else if (typeof module === 'object' && module.exports) {
@@ -72,7 +72,7 @@
     // Browser globals
     root.OpenLocationCode = factory();
   }
-} (this, function () {
+} (this, function() {
   var OpenLocationCode = {};
 
   /**
@@ -116,8 +116,8 @@
   // for identifying buildings. This excludes prefix and separator characters.
   var PAIR_CODE_LENGTH_ = 10;
 
-	// First place value of the pairs (if the last pair value is 1).
-	var PAIR_FIRST_PLACE_VALUE_ = ENCODING_BASE_**(PAIR_CODE_LENGTH_ / 2 - 1);
+  // First place value of the pairs (if the last pair value is 1).
+  var PAIR_FIRST_PLACE_VALUE_ = ENCODING_BASE_**(PAIR_CODE_LENGTH_ / 2 - 1);
 
   // Inverse of the precision of the pair section of the code.
   var PAIR_PRECISION_ = ENCODING_BASE_**3;
@@ -136,11 +136,11 @@
   // Number of rows in the grid refinement method.
   var GRID_ROWS_ = 5;
 
-	// First place value of the latitude grid (if the last place is 1).
-	var GRID_LAT_FIRST_PLACE_VALUE_ = GRID_ROWS_**(GRID_CODE_LENGTH_ - 1);
+  // First place value of the latitude grid (if the last place is 1).
+  var GRID_LAT_FIRST_PLACE_VALUE_ = GRID_ROWS_**(GRID_CODE_LENGTH_ - 1);
 
-	// First place value of the longitude grid (if the last place is 1).
-	var GRID_LNG_FIRST_PLACE_VALUE_ = GRID_COLUMNS_**(GRID_CODE_LENGTH_ - 1);
+  // First place value of the longitude grid (if the last place is 1).
+  var GRID_LNG_FIRST_PLACE_VALUE_ = GRID_COLUMNS_**(GRID_CODE_LENGTH_ - 1);
 
   // Multiply latitude by this much to make it a multiple of the finest
   // precision.
@@ -156,9 +156,9 @@
   var MIN_TRIMMABLE_CODE_LEN_ = 6;
 
   /**
-    Returns the OLC alphabet.
+    @return {string} Returns the OLC alphabet.
    */
-  var getAlphabet = OpenLocationCode.getAlphabet = function() {
+  OpenLocationCode.getAlphabet = function() {
     return CODE_ALPHABET_;
   };
 
@@ -312,7 +312,7 @@
       codeLength = Math.min(MAX_DIGIT_COUNT_, Number(codeLength));
     }
     if (isNaN(latitude) || isNaN(longitude) || isNaN(codeLength)) {
-      throw ('ValueError: Parameters are not numbers');
+      throw 'ValueError: Parameters are not numbers';
     }
     if (codeLength < 2 ||
         (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
@@ -546,7 +546,7 @@
     if (code.indexOf(PADDING_CHARACTER_) != -1) {
       throw 'ValueError: Cannot shorten padded codes: ' + code;
     }
-    var code = code.toUpperCase();
+    code = code.toUpperCase();
     var codeArea = decode(code);
     if (codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN_) {
       throw 'ValueError: Code length must be at least ' +
@@ -623,16 +623,21 @@
    * The coordinates include the latitude and longitude of the lower left and
    * upper right corners and the center of the bounding box for the area the
    * code represents.
+   * @param {number} latitudeLo
+   * @param {number} longitudeLo
+   * @param {number} latitudeHi
+   * @param {number} longitudeHi
+   * @param {number} codeLength
    *
    * @constructor
    */
   var CodeArea = OpenLocationCode.CodeArea = function(
-    latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) {
-    return new OpenLocationCode.CodeArea.fn.init(
+      latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) {
+    return new OpenLocationCode.CodeArea.fn.Init(
         latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength);
   };
   CodeArea.fn = CodeArea.prototype = {
-    init: function(
+    Init: function(
         latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) {
       /**
        * The latitude of the SW corner.
@@ -671,7 +676,7 @@
        */
       this.longitudeCenter = Math.min(
           longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX_);
-    }
+    },
   };
   CodeArea.fn.init.prototype = CodeArea.fn;
 
