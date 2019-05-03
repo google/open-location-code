@@ -31,10 +31,6 @@ import (
 	"strings"
 )
 
-var (
-	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
-)
-
 const (
 	// Separator is the character that separates the two parts of location code.
 	Separator = '+'
@@ -43,16 +39,25 @@ const (
 
 	// Alphabet is the set of valid encoding characters.
 	Alphabet = "23456789CFGHJMPQRVWX"
+	encBase  = len(Alphabet)
 
-	pairCodeLen       = 10
-	maxCodeLen        = 15
-	gridCodeLen       = 5
-	pairPrecision     = 8000
-	gridCols          = 4
-	gridRows          = 5
-	finalLatPrecision = 8000 * 3125 // pairPrecision * gridRows**gridCodeLen
-	finalLngPrecision = 8000 * 1024 // pairPrecision * gridCols**gridCodeLen
-	gridSizeDegrees   = 0.000125    // 1/pairPrecision
+	maxCodeLen  = 15
+	pairCodeLen = 10
+	gridCodeLen = maxCodeLen - pairCodeLen
+	gridCols    = 4
+	gridRows    = 5
+	// First place value of the pairs (if the last pair value is 1). encBase^(pairs-1)
+	pairFPV = 160000
+	// Precision of the pair part of the code, in 1/degrees.
+	pairPrecision = 8000
+	// First place value of the latitude grid (if the last place is 1). gridRows^(gridCodeLen - 1)
+	gridLatFPV = 625
+	// First place value of the longitude grid (if the last place is 1). gridCols^(gridCodeLen - 1)
+	gridLngFPV = 256
+	// Latitude precision of a full length code. pairPrecision * gridRows**gridCodeLen
+	finalLatPrecision = 8000 * 3125
+	// Longitude precision of a full length code. pairPrecision * gridCols**gridCodeLen
+	finalLngPrecision = 8000 * 1024
 
 	latMax = 90
 	lngMax = 180
@@ -209,6 +214,17 @@ func normalize(value, max float64) float64 {
 		value -= 2 * max
 	}
 	return value
+}
+
+// clipLatitude forces the latitude into the valid range.
+func clipLatitude(lat float64) float64 {
+	if lat > latMax {
+		return latMax
+	}
+	if lat < -latMax {
+		return -latMax
+	}
+	return lat
 }
 
 func normalizeLat(value float64) float64 {

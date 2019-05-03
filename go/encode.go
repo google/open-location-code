@@ -28,8 +28,6 @@ var (
 )
 
 const (
-	encBase = len(Alphabet)
-
 	minTrimmableCodeLen = 6
 )
 
@@ -68,14 +66,16 @@ func Encode(lat, lng float64, codeLen int) string {
 
 	// This algorithm starts with the least significant digits, and works it's way to the front of the code.
 	// We generate either a max- or default length code, and then shorten/pad it at the end.
-	code := ""
+  // Build up the code as bytes, convert to string at the end.
+	var code [15]byte
 	if codeLen > pairCodeLen {
 		// Multiply the decimal part of each coordinate by the final precision and round off to 1e-6 precision.
 		// Convert to integers so the rest of the math is integer based.
+		// This avoids/minimises errors due to loss of precision in floating point representation.
 		latPrecision := int(math.Round((lat-math.Floor(lat))*finalLatPrecision*1e6) / 1e6)
 		lngPrecision := int(math.Round((lng-math.Floor(lng))*finalLngPrecision*1e6) / 1e6)
 		for i := 0; i < gridCodeLen; i++ {
-			code = string(Alphabet[(latPrecision%gridRows)*gridCols+int(lngPrecision%gridCols)]) + code
+			code[maxCodeLen-1-i] = Alphabet[(latPrecision%gridRows)*gridCols+int(lngPrecision%gridCols)]
 			latPrecision /= gridRows
 			lngPrecision /= gridCols
 		}
@@ -85,20 +85,17 @@ func Encode(lat, lng float64, codeLen int) string {
 	latPrecision := int(math.Round((lat+latMax)*pairPrecision*1e6) / 1e6)
 	lngPrecision := int(math.Round((lng+lngMax)*pairPrecision*1e6) / 1e6)
 	for i := 0; i < pairCodeLen/2; i++ {
-		code = string(Alphabet[lngPrecision%encBase]) + code
-		code = string(Alphabet[latPrecision%encBase]) + code
+		code[pairCodeLen-i*2-1] = Alphabet[lngPrecision%encBase]
+		code[pairCodeLen-i*2-2] = Alphabet[latPrecision%encBase]
 		latPrecision /= encBase
 		lngPrecision /= encBase
-		if i == 0 {
-			code = string(Separator) + code
-		}
 	}
 	// If we don't need to pad the code, return the requested section.
 	if codeLen >= sepPos {
-		return code[:codeLen+1]
+		return string(code[:sepPos]) + string(Separator) + string(code[sepPos:codeLen])
 	}
 	// Pad and return the code.
-	return code[:codeLen] + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
+	return string(code[:codeLen]) + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
 }
 
 // computePrec computes the precision value for a given code length.
@@ -114,14 +111,4 @@ func computePrec(codeLen int, longitudal bool) float64 {
 		g = gridCols
 	}
 	return math.Pow(20, -3) / math.Pow(g, float64(codeLen-10))
-}
-
-func clipLatitude(lat float64) float64 {
-	if lat > latMax {
-		return latMax
-	}
-	if lat < -latMax {
-		return -latMax
-	}
-	return lat
 }

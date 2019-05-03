@@ -10,6 +10,10 @@ import (
 // MinTrimmableCodeLen is the minimum length of a code that is able to be shortened.
 const MinTrimmableCodeLen = 6
 
+var (
+	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
+)
+
 // Shorten removes characters from the start of an OLC code.
 //
 // This uses a reference location to determine how many initial characters

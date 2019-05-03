@@ -15,10 +15,11 @@
 package olc
 
 import (
-	"bytes"
-	"io/ioutil"
+	"bufio"
+	"encoding/csv"
 	"math"
 	"math/rand"
+	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
@@ -67,10 +68,10 @@ func init() {
 		defer wg.Done()
 		for _, cols := range mustReadLines("validityTests.csv") {
 			validity = append(validity, validityTest{
-				code:    string(cols[0]),
-				isValid: cols[1][0] == 't',
-				isShort: cols[2][0] == 't',
-				isFull:  cols[3][0] == 't',
+				code:    cols[0],
+				isValid: cols[1] == "true",
+				isShort: cols[2] == "true",
+				isFull:  cols[3] == "true",
 			})
 		}
 	}()
@@ -84,7 +85,7 @@ func init() {
 				lat:    mustFloat(cols[0]),
 				lng:    mustFloat(cols[1]),
 				length: mustInt(cols[2]),
-				code:   string(cols[3]),
+				code:   cols[3],
 			})
 		}
 	}()
@@ -95,7 +96,7 @@ func init() {
 			mustReadLines("decoding.csv"),
 		) {
 			decoding = append(decoding, decodingTest{
-				code:   string(cols[0]),
+				code:   cols[0],
 				length: mustInt(cols[1]),
 				latLo:  mustFloat(cols[2]),
 				lngLo:  mustFloat(cols[3]),
@@ -109,11 +110,11 @@ func init() {
 		defer wg.Done()
 		for _, cols := range mustReadLines("shortCodeTests.csv") {
 			shorten = append(shorten, shortenTest{
-				code:  string(cols[0]),
+				code:  cols[0],
 				lat:   mustFloat(cols[1]),
 				lng:   mustFloat(cols[2]),
-				short: string(cols[3]),
-				tType: string(cols[4]),
+				short: cols[3],
+				tType: cols[4],
 			})
 		}
 	}()
@@ -185,76 +186,34 @@ func closeEnough(a, b float64) bool {
 	return a == b || math.Abs(a-b) <= 0.0000000001
 }
 
-func mustReadLines(name string) [][][]byte {
-	rows, err := readLines(filepath.Join("..", "test_data", name))
+func mustReadLines(name string) [][]string {
+	csvFile, err := os.Open(filepath.Join("..", "test_data", name))
 	if err != nil {
 		panic(err)
 	}
-	return rows
+	reader := csv.NewReader(bufio.NewReader(csvFile))
+	reader.Comment = '#'
+	if records, err := reader.ReadAll(); err != nil {
+		panic(err)
+	} else {
+		return records
+	}
 }
 
-func readLines(path string) (rows [][][]byte, err error) {
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	for _, row := range bytes.Split(data, []byte{'\n'}) {
-		if j := bytes.IndexByte(row, '#'); j >= 0 {
-			row = row[:j]
-		}
-		row = bytes.TrimSpace(row)
-		if len(row) == 0 {
-			continue
-		}
-		rows = append(rows, bytes.Split(row, []byte{','}))
-	}
-	return rows, nil
-}
-
-func mustFloat(a []byte) float64 {
-	f, err := strconv.ParseFloat(string(a), 64)
+func mustFloat(a string) float64 {
+	f, err := strconv.ParseFloat(a, 64)
 	if err != nil {
 		panic(err)
 	}
 	return f
 }
 
-func mustInt(a []byte) int {
-	f, err := strconv.Atoi(string(a))
+func mustInt(a string) int {
+	f, err := strconv.Atoi(a)
 	if err != nil {
 		panic(err)
 	}
 	return f
-}
-
-func TestPrecision(t *testing.T) {
-	const c15 = "6GFRP39C+5HG4QWR"
-	const c16 = "6GFRP39C+5HG4QWRV"
-	want := CodeArea{
-		LatLo: -0.2820710399999935, LatHi: -0.2820709999999935,
-		LngLo: 36.07145996093752, LngHi: 36.07146008300783,
-		Len: 15,
-	}
-
-	a15, err := Decode(c15)
-	if err != nil {
-		t.Errorf("%q Decode: %v", c15, err)
-	}
-	if a15 != want {
-		t.Errorf("got %v, wanted %v", a15, want)
-	}
-
-	a16, err := Decode(c16)
-	if err != nil {
-		t.Errorf("%q Decode: %v", c16, err)
-	}
-
-	if a16 != a15 {
-		t.Errorf("got %v, wanted %v", a15, a16)
-	}
-
-	t.Logf("15: %v, 16: %v", a15, a16)
-
 }
 
 func TestFuzzCrashers(t *testing.T) {

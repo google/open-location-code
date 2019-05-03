@@ -34,80 +34,66 @@ func Decode(code string) (CodeArea, error) {
 	// valid so the maximum is one), padding characters and convert to upper
 	// case.
 	code = StripCode(code)
-	n := len(code)
-	if n < 2 {
+	if len(code) < 2 {
 		return area, errors.New("code too short")
 	}
-	if n <= pairCodeLen {
-		area = decodePairs(code)
-		return area, nil
+	// Initialise the values for each section. We work them out as integers and
+  // convert them to floats at the end.
+	normalLat := -latMax * pairPrecision
+	normalLng := -lngMax * pairPrecision
+	extraLat := 0
+	extraLng := 0
+	// How many digits do we have to process?
+	digits := pairCodeLen
+	if len(code) < digits {
+		digits = len(code)
 	}
-	area = decodePairs(code[:pairCodeLen])
-	if n > maxCodeLen {
-		n = maxCodeLen
+	// Define the place value for the most significant pair.
+	pv := pairFPV
+	for i := 0; i < digits-1; i += 2 {
+		normalLat += strings.IndexByte(Alphabet, code[i]) * pv
+		normalLng += strings.IndexByte(Alphabet, code[i+1]) * pv
+		if i < digits-2 {
+			pv /= encBase
+		}
 	}
-	grid := decodeGrid(code[pairCodeLen:n])
+	// Convert the place value to a float in degrees.
+	latPrecision := float64(pv) / pairPrecision
+	lngPrecision := float64(pv) / pairPrecision
+	// Process any extra precision digits.
+	if len(code) > pairCodeLen {
+		// Initialise the place values for the grid.
+		rowpv := gridLatFPV
+		colpv := gridLngFPV
+		// How many digits do we have to process?
+		digits = maxCodeLen
+		if len(code) < maxCodeLen {
+			digits = len(code)
+		}
+		for i := pairCodeLen; i < digits; i++ {
+			dval := strings.IndexByte(Alphabet, code[i])
+			row := dval / gridCols
+			col := dval % gridCols
+			extraLat += row * rowpv
+			extraLng += col * colpv
+			if i < digits-1 {
+				rowpv /= gridRows
+				colpv /= gridCols
+			}
+		}
+		// Adjust the precisions from the integer values to degrees.
+		latPrecision = float64(rowpv) / finalLatPrecision
+		lngPrecision = float64(colpv) / finalLngPrecision
+	}
+	// Merge the values from the normal and extra precision parts of the code.
+	// Everything is ints so they all need to be cast to floats.
+	lat := float64(normalLat)/pairPrecision + float64(extraLat)/finalLatPrecision
+	lng := float64(normalLng)/pairPrecision + float64(extraLng)/finalLngPrecision
 	return CodeArea{
-		LatLo: area.LatLo + grid.LatLo,
-		LngLo: area.LngLo + grid.LngLo,
-		LatHi: area.LatLo + grid.LatHi,
-		LngHi: area.LngLo + grid.LngHi,
-		Len:   area.Len + grid.Len,
+		LatLo: lat,
+		LngLo: lng,
+		LatHi: lat + latPrecision,
+		LngHi: lng + lngPrecision,
+		Len:   len(code),
 	}, nil
-}
-
-// decodePairs decodes an OLC code made up of alternating latitude and longitude
-// characters, encoded using base 20.
-func decodePairs(code string) CodeArea {
-	latLo, latHi := decodePairsSequence(code, 0)
-	lngLo, lngHi := decodePairsSequence(code, 1)
-	return CodeArea{
-		LatLo: latLo - latMax, LatHi: latHi - latMax,
-		LngLo: lngLo - lngMax, LngHi: lngHi - lngMax,
-		Len: len(code),
-	}
-}
-
-// This decodes the latitude or longitude sequence of a lat/lng pair encoding.
-// Starting at the character at position offset, every second character is
-// decoded and the value returned.
-//
-// Returns a pair of the low and high values.
-// The low value comes from decoding the characters.
-// The high value is the low value plus the resolution of the last position.
-// Both values are offset into positive ranges and will need to be corrected
-// before use.
-func decodePairsSequence(code string, offset int) (lo, hi float64) {
-	var value float64
-	i := -1
-	for j := offset; j < len(code); j += 2 {
-		i++
-		value += float64(strings.IndexByte(Alphabet, code[j])) * pairResolutions[i]
-	}
-	return value, value + pairResolutions[i]
-}
-
-// decodeGrid decodes an OLC code using the grid refinement method.
-// The code input argument shall be a valid OLC code sequence that is only
-// the grid refinement portion!
-//
-// This is the portion of a code starting at position 11.
-func decodeGrid(code string) CodeArea {
-	var latLo, lngLo float64
-	var latPlaceValue, lngPlaceValue float64 = gridSizeDegrees, gridSizeDegrees
-	fGridRows, fGridCols := float64(gridRows), float64(gridCols)
-	for _, r := range code {
-		i := strings.IndexByte(Alphabet, byte(r))
-		row := i / gridCols
-		col := i % gridCols
-		latPlaceValue /= fGridRows
-		lngPlaceValue /= fGridCols
-		latLo += float64(row) * latPlaceValue
-		lngLo += float64(col) * lngPlaceValue
-	}
-	return CodeArea{
-		LatLo: latLo, LatHi: latLo + latPlaceValue,
-		LngLo: lngLo, LngHi: lngLo + lngPlaceValue,
-		Len: len(code),
-	}
 }
