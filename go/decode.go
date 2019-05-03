@@ -38,7 +38,7 @@ func Decode(code string) (CodeArea, error) {
 		return area, errors.New("code too short")
 	}
 	// Initialise the values for each section. We work them out as integers and
-  // convert them to floats at the end.
+	// convert them to floats at the end.
 	normalLat := -latMax * pairPrecision
 	normalLng := -lngMax * pairPrecision
 	extraLat := 0

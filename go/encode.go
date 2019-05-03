@@ -66,7 +66,7 @@ func Encode(lat, lng float64, codeLen int) string {
 
 	// This algorithm starts with the least significant digits, and works it's way to the front of the code.
 	// We generate either a max- or default length code, and then shorten/pad it at the end.
-  // Build up the code as bytes, convert to string at the end.
+	// Build up the code as bytes, convert to string at the end.
 	var code [15]byte
 	if codeLen > pairCodeLen {
 		// Multiply the decimal part of each coordinate by the final precision and round off to 1e-6 precision.
