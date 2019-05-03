@@ -16,10 +16,8 @@ package olc
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"math"
-	"sync"
+	"strings"
 )
 
 var (
@@ -30,14 +28,8 @@ var (
 )
 
 const (
-	encBase = len(Alphabet)
-
 	minTrimmableCodeLen = 6
 )
-
-var codePool = sync.Pool{
-	New: func() interface{} { return make([]byte, 0, pairCodeLen+1) },
-}
 
 // Encode a location into an Open Location Code.
 //
@@ -71,106 +63,39 @@ func Encode(lat, lng float64, codeLen int) string {
 	if lng == lngMax {
 		lng = normalizeLng(lng + computePrec(codeLen+2, true))
 	}
-	debug("Encode lat=%f lng=%f", lat, lng)
-	n := codeLen
-	if n > pairCodeLen {
-		n = pairCodeLen
-	}
-	code := codePool.Get().([]byte)
-	code = encodePairs(code[:0], lat, lng, n)
-	codeS := string(code)
+
+	// This algorithm starts with the least significant digits, and works it's way to the front of the code.
+	// We generate either a max- or default length code, and then shorten/pad it at the end.
+	// Build up the code as bytes, convert to string at the end.
+	var code [15]byte
 	if codeLen > pairCodeLen {
-		finerCode, err := encodeGrid(code, lat, lng, codeLen-pairCodeLen)
-		if err != nil {
-			log.Printf("encodeGrid(%q, %f, %f, %d): %v", code, lat, lng, codeLen-pairCodeLen, err)
-		} else {
-			codeS = string(finerCode)
+		// Multiply the decimal part of each coordinate by the final precision and round off to 1e-6 precision.
+		// Convert to integers so the rest of the math is integer based.
+		// This avoids/minimises errors due to loss of precision in floating point representation.
+		latPrecision := int(math.Round((lat-math.Floor(lat))*finalLatPrecision*1e6) / 1e6)
+		lngPrecision := int(math.Round((lng-math.Floor(lng))*finalLngPrecision*1e6) / 1e6)
+		for i := 0; i < gridCodeLen; i++ {
+			code[maxCodeLen-1-i] = Alphabet[(latPrecision%gridRows)*gridCols+int(lngPrecision%gridCols)]
+			latPrecision /= gridRows
+			lngPrecision /= gridCols
 		}
 	}
-	codePool.Put(code)
-	return codeS
-}
-
-// encodePairs encode the location into a sequence of OLC lat/lng pairs.
-//
-// Appends to the given code byte slice!
-//
-// This uses pairs of characters (longitude and latitude in that order) to
-// represent each step in a 20x20 grid. Each code, therefore, has 1/400th
-// the area of the previous code.
-func encodePairs(code []byte, lat, lng float64, codeLen int) []byte {
-	lat += latMax
-	lng += lngMax
-	for digits := 0; digits < codeLen; {
-		// value of digits in this place, in decimal degrees
-		placeValue := pairResolutions[digits/2]
-
-		digitValue := int(lat / placeValue)
-		lat -= float64(digitValue) * placeValue
-		code = append(code, Alphabet[digitValue])
-		digits++
-
-		digitValue = int(lng / placeValue)
-		lng -= float64(digitValue) * placeValue
-		code = append(code, Alphabet[digitValue])
-		digits++
-
-		if digits == sepPos && digits < codeLen {
-			code = append(code, Separator)
-		}
+	// Multiply each coordinate by the precision and round off to 1e-6 precision.
+	// Convert to integers so the rest of the math is integer based.
+	latPrecision := int(math.Round((lat+latMax)*pairPrecision*1e6) / 1e6)
+	lngPrecision := int(math.Round((lng+lngMax)*pairPrecision*1e6) / 1e6)
+	for i := 0; i < pairCodeLen/2; i++ {
+		code[pairCodeLen-i*2-1] = Alphabet[lngPrecision%encBase]
+		code[pairCodeLen-i*2-2] = Alphabet[latPrecision%encBase]
+		latPrecision /= encBase
+		lngPrecision /= encBase
 	}
-	for len(code) < sepPos {
-		code = append(code, Padding)
+	// If we don't need to pad the code, return the requested section.
+	if codeLen >= sepPos {
+		return string(code[:sepPos]) + string(Separator) + string(code[sepPos:codeLen])
 	}
-	if len(code) == sepPos {
-		code = append(code, Separator)
-	}
-
-	return code
-}
-
-// encodeGrid encodes a location using the grid refinement method into
-// an OLC string.
-//
-// Appends to the given code byte slice!
-//
-// The grid refinement method divides the area into a grid of 4x5, and uses a
-// single character to refine the area. This allows default accuracy OLC codes
-// to be refined with just a single character.
-func encodeGrid(code []byte, lat, lng float64, codeLen int) ([]byte, error) {
-	// Adjust to positive ranges.
-	lat += latMax
-	lng += lngMax
-	// To avoid problems with floating point, get rid of the degrees.
-	lat = math.Remainder(lat, 1.0)
-	lng = math.Remainder(lng, 1.0)
-	latPlaceValue, lngPlaceValue := gridSizeDegrees, gridSizeDegrees
-	lat = math.Remainder(lat, latPlaceValue)
-	if lat < 0 {
-		lat += latPlaceValue
-	}
-	lng = math.Remainder(lng, lngPlaceValue)
-	if lng < 0 {
-		lng += lngPlaceValue
-	}
-	for i := 0; i < codeLen; i++ {
-		row := int(math.Floor(lat / (latPlaceValue / gridRows)))
-		col := int(math.Floor(lng / (lngPlaceValue / gridCols)))
-		pos := row*gridCols + col
-		if !(0 <= pos && pos < len(Alphabet)) {
-			return nil, fmt.Errorf("pos=%d is out of alphabet", pos)
-		}
-		code = append(code, Alphabet[pos])
-		if i == codeLen-1 {
-			break
-		}
-
-		latPlaceValue /= gridRows
-		lngPlaceValue /= gridCols
-		lat -= float64(row) * latPlaceValue
-		lng -= float64(col) * lngPlaceValue
-	}
-	return code, nil
+	// Pad and return the code.
+	return string(code[:codeLen]) + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
 }
 
 // computePrec computes the precision value for a given code length.
@@ -186,14 +111,4 @@ func computePrec(codeLen int, longitudal bool) float64 {
 		g = gridCols
 	}
 	return math.Pow(20, -3) / math.Pow(g, float64(codeLen-10))
-}
-
-func clipLatitude(lat float64) float64 {
-	if lat > latMax {
-		return latMax
-	}
-	if lat < -latMax {
-		return -latMax
-	}
-	return lat
 }

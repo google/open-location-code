@@ -10,6 +10,10 @@ import (
 // MinTrimmableCodeLen is the minimum length of a code that is able to be shortened.
 const MinTrimmableCodeLen = 6
 
+var (
+	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
+)
+
 // Shorten removes characters from the start of an OLC code.
 //
 // This uses a reference location to determine how many initial characters
@@ -32,7 +36,6 @@ func Shorten(code string, lat, lng float64) (string, error) {
 	}
 	code = strings.ToUpper(code)
 	area, err := Decode(code)
-	debug("Shorten(%s) area=%v error=%v", code, area, err)
 	if err != nil {
 		return code, err
 	}
@@ -46,7 +49,6 @@ func Shorten(code string, lat, lng float64) (string, error) {
 	centerLat, centerLng := area.Center()
 	distance := math.Max(math.Abs(centerLat-lat), math.Abs(centerLng-lng))
 
-	//debug("Shorten lat=%f lng=%f centerLat=%f centerLng=%f distance=%.10f", lat, lng, centerLat, centerLng, distance)
 	for i := len(pairResolutions) - 2; i >= 1; i-- {
 		// Check if we're close enough to shorten. The range must be less than 1/2
 		// the resolution to shorten at all, and we want to allow some safety, so
