@@ -16,6 +16,7 @@ package olc
 
 import (
 	"errors"
+  "math"
 	"strings"
 )
 
@@ -89,11 +90,12 @@ func Decode(code string) (CodeArea, error) {
 	// Everything is ints so they all need to be cast to floats.
 	lat := float64(normalLat)/pairPrecision + float64(extraLat)/finalLatPrecision
 	lng := float64(normalLng)/pairPrecision + float64(extraLng)/finalLngPrecision
+  // Round everthing off to 14 places.
 	return CodeArea{
-		LatLo: lat,
-		LngLo: lng,
-		LatHi: lat + latPrecision,
-		LngHi: lng + lngPrecision,
+		LatLo: math.Round(lat*1e14)/1e14,
+		LngLo: math.Round(lng*1e14)/1e14,
+		LatHi: math.Round((lat + latPrecision)*1e14)/1e14,
+		LngHi: math.Round((lng + lngPrecision)*1e14)/1e14,
 		Len:   len(code),
 	}, nil
 }
