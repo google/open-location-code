@@ -2,6 +2,8 @@
 
 # pylint: disable=redefined-builtin
 from io import open
+import random
+import time
 import unittest
 import openlocationcode as olc
 
@@ -105,6 +107,7 @@ class TestEncoding(unittest.TestCase):
       self.assertEqual(td['code'],
                        olc.encode(td['lat'], td['lng'], codelength), td)
 
+
 class TestDecoding(unittest.TestCase):
 
   def setUp(self):
@@ -146,6 +149,39 @@ class TestDecoding(unittest.TestCase):
       self.assertEqual(
           round(decoded.longitudeHi, precision),
           round(td['longHi'], precision), td)
+
+
+class Benchmark(unittest.TestCase):
+
+  def setUp(self):
+    self.testdata = []
+    for i in xrange(0, 1000000):
+      dec = random.randint(0, 15)
+      lat = round(random.uniform(1, 180) - 90, dec)
+      lng = round(random.uniform(1, 360) - 180, dec)
+      length = random.randint(2, 15)
+      if length % 2 == 1:
+        length = length + 1
+      self.testdata.append([lat, lng, length, olc.encode(lat, lng, length)])
+
+  def test_benchmark(self):
+    start_millis = round(time.time() * 1000)
+    for td in self.testdata:
+      olc.encode(td[0], td[1], td[2])
+    duration_millis = round(time.time() * 1000) - start_millis
+    print('Encoding benchmark: %d passes, %d millis total, %.03f usec each' %
+          (len(self.testdata), duration_millis,
+           (duration_millis * 1000) / len(self.testdata)))
+
+    start_millis = round(time.time() * 1000)
+    for td in self.testdata:
+      olc.decode(td[3])
+    duration_millis = round(time.time() * 1000) - start_millis
+    print('Decoding benchmark: %d passes, %d millis total, %.03f usec each' %
+          (len(self.testdata), duration_millis,
+           (duration_millis * 1000) / len(self.testdata)))
+
+
 
 
 if __name__ == '__main__':
