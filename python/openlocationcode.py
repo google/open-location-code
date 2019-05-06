@@ -270,7 +270,7 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
         lngPrecision = int(
             round((longitude - math.floor(longitude)) * FINAL_LNG_PRECISION_,
                   6))
-        for i in xrange(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
+        for i in range(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
             code = CODE_ALPHABET_[(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
                                   (lngPrecision % GRID_COLUMNS_)] + code
             latPrecision /= GRID_ROWS_
@@ -279,7 +279,7 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
     # Multiply the coordinates by the pair precision and convert to integers.
     latPrecision = int(round((latitude + LATITUDE_MAX_) * PAIR_PRECISION_, 6))
     lngPrecision = int(round((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_, 6))
-    for i in xrange(0, PAIR_CODE_LENGTH_ / 2):
+    for i in range(0, PAIR_CODE_LENGTH_ / 2):
         code = CODE_ALPHABET_[(lngPrecision % ENCODING_BASE_)] + code
         code = CODE_ALPHABET_[(latPrecision % ENCODING_BASE_)] + code
         latPrecision /= ENCODING_BASE_
@@ -329,7 +329,7 @@ def decode(code):
     # Define the place value for the most significant pair.
     pv = PAIR_FIRST_PLACE_VALUE_
     # Decode the paired digits.
-    for i in xrange(0, digits, 2):
+    for i in range(0, digits, 2):
         normalLat += CODE_ALPHABET_.find(code[i]) * pv
         normalLng += CODE_ALPHABET_.find(code[i + 1]) * pv
         if i < digits - 2:
@@ -345,7 +345,7 @@ def decode(code):
         colpv = GRID_LNG_FIRST_PLACE_VALUE_
         # How many digits do we have to process?
         digits = min(len(code), MAX_DIGIT_COUNT_)
-        for i in xrange(PAIR_CODE_LENGTH_, digits):
+        for i in range(PAIR_CODE_LENGTH_, digits):
             digitVal = CODE_ALPHABET_.find(code[i])
             row = digitVal / GRID_COLUMNS_
             col = digitVal % GRID_COLUMNS_
