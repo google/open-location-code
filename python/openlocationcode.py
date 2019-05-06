@@ -273,17 +273,17 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
         for i in range(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
             code = CODE_ALPHABET_[int(latPrecision % GRID_ROWS_) * GRID_COLUMNS_
                                   + int(lngPrecision % GRID_COLUMNS_)] + code
-            latPrecision /= GRID_ROWS_
-            lngPrecision /= GRID_COLUMNS_
+            latPrecision //= GRID_ROWS_
+            lngPrecision //= GRID_COLUMNS_
 
     # Multiply the coordinates by the pair precision and convert to integers.
     latPrecision = int(round((latitude + LATITUDE_MAX_) * PAIR_PRECISION_, 6))
     lngPrecision = int(round((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_, 6))
-    for i in range(0, int(PAIR_CODE_LENGTH_ / 2)):
+    for i in range(0, PAIR_CODE_LENGTH_ // 2):
         code = CODE_ALPHABET_[int(lngPrecision % ENCODING_BASE_)] + code
         code = CODE_ALPHABET_[int(latPrecision % ENCODING_BASE_)] + code
-        latPrecision /= ENCODING_BASE_
-        lngPrecision /= ENCODING_BASE_
+        latPrecision //= ENCODING_BASE_
+        lngPrecision //= ENCODING_BASE_
         if i == 0:
             code = '+' + code
 
@@ -333,7 +333,7 @@ def decode(code):
         normalLat += CODE_ALPHABET_.find(code[i]) * pv
         normalLng += CODE_ALPHABET_.find(code[i + 1]) * pv
         if i < digits - 2:
-            pv /= ENCODING_BASE_
+            pv //= ENCODING_BASE_
 
     # Convert the place value to a float in degrees.
     latPrecision = float(pv) / PAIR_PRECISION_
@@ -347,13 +347,13 @@ def decode(code):
         digits = min(len(code), MAX_DIGIT_COUNT_)
         for i in range(PAIR_CODE_LENGTH_, digits):
             digitVal = CODE_ALPHABET_.find(code[i])
-            row = int(digitVal / GRID_COLUMNS_)
+            row = digitVal // GRID_COLUMNS_
             col = digitVal % GRID_COLUMNS_
             gridLat += row * rowpv
             gridLng += col * colpv
             if i < digits - 1:
-                rowpv /= GRID_ROWS_
-                colpv /= GRID_COLUMNS_
+                rowpv //= GRID_ROWS_
+                colpv //= GRID_COLUMNS_
 
         # Adjust the precisions from the integer values to degrees.
         latPrecision = float(rowpv) / FINAL_LAT_PRECISION_
