@@ -152,7 +152,7 @@ class Benchmark(unittest.TestCase):
 
     def setUp(self):
         self.testdata = []
-        for i in range(0, 1000000):
+        for i in range(0, 100000):
             dec = random.randint(0, 15)
             lat = round(random.uniform(1, 180) - 90, dec)
             lng = round(random.uniform(1, 360) - 180, dec)

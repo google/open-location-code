@@ -1,12 +1,12 @@
 # Python Library
 
-This is the Python Open Location Code library. It is tested for python 3,
-but should work with python 2 as well.
+This is the Python Open Location Code library. It is tested for both python 2.7
+and python 3.6.
 
 ## Formatting
 
 Code must be formatted according to the
-(Google Python Style Guide)[http://google.github.io/styleguide/pyguide.html].
+[Google Python Style Guide](http://google.github.io/styleguide/pyguide.html).
 
 You can format your code automatically using
 [YAPF](https://github.com/google/yapf/).

@@ -59,7 +59,6 @@ matrix:
       cache:
         # Set the timeout to fetch and unpack the cache.
         timeout: 300
-        timeout: 300
         directories:
           - ${HOME}/.cache/bazel
       script:
