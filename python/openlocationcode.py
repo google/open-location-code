@@ -271,17 +271,17 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
             round((longitude - math.floor(longitude)) * FINAL_LNG_PRECISION_,
                   6))
         for i in range(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
-            code = CODE_ALPHABET_[(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
-                                  (lngPrecision % GRID_COLUMNS_)] + code
+            code = CODE_ALPHABET_[int(latPrecision % GRID_ROWS_) * GRID_COLUMNS_
+                                  + int(lngPrecision % GRID_COLUMNS_)] + code
             latPrecision /= GRID_ROWS_
             lngPrecision /= GRID_COLUMNS_
 
     # Multiply the coordinates by the pair precision and convert to integers.
     latPrecision = int(round((latitude + LATITUDE_MAX_) * PAIR_PRECISION_, 6))
     lngPrecision = int(round((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_, 6))
-    for i in range(0, PAIR_CODE_LENGTH_ / 2):
-        code = CODE_ALPHABET_[(lngPrecision % ENCODING_BASE_)] + code
-        code = CODE_ALPHABET_[(latPrecision % ENCODING_BASE_)] + code
+    for i in range(0, int(PAIR_CODE_LENGTH_ / 2)):
+        code = CODE_ALPHABET_[int(lngPrecision % ENCODING_BASE_)] + code
+        code = CODE_ALPHABET_[int(latPrecision % ENCODING_BASE_)] + code
         latPrecision /= ENCODING_BASE_
         lngPrecision /= ENCODING_BASE_
         if i == 0:
