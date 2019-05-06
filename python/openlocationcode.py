@@ -347,7 +347,7 @@ def decode(code):
         digits = min(len(code), MAX_DIGIT_COUNT_)
         for i in range(PAIR_CODE_LENGTH_, digits):
             digitVal = CODE_ALPHABET_.find(code[i])
-            row = digitVal / GRID_COLUMNS_
+            row = int(digitVal / GRID_COLUMNS_)
             col = digitVal % GRID_COLUMNS_
             gridLat += row * rowpv
             gridLng += col * colpv
