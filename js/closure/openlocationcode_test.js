@@ -141,4 +141,38 @@ testSuite({
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.send(VALIDITY_TEST_FILE, 'GET');
   },
+  testBenchmarks: function() {
+    var input = [];
+    for (var i = 0; i < 100000; i++) {
+      var lat = Math.random() * 180 - 90;
+      var lng = Math.random() * 360 - 180;
+      var decimals = Math.floor(Math.random() * 10);
+      lat = Math.round(lat * Math.pow(10, decimals)) / Math.pow(10, decimals);
+      lng = Math.round(lng * Math.pow(10, decimals)) / Math.pow(10, decimals);
+      var length = 2 + Math.round(Math.random() * 13);
+      if (length < 10 && length % 2 === 1) {
+       length += 1;
+      }
+      input.push([lat, lng, length, OpenLocationCode.encode(lat, lng, length)]);
+    }
+    var start_millis = Date.now();
+    for (var i = 0; i < input.length; i++) {
+      OpenLocationCode.encode(input[i][0], input[i][1], input[i][2]);
+    }
+    var duration_millis = Date.now() - start_millis;
+    console.info(
+        "Encoding: " + input.length + ", total " + duration_millis +
+        " millis, average duration " +
+        ((duration_millis * 1000) / input.length) + " usecs");
+
+    start_millis = Date.now();
+    for (var i = 0; i < input.length; i++) {
+      OpenLocationCode.decode(input[i][3]);
+    }
+    duration_millis = Date.now() - start_millis;
+    console.info(
+        "Decoding: " + input.length + ", total " + duration_millis +
+        " millis, average duration " +
+        ((duration_millis * 1000) / input.length) + " usecs");
+  },
 });
