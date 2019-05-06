@@ -117,65 +117,67 @@ GRID_LNG_FIRST_PLACE_VALUE_ = GRID_COLUMNS_**(GRID_CODE_LENGTH_ - 1)
 
 # Multiply latitude by this much to make it a multiple of the finest
 # precision.
-FINAL_LAT_PRECISION_ = PAIR_PRECISION_ * GRID_ROWS_**(
-    MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_)
+FINAL_LAT_PRECISION_ = PAIR_PRECISION_ * GRID_ROWS_**(MAX_DIGIT_COUNT_ -
+                                                      PAIR_CODE_LENGTH_)
 
 # Multiply longitude by this much to make it a multiple of the finest
 # precision.
-FINAL_LNG_PRECISION_ = PAIR_PRECISION_ * GRID_COLUMNS_**(
-    MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_)
+FINAL_LNG_PRECISION_ = PAIR_PRECISION_ * GRID_COLUMNS_**(MAX_DIGIT_COUNT_ -
+                                                         PAIR_CODE_LENGTH_)
 
 # Minimum length of a code that can be shortened.
 MIN_TRIMMABLE_CODE_LEN_ = 6
 
 GRID_SIZE_DEGREES_ = 0.000125
-
 """
 Determines if a code is valid.
 To be valid, all characters must be from the Open Location Code character
 set with at most one separator. The separator can be in any even-numbered
 position up to the eighth digit.
 """
-def isValid(code):
-  # The separator is required.
-  sep = code.find(SEPARATOR_)
-  if code.count(SEPARATOR_) > 1:
-    return False
-  # Is it the only character?
-  if len(code) == 1:
-    return False
-  # Is it in an illegal position?
-  if sep == -1 or sep > SEPARATOR_POSITION_ or sep % 2 == 1:
-    return False
-  # We can have an even number of padding characters before the separator,
-  # but then it must be the final character.
-  pad = code.find(PADDING_CHARACTER_)
-  if pad != -1:
-    # Short codes cannot have padding
-    if sep < SEPARATOR_POSITION_:
-      return False
-    # Not allowed to start with them!
-    if pad == 0:
-      return False
 
-    # There can only be one group and it must have even length.
-    rpad = code.rfind(PADDING_CHARACTER_) + 1
-    pads = code[pad:rpad]
-    if len(pads) % 2 == 1 or pads.count(PADDING_CHARACTER_) != len(pads):
-      return False
-    # If the code is long enough to end with a separator, make sure it does.
-    if not code.endswith(SEPARATOR_):
-      return False
-  # If there are characters after the separator, make sure there isn't just
-  # one of them (not legal).
-  if len(code) - sep - 1 == 1:
-    return False
-  # Check the code contains only valid characters.
-  sepPad = SEPARATOR_ + PADDING_CHARACTER_
-  for ch in code:
-    if ch.upper() not in CODE_ALPHABET_ and ch not in sepPad:
-      return False
-  return True
+
+def isValid(code):
+    # The separator is required.
+    sep = code.find(SEPARATOR_)
+    if code.count(SEPARATOR_) > 1:
+        return False
+    # Is it the only character?
+    if len(code) == 1:
+        return False
+    # Is it in an illegal position?
+    if sep == -1 or sep > SEPARATOR_POSITION_ or sep % 2 == 1:
+        return False
+    # We can have an even number of padding characters before the separator,
+    # but then it must be the final character.
+    pad = code.find(PADDING_CHARACTER_)
+    if pad != -1:
+        # Short codes cannot have padding
+        if sep < SEPARATOR_POSITION_:
+            return False
+        # Not allowed to start with them!
+        if pad == 0:
+            return False
+
+        # There can only be one group and it must have even length.
+        rpad = code.rfind(PADDING_CHARACTER_) + 1
+        pads = code[pad:rpad]
+        if len(pads) % 2 == 1 or pads.count(PADDING_CHARACTER_) != len(pads):
+            return False
+        # If the code is long enough to end with a separator, make sure it does.
+        if not code.endswith(SEPARATOR_):
+            return False
+    # If there are characters after the separator, make sure there isn't just
+    # one of them (not legal).
+    if len(code) - sep - 1 == 1:
+        return False
+    # Check the code contains only valid characters.
+    sepPad = SEPARATOR_ + PADDING_CHARACTER_
+    for ch in code:
+        if ch.upper() not in CODE_ALPHABET_ and ch not in sepPad:
+            return False
+    return True
+
 
 """
 Determines if a code is a valid short code.
@@ -183,15 +185,18 @@ A short Open Location Code is a sequence created by removing four or more
 digits from an Open Location Code. It must include a separator
 character.
 """
+
+
 def isShort(code):
-  # Check it's valid.
-  if not isValid(code):
+    # Check it's valid.
+    if not isValid(code):
+        return False
+    # If there are less characters than expected before the SEPARATOR.
+    sep = code.find(SEPARATOR_)
+    if sep >= 0 and sep < SEPARATOR_POSITION_:
+        return True
     return False
-  # If there are less characters than expected before the SEPARATOR.
-  sep = code.find(SEPARATOR_)
-  if sep >= 0 and sep < SEPARATOR_POSITION_:
-    return True
-  return False
+
 
 """
  Determines if a code is a valid full Open Location Code.
@@ -201,24 +206,28 @@ def isShort(code):
  character is present, it must be the first character. If the separator
  character is present, it must be after four characters.
 """
+
+
 def isFull(code):
-  if not isValid(code):
-    return False
-  # If it's short, it's not full
-  if isShort(code):
-    return False
-  # Work out what the first latitude character indicates for latitude.
-  firstLatValue = CODE_ALPHABET_.find(code[0].upper()) * ENCODING_BASE_
-  if firstLatValue >= LATITUDE_MAX_ * 2:
-    # The code would decode to a latitude of >= 90 degrees.
-    return False
-  if len(code) > 1:
-    # Work out what the first longitude character indicates for longitude.
-    firstLngValue = CODE_ALPHABET_.find(code[1].upper()) * ENCODING_BASE_
-  if firstLngValue >= LONGITUDE_MAX_ * 2:
-    # The code would decode to a longitude of >= 180 degrees.
-    return False
-  return True
+    if not isValid(code):
+        return False
+    # If it's short, it's not full
+    if isShort(code):
+        return False
+    # Work out what the first latitude character indicates for latitude.
+    firstLatValue = CODE_ALPHABET_.find(code[0].upper()) * ENCODING_BASE_
+    if firstLatValue >= LATITUDE_MAX_ * 2:
+        # The code would decode to a latitude of >= 90 degrees.
+        return False
+    if len(code) > 1:
+        # Work out what the first longitude character indicates for longitude.
+        firstLngValue = CODE_ALPHABET_.find(code[1].upper()) * ENCODING_BASE_
+    if firstLngValue >= LONGITUDE_MAX_ * 2:
+        # The code would decode to a longitude of >= 180 degrees.
+        return False
+    return True
+
+
 """
  Encode a location into an Open Location Code.
  Produces a code of the specified length, or the default length if no length
@@ -235,51 +244,56 @@ def isFull(code):
    codeLength: The number of significant digits in the output code, not
        including any separator characters.
 """
+
+
 def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
-  if codeLength < 2 or (codeLength < PAIR_CODE_LENGTH_ and codeLength % 2 == 1):
-    raise ValueError('Invalid Open Location Code length - ' + str(codeLength))
-  codeLength = min(codeLength, MAX_DIGIT_COUNT_)
-  # Ensure that latitude and longitude are valid.
-  latitude = clipLatitude(latitude)
-  longitude = normalizeLongitude(longitude)
-  # Latitude 90 needs to be adjusted to be just less, so the returned code
-  # can also be decoded.
-  if latitude == 90:
-    latitude = latitude - computeLatitudePrecision(codeLength)
-  # This algorithm starts with the least significant digits, and works it's
-  # way to the front of the code.
-  code = ''
-  if codeLength > PAIR_CODE_LENGTH_:
-    # Multiply the decimal part of each coordinate by the final precision so
-    # we can treat them as integers.
-    latPrecision = int(
-        round((latitude - math.floor(latitude)) * FINAL_LAT_PRECISION_, 6))
-    lngPrecision = int(
-        round((longitude - math.floor(longitude)) * FINAL_LNG_PRECISION_, 6))
-    for i in xrange(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
-      code = CODE_ALPHABET_[(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
-                            (lngPrecision % GRID_COLUMNS_)] + code
-      latPrecision /= GRID_ROWS_
-      lngPrecision /= GRID_COLUMNS_
+    if codeLength < 2 or (codeLength < PAIR_CODE_LENGTH_ and
+                          codeLength % 2 == 1):
+        raise ValueError('Invalid Open Location Code length - ' +
+                         str(codeLength))
+    codeLength = min(codeLength, MAX_DIGIT_COUNT_)
+    # Ensure that latitude and longitude are valid.
+    latitude = clipLatitude(latitude)
+    longitude = normalizeLongitude(longitude)
+    # Latitude 90 needs to be adjusted to be just less, so the returned code
+    # can also be decoded.
+    if latitude == 90:
+        latitude = latitude - computeLatitudePrecision(codeLength)
+    # This algorithm starts with the least significant digits, and works it's
+    # way to the front of the code.
+    code = ''
+    if codeLength > PAIR_CODE_LENGTH_:
+        # Multiply the decimal part of each coordinate by the final precision so
+        # we can treat them as integers.
+        latPrecision = int(
+            round((latitude - math.floor(latitude)) * FINAL_LAT_PRECISION_, 6))
+        lngPrecision = int(
+            round((longitude - math.floor(longitude)) * FINAL_LNG_PRECISION_,
+                  6))
+        for i in xrange(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
+            code = CODE_ALPHABET_[(latPrecision % GRID_ROWS_) * GRID_COLUMNS_ +
+                                  (lngPrecision % GRID_COLUMNS_)] + code
+            latPrecision /= GRID_ROWS_
+            lngPrecision /= GRID_COLUMNS_
 
-  # Multiply the coordinates by the pair precision and convert to integers.
-  latPrecision = int(round((latitude + LATITUDE_MAX_) * PAIR_PRECISION_, 6))
-  lngPrecision = int(round((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_, 6))
-  for i in xrange(0, PAIR_CODE_LENGTH_ / 2):
-    code = CODE_ALPHABET_[(lngPrecision % ENCODING_BASE_)] + code
-    code = CODE_ALPHABET_[(latPrecision % ENCODING_BASE_)] + code
-    latPrecision /= ENCODING_BASE_
-    lngPrecision /= ENCODING_BASE_
-    if i == 0:
-      code = '+' + code
+    # Multiply the coordinates by the pair precision and convert to integers.
+    latPrecision = int(round((latitude + LATITUDE_MAX_) * PAIR_PRECISION_, 6))
+    lngPrecision = int(round((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_, 6))
+    for i in xrange(0, PAIR_CODE_LENGTH_ / 2):
+        code = CODE_ALPHABET_[(lngPrecision % ENCODING_BASE_)] + code
+        code = CODE_ALPHABET_[(latPrecision % ENCODING_BASE_)] + code
+        latPrecision /= ENCODING_BASE_
+        lngPrecision /= ENCODING_BASE_
+        if i == 0:
+            code = '+' + code
 
-  # If we don't need to pad the code, return the requested section.
-  if codeLength >= SEPARATOR_POSITION_:
-    return code[0:codeLength + 1]
+    # If we don't need to pad the code, return the requested section.
+    if codeLength >= SEPARATOR_POSITION_:
+        return code[0:codeLength + 1]
 
-  # Pad and return the code.
-  return code[0:codeLength] + ''.zfill(SEPARATOR_POSITION_ -
-                                       codeLength) + SEPARATOR_
+    # Pad and return the code.
+    return code[0:codeLength] + ''.zfill(SEPARATOR_POSITION_ -
+                                         codeLength) + SEPARATOR_
 
 
 """
@@ -295,66 +309,67 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
 
 
 def decode(code):
-  if not isFull(code):
-    raise ValueError('Passed Open Location Code is not a valid full code - ' +
-                     str(code))
-  # Strip out separator character (we've already established the code is
-  # valid so the maximum is one), and padding characters. Convert to upper
-  # case and constrain to the maximum number of digits.
-  code = re.sub('[+0]', '', code)
-  code = code.upper()
-  code = code[:MAX_DIGIT_COUNT_]
-  # Initialise the values for each section. We work them out as integers and
-  # convert them to floats at the end.
-  normalLat = -LATITUDE_MAX_ * PAIR_PRECISION_
-  normalLng = -LONGITUDE_MAX_ * PAIR_PRECISION_
-  gridLat = 0
-  gridLng = 0
-  # How many digits do we have to process?
-  digits = min(len(code), PAIR_CODE_LENGTH_)
-  # Define the place value for the most significant pair.
-  pv = PAIR_FIRST_PLACE_VALUE_
-  # Decode the paired digits.
-  for i in xrange(0, digits, 2):
-    normalLat += CODE_ALPHABET_.find(code[i]) * pv
-    normalLng += CODE_ALPHABET_.find(code[i + 1]) * pv
-    if i < digits - 2:
-      pv /= ENCODING_BASE_
-
-  # Convert the place value to a float in degrees.
-  latPrecision = float(pv) / PAIR_PRECISION_
-  lngPrecision = float(pv) / PAIR_PRECISION_
-  # Process any extra precision digits.
-  if len(code) > PAIR_CODE_LENGTH_:
-    # Initialise the place values for the grid.
-    rowpv = GRID_LAT_FIRST_PLACE_VALUE_
-    colpv = GRID_LNG_FIRST_PLACE_VALUE_
+    if not isFull(code):
+        raise ValueError(
+            'Passed Open Location Code is not a valid full code - ' + str(code))
+    # Strip out separator character (we've already established the code is
+    # valid so the maximum is one), and padding characters. Convert to upper
+    # case and constrain to the maximum number of digits.
+    code = re.sub('[+0]', '', code)
+    code = code.upper()
+    code = code[:MAX_DIGIT_COUNT_]
+    # Initialise the values for each section. We work them out as integers and
+    # convert them to floats at the end.
+    normalLat = -LATITUDE_MAX_ * PAIR_PRECISION_
+    normalLng = -LONGITUDE_MAX_ * PAIR_PRECISION_
+    gridLat = 0
+    gridLng = 0
     # How many digits do we have to process?
-    digits = min(len(code), MAX_DIGIT_COUNT_)
-    for i in xrange(PAIR_CODE_LENGTH_, digits):
-      digitVal = CODE_ALPHABET_.find(code[i])
-      row = digitVal / GRID_COLUMNS_
-      col = digitVal % GRID_COLUMNS_
-      gridLat += row * rowpv
-      gridLng += col * colpv
-      if i < digits - 1:
-        rowpv /= GRID_ROWS_
-        colpv /= GRID_COLUMNS_
+    digits = min(len(code), PAIR_CODE_LENGTH_)
+    # Define the place value for the most significant pair.
+    pv = PAIR_FIRST_PLACE_VALUE_
+    # Decode the paired digits.
+    for i in xrange(0, digits, 2):
+        normalLat += CODE_ALPHABET_.find(code[i]) * pv
+        normalLng += CODE_ALPHABET_.find(code[i + 1]) * pv
+        if i < digits - 2:
+            pv /= ENCODING_BASE_
 
-    # Adjust the precisions from the integer values to degrees.
-    latPrecision = float(rowpv) / FINAL_LAT_PRECISION_
-    lngPrecision = float(colpv) / FINAL_LNG_PRECISION_
+    # Convert the place value to a float in degrees.
+    latPrecision = float(pv) / PAIR_PRECISION_
+    lngPrecision = float(pv) / PAIR_PRECISION_
+    # Process any extra precision digits.
+    if len(code) > PAIR_CODE_LENGTH_:
+        # Initialise the place values for the grid.
+        rowpv = GRID_LAT_FIRST_PLACE_VALUE_
+        colpv = GRID_LNG_FIRST_PLACE_VALUE_
+        # How many digits do we have to process?
+        digits = min(len(code), MAX_DIGIT_COUNT_)
+        for i in xrange(PAIR_CODE_LENGTH_, digits):
+            digitVal = CODE_ALPHABET_.find(code[i])
+            row = digitVal / GRID_COLUMNS_
+            col = digitVal % GRID_COLUMNS_
+            gridLat += row * rowpv
+            gridLng += col * colpv
+            if i < digits - 1:
+                rowpv /= GRID_ROWS_
+                colpv /= GRID_COLUMNS_
 
-  # Merge the values from the normal and extra precision parts of the code.
-  lat = float(normalLat) / PAIR_PRECISION_ + float(
-      gridLat) / FINAL_LAT_PRECISION_
-  lng = float(normalLng) / PAIR_PRECISION_ + float(
-      gridLng) / FINAL_LNG_PRECISION_
-  # Multiple values by 1e14, round and then divide. This reduces errors due
-  # to floating point precision.
-  return CodeArea(
-      round(lat, 14), round(lng, 14), round(lat + latPrecision, 14),
-      round(lng + lngPrecision, 14), min(len(code), MAX_DIGIT_COUNT_))
+        # Adjust the precisions from the integer values to degrees.
+        latPrecision = float(rowpv) / FINAL_LAT_PRECISION_
+        lngPrecision = float(colpv) / FINAL_LNG_PRECISION_
+
+    # Merge the values from the normal and extra precision parts of the code.
+    lat = float(normalLat) / PAIR_PRECISION_ + float(
+        gridLat) / FINAL_LAT_PRECISION_
+    lng = float(normalLng) / PAIR_PRECISION_ + float(
+        gridLng) / FINAL_LNG_PRECISION_
+    # Multiple values by 1e14, round and then divide. This reduces errors due
+    # to floating point precision.
+    return CodeArea(round(lat, 14), round(lng,
+                                          14), round(lat + latPrecision, 14),
+                    round(lng + lngPrecision, 14),
+                    min(len(code), MAX_DIGIT_COUNT_))
 
 
 """
@@ -385,44 +400,49 @@ def decode(code):
    valid full code, it is returned with proper capitalization but otherwise
    unchanged.
 """
+
+
 def recoverNearest(code, referenceLatitude, referenceLongitude):
-  # if code is a valid full code, return it properly capitalized
-  if isFull(code):
-    return code.upper()
-  if not isShort(code):
-    raise ValueError('Passed short code is not valid - ' + str(code))
-  # Ensure that latitude and longitude are valid.
-  referenceLatitude = clipLatitude(referenceLatitude)
-  referenceLongitude = normalizeLongitude(referenceLongitude)
-  # Clean up the passed code.
-  code = code.upper()
-  # Compute the number of digits we need to recover.
-  paddingLength = SEPARATOR_POSITION_ - code.find(SEPARATOR_)
-  # The resolution (height and width) of the padded area in degrees.
-  resolution = pow(20, 2 - (paddingLength / 2))
-  # Distance from the center to an edge (in degrees).
-  halfResolution = resolution / 2.0
-  # Use the reference location to pad the supplied short code and decode it.
-  codeArea = decode(encode(referenceLatitude, referenceLongitude)[0:paddingLength] + code)
-  # How many degrees latitude is the code from the reference? If it is more
-  # than half the resolution, we need to move it north or south but keep it
-  # within -90 to 90 degrees.
-  if (referenceLatitude + halfResolution < codeArea.latitudeCenter and
-      codeArea.latitudeCenter - resolution >= -LATITUDE_MAX_):
-    # If the proposed code is more than half a cell north of the reference location,
-    # it's too far, and the best match will be one cell south.
-    codeArea.latitudeCenter -= resolution
-  elif (referenceLatitude - halfResolution > codeArea.latitudeCenter and
-        codeArea.latitudeCenter + resolution <= LATITUDE_MAX_):
-    # If the proposed code is more than half a cell south of the reference location,
-    # it's too far, and the best match will be one cell north.
-    codeArea.latitudeCenter += resolution
-  # Adjust longitude if necessary.
-  if referenceLongitude + halfResolution < codeArea.longitudeCenter:
-    codeArea.longitudeCenter -= resolution
-  elif referenceLongitude - halfResolution > codeArea.longitudeCenter:
-    codeArea.longitudeCenter += resolution
-  return encode(codeArea.latitudeCenter, codeArea.longitudeCenter, codeArea.codeLength)
+    # if code is a valid full code, return it properly capitalized
+    if isFull(code):
+        return code.upper()
+    if not isShort(code):
+        raise ValueError('Passed short code is not valid - ' + str(code))
+    # Ensure that latitude and longitude are valid.
+    referenceLatitude = clipLatitude(referenceLatitude)
+    referenceLongitude = normalizeLongitude(referenceLongitude)
+    # Clean up the passed code.
+    code = code.upper()
+    # Compute the number of digits we need to recover.
+    paddingLength = SEPARATOR_POSITION_ - code.find(SEPARATOR_)
+    # The resolution (height and width) of the padded area in degrees.
+    resolution = pow(20, 2 - (paddingLength / 2))
+    # Distance from the center to an edge (in degrees).
+    halfResolution = resolution / 2.0
+    # Use the reference location to pad the supplied short code and decode it.
+    codeArea = decode(
+        encode(referenceLatitude, referenceLongitude)[0:paddingLength] + code)
+    # How many degrees latitude is the code from the reference? If it is more
+    # than half the resolution, we need to move it north or south but keep it
+    # within -90 to 90 degrees.
+    if (referenceLatitude + halfResolution < codeArea.latitudeCenter and
+            codeArea.latitudeCenter - resolution >= -LATITUDE_MAX_):
+        # If the proposed code is more than half a cell north of the reference location,
+        # it's too far, and the best match will be one cell south.
+        codeArea.latitudeCenter -= resolution
+    elif (referenceLatitude - halfResolution > codeArea.latitudeCenter and
+          codeArea.latitudeCenter + resolution <= LATITUDE_MAX_):
+        # If the proposed code is more than half a cell south of the reference location,
+        # it's too far, and the best match will be one cell north.
+        codeArea.latitudeCenter += resolution
+    # Adjust longitude if necessary.
+    if referenceLongitude + halfResolution < codeArea.longitudeCenter:
+        codeArea.longitudeCenter -= resolution
+    elif referenceLongitude - halfResolution > codeArea.longitudeCenter:
+        codeArea.longitudeCenter += resolution
+    return encode(codeArea.latitudeCenter, codeArea.longitudeCenter,
+                  codeArea.codeLength)
+
 
 """
  Remove characters from the start of an OLC code.
@@ -446,36 +466,44 @@ def recoverNearest(code, referenceLatitude, referenceLongitude):
    Either the original code, if the reference location was not close enough,
    or the .
 """
-def shorten(code,latitude,longitude):
-  if not isFull(code):
-    raise ValueError('Passed code is not valid and full: ' + str(code))
-  if code.find(PADDING_CHARACTER_) != -1:
-    raise ValueError('Cannot shorten padded codes: ' + str(code))
-  code = code.upper()
-  codeArea = decode(code)
-  if codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN_:
-    raise ValueError('Code length must be at least ' + MIN_TRIMMABLE_CODE_LEN_)
-  # Ensure that latitude and longitude are valid.
-  latitude = clipLatitude(latitude)
-  longitude = normalizeLongitude(longitude)
-  # How close are the latitude and longitude to the code center.
-  coderange = max(abs(codeArea.latitudeCenter - latitude), abs(codeArea.longitudeCenter - longitude))
-  for i in range(len(PAIR_RESOLUTIONS_) - 2, 0, -1):
-    # Check if we're close enough to shorten. The range must be less than 1/2
-    # the resolution to shorten at all, and we want to allow some safety, so
-    # use 0.3 instead of 0.5 as a multiplier.
-    if coderange < (PAIR_RESOLUTIONS_[i] * 0.3):
-      # Trim it.
-      return code[(i+1)*2:]
-  return code
+
+
+def shorten(code, latitude, longitude):
+    if not isFull(code):
+        raise ValueError('Passed code is not valid and full: ' + str(code))
+    if code.find(PADDING_CHARACTER_) != -1:
+        raise ValueError('Cannot shorten padded codes: ' + str(code))
+    code = code.upper()
+    codeArea = decode(code)
+    if codeArea.codeLength < MIN_TRIMMABLE_CODE_LEN_:
+        raise ValueError('Code length must be at least ' +
+                         MIN_TRIMMABLE_CODE_LEN_)
+    # Ensure that latitude and longitude are valid.
+    latitude = clipLatitude(latitude)
+    longitude = normalizeLongitude(longitude)
+    # How close are the latitude and longitude to the code center.
+    coderange = max(abs(codeArea.latitudeCenter - latitude),
+                    abs(codeArea.longitudeCenter - longitude))
+    for i in range(len(PAIR_RESOLUTIONS_) - 2, 0, -1):
+        # Check if we're close enough to shorten. The range must be less than 1/2
+        # the resolution to shorten at all, and we want to allow some safety, so
+        # use 0.3 instead of 0.5 as a multiplier.
+        if coderange < (PAIR_RESOLUTIONS_[i] * 0.3):
+            # Trim it.
+            return code[(i + 1) * 2:]
+    return code
+
 
 """
  Clip a latitude into the range -90 to 90.
  Args:
    latitude: A latitude in signed decimal degrees.
 """
+
+
 def clipLatitude(latitude):
-  return min(90, max(-90, latitude))
+    return min(90, max(-90, latitude))
+
 
 """
  Compute the latitude precision value for a given code length. Lengths <=
@@ -483,22 +511,28 @@ def clipLatitude(latitude):
  have different precisions due to the grid method having fewer columns than
  rows.
 """
+
+
 def computeLatitudePrecision(codeLength):
-  if codeLength <= 10:
-    return pow(20, math.floor((codeLength / -2) + 2))
-  return pow(20, -3) / pow(GRID_ROWS_, codeLength - 10)
+    if codeLength <= 10:
+        return pow(20, math.floor((codeLength / -2) + 2))
+    return pow(20, -3) / pow(GRID_ROWS_, codeLength - 10)
+
 
 """
  Normalize a longitude into the range -180 to 180, not including 180.
  Args:
    longitude: A longitude in signed decimal degrees.
 """
+
+
 def normalizeLongitude(longitude):
-  while longitude < -180:
-    longitude = longitude + 360
-  while longitude >= 180:
-    longitude = longitude - 360
-  return longitude
+    while longitude < -180:
+        longitude = longitude + 360
+    while longitude >= 180:
+        longitude = longitude - 360
+    return longitude
+
 
 """
  Coordinates of a decoded Open Location Code.
@@ -515,24 +549,28 @@ def normalizeLongitude(longitude):
    code_length: The number of significant characters that were in the code.
        This excludes the separator.
 """
+
+
 class CodeArea(object):
-  def __init__(self,latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength):
-    self.latitudeLo = latitudeLo
-    self.longitudeLo = longitudeLo
-    self.latitudeHi = latitudeHi
-    self.longitudeHi = longitudeHi
-    self.codeLength = codeLength
-    self.latitudeCenter = min( latitudeLo + (latitudeHi - latitudeLo) / 2, LATITUDE_MAX_)
-    self.longitudeCenter = min( longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX_)
 
-  def __repr__(self):
-    return str([self.latitudeLo,
-            self.longitudeLo,
-            self.latitudeHi,
-            self.longitudeHi,
-            self.latitudeCenter,
-            self.longitudeCenter,
-            self.codeLength])
+    def __init__(self, latitudeLo, longitudeLo, latitudeHi, longitudeHi,
+                 codeLength):
+        self.latitudeLo = latitudeLo
+        self.longitudeLo = longitudeLo
+        self.latitudeHi = latitudeHi
+        self.longitudeHi = longitudeHi
+        self.codeLength = codeLength
+        self.latitudeCenter = min(latitudeLo + (latitudeHi - latitudeLo) / 2,
+                                  LATITUDE_MAX_)
+        self.longitudeCenter = min(
+            longitudeLo + (longitudeHi - longitudeLo) / 2, LONGITUDE_MAX_)
 
-  def latlng(self):
-    return [self.latitudeCenter, self.longitudeCenter]
+    def __repr__(self):
+        return str([
+            self.latitudeLo, self.longitudeLo, self.latitudeHi,
+            self.longitudeHi, self.latitudeCenter, self.longitudeCenter,
+            self.codeLength
+        ])
+
+    def latlng(self):
+        return [self.latitudeCenter, self.longitudeCenter]
