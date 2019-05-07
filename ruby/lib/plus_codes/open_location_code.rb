@@ -52,18 +52,47 @@ module PlusCodes
       longitude = normalize_longitude(longitude)
       latitude -= precision_by_length(code_length) if latitude == 90
 
-      lat = (latitude + 90).to_r
-      lng = (longitude + 180).to_r
+      finalLatPrecision = 8000 * 5 ** (MAX_CODE_LENGTH - PAIR_CODE_LENGTH)
+      finalLngPrecision = 8000 * 4 ** (MAX_CODE_LENGTH - PAIR_CODE_LENGTH)
 
-      digit = 0
+      # This algorithm starts with the least significant digits, and works it's
+      # way to the front of the code.
       code = ''
-      while digit < code_length
-        lat, lng = narrow_region(digit, lat, lng)
-        digit, lat, lng = build_code(digit, code, lat, lng)
-        code << SEPARATOR if (digit == SEPARATOR_POSITION)
+      if (code_length > PAIR_CODE_LENGTH)
+        # Multiply the decimal part of each coordinate by the final precision so
+        # we can treat them as integers. Round them off to 6 decimal places
+        # before converting to integers to avoid floating point rounding errors.
+        latPrecision =
+            (((latitude - latitude.floor()) * finalLatPrecision * 1e6).round() /
+             1e6).to_i
+        lngPrecision =
+            (((longitude - longitude.floor()) * finalLngPrecision * 1e6)
+                 .round() / 1e6).to_i
+        for i in 0..MAX_CODE_LENGTH - PAIR_CODE_LENGTH - 1
+          index = (latPrecision % 5) * 4 + (lngPrecision % 4)
+          code = CODE_ALPHABET[index] + code
+          latPrecision = latPrecision / 5
+          lngPrecision = lngPrecision / 4
+        end
       end
-
-      digit < SEPARATOR_POSITION ? padded(code) : code
+      # Multiply the coordinates by the pair precision and convert to integers.
+      latPrecision = (((latitude + 90) * 8000 * 1e6).round() / 1e6).to_i
+      lngPrecision = (((longitude + 180) * 8000 * 1e6).round() / 1e6).to_i
+      for i in 0..PAIR_CODE_LENGTH / 2 - 1
+        code = CODE_ALPHABET[lngPrecision % 20] + code
+        code = CODE_ALPHABET[latPrecision % 20] + code
+        latPrecision = latPrecision / 20
+        lngPrecision = lngPrecision / 20
+        if (i == 0)
+          code = '+' + code;
+        end
+      end
+      # If we don't need to pad the code, return the requested section.
+      if (code_length >= SEPARATOR_POSITION)
+        return code[0, code_length + 1]
+      end
+      # Pad and return the code.
+      return code[0, code_length] + PADDING * (SEPARATOR_POSITION - code_length) + '+'
     end
 
     # Decodes an Open Location Code(Plus+Codes) into a [CodeArea].
@@ -243,7 +272,7 @@ module PlusCodes
       if code_length <= PAIR_CODE_LENGTH
         precision = 20 ** ((code_length / -2).to_i + 2)
       else
-        precision = (20 ** -3) / (5 ** (code_length - PAIR_CODE_LENGTH))
+        precision = 1.0 / ((20 ** 3) * (5 ** (code_length - PAIR_CODE_LENGTH)))
       end
       precision.to_r
     end

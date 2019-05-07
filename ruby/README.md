@@ -5,6 +5,13 @@ Ruby implementation of Google Open Location Code(Plus+Codes)
 The latest source code can be found in this
 [PlusCodes Gem Github Repo](https://github.com/wnameless/plus_codes-ruby)
 
+## Testing
+
+```
+gem install test-unit
+ruby test/plus_codes_test.rb
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
