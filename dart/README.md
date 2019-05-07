@@ -2,14 +2,13 @@
 
 ## Formatting
 
-Code must be formatted using `dartfmt`:
+Code **must** be formatted using `dartfmt`:
 
 ```
 dartfmt --fix --overwrite lib/* lib/src/* test/*
 ```
 
-The TravisCI test will check, and will fail the tests if any files need
-formatting.
+The TravisCI test will fail if any files need formatting.
 
 ## Testing
 

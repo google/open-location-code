@@ -48,11 +48,10 @@ const maxDigitCount = 15;
 const pairCodeLength = 10;
 
 /// First place value of the pairs (if the last pair value is 1).
-final int pairFirstPlaceValue =
-    pow(encodingBase, pairCodeLength / 2 - 1).toInt();
+final pairFirstPlaceValue = pow(encodingBase, pairCodeLength / 2 - 1).toInt();
 
 /// Inverse of the precision of the pair section of the code.
-final int pairPrecision = pow(encodingBase, 3).toInt();
+final pairPrecision = pow(encodingBase, 3).toInt();
 
 /// The resolution values in degrees for each position in the lat/lng pair
 /// encoding. These give the place value of each position, and therefore the
@@ -69,18 +68,19 @@ const gridColumns = 4;
 const gridRows = 5;
 
 /// First place value of the latitude grid (if the last place is 1).
-final int gridLatFirstPlaceValue = pow(gridRows, gridCodeLength - 1);
+final gridLatFirstPlaceValue = pow(gridRows, gridCodeLength - 1).toInt();
 
 /// First place value of the longitude grid (if the last place is 1).
-final int gridLngFirstPlaceValue = pow(gridColumns, gridCodeLength - 1);
+final gridLngFirstPlaceValue = pow(gridColumns, gridCodeLength - 1).toInt();
 
 /// Multiply latitude by this much to make it a multiple of the finest
 /// precision.
-final int finalLatPrecision = pairPrecision * pow(gridRows, gridCodeLength);
+final finalLatPrecision = pairPrecision * pow(gridRows, gridCodeLength).toInt();
 
 /// Multiply longitude by this much to make it a multiple of the finest
 /// precision.
-final int finalLngPrecision = pairPrecision * pow(gridColumns, gridCodeLength);
+final finalLngPrecision =
+    pairPrecision * pow(gridColumns, gridCodeLength).toInt();
 
 /// Minimum length of a code that can be shortened.
 const minTrimmableCodeLen = 6;
