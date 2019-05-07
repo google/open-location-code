@@ -7,7 +7,10 @@ Gem::Specification.new do |s|
   s.version       = '1.0.3'
   s.authors       = ['Google', 'Wei-Ming Wu']
   s.date          = Date.today.to_s
-  s.email         = ['open-location-code@googlegroups.com', 'wnameless@gmail.com']
+  s.email         = [
+                      'open-location-code@googlegroups.com',
+		      'wnameless@gmail.com'
+                    ]
   s.summary       = 'Ruby implementation of Open Location Code (Plus Codes)'
   s.description   = s.summary
   s.homepage      = 'https://github.com/google/open-location-code'
