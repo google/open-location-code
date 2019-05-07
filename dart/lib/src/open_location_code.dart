@@ -86,7 +86,7 @@ final finalLngPrecision =
 const minTrimmableCodeLen = 6;
 
 /// Decoder lookup table.
-///
+/// Position is ASCII character value, value is:
 /// * -2: illegal.
 /// * -1: Padding or Separator
 /// * >= 0: index in the alphabet.
