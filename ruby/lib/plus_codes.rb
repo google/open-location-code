@@ -2,7 +2,6 @@
 #
 # @author We-Ming Wu
 module PlusCodes
-
   # The character set used to encode coordinates.
   CODE_ALPHABET = '23456789CFGHJMPQRVWX'.freeze
 
@@ -24,11 +23,12 @@ module PlusCodes
   PAIR_CODE_LENGTH = 10
 
   # ASCII lookup table.
-  DECODE = (CODE_ALPHABET.chars + [PADDING, SEPARATOR]).reduce([]) do |ary, c|
+  DECODE = (CODE_ALPHABET.chars + [PADDING, SEPARATOR]).each_with_object(
+    []
+  ) do |c, ary|
     ary[c.ord] = CODE_ALPHABET.index(c)
     ary[c.downcase.ord] = CODE_ALPHABET.index(c)
     ary[c.ord] ||= -1
     ary
   end.freeze
-
 end
