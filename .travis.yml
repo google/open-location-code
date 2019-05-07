@@ -101,7 +101,7 @@ matrix:
       rvm: 2.2
       env: OLC_PATH=ruby
       script:
-        - gen install rubocop
+        - gem install rubocop
         - gem install test-unit
         - cd ruby && ruby test/plus_codes_test.rb
         - rubocop --config rubocop.yml
