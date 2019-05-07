@@ -1,4 +1,4 @@
-# Plus+Codes is a Ruby implementation of Google Open Location Code(Plus+Codes).
+# Plus+Codes is a Ruby implementation of Google Open Location Code (Plus Codes).
 #
 # @author We-Ming Wu
 module PlusCodes
