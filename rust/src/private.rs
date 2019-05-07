@@ -1,6 +1,6 @@
 use consts::{
     CODE_ALPHABET, ENCODING_BASE, LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH, GRID_ROWS,
-    GRID_COLUMNS,
+    GRID_COLUMNS, NARROW_REGION_PRECISION,
 };
 
 use interface::encode;
@@ -49,13 +49,15 @@ pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
     code
 }
 
-pub fn near(value: f64) -> bool {
-    // Detects real values that are "very near" the next integer value
-    // returning true when this is the case.
-    //
-    // I'm not particularly happy with this function, but I am at a loss
-    // for another (better?) way to achieve the required behaviour.
-    value.trunc() != (value + 0.0000000001f64).trunc()
+// Apply "gravity" towards closest integer value, if current value is closer that given threshold.
+// This is a way to compensate aggregated error caused by floating point precision restriction.
+fn near(value: f64, error: f64) -> f64 {
+    let target = (value + error).trunc();
+    if value.trunc() != target {
+        target
+    } else {
+        value
+    }
 }
 
 pub fn narrow_region(digit: usize, lat: &mut f64, lng: &mut f64) {
@@ -69,10 +71,23 @@ pub fn narrow_region(digit: usize, lat: &mut f64, lng: &mut f64) {
         *lat *= GRID_ROWS;
         *lng *= GRID_COLUMNS
     }
-    if near(*lat) {
-        *lat = lat.round();
+    *lat = near(*lat, NARROW_REGION_PRECISION);
+    *lng = near(*lng, NARROW_REGION_PRECISION);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn near_applied() {
+        let value = 3.0f64 - NARROW_REGION_PRECISION * 2.;
+        assert_eq!(near(value, NARROW_REGION_PRECISION), value);
     }
-    if near(*lng) {
-        *lng = lng.round();
+
+    #[test]
+    fn near_not_applied() {
+        let value = 3.0f64 - NARROW_REGION_PRECISION;
+        assert_eq!(near(value, NARROW_REGION_PRECISION), 3.0f64);
     }
 }

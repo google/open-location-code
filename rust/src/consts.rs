@@ -49,3 +49,5 @@ pub const GRID_ROWS: f64 = 5f64;
 // Minimum length of a code that can be shortened.
 pub const MIN_TRIMMABLE_CODE_LEN: usize = 6;
 
+// Precision of "gravity" to closest larger integer value.
+pub const NARROW_REGION_PRECISION: f64 = 1e-9;
