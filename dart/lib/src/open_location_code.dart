@@ -57,7 +57,7 @@ final int pairPrecision = pow(encodingBase, 3).toInt();
 /// The resolution values in degrees for each position in the lat/lng pair
 /// encoding. These give the place value of each position, and therefore the
 /// dimensions of the resulting area.
-const pairResolutions = const <double>[20.0, 1.0, .05, .0025, .000125];
+const pairResolutions = <double>[20.0, 1.0, .05, .0025, .000125];
 
 /// Number of digits in the grid precision part of the code.
 const gridCodeLength = maxDigitCount - pairCodeLength;
@@ -90,7 +90,7 @@ const minTrimmableCodeLen = 6;
 /// * -2: illegal.
 /// * -1: Padding or Separator
 /// * >= 0: index in the alphabet.
-const _decode = const <int>[
+const _decode = <int>[
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, //
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, //
   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -1, -2, -2, -2, -2, //
@@ -162,10 +162,10 @@ num clipLatitude(num latitude) => latitude.clamp(-90.0, 90.0);
 /// lengths > 10 have different precisions due to the grid method having fewer
 /// columns than rows.
 num computeLatitudePrecision(int codeLength) {
-if (codeLength <= 10) {
-  return pow(encodingBase, (codeLength ~/ -2) + 2);
-}
-return 1 / (pow(encodingBase, 3) * pow(gridRows, codeLength - 10));
+  if (codeLength <= 10) {
+    return pow(encodingBase, (codeLength ~/ -2) + 2);
+  }
+  return 1 / (pow(encodingBase, 3) * pow(gridRows, codeLength - 10));
 }
 
 /// Normalize a [longitude] into the range -180 to 180, not including 180.
@@ -266,11 +266,11 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
     // we can treat them as integers. Round them off to 6 decimal places
     // before converting to integers to avoid floating point rounding errors.
     var latPrecision =
-        ((latitude - (latitude).floor()) * finalLatPrecision * 1e6)
-            .round() ~/1e6;
+        ((latitude - (latitude).floor()) * finalLatPrecision * 1e6).round() ~/
+            1e6;
     var lngPrecision =
-        ((longitude - (longitude).floor()) * finalLngPrecision * 1e6)
-             .round() ~/1e6;
+        ((longitude - (longitude).floor()) * finalLngPrecision * 1e6).round() ~/
+            1e6;
     for (var i = 0; i < maxDigitCount - pairCodeLength; i++) {
       var index = (latPrecision % gridRows) * gridColumns +
           (lngPrecision % gridColumns);
@@ -283,7 +283,8 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   var latPrecision =
       ((latitude + latitudeMax) * pairPrecision * 1e6).round() ~/ 1e6;
   var lngPrecision =
-      ((longitude + longitudeMax) * pairPrecision * 1e6).round() ~/ 1e6;;
+      ((longitude + longitudeMax) * pairPrecision * 1e6).round() ~/ 1e6;
+  ;
   for (var i = 0; i < pairCodeLength / 2; i++) {
     code = codeAlphabet[lngPrecision % encodingBase] + code;
     code = codeAlphabet[latPrecision % encodingBase] + code;
@@ -299,7 +300,8 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   }
   // Pad and return the code.
   return code.substring(0, codeLength) +
-      (padding * (separatorPosition - codeLength)) + '+';
+      (padding * (separatorPosition - codeLength)) +
+      '+';
 }
 
 /// Decodes an Open Location Code into the location coordinates.
@@ -365,8 +367,9 @@ CodeArea decode(String code) {
   var lng = normalLng / pairPrecision + gridLng / finalLngPrecision;
   // Multiple values by 1e14, round and then divide. This reduces errors due
   // to floating point precision.
-  return new CodeArea(
-      (lat * 1e14).round() / 1e14, (lng * 1e14).round() / 1e14,
+  return CodeArea(
+      (lat * 1e14).round() / 1e14,
+      (lng * 1e14).round() / 1e14,
       ((lat + latPrecision) * 1e14).round() / 1e14,
       ((lng + lngPrecision) * 1e14).round() / 1e14,
       min(code.length, maxDigitCount));

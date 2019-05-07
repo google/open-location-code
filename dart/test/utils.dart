@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 
 List<String> getCsvLines(String fileName) {
-  return new File(fileName)
+  return File(fileName)
       .readAsLinesSync()
       .where((x) => !x.isEmpty && !x.startsWith('#'))
       .map((x) => x.trim())

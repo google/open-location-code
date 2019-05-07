@@ -28,8 +28,9 @@ matrix:
       env: OLC_PATH=dart
       script:
         - cd dart && pub get
-        - dartanalyzer lib/open_location_code.dart
         - pub run test
+        - dartanalyzer lib/open_location_code.dart
+        - dartfmt --set-exit-if-changed --dry-run --fix lib/* lib/src/* test/*
 
     # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.
     - language: go
