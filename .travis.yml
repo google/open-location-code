@@ -11,7 +11,7 @@ matrix:
     - language: c
       env: OLC_PATH=c
       script:
-        - cd ${OLC_PATH} && make test && sh clang-check.sh
+        - cd ${OLC_PATH} && make test
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
@@ -21,6 +21,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - sh clang-check.sh
 
     # Dart implementation. Lives in dart/
     - language: dart
