@@ -1,8 +1,9 @@
 #include "openlocationcode.h"
 
-#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <cstring>
 #include <fstream>
 #include <string>
 
@@ -117,14 +118,14 @@ TEST_P(DecodingChecks, Decode) {
               actual_rect.GetCenter().latitude, 1e-10);
   EXPECT_NEAR(expected_rect.GetCenter().longitude,
               actual_rect.GetCenter().longitude, 1e-10);
-  EXPECT_NEAR(expected_rect.GetLatitudeLo(),
-              actual_rect.GetLatitudeLo(), 1e-10);
-  EXPECT_NEAR(expected_rect.GetLongitudeLo(),
-              actual_rect.GetLongitudeLo(), 1e-10);
-  EXPECT_NEAR(expected_rect.GetLatitudeHi(),
-              actual_rect.GetLatitudeHi(), 1e-10);
-  EXPECT_NEAR(expected_rect.GetLongitudeHi(),
-              actual_rect.GetLongitudeHi(), 1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeLo(), actual_rect.GetLatitudeLo(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeLo(), actual_rect.GetLongitudeLo(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeHi(), actual_rect.GetLatitudeHi(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeHi(), actual_rect.GetLongitudeHi(),
+              1e-10);
 }
 
 INSTANTIATE_TEST_CASE_P(OLC_Tests, DecodingChecks,
@@ -242,7 +243,8 @@ TEST_P(ShortCodeChecks, ShortCode) {
   }
   // Now extend the code using the reference location and check.
   if (test_data.test_type == "B" || test_data.test_type == "R") {
-    std::string actual_full = RecoverNearest(test_data.short_code, reference_loc);
+    std::string actual_full =
+        RecoverNearest(test_data.short_code, reference_loc);
     EXPECT_EQ(test_data.full_code, actual_full);
   }
 }

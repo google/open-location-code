@@ -11,7 +11,7 @@ matrix:
     - language: c
       env: OLC_PATH=c
       script:
-        - cd ${OLC_PATH};make test
+        - cd ${OLC_PATH} && make test && sh clang-check.sh
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp

@@ -16,21 +16,13 @@ CodeArea::CodeArea(double latitude_lo, double longitude_lo, double latitude_hi,
   code_length_ = code_length;
 }
 
-double CodeArea::GetLatitudeLo() const{
-  return latitude_lo_;
-}
+double CodeArea::GetLatitudeLo() const { return latitude_lo_; }
 
-double CodeArea::GetLongitudeLo() const {
-  return longitude_lo_;
-}
+double CodeArea::GetLongitudeLo() const { return longitude_lo_; }
 
-double CodeArea::GetLatitudeHi() const {
-  return latitude_hi_;
-}
+double CodeArea::GetLatitudeHi() const { return latitude_hi_; }
 
-double CodeArea::GetLongitudeHi() const {
-  return longitude_hi_;
-}
+double CodeArea::GetLongitudeHi() const { return longitude_hi_; }
 
 size_t CodeArea::GetCodeLength() const { return code_length_; }
 
@@ -44,4 +36,4 @@ LatLng CodeArea::GetCenter() const {
   return center;
 }
 
-} // namespace openlocationcode
+}  // namespace openlocationcode
