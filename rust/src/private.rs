@@ -49,7 +49,7 @@ pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
     code
 }
 
-// Apply "gravity" towards closest integer value, if current value is closer that given threshold.
+// Apply "gravity" towards closest integer value, if current value is closer than given threshold.
 // This is a way to compensate aggregated error caused by floating point precision restriction.
 fn near(value: f64, error: f64) -> f64 {
     let target = (value + error).trunc();
