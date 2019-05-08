@@ -21,7 +21,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-        - cd cpp && bash clang-check.sh
+        - cd cpp && bash clang_check.sh
 
     # Dart implementation. Lives in dart/
     - language: dart
