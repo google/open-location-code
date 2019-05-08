@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-CLANG_FORMAT="clang-format-3.8"
+CLANG_FORMAT="clang-format-5.0"
 if hash $CLANG_FORMAT 2>/dev/null; then
   echo "clang-format hashed"
 elif hash clang-format 2>/dev/null; then
-  echo "Cannot find clang-format-3.8, using clang-format"
+  echo "Cannot find $CLANG_FORMAT, using clang-format"
   CLANG_FORMAT="clang-format"
 else
   echo "Cannot find clang-format"
