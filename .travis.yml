@@ -98,7 +98,7 @@ matrix:
 
     # Ruby implementation. Lives in ruby/
     - language: ruby
-      rvm: 2.2
+      rvm: 2.6.3
       env: OLC_PATH=ruby
       script:
         - gem install rubocop
