@@ -117,52 +117,60 @@ std::string clean_code_chars(const std::string &code) {
 
 }  // anonymous namespace
 
+
 std::string Encode(const LatLng &location, size_t code_length) {
   // Limit the maximum number of digits in the code.
   code_length = std::min(code_length, internal::kMaximumDigitCount);
-  // Adjust latitude and longitude so they fall into positive ranges.
+  // Adjust latitude and longitude so that they are normalized/clipped.
   double latitude = adjust_latitude(location.latitude, code_length);
   double longitude = normalize_longitude(location.longitude);
-  std::string code = "0000000000000000";
-  // Build the code up from right to left - start with the grid section.
+  // Reserve 15 characters for the code digits. The separator will be inserted
+  // at the end.
+  std::string code = "123456789abcdef";
+  
+  // Compute the code.
+  // This approach converts each value to an integer after multiplying it by
+  // the final precision. This allows us to use only integer operations, so
+  // avoiding any accumulation of floating point representation errors.
+
+  // Multiply values by their precision and convert to positive without any
+  // floating point operations.
+  int64_t lat_val = internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse;
+  int64_t lng_val = internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
+  lat_val += latitude * internal::kGridLatPrecisionInverse;
+  lng_val += longitude * internal::kGridLngPrecisionInverse;
+  
+  size_t pos = internal::kMaximumDigitCount - 1;
+  // Compute the grid part of the code if necessary.
   if (code_length > internal::kPairCodeLength) {
-    // Multiply the decimal part of each coordinate by the final precision and
-    // round off to 1e-6 precision. Use integers so the rest of the math is
-    // integer based. This avoids/minimises errors due to loss of precision in
-    // floating point representation.
-    double lat_decimal = latitude - floor(latitude);
-    double lng_decimal = longitude - floor(longitude);
-    uint32_t lat_precision =
-        round(lat_decimal * internal::kGridLatPrecisionInverse * 1e6) / 1e6;
-    uint32_t lng_precision =
-        round(lng_decimal * internal::kGridLngPrecisionInverse * 1e6) / 1e6;
     for (size_t i = 0; i < internal::kGridCodeLength; i++) {
-      size_t index =
-          (lat_precision % internal::kGridRows) * internal::kGridColumns +
-          lng_precision % internal::kGridColumns;
-      code[internal::kMaximumDigitCount - 1 - i] = internal::kAlphabet[index];
-      lat_precision /= internal::kGridRows;
-      lng_precision /= internal::kGridColumns;
+      int lat_digit = lat_val % internal::kGridRows;
+      int lng_digit = lng_val % internal::kGridColumns;
+      int ndx = lat_digit * internal::kGridColumns + lng_digit;
+      code.replace(pos--, 1, 1, internal::kAlphabet[ndx]);
+      // Note! Integer division.
+      lat_val /= internal::kGridRows;
+      lng_val /= internal::kGridColumns;
     }
+  } else {
+    lat_val /= pow(internal::kGridRows, internal::kGridCodeLength);
+    lng_val /= pow(internal::kGridColumns, internal::kGridCodeLength);
   }
-  // Now do the pairs.
-  // Multiply each coordinate by the precision and round off to 1e-6 precision.
-  // Convert to integers so the rest of the math is integer based.
-  uint32_t lat_precision = round((latitude + internal::kLatitudeMaxDegrees) *
-                                 internal::kPairPrecisionInverse * 1e6) /
-                           1e6;
-  uint32_t lng_precision = round((longitude + internal::kLongitudeMaxDegrees) *
-                                 internal::kPairPrecisionInverse * 1e6) /
-                           1e6;
+  pos = internal::kPairCodeLength - 1;
+  // Compute the pair section of the code.
   for (size_t i = 0; i < internal::kPairCodeLength / 2; i++) {
-    code[internal::kPairCodeLength - i * 2 - 1] =
-        internal::kAlphabet[lng_precision % internal::kEncodingBase];
-    code[internal::kPairCodeLength - i * 2 - 2] =
-        internal::kAlphabet[lat_precision % internal::kEncodingBase];
-    lat_precision /= internal::kEncodingBase;
-    lng_precision /= internal::kEncodingBase;
+    int lat_ndx = lat_val % internal::kEncodingBase;
+    int lng_ndx = lng_val % internal::kEncodingBase;
+    code.replace(pos--, 1, 1, internal::kAlphabet[lng_ndx]);
+    code.replace(pos--, 1, 1, internal::kAlphabet[lat_ndx]);
+      // Note! Integer division.
+    lat_val /= internal::kEncodingBase;
+    lng_val /= internal::kEncodingBase;
   }
+  
+  // Add the separator character.
   code.insert(internal::kSeparatorPosition, &(internal::kSeparator), 1);
+  
   // If we don't need to pad the code, return the requested section.
   if (code_length >= internal::kSeparatorPosition) {
     return code.substr(0, code_length + 1);
