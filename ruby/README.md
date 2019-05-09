@@ -11,7 +11,17 @@ Ruby implementation of Open Location Code library.
 5. Create a new Pull Request
 
 Your code must pass tests, and must be formatted with
-[rubocop](https://github.com/rubocop-hq/rubocop).
+[rubocop](https://github.com/rubocop-hq/rubocop). This will check all the ruby
+files and print a list of corrections you need to make - it will not format your
+file automatically.
+
+```
+gem install rubocop
+rubocop --config rubocop.yml
+```
+
+If you can't run it yourself, it is run as part of the TravisCI tests.
+
 
 ### Testing
 
