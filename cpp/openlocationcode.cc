@@ -117,7 +117,6 @@ std::string clean_code_chars(const std::string &code) {
 
 }  // anonymous namespace
 
-
 std::string Encode(const LatLng &location, size_t code_length) {
   // Limit the maximum number of digits in the code.
   code_length = std::min(code_length, internal::kMaximumDigitCount);
@@ -127,7 +126,7 @@ std::string Encode(const LatLng &location, size_t code_length) {
   // Reserve 15 characters for the code digits. The separator will be inserted
   // at the end.
   std::string code = "123456789abcdef";
-  
+
   // Compute the code.
   // This approach converts each value to an integer after multiplying it by
   // the final precision. This allows us to use only integer operations, so
@@ -135,11 +134,13 @@ std::string Encode(const LatLng &location, size_t code_length) {
 
   // Multiply values by their precision and convert to positive without any
   // floating point operations.
-  int64_t lat_val = internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse;
-  int64_t lng_val = internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
+  int64_t lat_val =
+      internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse;
+  int64_t lng_val =
+      internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
   lat_val += latitude * internal::kGridLatPrecisionInverse;
   lng_val += longitude * internal::kGridLngPrecisionInverse;
-  
+
   size_t pos = internal::kMaximumDigitCount - 1;
   // Compute the grid part of the code if necessary.
   if (code_length > internal::kPairCodeLength) {
@@ -163,14 +164,14 @@ std::string Encode(const LatLng &location, size_t code_length) {
     int lng_ndx = lng_val % internal::kEncodingBase;
     code.replace(pos--, 1, 1, internal::kAlphabet[lng_ndx]);
     code.replace(pos--, 1, 1, internal::kAlphabet[lat_ndx]);
-      // Note! Integer division.
+    // Note! Integer division.
     lat_val /= internal::kEncodingBase;
     lng_val /= internal::kEncodingBase;
   }
-  
+
   // Add the separator character.
   code.insert(internal::kSeparatorPosition, &(internal::kSeparator), 1);
-  
+
   // If we don't need to pad the code, return the requested section.
   if (code_length >= internal::kSeparatorPosition) {
     return code.substr(0, code_length + 1);
