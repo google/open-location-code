@@ -50,37 +50,36 @@ module PlusCodes
       longitude = normalize_longitude(longitude)
       latitude -= precision_by_length(code_length) if latitude == 90
 
-      final_lat_precision = 8000 * 5**(MAX_CODE_LENGTH - PAIR_CODE_LENGTH)
-      final_lng_precision = 8000 * 4**(MAX_CODE_LENGTH - PAIR_CODE_LENGTH)
-
-      # This algorithm starts with the least significant digits, and works it's
-      # way to the front of the code.
       code = ''
+
+      # Compute the code.
+      # This approach converts each value to an integer after multiplying it by
+      # the final precision. This allows us to use only integer operations, so
+      # avoiding any accumulation of floating point representation errors.
+      lat_val = 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
+      lat_val += latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
+      lng_val = 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
+      lng_val += longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
+      lat_val = lat_val.to_i
+      lng_val = lng_val.to_i
+
+      # Compute the grid part of the code if necessary.
       if code_length > PAIR_CODE_LENGTH
-        # Multiply the decimal part of each coordinate by the final precision so
-        # we can treat them as integers. Round them off to 6 decimal places
-        # before converting to integers to avoid floating point rounding errors.
-        lat_p =
-          (((latitude - latitude.floor) * final_lat_precision * 1e6).round /
-          1e6).to_i
-        lng_p =
-          (((longitude - longitude.floor) * final_lng_precision * 1e6).round /
-          1e6).to_i
         (0..MAX_CODE_LENGTH - PAIR_CODE_LENGTH - 1).each do
-          index = (lat_p % 5) * 4 + (lng_p % 4)
+          index = (lat_val % 5) * 4 + (lng_val % 4)
           code = CODE_ALPHABET[index] + code
-          lat_p /= 5
-          lng_p /= 4
+          lat_val = lat_val.div 5
+          lng_val = lng_val.div 4
         end
+      else
+        lat_val = lat_val.div LAT_GRID_PRECISION
+        lng_val = lng_val.div LNG_GRID_PRECISION
       end
-      # Multiply the coordinates by the pair precision and convert to integers.
-      lat_p = (((latitude + 90) * 8000 * 1e6).round / 1e6).to_i
-      lng_p = (((longitude + 180) * 8000 * 1e6).round / 1e6).to_i
       (0..PAIR_CODE_LENGTH / 2 - 1).each do |i|
-        code = CODE_ALPHABET[lng_p % 20] + code
-        code = CODE_ALPHABET[lat_p % 20] + code
-        lat_p /= 20
-        lng_p /= 20
+        code = CODE_ALPHABET[lng_val % 20] + code
+        code = CODE_ALPHABET[lat_val % 20] + code
+        lat_val = lat_val.div 20
+        lng_val = lng_val.div 20
         code = '+' + code if i.zero?
       end
       # If we don't need to pad the code, return the requested section.

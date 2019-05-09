@@ -22,6 +22,15 @@ module PlusCodes
   # for identifying buildings. This excludes prefix and separator characters.
   PAIR_CODE_LENGTH = 10
 
+  # Inverse of the precision of the pair code section.
+  PAIR_CODE_PRECISION = 8000
+
+  # Precision of the latitude grid.
+  LAT_GRID_PRECISION = 5**(MAX_CODE_LENGTH - PAIR_CODE_LENGTH)
+
+  # Precision of the longitude grid.
+  LNG_GRID_PRECISION = 4**(MAX_CODE_LENGTH - PAIR_CODE_LENGTH)
+
   # ASCII lookup table.
   DECODE = (CODE_ALPHABET.chars + [PADDING, SEPARATOR]).each_with_object(
     []
