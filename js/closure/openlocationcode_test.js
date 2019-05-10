@@ -101,7 +101,7 @@ testSuite({
         const shortCode = fields[3];
         const testType = fields[4];
 
-        if (testType == "B" || testType == "S") {
+        if (testType == 'B' || testType == 'S') {
           const gotShort = OpenLocationCode.shorten(code, lat, lng);
           assertEquals('testShortCodes ' + i, shortCode, gotShort);
         }
@@ -116,9 +116,9 @@ testSuite({
     xhrIo_.send(SHORT_CODE_TEST_FILE, 'GET');
   },
   testRecoveryNearPoles: function() {
-    assertEquals("2CXXXXXX+XX", OpenLocationCode.recoverNearest("XXXXXX+XX", -81.0, 0.0));
-    assertEquals("CFX22222+22", OpenLocationCode.recoverNearest("2222+22", 89.6, 0.0));
-    assertEquals("CFX22222+22", OpenLocationCode.recoverNearest("2222+22", 89.6, 0.0));
+    assertEquals('2CXXXXXX+XX', OpenLocationCode.recoverNearest('XXXXXX+XX', -81.0, 0.0));
+    assertEquals('CFX22222+22', OpenLocationCode.recoverNearest('2222+22', 89.6, 0.0));
+    assertEquals('CFX22222+22', OpenLocationCode.recoverNearest('2222+22', 89.6, 0.0));
   },
   testValidity: function() {
     const xhrIo_ = new XhrIo();
@@ -151,28 +151,28 @@ testSuite({
       lng = Math.round(lng * Math.pow(10, decimals)) / Math.pow(10, decimals);
       var length = 2 + Math.round(Math.random() * 13);
       if (length < 10 && length % 2 === 1) {
-       length += 1;
+        length += 1;
       }
       input.push([lat, lng, length, OpenLocationCode.encode(lat, lng, length)]);
     }
-    var start_millis = Date.now();
+    var startMillis = Date.now();
     for (var i = 0; i < input.length; i++) {
       OpenLocationCode.encode(input[i][0], input[i][1], input[i][2]);
     }
-    var duration_millis = Date.now() - start_millis;
+    var durationMillis = Date.now() - startMillis;
     console.info(
-        "Encoding: " + input.length + ", total " + duration_millis +
-        " millis, average duration " +
-        ((duration_millis * 1000) / input.length) + " usecs");
+        'Encoding: ' + input.length + ', total ' + durationMillis * 1000 +
+        ' usecs, average duration ' +
+        ((durationMillis * 1000) / input.length) + ' usecs');
 
-    start_millis = Date.now();
+    startMillis = Date.now();
     for (var i = 0; i < input.length; i++) {
       OpenLocationCode.decode(input[i][3]);
     }
-    duration_millis = Date.now() - start_millis;
+    durationMillis = Date.now() - startMillis;
     console.info(
-        "Decoding: " + input.length + ", total " + duration_millis +
-        " millis, average duration " +
-        ((duration_millis * 1000) / input.length) + " usecs");
+        'Decoding: ' + input.length + ', total ' + durationMillis * 1000 +
+        ' usecs, average duration ' +
+        ((durationMillis * 1000) / input.length) + ' usecs');
   },
 });
