@@ -67,7 +67,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test ${OLC_PATH}:all
-        - cd js && npm install eslint && eslint closure/*js
+        - cd js && npm install eslint --save-dev && ./node_modules/.bin/eslint closure/*js
 
     # Javascript implementation. Lives in js/.
     - language: node_js
