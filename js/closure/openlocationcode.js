@@ -376,8 +376,9 @@ function encode(latitude, longitude, optLength) {
   // Multiply values by their precision and convert to positive.
   // Force to integers so the division operations will have integer results.
   // Note: JavaScript requires rounding before truncating to ensure precision!
-  var latVal =      Math.floor(Math.round((latitude + LATITUDE_MAX) * FINAL_LAT_PRECISION * 1e6) / 1e6);
-             var lngVal =
+  var latVal =
+      Math.floor(Math.round((latitude + LATITUDE_MAX) * FINAL_LAT_PRECISION * 1e6) / 1e6);
+  var lngVal =
       Math.floor(Math.round((longitude + LONGITUDE_MAX) * FINAL_LNG_PRECISION * 1e6) / 1e6);
 
   // Compute the grid part of the code if necessary.
