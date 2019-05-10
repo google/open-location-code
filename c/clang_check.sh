@@ -11,7 +11,6 @@ else
   echo "Cannot find clang-format"
   exit 1
 fi
-$CLANG_FORMAT --version
 
 if [ ! -f ".clang-format" ]; then
   echo ".clang-format file not found!"
@@ -21,11 +20,15 @@ fi
 RETURN=0
 :
 for FILE in `ls *.[ch] */*.[ch]`; do
-  echo "Checking clang-format: $FILE"
-  $CLANG_FORMAT $FILE | cmp $FILE >/dev/null
+  DIFF=`diff --color=always $FILE <($CLANG_FORMAT $FILE)`
   if [ $? -ne 0 ]; then
-    echo "[!] INCORRECT FORMATTING! $FILE" >&2
-    $CLANG_FORMAT -i $FILE
+    if [ -z "$TRAVIS" ]; then
+      echo "Formatting $FILE" >&2
+      $CLANG_FORMAT -i $FILE
+    else
+      echo -e "\e[31m$FILE has formatting errors:\e[30m" >&2
+      echo "$DIFF" >&2
+    fi
     RETURN=1
   fi
 done

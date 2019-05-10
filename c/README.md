@@ -2,6 +2,14 @@
 
 This is the C implementation of the Open Location Code API.
 
+# Code Style and Formatting
+
+Code style is based on Googles formatting rules. Code must be formatted
+using `clang-format`.
+
+The `clang_check.sh` script will check for formatting errors, output them,
+and automatically format files.
+
 # Building
 
 For now we have a simple `Makefile`.  Usual targets work:

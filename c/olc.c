@@ -10,7 +10,7 @@
     (var) += (info)->sep_first >= 0 ? 1 : 0; \
   } while (0)
 
-typedef struct CodeInfo {
+   typedef struct CodeInfo {
   const char* code;
   int size;
   int len;
