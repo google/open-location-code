@@ -20,7 +20,7 @@ fi
 RETURN=0
 :
 for FILE in `ls *.[ch] */*.[ch]`; do
-  DIFF=`diff --color=always $FILE <($CLANG_FORMAT $FILE)`
+  DIFF=`diff $FILE <($CLANG_FORMAT $FILE)`
   if [ $? -ne 0 ]; then
     if [ -z "$TRAVIS" ]; then
       echo "Formatting $FILE" >&2
