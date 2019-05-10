@@ -105,7 +105,7 @@ class TestEncoding(unittest.TestCase):
             if '0' in td['code']:
                 codelength = td['code'].index('0')
             self.assertEqual(td['code'],
-                             olc.encode(td['lat'], td['lng'], codelength), td)
+                             olc.encode(td['lat'], td['lng'], codelength))
 
 
 class TestDecoding(unittest.TestCase):

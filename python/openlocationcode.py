@@ -259,33 +259,40 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
     # can also be decoded.
     if latitude == 90:
         latitude = latitude - computeLatitudePrecision(codeLength)
-    # This algorithm starts with the least significant digits, and works it's
-    # way to the front of the code.
     code = ''
-    if codeLength > PAIR_CODE_LENGTH_:
-        # Multiply the decimal part of each coordinate by the final precision so
-        # we can treat them as integers.
-        latPrecision = int(
-            round((latitude - math.floor(latitude)) * FINAL_LAT_PRECISION_, 6))
-        lngPrecision = int(
-            round((longitude - math.floor(longitude)) * FINAL_LNG_PRECISION_,
-                  6))
-        for i in range(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
-            code = CODE_ALPHABET_[int(latPrecision % GRID_ROWS_) * GRID_COLUMNS_
-                                  + int(lngPrecision % GRID_COLUMNS_)] + code
-            latPrecision //= GRID_ROWS_
-            lngPrecision //= GRID_COLUMNS_
 
-    # Multiply the coordinates by the pair precision and convert to integers.
-    latPrecision = int(round((latitude + LATITUDE_MAX_) * PAIR_PRECISION_, 6))
-    lngPrecision = int(round((longitude + LONGITUDE_MAX_) * PAIR_PRECISION_, 6))
+    # Compute the code.
+    # This approach converts each value to an integer after multiplying it by
+    # the final precision. This allows us to use only integer operations, so
+    # avoiding any accumulation of floating point representation errors.
+
+    # Multiply values by their precision and convert to positive.
+    # Force to integers so the division operations will have integer results.
+    # Note: Python requires rounding before truncating to ensure precision!
+    latVal = int(round((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_, 6))
+    lngVal = int(round((longitude + LONGITUDE_MAX_) * FINAL_LNG_PRECISION_, 6))
+
+    # Compute the grid part of the code if necessary.
+    if codeLength > PAIR_CODE_LENGTH_:
+        for i in range(0, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_):
+            latDigit = latVal % GRID_ROWS_
+            lngDigit = lngVal % GRID_COLUMNS_
+            ndx = latDigit * GRID_COLUMNS_ + lngDigit
+            code = CODE_ALPHABET_[ndx] + code
+            latVal /= GRID_ROWS_
+            lngVal /= GRID_COLUMNS_
+    else:
+        latVal /= pow(GRID_ROWS_, GRID_CODE_LENGTH_)
+        lngVal /= pow(GRID_COLUMNS_, GRID_CODE_LENGTH_)
+    # Compute the pair section of the code.
     for i in range(0, PAIR_CODE_LENGTH_ // 2):
-        code = CODE_ALPHABET_[int(lngPrecision % ENCODING_BASE_)] + code
-        code = CODE_ALPHABET_[int(latPrecision % ENCODING_BASE_)] + code
-        latPrecision //= ENCODING_BASE_
-        lngPrecision //= ENCODING_BASE_
-        if i == 0:
-            code = '+' + code
+        code = CODE_ALPHABET_[int(lngVal % ENCODING_BASE_)] + code
+        code = CODE_ALPHABET_[int(latVal % ENCODING_BASE_)] + code
+        latVal /= ENCODING_BASE_
+        lngVal /= ENCODING_BASE_
+
+    # Add the separator character.
+    code = code[:SEPARATOR_POSITION_] + SEPARATOR_ + code[SEPARATOR_POSITION_:]
 
     # If we don't need to pad the code, return the requested section.
     if codeLength >= SEPARATOR_POSITION_:
