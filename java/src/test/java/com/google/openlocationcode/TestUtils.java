@@ -2,10 +2,6 @@ package com.google.openlocationcode;
 
 import java.io.File;
 
-/**
- * Test class for accumulating all the general methods at one place this will provide more
- * re-usability. KLOC in the tests will be decreased.
- */
 public class TestUtils {
   // Gets the test file, factoring in whether it's being built from Maven or Bazel.
   public static File getTestFile(String testFile) {
