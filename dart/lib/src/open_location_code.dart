@@ -258,42 +258,51 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   if (latitude == 90) {
     latitude -= computeLatitudePrecision(codeLength).toDouble();
   }
-  // This algorithm starts with the least significant digits, and works it's
-  // way to the front of the code.
   var code = '';
+
+  // Compute the code.
+  // This approach converts each value to an integer after multiplying it by
+  // the final precision. This allows us to use only integer operations, so
+  // avoiding any accumulation of floating point representation errors.
+
+  // Multiply values by their precision and convert to positive.
+  // Force to integers so the division operations will have integer results.
+  // Note: Dart requires rounding before truncating to ensure precision!
+  int latVal =
+      (((latitude + latitudeMax) * finalLatPrecision * 1e6).round() / 1e6)
+          .toInt();
+  int lngVal =
+      (((longitude + longitudeMax) * finalLngPrecision * 1e6).round() / 1e6)
+          .toInt();
+
+  // Compute the grid part of the code if necessary.
   if (codeLength > pairCodeLength) {
-    // Multiply the decimal part of each coordinate by the final precision so
-    // we can treat them as integers. Round them off to 6 decimal places
-    // before converting to integers to avoid floating point rounding errors.
-    var latPrecision =
-        ((latitude - (latitude).floor()) * finalLatPrecision * 1e6).round() ~/
-            1e6;
-    var lngPrecision =
-        ((longitude - (longitude).floor()) * finalLngPrecision * 1e6).round() ~/
-            1e6;
     for (var i = 0; i < maxDigitCount - pairCodeLength; i++) {
-      var index = (latPrecision % gridRows) * gridColumns +
-          (lngPrecision % gridColumns);
-      code = codeAlphabet[index] + code;
-      latPrecision = latPrecision ~/ gridRows;
-      lngPrecision = lngPrecision ~/ gridColumns;
+      int lat_digit = latVal % gridRows;
+      int lng_digit = lngVal % gridColumns;
+      int ndx = lat_digit * gridColumns + lng_digit;
+      code = codeAlphabet[ndx] + code;
+      // Note! Integer division.
+      latVal ~/= gridRows;
+      lngVal ~/= gridColumns;
     }
+  } else {
+    latVal ~/= pow(gridRows, gridCodeLength);
+    lngVal ~/= pow(gridColumns, gridCodeLength);
   }
-  // Multiple the coordinates by the pair precision and convert to integers.
-  var latPrecision =
-      ((latitude + latitudeMax) * pairPrecision * 1e6).round() ~/ 1e6;
-  var lngPrecision =
-      ((longitude + longitudeMax) * pairPrecision * 1e6).round() ~/ 1e6;
-  ;
+  // Compute the pair section of the code.
   for (var i = 0; i < pairCodeLength / 2; i++) {
-    code = codeAlphabet[lngPrecision % encodingBase] + code;
-    code = codeAlphabet[latPrecision % encodingBase] + code;
-    latPrecision = latPrecision ~/ encodingBase;
-    lngPrecision = lngPrecision ~/ encodingBase;
-    if (i == 0) {
-      code = '+' + code;
-    }
+    code = codeAlphabet[lngVal % encodingBase] + code;
+    code = codeAlphabet[latVal % encodingBase] + code;
+    latVal ~/= encodingBase;
+    lngVal ~/= encodingBase;
   }
+
+  // Add the separator character.
+  code = code.substring(0, separatorPosition) +
+      separator +
+      code.substring(separatorPosition);
+
   // If we don't need to pad the code, return the requested section.
   if (codeLength >= separatorPosition) {
     return code.substring(0, codeLength + 1);
@@ -301,7 +310,7 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   // Pad and return the code.
   return code.substring(0, codeLength) +
       (padding * (separatorPosition - codeLength)) +
-      '+';
+      separator;
 }
 
 /// Decodes an Open Location Code into the location coordinates.
