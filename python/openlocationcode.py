@@ -279,17 +279,17 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
             lngDigit = lngVal % GRID_COLUMNS_
             ndx = latDigit * GRID_COLUMNS_ + lngDigit
             code = CODE_ALPHABET_[ndx] + code
-            latVal /= GRID_ROWS_
-            lngVal /= GRID_COLUMNS_
+            latVal //= GRID_ROWS_
+            lngVal //= GRID_COLUMNS_
     else:
-        latVal /= pow(GRID_ROWS_, GRID_CODE_LENGTH_)
-        lngVal /= pow(GRID_COLUMNS_, GRID_CODE_LENGTH_)
+        latVal //= pow(GRID_ROWS_, GRID_CODE_LENGTH_)
+        lngVal //= pow(GRID_COLUMNS_, GRID_CODE_LENGTH_)
     # Compute the pair section of the code.
     for i in range(0, PAIR_CODE_LENGTH_ // 2):
-        code = CODE_ALPHABET_[int(lngVal % ENCODING_BASE_)] + code
-        code = CODE_ALPHABET_[int(latVal % ENCODING_BASE_)] + code
-        latVal /= ENCODING_BASE_
-        lngVal /= ENCODING_BASE_
+        code = CODE_ALPHABET_[lngVal % ENCODING_BASE_] + code
+        code = CODE_ALPHABET_[latVal % ENCODING_BASE_] + code
+        latVal //= ENCODING_BASE_
+        lngVal //= ENCODING_BASE_
 
     # Add the separator character.
     code = code[:SEPARATOR_POSITION_] + SEPARATOR_ + code[SEPARATOR_POSITION_:]
