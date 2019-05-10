@@ -81,10 +81,10 @@ describe("Open Location Code", function() {
     for (var i = 0; i < input.length; i++) {
       OpenLocationCode.encode(input[i][0], input[i][1], input[i][2]);
     }
-    var end = Date.now();
+    var duration_millis = Date.now() - start;
     console.info(
         "Encoding: " + input.length + ", average duration " +
-        ((end - start) / input.length * 1000000) + " ns");
+        (1000 * duration_millis / input.length) + " usecs");
   });
 
   it("Decoding benchmark", function() {
@@ -105,9 +105,9 @@ describe("Open Location Code", function() {
     for (var i = 0; i < input.length; i++) {
       OpenLocationCode.decode(input[i]);
     }
-    var end = Date.now();
+    var duration_millis = Date.now() - start;
     console.info(
         "Decoding: " + input.length + ", average duration " +
-        ((end - start) / input.length * 1000000) + " ns");
+        (1000 * duration_millis / input.length) + " usecs");
   });
 });
