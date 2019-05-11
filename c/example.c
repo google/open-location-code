@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "olc.h"
+#include "src/olc.h"
 
 int main(int argc, char* argv[]) {
   char code[256];

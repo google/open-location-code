@@ -10,30 +10,31 @@ using `clang-format`.
 The `clang_check.sh` script will check for formatting errors, output them,
 and automatically format files.
 
-# Building
+# Usage
 
-For now we have a simple `Makefile`.  Usual targets work:
-```
-make clean
-make all
-make install
-```
+See example.cc for how to use the library. To run the example, use:
 
-# Examples
-
-See `example.c` for how to use the library. To run the example, use:
 ```
-make example && ./example
+bazel run openlocationcode_example
 ```
 
-# Testing
+# Development
 
-To test the library, use:
+The library is built/tested using [Bazel](https://bazel.build). To build the library, use:
+
 ```
-make test
+bazel build openlocationcode
 ```
 
-The tests use the CSV files in the parent's `test_data` folder.
+To run the tests, use:
+
+```
+bazel test --test_output=all openlocationcode_test
+```
+
+The tests use the CSV files in the test_data folder. Make sure you copy this folder to the
+root of your local workspace.
+
 
 # Authors
 
