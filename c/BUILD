@@ -1,0 +1,39 @@
+cc_library(
+    name = "openlocationcode",
+    srcs = [
+        "src/olc.c",
+    ],
+    hdrs = [
+        "src/olc.h",
+        "src/olc_private.h",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "openlocationcode_test",
+    size = "small",
+    srcs = ["openlocationcode_test.cc"],
+    copts = [
+        "-pthread",
+        "-Iexternal/gtest/include",
+    ],
+    data = [
+        "//test_data",
+    ],
+    linkopts = ["-pthread"],
+    deps = [
+        ":openlocationcode",
+        "@gtest//:main",
+    ],
+)
+
+cc_binary(
+    name = "openlocationcode_example",
+    srcs = [
+        "example.c",
+    ],
+    deps = [
+        ":openlocationcode",
+    ],
+)
