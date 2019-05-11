@@ -4,6 +4,7 @@ cc_library(
     srcs = [
         "src/olc.c",
     ],
+    copts = ["-std=c99"],
     hdrs = [
         "src/olc.h",
         "src/olc_private.h",
