@@ -1,3 +1,4 @@
+# Rule to build the library.
 cc_library(
     name = "openlocationcode",
     srcs = [
@@ -10,6 +11,7 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+# Rule to build and run the unit tests.
 cc_test(
     name = "openlocationcode_test",
     size = "small",
@@ -28,6 +30,7 @@ cc_test(
     ],
 )
 
+# Rule to build and run the example.
 cc_binary(
     name = "openlocationcode_example",
     srcs = [
