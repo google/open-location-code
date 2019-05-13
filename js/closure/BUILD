@@ -3,6 +3,7 @@ load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_library", "closure
 closure_js_library(
     name = "openlocationcode_lib",
     srcs = ["openlocationcode.js"],
+    convention = "GOOGLE",
 )
 
 closure_js_test(
