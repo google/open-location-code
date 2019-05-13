@@ -17,7 +17,7 @@ matrix:
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
         - pwd
         - cd ${OLC_PATH} && bash clang_check.sh
-        - echo "Just checking!" | bash ${HOME}/travis_utils/comment_pr.sh
+        - echo "Just checking!" | bash ${TRAVIS_BUILD_DIR}/travis_utils/comment_pr.sh
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
