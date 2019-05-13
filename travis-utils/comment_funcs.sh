@@ -77,6 +77,8 @@ function payload_to_github {
   if [ "$STATUS" != "200" ]; then
     echo -e "\e[31mFailed sending comment to GitHub:\e[30m"
     cat "$LOG"
+    echo "$URL"
+    echo "$BODY"
   fi
 }
 
