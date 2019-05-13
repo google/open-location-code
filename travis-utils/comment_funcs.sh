@@ -48,9 +48,11 @@ function post_file_comment {
     # We're not processing a pull request.
     return 0
   fi
+  # TRAVIS_PULL_REQUEST_SHA
+  __COMMIT_SHA=`git rev-parse FETCH_HEAD`
   __BODY="{
   \"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$__COMMENT\",
-  \"commit_id\": \"$TRAVIS_PULL_REQUEST_SHA\",
+  \"commit_id\": \"$__COMMIT_SHA\",
   \"path\": \"$1\",
   \"position\": 1}"
   payload_to_github \
@@ -76,14 +78,14 @@ function payload_to_github {
     return 0
   fi
   __LOG=`mktemp`
-  STATUS=`curl -s -o "$__LOG" -w "%{http_code}" \
+  __STATUS=`curl -s -o "$__LOG" -w "%{http_code}" \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
     -d "$__PAYLOAD" "$__URL"`
-  if [ "$STATUS" != "200" ]; then
-    echo -e "\e[31mFailed sending comment to GitHub:\e[30m"
+  if [ "$__STATUS" != "200" ]; then
+    echo -e "\e[31mFailed sending comment to GitHub (status $__STATUS):\e[30m"
     cat "$__LOG"
-    echo "$__URL"
-    echo "$__PAYLOAD"
+    echo "URL was: $__URL"
+    echo "Payload was: >>$__PAYLOAD<<"
   fi
 }
 

@@ -23,7 +23,7 @@ fi
 # Define the default return code.
 RETURN=0
 
-# For every dart file, check the formatting and perform static analysis.
+# For every dart file, check the formatting.
 for FILE in `find * | egrep "\.dart$"`; do
   echo Checking $FILE
   FORMATTED=`$DART_FMT_CMD --set-exit-if-changed --fix "$FILE"`
