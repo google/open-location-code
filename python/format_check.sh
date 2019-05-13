@@ -3,7 +3,7 @@
 
 python -m yapf --version >/dev/null 2>&1
 if [ $? -eq 1 ]; then
-  wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install yapf
+  curl -o /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py && python /tmp/get-pip.py && pip install yapf
 fi
 
 # Run YAPF and check for diffs. If there aren't any, we're done.
