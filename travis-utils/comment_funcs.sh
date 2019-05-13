@@ -47,8 +47,9 @@ function post_body_to_github {
     echo -e "\e[31mNo auth token, cannot send to GitHub\e[30m"
     return 0
   fi
-  
-  STATUS=`curl -s -o /dev/null -w "%{http_code}" \
+  echo "Trying to send to GitHub..."
+  # STATUS=`curl -s -o /dev/null -w "%{http_code}" 
+  STATUS=`curl -s -w "%{http_code}" \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
     -d "$0" $1`
   if [ "$STATUS" != "200" ]; then
