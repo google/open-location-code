@@ -30,9 +30,9 @@ const double kGridSizeDegrees =
 const size_t kPairPrecisionInverse = 8000;
 // Inverse (1/) of the precision of the final grid digits in degrees.
 // (Latitude and longitude are different.)
-const size_t kGridLatPrecisionInverse = 8000 * pow(kGridRows, kGridCodeLength);
+const size_t kGridLatPrecisionInverse = kPairPrecisionInverse * pow(kGridRows, kGridCodeLength);
 const size_t kGridLngPrecisionInverse =
-    8000 * pow(kGridColumns, kGridCodeLength);
+    kPairPrecisionInverse * pow(kGridColumns, kGridCodeLength);
 // Latitude bounds are -kLatitudeMaxDegrees degrees and +kLatitudeMaxDegrees
 // degrees which we transpose to 0 and 180 degrees.
 const double kLatitudeMaxDegrees = 90;
@@ -244,7 +244,7 @@ CodeArea Decode(const std::string &code) {
                (double)extra_lat / internal::kGridLatPrecisionInverse;
   double lng = (double)normal_lng / internal::kPairPrecisionInverse +
                (double)extra_lng / internal::kGridLngPrecisionInverse;
-  // Round everthing off to 14 places.
+  // Round everything off to 14 places.
   return CodeArea(round(lat * 1e14) / 1e14, round(lng * 1e14) / 1e14,
                   round((lat + lat_precision) * 1e14) / 1e14,
                   round((lng + lng_precision) * 1e14) / 1e14,
