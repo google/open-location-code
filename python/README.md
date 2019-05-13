@@ -28,27 +28,23 @@ pip install --user yapf
 
 ### Formatting code
 
-To see if the files need formatting, look at the TravisCI test output, or run:
+To format your files, just run:
 
 ```
-$HOME/.local/bin/yapf --diff openlocationcode.py openlocationcode_test.py
+bash format_check.sh
 ```
 
-If the files need formatting, run:
+If you just want to see the changes, you can run `python -m yapf --diff *py`
 
-```
-$HOME/.local/bin/yapf --in-place openlocationcode.py openlocationcode_test.py
-
-```
+This script runs as part of the TravisCI tests - if files need formatting it
+will display the required changes **and fail the test**.
 
 
 ## Testing
 
-Run the unit tests and benchmarks with:
+Run the unit tests and benchmarks locally with:
 
 ```
 bazel test python:openlocationcode_test
 ```
 
-If the tests fail, or if the code needs formatting, the integration tests
-will fail.

@@ -168,19 +168,17 @@ class Benchmark(unittest.TestCase):
         for td in self.testdata:
             olc.encode(td[0], td[1], td[2])
         duration_micros = round(time.time() * 1e6) - start_micros
-        print(
-            'Encoding benchmark: %d passes, %d usec total, %.03f usec each' %
-            (len(self.testdata), duration_micros,
-             duration_micros / len(self.testdata)))
+        print('Encoding benchmark: %d passes, %d usec total, %.03f usec each' %
+              (len(self.testdata), duration_micros,
+               duration_micros / len(self.testdata)))
 
         start_micros = round(time.time() * 1e6)
         for td in self.testdata:
             olc.decode(td[3])
         duration_micros = round(time.time() * 1e6) - start_micros
-        print(
-            'Decoding benchmark: %d passes, %d usec total, %.03f usec each' %
-            (len(self.testdata), duration_micros,
-             duration_micros / len(self.testdata)))
+        print('Decoding benchmark: %d passes, %d usec total, %.03f usec each' %
+              (len(self.testdata), duration_micros,
+               duration_micros / len(self.testdata)))
 
 
 if __name__ == '__main__':

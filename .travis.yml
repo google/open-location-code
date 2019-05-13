@@ -85,7 +85,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-        - wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install yapf && yapf --diff ${OLC_PATH}/*py
+        - cd ${OLC_PATH} && bash format_check.sh
 
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
@@ -96,7 +96,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-        - wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && pip install yapf && yapf --diff ${OLC_PATH}/*py
+        - cd ${OLC_PATH} && bash format_check.sh
 
     # Ruby implementation. Lives in ruby/
     - language: ruby
