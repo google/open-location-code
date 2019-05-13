@@ -38,7 +38,7 @@ for FILE in `find * | egrep "\.dart$"`; do
       echo -e "\e[1;31mFile has formatting errors: $FILE\e[0m"
       echo "$DIFF"
       BODY='**File has `dartfmt` errors that must be fixed**. Here is a diff, or run `format_check.sh`:'
-      BODY="$BODY\n```\n$DIFF\n```"
+      BODY="$BODY\n<pre>$DIFF</pre>"
       RETURN=1
       post_file_comment "dart/$FILE" "$BODY"
     fi

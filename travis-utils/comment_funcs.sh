@@ -18,7 +18,7 @@
 # Post a comment to a pull request.
 # The comment should be the first argument, and will also be echoed to stdout.
 function post_comment {
-  COMMENT=`clean_body "$2"`
+  __COMMENT=`clean_body "$2"`
   if [ -z "$TRAVIS_PULL_REQUEST" ]; then
     # We're not even in TravisCI AFAICT.
     return 0
@@ -27,18 +27,19 @@ function post_comment {
     # We're not processing a pull request.
     return 0
   fi
-  BODY="{\"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$COMMENT\"}"
+  __BODY="{\"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$__COMMENT\"}"
   payload_to_github \
       "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/issues/${TRAVIS_PULL_REQUEST}/comments" \
-      "$BODY"
+      "$__BODY"
 }
 
 # Post a comment to a specific file in a pull request.
 # The file path should be the first argument, the body the second. The body will
 # also be echoed to stdout.
 function post_file_comment {
-  FILE=$1
-  COMMENT=`clean_body "$2"`
+  __FILE=$1
+  __COMMENT=`clean_body "$2"`
+  echo "Comment is $__COMMENT"
   if [ -z "$TRAVIS_PULL_REQUEST" ]; then
     # We're not even in TravisCI AFAICT.
     return 0
@@ -47,22 +48,26 @@ function post_file_comment {
     # We're not processing a pull request.
     return 0
   fi
-  BODY="{\"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$COMMENT\", \"commit_id\": \"$TRAVIS_PULL_REQUEST_SHA\", \"path\": \"$1\", \"position\": 1}"
+  __BODY="{
+  \"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$__COMMENT\",
+  \"commit_id\": \"$TRAVIS_PULL_REQUEST_SHA\",
+  \"path\": \"$1\",
+  \"position\": 1}"
   payload_to_github \
       "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments" \
-      "$BODY"
+      "$__BODY"
 }
 
 # Post a payload to a GitHub API URL.
 # The first argument is the URL, the second is the payload.
 function payload_to_github {
-  URL=$1
-  PAYLOAD=$2
-  if [ -z "$URL" ]; then
+  __URL=$1
+  __PAYLOAD=$2
+  if [ -z "$__URL" ]; then
     echo -e "\e[31mNo URL to post to GitHub\e[30m"
     return 0
   fi
-  if [ -z "$PAYLOAD" ]; then
+  if [ -z "$__PAYLOAD" ]; then
     echo -e "\e[31mNo payload to post to GitHub\e[30m"
     return 0
   fi
@@ -70,27 +75,26 @@ function payload_to_github {
     echo -e "\e[31mNo auth token, cannot send to GitHub\e[30m"
     return 0
   fi
-  LOG=`mktemp`
-  STATUS=`curl -s -o "$LOG" -w "%{http_code}" \
+  __LOG=`mktemp`
+  STATUS=`curl -s -o "$__LOG" -w "%{http_code}" \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
-    -d "$PAYLOAD" "$URL"`
+    -d "$__PAYLOAD" "$__URL"`
   if [ "$STATUS" != "200" ]; then
     echo -e "\e[31mFailed sending comment to GitHub:\e[30m"
-    cat "$LOG"
-    echo "$URL"
-    echo "$BODY"
+    cat "$__LOG"
+    echo "$__URL"
+    echo "$__PAYLOAD"
   fi
 }
 
-# Format the body so it's JSON safe.
+# Format a string so that it's JSON safe.
 function clean_body {
   # Remove literal linefeeds and change them to "  \n".
   # Remove bash colour characters or GitHub's comment JSON parser will complain.
   # Convert new lines into "  \n" so they are formatted correctly in markdown.
   # Convert quotes into backspaced quotes.
   echo "$1" | \
-      sed ':a;N;$!ba;s/\n/  \\\n/g' | \
+      sed ':a;N;$!ba;s/\n/  \\n/g' | \
       sed -r "s/\x1B\[[0-9]+m//g" | \
-      sed -r "s/\n/  \\\n/g" | \
       sed -r 's/\"/\\\"/g'
 }
