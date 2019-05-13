@@ -37,7 +37,8 @@ for FILE in `find . | egrep "\.dart$"`; do
       DIFF=`echo "$FORMATTED" | diff $FILE -`
       echo -e "\e[1;31mFile has formatting errors: $FILE\e[0m"
       echo "$DIFF"
-      BODY=$'**File has \'dartfmt\' errors that must be fixed**. Here is a diff, or run `format_check.sh`:\n'$DIFF
+      BODY='**File has `dartfmt` errors that must be fixed**. Here is a diff, or run `format_check.sh`:'
+      BODY="$BODY"$'\n```\n'"$DIFF"$'\n```'
       RETURN=1
       post_file_comment "$FILE" "$BODY"
     fi
@@ -48,9 +49,10 @@ for FILE in `find . | egrep "\.dart$"`; do
     echo "$ANALYSIS"
     if [ "$TRAVIS" != "" ]; then
       # On TravisCI, send a comment with the diff to the pull request.
-      BODY=$'**File has \'dartanalyzer\' errors that must be fixed**:\n'$DIFF
+      BODY='**File has `dartanalyzer` errors that must be fixed**:'
+      BODY="$BODY"$'\n'"$ANALYSIS"
       RETURN=1
-      post_file_comment "$FILE" "$ANALYSIS"
+      post_file_comment "$FILE" "$BODY"
     fi
   fi
 done
