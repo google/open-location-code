@@ -49,7 +49,7 @@ function post_file_comment {
     return 0
   fi
   # TRAVIS_PULL_REQUEST_SHA holds the GitHub commit ID SHA.
-  __COMMIT_SHA=TRAVIS_PULL_REQUEST_SHA
+  __COMMIT_SHA=$TRAVIS_PULL_REQUEST_SHA
   __BODY="{
   \"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$__COMMENT\",
   \"commit_id\": \"$__COMMIT_SHA\",
