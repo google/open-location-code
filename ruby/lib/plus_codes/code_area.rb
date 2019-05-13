@@ -1,5 +1,4 @@
 module PlusCodes
-
   # [CodeArea] contains coordinates of a decoded Open Location Code(Plus+Codes).
   # The coordinates include the latitude and longitude of the lower left and
   # upper right corners and the center of the bounding box for the area the
@@ -8,7 +7,8 @@ module PlusCodes
   # @author We-Ming Wu
   class CodeArea
     attr_accessor :south_latitude, :west_longitude, :latitude_height,
-    :longitude_width, :latitude_center, :longitude_center, :code_length
+                  :longitude_width, :latitude_center, :longitude_center,
+                  :code_length
 
     # Creates a [CodeArea].
     #
@@ -18,7 +18,8 @@ module PlusCodes
     # @param longitude_width [Numeric] the width from the SW corner in degrees
     # @param code_length [Numeric] the number of significant digits in the code
     # @return [CodeArea] a code area which contains the coordinates
-    def initialize(south_latitude, west_longitude, latitude_height, longitude_width, code_length)
+    def initialize(south_latitude, west_longitude, latitude_height,
+                   longitude_width, code_length)
       @south_latitude = south_latitude
       @west_longitude = west_longitude
       @latitude_height = latitude_height
@@ -36,5 +37,4 @@ module PlusCodes
       @west_longitude + @longitude_width
     end
   end
-
 end

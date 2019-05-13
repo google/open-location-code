@@ -63,33 +63,47 @@ func Encode(lat, lng float64, codeLen int) string {
 	if lng == lngMax {
 		lng = normalizeLng(lng + computePrec(codeLen+2, true))
 	}
-
-	// This algorithm starts with the least significant digits, and works it's way to the front of the code.
-	// We generate either a max- or default length code, and then shorten/pad it at the end.
-	// Build up the code as bytes, convert to string at the end.
 	var code [15]byte
+
+	// Compute the code.
+	// This approach converts each value to an integer after multiplying it by
+	// the final precision. This allows us to use only integer operations, so
+	// avoiding any accumulation of floating point representation errors.
+
+	// Multiply values by their precision and convert to positive.
+	// Note: Go requires rounding before truncating to ensure precision!
+	var latVal int64 = int64(math.Round((lat+latMax)*finalLatPrecision*1e6) / 1e6)
+	var lngVal int64 = int64(math.Round((lng+lngMax)*finalLngPrecision*1e6) / 1e6)
+
+	pos := maxCodeLen - 1
+	// Compute the grid part of the code if necessary.
 	if codeLen > pairCodeLen {
-		// Multiply the decimal part of each coordinate by the final precision and round off to 1e-6 precision.
-		// Convert to integers so the rest of the math is integer based.
-		// This avoids/minimises errors due to loss of precision in floating point representation.
-		latPrecision := int(math.Round((lat-math.Floor(lat))*finalLatPrecision*1e6) / 1e6)
-		lngPrecision := int(math.Round((lng-math.Floor(lng))*finalLngPrecision*1e6) / 1e6)
 		for i := 0; i < gridCodeLen; i++ {
-			code[maxCodeLen-1-i] = Alphabet[(latPrecision%gridRows)*gridCols+int(lngPrecision%gridCols)]
-			latPrecision /= gridRows
-			lngPrecision /= gridCols
+			latDigit := latVal % int64(gridRows)
+			lngDigit := lngVal % int64(gridCols)
+			ndx := latDigit*gridCols + lngDigit
+			code[pos] = Alphabet[ndx]
+			pos -= 1
+			latVal /= int64(gridRows)
+			lngVal /= int64(gridCols)
 		}
+	} else {
+		latVal /= 3125 // gridRows**gridCodeLength
+		lngVal /= 1024 // gridCols**gridCodeLength
 	}
-	// Multiply each coordinate by the precision and round off to 1e-6 precision.
-	// Convert to integers so the rest of the math is integer based.
-	latPrecision := int(math.Round((lat+latMax)*pairPrecision*1e6) / 1e6)
-	lngPrecision := int(math.Round((lng+lngMax)*pairPrecision*1e6) / 1e6)
+	pos = pairCodeLen - 1
+	// Compute the pair section of the code.
 	for i := 0; i < pairCodeLen/2; i++ {
-		code[pairCodeLen-i*2-1] = Alphabet[lngPrecision%encBase]
-		code[pairCodeLen-i*2-2] = Alphabet[latPrecision%encBase]
-		latPrecision /= encBase
-		lngPrecision /= encBase
+		latNdx := latVal % int64(encBase)
+		lngNdx := lngVal % int64(encBase)
+		code[pos] = Alphabet[lngNdx]
+		pos -= 1
+		code[pos] = Alphabet[latNdx]
+		pos -= 1
+		latVal /= int64(encBase)
+		lngVal /= int64(encBase)
 	}
+
 	// If we don't need to pad the code, return the requested section.
 	if codeLen >= sepPos {
 		return string(code[:sepPos]) + string(Separator) + string(code[sepPos:codeLen])

@@ -2,30 +2,39 @@
 
 This is the C implementation of the Open Location Code API.
 
-# Building
+# Code Style and Formatting
 
-For now we have a simple `Makefile`.  Usual targets work:
-```
-make clean
-make all
-make install
-```
+Code style is based on Googles formatting rules. Code must be formatted
+using `clang-format`.
 
-# Examples
+The `clang_check.sh` script will check for formatting errors, output them,
+and automatically format files.
 
-See `example.c` for how to use the library. To run the example, use:
-```
-make example && ./example
-```
+# Usage
 
-# Testing
+See example.cc for how to use the library. To run the example, use:
 
-To test the library, use:
 ```
-make test
+bazel run openlocationcode_example
 ```
 
-The tests use the CSV files in the parent's `test_data` folder.
+# Development
+
+The library is built/tested using [Bazel](https://bazel.build). To build the library, use:
+
+```
+bazel build openlocationcode
+```
+
+To run the tests, use:
+
+```
+bazel test --test_output=all openlocationcode_test
+```
+
+The tests use the CSV files in the test_data folder. Make sure you copy this folder to the
+root of your local workspace.
+
 
 # Authors
 

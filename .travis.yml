@@ -7,11 +7,15 @@ dist: trusty
 
 matrix:
   include:
-    # C implementation. Lives in c/, tested with make.
+    # C implementation. Lives in c/, tested with bazel.
     - language: c
       env: OLC_PATH=c
       script:
-        - cd ${OLC_PATH} && make test
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - cd ${OLC_PATH} && bash clang_check.sh
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
@@ -99,11 +103,13 @@ matrix:
 
     # Ruby implementation. Lives in ruby/
     - language: ruby
-      rvm: 2.2
+      rvm: 2.6.3
       env: OLC_PATH=ruby
       script:
+        - gem install rubocop
         - gem install test-unit
         - cd ruby && ruby test/plus_codes_test.rb
+        - rubocop --config rubocop.yml
 
     # Rust implementation. Lives in rust/
     - language: rust

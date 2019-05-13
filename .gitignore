@@ -5,3 +5,11 @@
 /bazel-*
 # Ignore outputs generated during Bazel bootstrapping.
 /output/
+# Ignore Compiled files
+**/target/
+# Ignore intelliJ auto generated dir
+**/.idea/
+#Ignore iml extensions files
+**/*.iml
+#ignore visusl studio auto generated dir
+**/.vscode/
