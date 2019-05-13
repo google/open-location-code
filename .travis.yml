@@ -30,7 +30,7 @@ matrix:
         - cd dart && pub get
         - pub run test
         - dartanalyzer lib/open_location_code.dart
-        - dartfmt --set-exit-if-changed --dry-run --fix lib/* lib/src/* test/*
+        - cd ${OLC_PATH} && bash format_check.sh
 
     # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.
     - language: go

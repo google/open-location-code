@@ -2,13 +2,15 @@
 
 ## Formatting
 
-Code **must** be formatted using `dartfmt`:
+Code **must** be formatted using `dartfmt`.
+
+To format your files, just run `format_check.sh` or:
 
 ```
-dartfmt --fix --overwrite lib/* lib/src/* test/*
+dartfmt --fix --overwrite .
 ```
 
-The TravisCI test will fail if any files need formatting.
+The TravisCI test **will fail if any files need formatting**.
 
 ## Testing
 
