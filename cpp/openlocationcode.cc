@@ -30,7 +30,8 @@ const double kGridSizeDegrees =
 const size_t kPairPrecisionInverse = 8000;
 // Inverse (1/) of the precision of the final grid digits in degrees.
 // (Latitude and longitude are different.)
-const size_t kGridLatPrecisionInverse = kPairPrecisionInverse * pow(kGridRows, kGridCodeLength);
+const size_t kGridLatPrecisionInverse =
+    kPairPrecisionInverse * pow(kGridRows, kGridCodeLength);
 const size_t kGridLngPrecisionInverse =
     kPairPrecisionInverse * pow(kGridColumns, kGridCodeLength);
 // Latitude bounds are -kLatitudeMaxDegrees degrees and +kLatitudeMaxDegrees
