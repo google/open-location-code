@@ -49,9 +49,9 @@ function post_body_to_github {
   fi
   echo "Trying to send to GitHub..."
   # STATUS=`curl -s -o /dev/null -w "%{http_code}" 
-  STATUS=`curl -s -w "%{http_code}" \
+  curl -s -w "%{http_code}" \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
-    -d "$0" $1`
+    -d "$0" $1
   if [ "$STATUS" != "200" ]; then
     echo -e "\e[31mFailed sending comment to GitHub\e[30m"
   fi
