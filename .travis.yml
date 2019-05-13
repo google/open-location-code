@@ -102,11 +102,13 @@ matrix:
 
     # Ruby implementation. Lives in ruby/
     - language: ruby
-      rvm: 2.2
+      rvm: 2.6.3
       env: OLC_PATH=ruby
       script:
+        - gem install rubocop
         - gem install test-unit
         - cd ruby && ruby test/plus_codes_test.rb
+        - rubocop --config rubocop.yml
 
     # Rust implementation. Lives in rust/
     - language: rust
