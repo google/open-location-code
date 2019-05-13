@@ -47,6 +47,7 @@ for FILE in `find * | egrep "\.dart$"`; do
     fi
   fi
   ANALYSIS=`$DART_ANALYZER_CMD "$FILE"`
+  echo "$ANALYSIS" | grep "No issues found" >/dev/null
   if [ $? -ne 0 ]; then
     echo -e "\e[1;31mStatic analysis problems: $FILE\e[0m"
     echo "$ANALYSIS"
@@ -61,7 +62,7 @@ for FILE in `find * | egrep "\.dart$"`; do
 done
 
 if [ $RETURN -ne 0 ]; then
-  echo -e "\e[1;32mFiles have issues that must be addressed\e[0m"
+  echo -e "\e[1;31mFiles have issues that must be addressed\e[0m"
 else
   echo -e "\e[1;32mFiles pass all checks\e[0m"
 fi

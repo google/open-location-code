@@ -44,7 +44,7 @@ done
 exit $RETURN
 
 if [ $RETURN -ne 0 ]; then
-  echo -e "\e[1;32mFiles have issues that must be addressed\e[0m"
+  echo -e "\e[1;31mFiles have issues that must be addressed\e[0m"
 else
   echo -e "\e[1;32mFiles pass all checks\e[0m"
 fi

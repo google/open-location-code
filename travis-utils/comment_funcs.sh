@@ -38,7 +38,6 @@ function post_comment {
 function post_file_comment {
   __FILE=$1
   __COMMENT=`clean_body "$2"`
-  echo "Comment is $__COMMENT"
   if [ -z "$TRAVIS_PULL_REQUEST" ]; then
     # We're not even in TravisCI AFAICT.
     return 0
