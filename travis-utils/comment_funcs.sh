@@ -1,6 +1,15 @@
 #!/bin/bash
 # If we are in TravisCI processing a pull request, send stdin to that pull
 # request as a comment.
+# This requires a number of environment variables to be set:
+#
+# * GITHUB_TOKEN: This is the authentication token by a user, used to send the
+#     comments. It's set in the TravisCI project settings.
+# * TRAVIS_PULL_REQUEST: Provides the pull request number. If it is "false",
+#     signifies that we are in a push build.
+# * TRAVIS_REPO_SLUG: Provides the path to the repository
+#     ("google/open-location-code").
+# * TRAVIS_COMMIT: Provides the 
 
 # Post a comment to a pull request.
 # The comment should be the first argument, and will also be echoed to stdout.
@@ -47,6 +56,8 @@ function post_file_comment {
 }
 
 function post_body_to_github {
+  PAYLOAD=$1
+  URL=$2
   if [ -z "$GITHUB_TOKEN" ]; then
     echo -e "\e[31mNo auth token, cannot send to GitHub\e[30m"
     return 0
@@ -55,7 +66,7 @@ function post_body_to_github {
   # STATUS=`curl -s -o /dev/null -w "%{http_code}" 
   curl \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
-    -d "$0" $1
+    -d "$PAYLOAD" "$URL"
   if [ "$STATUS" != "200" ]; then
     echo -e "\e[31mFailed sending comment to GitHub\e[30m"
   fi
