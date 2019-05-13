@@ -53,7 +53,9 @@ function post_file_comment {
   \"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$__COMMENT\",
   \"commit_id\": \"$__COMMIT_SHA\",
   \"path\": \"$1\",
-  \"position\": 1}"
+  \"position\": 1,
+  \"side\": \"right\"
+}"
   payload_to_github \
       "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments" \
       "$__BODY"
@@ -82,11 +84,10 @@ function payload_to_github {
     -d "$__PAYLOAD" "$__URL"`
   # HTTP status should be 201 - created.
   if [ "$__STATUS" != "201" ]; then
-    echo -e "\e[31mFailed sending comment to GitHub (status $__STATUS)"
-    echo -e "(Can happen if file is not being edited in the pull request):\e[30m"
+    echo -e "\e[31mFailed sending comment to GitHub (status $__STATUS) (This will happen if the file is not being edited in the pull request):\e[30m"
     cat "$__LOG"
     echo "URL was: $__URL"
-    echo "Payload was: >>$__PAYLOAD<<"
+    echo "Payload was: $__PAYLOAD"
   fi
 }
 
