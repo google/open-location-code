@@ -82,12 +82,15 @@ function payload_to_github {
   fi
 }
 
+# Format the body so it's JSON safe.
 function clean_body {
+  # Remove literal linefeeds and change them to "  \n".
   # Remove bash colour characters or GitHub's comment JSON parser will complain.
   # Convert new lines into "  \n" so they are formatted correctly in markdown.
   # Convert quotes into backspaced quotes.
   echo "$1" | \
+      sed ':a;N;$!ba;s/\n/  \\\n/g' | \
       sed -r "s/\x1B\[[0-9]+m//g" | \
-      sed -r "s/\n/  \n/g" | \
+      sed -r "s/\n/  \\\n/g" | \
       sed -r 's/\"/\\\"/g'
 }
