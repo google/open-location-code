@@ -14,9 +14,10 @@ function post_comment {
   fi
   if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     # We're not processing a pull request.
+    echo "Not in a pull request"
     return 0
   fi
-  # Remove bash colour characters or GitHub's comment JSON parser complains.
+  # Remove bash colour characters or GitHub's comment JSON parser will complain.
   CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
   BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\"}"
   post_body_to_github "$BODY" "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/issues/${TRAVIS_PULL_REQUEST}/comments"
@@ -36,9 +37,10 @@ function post_file_comment {
   fi
   if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     # We're not processing a pull request.
+    echo "Not in a pull request"
     return 0
   fi
-  # Remove bash colour characters or GitHub's comment JSON parser complains.
+  # Remove bash colour characters or GitHub's comment JSON parser will complain.
   CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
   BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\", \"commit_id\": \"$TRAVIS_COMMIT\", \"path\": \"$1\", \"position\": 1}"
   post_body_to_github "$BODY" "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments"

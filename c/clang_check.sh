@@ -21,6 +21,8 @@ fi
 # Get the bash functions to send comments back to the pull request on TravisCI.
 . ../travis-utils/comment_funcs.sh
 post_file_comment "c/clang_check.sh" "test comment on clang_check.sh"
+post_comment "test comment on pull request"
+exit 0
 
 RETURN=0
 for FILE in `find . | egrep "\.(c|cc|h)$"`; do
