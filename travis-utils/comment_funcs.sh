@@ -9,9 +9,10 @@ function post_comment {
   echo "$BODY"
   if [ -z "$TRAVIS_PULL_REQUEST" ]; then
     # We're not even in TravisCI AFAICT.
+    echo "Not even in TravisCI"
     return 0
   fi
-  if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+  if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     # We're not processing a pull request.
     return 0
   fi
@@ -30,9 +31,10 @@ function post_file_comment {
   echo "$BODY"
   if [ -z "$TRAVIS_PULL_REQUEST" ]; then
     # We're not even in TravisCI AFAICT.
+    echo "Not even in TravisCI"
     return 0
   fi
-  if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+  if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     # We're not processing a pull request.
     return 0
   fi
@@ -49,7 +51,7 @@ function post_body_to_github {
   fi
   echo "Trying to send to GitHub..."
   # STATUS=`curl -s -o /dev/null -w "%{http_code}" 
-  curl -s -w "%{http_code}" \
+  curl \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
     -d "$0" $1
   if [ "$STATUS" != "200" ]; then
