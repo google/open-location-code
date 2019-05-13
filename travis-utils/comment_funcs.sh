@@ -11,7 +11,6 @@
 #     signifies that we are in a push build.
 # * TRAVIS_REPO_SLUG: Provides the path to the repository
 #     ("google/open-location-code").
-# * TRAVIS_COMMIT: Provides the commit that the current build is testing.
 
 # Post a comment to a pull request.
 # The comment should be the first argument, and will also be echoed to stdout.
@@ -53,9 +52,11 @@ function post_file_comment {
     echo "Not in a pull request"
     return 0
   fi
+  # Don't use TRAVIS_COMMIT, it's not the PR commit number.
+  HEAD_COMMIT=`git show FETCH_HEAD --pretty="format:%H"|head -1`
   # Remove bash colour characters or GitHub's comment JSON parser will complain.
   CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
-  BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\", \"commit_id\": \"$TRAVIS_COMMIT\", \"path\": \"$1\", \"position\": 1}"
+  BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\", \"commit_id\": \"$HEAD_COMMIT\", \"path\": \"$1\", \"position\": 1}"
   payload_to_github \
       "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments" \
       "$BODY"
