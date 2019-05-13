@@ -11,7 +11,7 @@ if [ -z "$TRAVIS_PULL_REQUEST" ]; then
   # We're not even in TravisCI AFAICT.
   exit 0
 fi
-if [ "$TRAVIS_PULL_REQUEST" != "false"]; then
+if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   # We're in a pull request.
   curl -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
     -d "{\"body\": \"$STDIN\"}" \
