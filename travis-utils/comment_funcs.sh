@@ -1,6 +1,8 @@
 #!/bin/bash
-# If we are in TravisCI processing a pull request, send stdin to that pull
-# request as a comment.
+# Provides bash functions to send comments to GitHub pull requests.
+# * post_comment sends a comment to the pull request conversation log.
+# * post_file_comment sends a comment to a specific file in the pull request.
+#
 # This requires a number of environment variables to be set:
 #
 # * GITHUB_TOKEN: This is the authentication token by a user, used to send the
@@ -9,7 +11,7 @@
 #     signifies that we are in a push build.
 # * TRAVIS_REPO_SLUG: Provides the path to the repository
 #     ("google/open-location-code").
-# * TRAVIS_COMMIT: Provides the 
+# * TRAVIS_COMMIT: Provides the commit that the current build is testing.
 
 # Post a comment to a pull request.
 # The comment should be the first argument, and will also be echoed to stdout.
@@ -29,7 +31,9 @@ function post_comment {
   # Remove bash colour characters or GitHub's comment JSON parser will complain.
   CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
   BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\"}"
-  post_body_to_github "$BODY" "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/issues/${TRAVIS_PULL_REQUEST}/comments"
+  payload_to_github \
+      "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/issues/${TRAVIS_PULL_REQUEST}/comments" \
+      "$BODY"
 }
 
 # Post a comment to a specific file in a pull request.
@@ -52,17 +56,31 @@ function post_file_comment {
   # Remove bash colour characters or GitHub's comment JSON parser will complain.
   CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
   BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\", \"commit_id\": \"$TRAVIS_COMMIT\", \"path\": \"$1\", \"position\": 1}"
-  post_body_to_github "$BODY" "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments"
+  payload_to_github \
+      "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments" \
+      "$BODY"
 }
 
-function post_body_to_github {
-  PAYLOAD=$1
-  URL=$2
+# Post a payload to a GitHub API URL.
+# The first argument is the URL, the second is the payload.
+function payload_to_github {
+  URL=$1
+  PAYLOAD=$2
+  if [ -z "$URL" ]; then
+    echo -e "\e[31mNo URL to post to GitHub\e[30m"
+    return 0
+  fi
+  if [ -z "$PAYLOAD" ]; then
+    echo -e "\e[31mNo payload to post to GitHub\e[30m"
+    return 0
+  fi
   if [ -z "$GITHUB_TOKEN" ]; then
     echo -e "\e[31mNo auth token, cannot send to GitHub\e[30m"
     return 0
   fi
   echo "Trying to send to GitHub..."
+  echo "$URL"
+  echo "$BODY"
   # STATUS=`curl -s -o /dev/null -w "%{http_code}" 
   curl \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
