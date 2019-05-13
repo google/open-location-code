@@ -7,9 +7,6 @@ set -e
 source ../travis-utils/comment_funcs.sh
 set +e
 
-go version
-git log -n 1
-
 CLANG_FORMAT="clang-format-5.0"
 if hash $CLANG_FORMAT 2>/dev/null; then
   echo "clang-format hashed"

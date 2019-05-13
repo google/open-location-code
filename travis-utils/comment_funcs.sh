@@ -83,7 +83,7 @@ function payload_to_github {
     -d "$__PAYLOAD" "$__URL"`
   # HTTP status should be 201 - created.
   if [ "$__STATUS" != "201" ]; then
-    echo -e "\e[31mFailed sending comment to GitHub (status $__STATUS) (This will happen if the file is not being edited in the pull request):\e[30m"
+    echo -e "\e[1;31mFailed sending comment to GitHub (status $__STATUS) (This will happen if the file is not being edited in the pull request):\e[30m"
     cat "$__LOG"
     echo "URL was: $__URL"
     echo "Payload was: $__PAYLOAD"
