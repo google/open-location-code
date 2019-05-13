@@ -14,7 +14,6 @@
 # * TRAVIS_PULL_REQUEST_SHA: This provides the pull request commit SHA that must
 #     be used to send file-based comments back to the pull request
 
-
 # Post a comment to a pull request.
 # The comment should be the first argument, and will also be echoed to stdout.
 function post_comment {
@@ -81,8 +80,10 @@ function payload_to_github {
   __STATUS=`curl -s -o "$__LOG" -w "%{http_code}" \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
     -d "$__PAYLOAD" "$__URL"`
-  if [ "$__STATUS" != "200" ]; then
-    echo -e "\e[31mFailed sending comment to GitHub (status $__STATUS):\e[30m"
+  # HTTP status should be 201 - created.
+  if [ "$__STATUS" != "201" ]; then
+    echo -e "\e[31mFailed sending comment to GitHub (status $__STATUS)"
+    echo -e "(Can happen if file is not being edited in the pull request):\e[30m"
     cat "$__LOG"
     echo "URL was: $__URL"
     echo "Payload was: >>$__PAYLOAD<<"

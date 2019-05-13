@@ -7,6 +7,9 @@ set -e
 source ../travis-utils/comment_funcs.sh
 set +e
 
+go version
+git log -n 1
+
 CLANG_FORMAT="clang-format-5.0"
 if hash $CLANG_FORMAT 2>/dev/null; then
   echo "clang-format hashed"
@@ -33,7 +36,7 @@ for FILE in `find * | egrep "\.(c|cc|h)$"`; do
     else
       echo -e "\e[1;31m$FILE has formatting errors:\e[0m"
       echo "$DIFF"
-      post_file_comment "c/$FILE" "clang-format reports formatting errors\n```\n$DIFF\n```"
+      post_file_comment "c/$FILE" "clang-format reports formatting errors\n<pre>$DIFF<pre>"
     fi
     RETURN=1
   fi
