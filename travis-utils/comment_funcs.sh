@@ -49,6 +49,7 @@ function post_file_comment {
     return 0
   fi
   # TRAVIS_PULL_REQUEST_SHA
+  env|grep TRAV
   __COMMIT_SHA=`git rev-parse FETCH_HEAD`
   __BODY="{
   \"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$__COMMENT\",
