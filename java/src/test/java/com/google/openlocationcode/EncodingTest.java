@@ -2,15 +2,13 @@ package com.google.openlocationcode;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.google.openlocationcode.OpenLocationCode;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +44,7 @@ public class EncodingTest {
 
   @Before
   public void setUp() throws Exception {
-    InputStream testDataStream = new FileInputStream(getTestFile());
+    InputStream testDataStream = new FileInputStream(TestUtils.getTestFile("encoding.csv"));
     BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream, UTF_8));
     String line;
     while ((line = reader.readLine()) != null) {
@@ -57,30 +55,15 @@ public class EncodingTest {
     }
   }
 
-  // Gets the test file, factoring in whether it's being built from Maven or Bazel.
-  private File getTestFile() {
-    String testPath;
-    String bazelRootPath = System.getenv("JAVA_RUNFILES");
-    if (bazelRootPath == null) {
-      File userDir = new File(System.getProperty("user.dir"));
-      testPath = userDir.getParent() + "/test_data";
-    } else {
-      testPath = bazelRootPath + "/openlocationcode/test_data";
-    }
-    return new File(testPath, "encoding.csv");
-  }
-
   @Test
   public void testEncodeFromLatLong() {
     for (TestData testData : testDataList) {
       Assert.assertEquals(
           String.format(
               "Latitude %f, longitude %f and length %d were wrongly encoded.",
-              testData.latitude,
-              testData.longitude,
-              testData.length),
+              testData.latitude, testData.longitude, testData.length),
           testData.code,
-          OpenLocationCode.encode(testData.latitude, testData.longitude, testData.length).toString());
+          OpenLocationCode.encode(testData.latitude, testData.longitude, testData.length));
     }
   }
 }
