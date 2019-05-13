@@ -11,26 +11,23 @@
 #     signifies that we are in a push build.
 # * TRAVIS_REPO_SLUG: Provides the path to the repository
 #     ("google/open-location-code").
-# * TRAVIS_PULL_REQUEST_SHA
+# * TRAVIS_PULL_REQUEST_SHA: This provides the pull request commit SHA that must
+#     be used to send file-based comments back to the pull request
+
 
 # Post a comment to a pull request.
 # The comment should be the first argument, and will also be echoed to stdout.
 function post_comment {
-  BODY=$1
-  echo "$BODY"
+  COMMENT=`clean_body "$2"`
   if [ -z "$TRAVIS_PULL_REQUEST" ]; then
     # We're not even in TravisCI AFAICT.
-    echo "Not even in TravisCI"
     return 0
   fi
   if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     # We're not processing a pull request.
-    echo "Not in a pull request"
     return 0
   fi
-  # Remove bash colour characters or GitHub's comment JSON parser will complain.
-  CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
-  BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\"}"
+  BODY="{\"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$COMMENT\"}"
   payload_to_github \
       "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/issues/${TRAVIS_PULL_REQUEST}/comments" \
       "$BODY"
@@ -41,21 +38,16 @@ function post_comment {
 # also be echoed to stdout.
 function post_file_comment {
   FILE=$1
-  BODY=$2
-  echo "$BODY"
+  COMMENT=`clean_body "$2"`
   if [ -z "$TRAVIS_PULL_REQUEST" ]; then
     # We're not even in TravisCI AFAICT.
-    echo "Not even in TravisCI"
     return 0
   fi
   if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     # We're not processing a pull request.
-    echo "Not in a pull request"
     return 0
   fi
-  # Remove bash colour characters or GitHub's comment JSON parser will complain.
-  CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
-  BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\", \"commit_id\": \"$TRAVIS_PULL_REQUEST_SHA\", \"path\": \"$1\", \"position\": 1}"
+  BODY="{\"body\": \"_This is an automated bot comment from the TravisCI tests_  \n$COMMENT\", \"commit_id\": \"$TRAVIS_PULL_REQUEST_SHA\", \"path\": \"$1\", \"position\": 1}"
   payload_to_github \
       "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments" \
       "$BODY"
@@ -78,15 +70,18 @@ function payload_to_github {
     echo -e "\e[31mNo auth token, cannot send to GitHub\e[30m"
     return 0
   fi
-  env | grep TRAVIS_
-  echo "Trying to send to GitHub..."
-  echo "$URL"
-  echo "$BODY"
-  # STATUS=`curl -s -o /dev/null -w "%{http_code}" 
-  curl \
+  LOG=`mktemp`
+  STATUS=`curl -s -o "$LOG" -w "%{http_code}" \
     -H "Authorization: token ${GITHUB_TOKEN}" -X POST \
-    -d "$PAYLOAD" "$URL"
+    -d "$PAYLOAD" "$URL"`
   if [ "$STATUS" != "200" ]; then
-    echo -e "\e[31mFailed sending comment to GitHub\e[30m"
+    echo -e "\e[31mFailed sending comment to GitHub:\e[30m"
+    cat "$LOG"
   fi
+}
+
+function clean_body {
+  # Remove bash colour characters or GitHub's comment JSON parser will complain.
+  # Convert new lines into "  \n" so they are formatted correctly in markdown.
+  echo "$1" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"
 }

@@ -1,6 +1,11 @@
 #!/bin/bash
 # Check the format of all the C files using clang-format.
-# Run from within the C directory (or clang-format won't find it's config file).
+# Run from within the c directory (or clang-format won't find it's config file).
+
+set -e
+# Get the functions to allow posting to pull requests.
+source ../travis-utils/comment_funcs.sh
+set +e
 
 CLANG_FORMAT="clang-format-5.0"
 if hash $CLANG_FORMAT 2>/dev/null; then
@@ -18,25 +23,26 @@ if [ ! -f ".clang-format" ]; then
   exit 1
 fi
 
-# Get the bash functions to send comments back to the pull request on TravisCI.
-. ../travis-utils/comment_funcs.sh
-post_file_comment "c/clang_check.sh" "test comment on clang_check.sh"
-post_comment "test comment on pull request"
-exit 0
-
 RETURN=0
 for FILE in `find . | egrep "\.(c|cc|h)$"`; do
   DIFF=`diff $FILE <($CLANG_FORMAT $FILE)`
   if [ $? -ne 0 ]; then
     if [ -z "$TRAVIS" ]; then
-      echo "Formatting $FILE"
+      echo -e "\e[1;34mFormatting $FILE\e[0m"
       $CLANG_FORMAT -i $FILE
     else
-      echo -e "\e[31m$FILE has formatting errors:\e[30m"
+      echo -e "\e[1;31m$FILE has formatting errors:\e[0m"
       echo "$DIFF"
       post_file_comment "$FILE" "clang-format reports formatting errors"
     fi
     RETURN=1
   fi
 done
+exit $RETURN
+
+if [ $RETURN -ne 0 ]; then
+  echo -e "\e[1;32mFiles have issues that must be addressed\e[0m"
+else
+  echo -e "\e[1;32mFiles pass all checks\e[0m"
+fi
 exit $RETURN

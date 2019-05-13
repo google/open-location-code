@@ -11,11 +11,11 @@ matrix:
     - language: c
       env: OLC_PATH=c
       script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
         - cd ${OLC_PATH} && bash clang_check.sh
-        - #wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
-        - #chmod +x install.sh
-        - #./install.sh --user && rm -f install.sh
-        - #~/bin/bazel test --test_output=all ${OLC_PATH}:all
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
@@ -33,7 +33,6 @@ matrix:
       script:
         - cd ${OLC_PATH}
         - pub get && pub run test
-        - dartanalyzer lib/open_location_code.dart
         - bash format_check.sh
 
     # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.

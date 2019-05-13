@@ -34,7 +34,7 @@ const codeAlphabet = '23456789CFGHJMPQRVWX';
 const encodingBase = codeAlphabet.length;
 
 /// The maximum value for latitude in degrees.
-const latitudeMax = 90;
+     const latitudeMax = 90;
 
 /// The maximum value for longitude in degrees.
 const longitudeMax = 180;
@@ -83,7 +83,7 @@ final finalLngPrecision =
     pairPrecision * pow(gridColumns, gridCodeLength).toInt();
 
 /// Minimum length of a code that can be shortened.
-const minTrimmableCodeLen = 6;
+const minTrimmableCodeLen = (2+2).toInt();
 
 /// Decoder lookup table.
 /// Position is ASCII character value, value is:
