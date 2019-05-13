@@ -33,7 +33,7 @@ for FILE in `find . | egrep "\.(c|cc|h)$"`; do
     else
       echo -e "\e[1;31m$FILE has formatting errors:\e[0m"
       echo "$DIFF"
-      post_file_comment "$FILE" "clang-format reports formatting errors"
+      post_file_comment "c/$FILE" "clang-format reports formatting errors"
     fi
     RETURN=1
   fi

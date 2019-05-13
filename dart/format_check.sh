@@ -40,7 +40,7 @@ for FILE in `find . | egrep "\.dart$"`; do
       BODY='**File has `dartfmt` errors that must be fixed**. Here is a diff, or run `format_check.sh`:'
       BODY="$BODY"$'\n```\n'"$DIFF"$'\n```'
       RETURN=1
-      post_file_comment "$FILE" "$BODY"
+      post_file_comment "dart/$FILE" "$BODY"
     fi
   fi
   ANALYSIS=`$DART_ANALYZER_CMD "$FILE"`
@@ -52,7 +52,7 @@ for FILE in `find . | egrep "\.dart$"`; do
       BODY='**File has `dartanalyzer` errors that must be fixed**:'
       BODY="$BODY"$'\n'"$ANALYSIS"
       RETURN=1
-      post_file_comment "$FILE" "$BODY"
+      post_file_comment "dart/$FILE" "$BODY"
     fi
   fi
 done
