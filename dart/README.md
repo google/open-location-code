@@ -12,6 +12,11 @@ dartfmt --fix --overwrite .
 
 The TravisCI test **will fail if any files need formatting**.
 
+## Hints
+
+The TravisCI test uses `dartanalyzer` to check the library for improvements. IF
+any are found the TravisCI tests **will fail**.
+
 ## Testing
 
 To test the dart version first download the dart sdk from

@@ -269,11 +269,9 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   // Force to integers so the division operations will have integer results.
   // Note: Dart requires rounding before truncating to ensure precision!
   int latVal =
-      (((latitude + latitudeMax) * finalLatPrecision * 1e6).round() / 1e6)
-          .toInt();
+      ((latitude + latitudeMax) * finalLatPrecision * 1e6).round() ~/ 1e6;
   int lngVal =
-      (((longitude + longitudeMax) * finalLngPrecision * 1e6).round() / 1e6)
-          .toInt();
+      ((longitude + longitudeMax) * finalLngPrecision * 1e6).round() ~/ 1e6;
 
   // Compute the grid part of the code if necessary.
   if (codeLength > pairCodeLength) {
@@ -374,13 +372,8 @@ CodeArea decode(String code) {
   // Merge the values from the normal and extra precision parts of the code.
   var lat = normalLat / pairPrecision + gridLat / finalLatPrecision;
   var lng = normalLng / pairPrecision + gridLng / finalLngPrecision;
-  // Multiple values by 1e14, round and then divide. This reduces errors due
-  // to floating point precision.
-  return CodeArea(
-      (lat * 1e14).round() / 1e14,
-      (lng * 1e14).round() / 1e14,
-      ((lat + latPrecision) * 1e14).round() / 1e14,
-      ((lng + lngPrecision) * 1e14).round() / 1e14,
+  // Return the code area.
+  return CodeArea(lat, lng, lat + latPrecision, lng + lngPrecision,
       min(code.length, maxDigitCount));
 }
 
