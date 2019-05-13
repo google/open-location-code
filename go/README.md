@@ -10,11 +10,21 @@ You can format your files by running:
 
 	gofmt -w -s .
 
-# Install
+# Testing
 
-	go get github.com/google/open-location-code/go
+Run the unit tests from within the `go` directory with:
 
-# Test with Go-Fuzz
+```
+go test . -v
+```
+
+To also run the benchmark tests, run:
+
+```
+go test -bench=. . -v
+```
+
+## Test with Go-Fuzz
 
     go get github.com/dvyukov/go-fuzz/...
 
@@ -22,4 +32,8 @@ You can format your files by running:
 
     go-fuzz-build github.com/google/open-location-code/go
 	go-fuzz -bin=./olc-fuzz.zip -workdir=/tmp/olc-fuzz
+
+# Install
+
+	go get github.com/google/open-location-code/go
 
