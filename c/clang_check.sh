@@ -24,7 +24,7 @@ if [ ! -f ".clang-format" ]; then
 fi
 
 RETURN=0
-for FILE in `find . | egrep "\.(c|cc|h)$"`; do
+for FILE in `find * | egrep "\.(c|cc|h)$"`; do
   DIFF=`diff $FILE <($CLANG_FORMAT $FILE)`
   if [ $? -ne 0 ]; then
     if [ -z "$TRAVIS" ]; then
@@ -33,7 +33,7 @@ for FILE in `find . | egrep "\.(c|cc|h)$"`; do
     else
       echo -e "\e[1;31m$FILE has formatting errors:\e[0m"
       echo "$DIFF"
-      post_file_comment "c/$FILE" "clang-format reports formatting errors"
+      post_file_comment "c/$FILE" "clang-format reports formatting errors\n```\n$DIFF\n```"
     fi
     RETURN=1
   fi

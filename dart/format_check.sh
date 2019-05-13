@@ -24,7 +24,7 @@ fi
 RETURN=0
 
 # For every dart file, check the formatting and perform static analysis.
-for FILE in `find . | egrep "\.dart$"`; do
+for FILE in `find * | egrep "\.dart$"`; do
   echo Checking $FILE
   FORMATTED=`$DART_FMT_CMD --set-exit-if-changed --fix "$FILE"`
   if [ $? -ne 0 ]; then
@@ -38,7 +38,7 @@ for FILE in `find . | egrep "\.dart$"`; do
       echo -e "\e[1;31mFile has formatting errors: $FILE\e[0m"
       echo "$DIFF"
       BODY='**File has `dartfmt` errors that must be fixed**. Here is a diff, or run `format_check.sh`:'
-      BODY="$BODY"$'\n```\n'"$DIFF"$'\n```'
+      BODY="$BODY\n```\n$DIFF\n```"
       RETURN=1
       post_file_comment "dart/$FILE" "$BODY"
     fi
@@ -50,7 +50,7 @@ for FILE in `find . | egrep "\.dart$"`; do
     if [ "$TRAVIS" != "" ]; then
       # On TravisCI, send a comment with the diff to the pull request.
       BODY='**File has `dartanalyzer` errors that must be fixed**:'
-      BODY="$BODY"$'\n'"$ANALYSIS"
+      BODY="$BODY\n$ANALYSIS"
       RETURN=1
       post_file_comment "dart/$FILE" "$BODY"
     fi
