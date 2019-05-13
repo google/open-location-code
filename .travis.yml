@@ -17,8 +17,6 @@ matrix:
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
         - pwd
         - cd ${OLC_PATH} && bash clang_check.sh
-        - ls -l | bash ${TRAVIS_BUILD_DIR}/travis-utils/comment_pr.sh
-        - echo -e "\e[31mThis time with colour\e[30m" | bash ${TRAVIS_BUILD_DIR}/travis-utils/comment_pr.sh
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
