@@ -11,6 +11,7 @@
 #     signifies that we are in a push build.
 # * TRAVIS_REPO_SLUG: Provides the path to the repository
 #     ("google/open-location-code").
+# * TRAVIS_PULL_REQUEST_SHA
 
 # Post a comment to a pull request.
 # The comment should be the first argument, and will also be echoed to stdout.
@@ -52,11 +53,9 @@ function post_file_comment {
     echo "Not in a pull request"
     return 0
   fi
-  # Don't use TRAVIS_COMMIT, it's not the PR commit number.
-  HEAD_COMMIT=`git show FETCH_HEAD --pretty="format:%H"|head -1`
   # Remove bash colour characters or GitHub's comment JSON parser will complain.
   CLEAN=`echo "$BODY" | sed -r "s/\x1B\[[0-9]+m//g"| sed -r "s/\n/  \n/g"`
-  BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\", \"commit_id\": \"$HEAD_COMMIT\", \"path\": \"$1\", \"position\": 1}"
+  BODY="{\"body\": \"_Automated bot comment from TravisCI tests_  \n$CLEAN\", \"commit_id\": \"$TRAVIS_PULL_REQUEST_SHA\", \"path\": \"$1\", \"position\": 1}"
   payload_to_github \
       "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/comments" \
       "$BODY"
@@ -79,6 +78,7 @@ function payload_to_github {
     echo -e "\e[31mNo auth token, cannot send to GitHub\e[30m"
     return 0
   fi
+  env | grep TRAVIS_
   echo "Trying to send to GitHub..."
   echo "$URL"
   echo "$BODY"
