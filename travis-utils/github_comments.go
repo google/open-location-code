@@ -90,6 +90,7 @@ func getComments(repo, pr string) ([]GitHubReviewComment, error) {
 		return resp, err
 	}
 	if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
+    log.Printf("Error decoding JSON: $v\n%v", err, r.Body)
 		return resp, err
 	}
 	if r.Status != "200 OK" {
