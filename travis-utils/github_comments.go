@@ -89,8 +89,10 @@ func getComments(repo, pr string) ([]GitHubReviewComment, error) {
 	if err != nil {
 		return resp, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-    log.Printf("Error decoding JSON response: %v\n%s", err, string(r.Body))
+  buf := new(bytes.Buffer)
+  buf.ReadFrom(r.Body)
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+    log.Printf("Error decoding JSON response: %v\n%v", err, buf.String())
 		return resp, err
 	}
 	if r.Status != "200 OK" {
@@ -140,9 +142,11 @@ func sendComment(repo, pr, comment, commit, file string, position int) error {
 		return err
 	}
 	// Decode the response.
+  buf := new(bytes.Buffer)
+  buf.ReadFrom(r.Body)
 	var resp GitHubReviewCommentResponse
-	if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-    log.Printf("Error decoding JSON response: %v\n%s", err, string(r.Body))
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+    log.Printf("Error decoding JSON response: %v\n%v", err, buf.String())
     return err
   }
 	if r.Status == "201 Created" {
@@ -154,9 +158,9 @@ func sendComment(repo, pr, comment, commit, file string, position int) error {
 
 // True if string b is within a. Strips tags and line feeds.
 func match(a, b string) bool {
-	re := regexp.MustCompile("\n|</?[a-z]*>")
-	a = re.ReplaceAllString(a, " ")
-	b = re.ReplaceAllString(b, " ")
+	re := regexp.MustCompile("\n|</?[a-z]*>|[^a-zA-Z0-9]")
+	a = re.ReplaceAllString(a, "")
+	b = re.ReplaceAllString(b, "")
 	return strings.Contains(a, b)
 }
 
@@ -193,6 +197,7 @@ func main() {
       }
     }
   }
+  return
 	// Post the comment.
 	if err := sendComment(*repo, *pr, *prefix+*comment, *commit, *file, *position); err != nil {
 		log.Printf("Posting comment failed: %v", err)
