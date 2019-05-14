@@ -57,12 +57,14 @@ func Encode(lat, lng float64, codeLen int) string {
 	// Latitude 90 needs to be adjusted to be just less, so the returned code
 	// can also be decoded.
 	if lat == latMax {
-		lat = normalizeLat(lat - computePrec(codeLen, false))
+		lat = normalizeLat(lat - computeLatPrec(codeLen))
 	}
-	// The tests for lng=180 want 2,2 but without this we get W,2
+	// Normalise the longitude.
 	if lng == lngMax {
-		lng = normalizeLng(lng + computePrec(codeLen+2, true))
+		lng = normalizeLng(lng)
 	}
+	// Use a char array so we can build it up from the end digits, without having
+	// to keep reallocating strings.
 	var code [15]byte
 
 	// Compute the code.
@@ -88,8 +90,8 @@ func Encode(lat, lng float64, codeLen int) string {
 			lngVal /= int64(gridCols)
 		}
 	} else {
-		latVal /= 3125 // gridRows**gridCodeLength
-		lngVal /= 1024 // gridCols**gridCodeLength
+		latVal /= gridLatFullValue
+		lngVal /= gridLngFullValue
 	}
 	pos = pairCodeLen - 1
 	// Compute the pair section of the code.
@@ -112,17 +114,13 @@ func Encode(lat, lng float64, codeLen int) string {
 	return string(code[:codeLen]) + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
 }
 
-// computePrec computes the precision value for a given code length.
+// computeLatPrec computes the precision value for a given code length.
 // Lengths <= 10 have the same precision for latitude and longitude,
 // but lengths > 10 have different precisions due to the grid method
 // having fewer columns than rows.
-func computePrec(codeLen int, longitudal bool) float64 {
-	if codeLen <= 10 {
-		return math.Pow(20, math.Floor(float64(codeLen/-2+2)))
+func computeLatPrec(codeLen int) float64 {
+	if codeLen <= pairCodeLen {
+		return math.Pow(float64(encBase), math.Floor(float64(codeLen/-2+2)))
 	}
-	g := float64(gridRows)
-	if longitudal {
-		g = gridCols
-	}
-	return math.Pow(20, -3) / math.Pow(g, float64(codeLen-10))
+	return math.Pow(float64(encBase), -3) / math.Pow(float64(gridRows), float64(codeLen-pairCodeLen))
 }

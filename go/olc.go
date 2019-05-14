@@ -50,14 +50,18 @@ const (
 	pairFPV = 160000
 	// Precision of the pair part of the code, in 1/degrees.
 	pairPrecision = 8000
+	// Full value of the latitude grid - gridRows**gridCodeLen.
+	gridLatFullValue = 3125
+	// Full value of the longitude grid - gridCols**gridCodeLen.
+	gridLngFullValue = 1024
 	// First place value of the latitude grid (if the last place is 1). gridRows^(gridCodeLen - 1)
-	gridLatFPV = 625
+	gridLatFPV = gridLatFullValue / gridRows
 	// First place value of the longitude grid (if the last place is 1). gridCols^(gridCodeLen - 1)
-	gridLngFPV = 256
+	gridLngFPV = gridLngFullValue / gridCols
 	// Latitude precision of a full length code. pairPrecision * gridRows**gridCodeLen
-	finalLatPrecision = 8000 * 3125
+	finalLatPrecision = pairPrecision * gridLatFullValue
 	// Longitude precision of a full length code. pairPrecision * gridCols**gridCodeLen
-	finalLngPrecision = 8000 * 1024
+	finalLngPrecision = pairPrecision * gridLngFullValue
 
 	latMax = 90
 	lngMax = 180
