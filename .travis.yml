@@ -94,16 +94,18 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - cd ${OLC_PATH} && bash format_check.sh
 
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
-      python: 3.4
+      python: 3.6
       env: OLC_PATH=python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - cd ${OLC_PATH} && bash format_check.sh
 
     # Ruby implementation. Lives in ruby/
     - language: ruby
