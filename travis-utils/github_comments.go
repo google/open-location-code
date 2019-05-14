@@ -209,7 +209,6 @@ func main() {
       }
     }
   }
-  return
 	// Post the comment.
 	if err := sendComment(*repo, *pr, *prefix+*comment, *commit, *file, *position); err != nil {
 		log.Printf("Posting comment failed: %v", err)
