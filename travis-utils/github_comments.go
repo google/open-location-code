@@ -37,6 +37,10 @@ var (
 	file     = flag.String("file", "", "Add comment to file instead of conversation (relative path to file)")
 	position = flag.Int("position", 1, "Lines from the first @@ hunk header to add the comment")
 	prefix   = flag.String("prefix", stdPrefix, "Prefix to add to the comment")
+  // If allowDupes is true, the new comment won't be compared against existing comments.
+  // Note that the GitHub API does not return the comment state, so we cannot tell if comments are resolved.
+  // If allowDupes is false, and the new comment matches a resolved one, it will not be added to the PR!
+  allowDupes = flag.Bool("dupes", false, "Allow duplicate comments")
 )
 
 // GitHubReviewCommentRequest defines the POST data to add a comment to a pull review.
@@ -157,29 +161,34 @@ func main() {
     return
   }
 	if *pr == "" || *repo == "" {
-		log.Fatal("PR or repo could not be determined")
+		log.Print("PR or repo could not be determined")
+    return
 	}
 	if *comment == "" {
-		log.Fatal("No comment specified")
+		log.Print("No comment specified")
+    return
 	}
 	if (*file == "") != (*commit == "") {
-		log.Fatal("If either of --file and --commit are specified, both must be specified")
+		log.Print("If either of --file and --commit are specified, both must be specified")
+    return
 	}
 
-	// Fetch the existing comments on the PR.
-	comments, err := getComments(*repo, *pr)
-	if err != nil {
-		log.Fatalf("Failed to fetch comments: %v\n", err)
-	}
-	// Do we already have this comment? We send HTML or literal "\n"s, but we get back markdown (on the whole).
-	for _, c := range comments {
-		if c.Path == *file && match(c.Body, *comment) && c.InReplyTo == 0 {
-			log.Printf("Skipping - PR already contains comment: %s", c.HtmlUrl)
-			return
-		}
-	}
+  if !*allowDupes {
+    // Fetch the existing comments on the PR.
+    comments, err := getComments(*repo, *pr)
+    if err != nil {
+      log.Fatalf("Failed to fetch comments: %v\n", err)
+    }
+    // Do we already have this comment? We send HTML or literal "\n"s, but we get back markdown (on the whole).
+    for _, c := range comments {
+      if c.Path == *file && match(c.Body, *comment) && c.InReplyTo == 0 {
+        log.Printf("Skipping - PR already contains comment: %s", c.HtmlUrl)
+        return
+      }
+    }
+  }
 	// Post the comment.
 	if err := sendComment(*repo, *pr, *prefix+*comment, *commit, *file, *position); err != nil {
-		log.Fatalf("Posting comment failed: %v", err)
+		log.Print("Posting comment failed: %v", err)
 	}
 }

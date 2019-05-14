@@ -33,7 +33,7 @@ for FILE in `find * | egrep "\.dart$"`; do
       echo -e "\e[1;31mFile has formatting errors: $FILE\e[0m"
       echo "$DIFF"
       RETURN=1
-      ../travis-utils/github_comments.go --pr $TRAVIS_PULL_REQUEST \
+      go run ../travis-utils/github_comments.go --pr $TRAVIS_PULL_REQUEST \
           --comment '**File has `dartfmt` errors that must be fixed**. Here is a diff, or run `format_check.sh`:'"<br><pre>$DIFF</pre>" \
           --file "dart/$FILE" \
           --commit $TRAVIS_PULL_REQUEST_SHA
@@ -47,7 +47,7 @@ for FILE in `find * | egrep "\.dart$"`; do
     if [ "$TRAVIS" != "" ]; then
       # On TravisCI, send a comment with the diff to the pull request.
       RETURN=1
-      ../travis-utils/github_comments.go --pr $TRAVIS_PULL_REQUEST \
+      go run ../travis-utils/github_comments.go --pr $TRAVIS_PULL_REQUEST \
           --comment '**File has `dartanalyzer` errors that must be addressed**:'"<br><pre>$ANALYSIS</pre>" \
           --file "dart/$FILE" \
           --commit $TRAVIS_PULL_REQUEST_SHA

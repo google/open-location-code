@@ -28,7 +28,7 @@ for FILE in `find * | egrep "\.(c|cc|h)$"`; do
     else
       echo -e "\e[1;31m$FILE has formatting errors:\e[0m"
       echo "$DIFF"
-      ../travis-utils/github_comments.go --pr $TRAVIS_PULL_REQUEST \
+      go run ../travis-utils/github_comments.go --pr $TRAVIS_PULL_REQUEST \
           --comment '**File has `clang-format` errors that must be fixed**. Here is a diff, or run `clang_check.sh`:'"<br><pre>$DIFF</pre>" \
           --file "c/$FILE" \
           --commit $TRAVIS_PULL_REQUEST_SHA
