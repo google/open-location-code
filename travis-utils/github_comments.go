@@ -6,6 +6,9 @@
 //   go run github_comments.go --pr 338 --comment "...."
 // Or you can add a comment to a file within the PR (the file path must be relative to the repo root):
 //   go run github_comments.go --pr 338 --comment "...." --file dart/lib/src/open_location_code.dart --commit 2592c2a78d5be48508dde390e51f585d15182fca
+//
+// For information on the GitHub API, see: https://developer.github.com/v3/
+// 
 
 package main
 
@@ -24,33 +27,22 @@ import (
 
 const (
 	stdPrefix        = "_This is an automated bot comment from the TravisCI tests_<br>"
+  // URLs for different types of requests.
 	fetchCommentsUrl = "https://api.github.com/repos/%s/pulls/%s/comments"
 	commentOnPRUrl   = "https://api.github.com/repos/%s/issues/%s/comments"
 	commentOnFileUrl = "https://api.github.com/repos/%s/pulls/%s/comments"
-)
-
-var (
-	repo     = flag.String("repo", "google/open-location-code", "Repository path")
-	pr       = flag.String("pr", "", "Pull request number")
-	commit   = flag.String("commit", "", "Commit ID SHA")
-	comment  = flag.String("comment", "", "Comment to add to the pull request")
-	file     = flag.String("file", "", "Add comment to file instead of conversation (relative path to file)")
-	position = flag.Int("position", 1, "Lines from the first @@ hunk header to add the comment")
-	prefix   = flag.String("prefix", stdPrefix, "Prefix to add to the comment")
-  // If allowDupes is true, the new comment won't be compared against existing comments.
-  // Note that the GitHub API does not return the comment state, so we cannot tell if comments are resolved.
-  // If allowDupes is false, and the new comment matches a resolved one, it will not be added to the PR!
-  allowDupes = flag.Bool("dupes", false, "Allow duplicate comments")
+	commentEditUrl = "https://api.github.com/repos/%s/pulls/comments/%d"
+  githubToken = "GITHUB_TOKEN"
 )
 
 // GitHubReviewCommentRequest defines the POST data to add a comment to a pull review.
 // To add to the conversation, just Body need be specified.
 // If CommitID and Path are specified, the comment will be added to the file.
 type GitHubReviewCommentRequest struct {
-	Body     string `json:"body,omitifempty"`
-	CommitID string `json:"commit_id,omitifempty"`
-	Path     string `json:"path,omitifempty"`
-	Position int    `json:"position,omitifempty"`
+	Body     string `json:"body,omitempty"`
+	CommitID string `json:"commit_id,omitempty"`
+	Path     string `json:"path,omitempty"`
+	Position int    `json:"position,omitempty"`
 }
 
 // GitHubError defines error data returned when a request fails..
@@ -81,11 +73,11 @@ type GitHubReviewComment struct {
 	HtmlUrl             string `json:"html_url"`
 }
 
-// Fetch the comments for the pull request.
+// getComments fetches all the comments for the specified pull request.
 func getComments(repo, pr string) ([]GitHubReviewComment, error) {
 	var resp []GitHubReviewComment
 	// Get the GitHub auth token from environment variables. Strictly speaking this may not be needed but helps to avoid rate limiting.
-	token := os.Getenv("GITHUB_TOKEN")
+	token := os.Getenv(githubToken)
 	if token == "" {
 		return resp, errors.New("Cannot send comment - no GITHUB_TOKEN environment variable")
 	}
@@ -95,6 +87,7 @@ func getComments(repo, pr string) ([]GitHubReviewComment, error) {
 	if err != nil {
 		return resp, err
 	}
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	req.Header.Add("Authorization", "token "+token)
 	r, err := http.DefaultClient.Do(req)
@@ -113,29 +106,13 @@ func getComments(repo, pr string) ([]GitHubReviewComment, error) {
 	return resp, nil
 }
 
-// Send the comment to the pull request.
-// If the file is specified, the comment will be attached to the file (as long
-// as the commit ID is also specified), otherwise it will be put into the PR
-// conversation.
-func sendComment(repo, pr, comment, commit, file string, position int) error {
+// makeRequest makes a POST request to the url and sends the GitHub request.
+// It relies on the environment variable GITHUB_TOKEN for authentication.
+func makeRequest(url string, ghc GitHubReviewCommentRequest) error {
 	// Get the GitHub auth token from environment variables.
-	token := os.Getenv("GITHUB_TOKEN")
+	token := os.Getenv(githubToken)
 	if token == "" {
 		return errors.New("Cannot send comment - no GITHUB_TOKEN environment variable")
-	}
-  // If the comment has <pre>, replace it with \n<pre> so that "---" strings in the preformatted section don't turn everything into a header.
-  comment = strings.Replace(comment, "<pre>", "\n<pre>", -1)
-  ghc := GitHubReviewCommentRequest{Body: comment}
-	url := fmt.Sprintf(commentOnPRUrl, repo, pr)
-	// If both file and commit have been specified, we can post the comment to a file.
-	if file != "" && commit != "" {
-		ghc.CommitID = commit
-		ghc.Path = file
-		ghc.Position = position
-		url = fmt.Sprintf(commentOnFileUrl, repo, pr)
-		log.Print("Posting comment to file within pull request...")
-	} else {
-		log.Print("Posting comment to pull request...")
 	}
 	// Encode the request.
 	b := new(bytes.Buffer)
@@ -147,6 +124,7 @@ func sendComment(repo, pr, comment, commit, file string, position int) error {
 	if err != nil {
 		return err
 	}
+	req.Header.Add("Accept", "application/vnd.github.v3+json")
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	req.Header.Add("Authorization", "token "+token)
 	r, err := http.DefaultClient.Do(req)
@@ -161,15 +139,46 @@ func sendComment(repo, pr, comment, commit, file string, position int) error {
     log.Printf("Error decoding JSON response: %v\n%v", err, buf.String())
     return err
   }
-	if r.Status == "201 Created" {
-		log.Printf("Comment added: %s", resp.HtmlUrl)
+	if r.Status == "201 Created" || r.Status == "200 OK" {
+		log.Printf("Comment added/updated: %s", resp.HtmlUrl)
 		return nil
 	}
 	return errors.New(resp.Message)
 }
 
-// True if string b is within a. Strips tags and line feeds.
-func match(a, b string) bool {
+// addComment adds a new comment to the pull request.
+// If the file is specified, the comment will be attached to the file (as long
+// as the commit ID is also specified), otherwise it will be put into the PR
+// conversation.
+func addComment(repo, pr, comment, commit, file string, position int) error {
+  // If the comment has <pre>, replace it with \n<pre> so that "---" strings in the preformatted section don't turn everything into a header.
+  comment = strings.Replace(comment, "<pre>", "\n<pre>", -1)
+  ghc := GitHubReviewCommentRequest{Body: comment}
+	url := fmt.Sprintf(commentOnPRUrl, repo, pr)
+	// If both file and commit have been specified, we can post the comment to a file.
+	if file != "" && commit != "" {
+		ghc.CommitID = commit
+		ghc.Path = file
+		ghc.Position = position
+		url = fmt.Sprintf(commentOnFileUrl, repo, pr)
+		log.Print("Posting comment to file within pull request...")
+	} else {
+		log.Print("Posting comment to pull request...")
+	}
+  return makeRequest(url, ghc)
+}
+
+// updateComment replaces the existing body with a new one.
+func updateComment(repo string, cid int, comment string) error {
+  // If the comment has <pre>, replace it with \n<pre> so that "---" strings in the preformatted section don't turn everything into a header.
+  comment = strings.Replace(comment, "<pre>", "\n<pre>", -1)
+  ghc := GitHubReviewCommentRequest{Body: comment}
+	url := fmt.Sprintf(commentEditUrl, repo, cid)
+  return makeRequest(url, ghc)
+}
+
+// commentMatch returns true if string b is within a, after stripping tags and everything other than letters and numbers.
+func commentMatch(a, b string) bool {
 	re := regexp.MustCompile("\n|</?[a-z]*>|[^a-zA-Z0-9]")
 	a = re.ReplaceAllString(a, "")
 	b = re.ReplaceAllString(b, "")
@@ -177,6 +186,17 @@ func match(a, b string) bool {
 }
 
 func main() {
+	repo     := flag.String("repo", "google/open-location-code", "Repository path")
+	pr       := flag.String("pr", "", "Pull request number")
+	commit   := flag.String("commit", "", "Commit ID SHA")
+	comment  := flag.String("comment", "", "Comment to add to the pull request")
+	file     := flag.String("file", "", "Add comment to file instead of conversation (relative path to file)")
+	position := flag.Int("position", 1, "Lines from the first @@ hunk header to add the comment")
+	prefix   := flag.String("prefix", stdPrefix, "Prefix to add to the comment")
+  // If allowDupes is true, the new comment won't be compared against existing comments.
+  // Note that the GitHub API does not return the comment state, so we cannot tell if comments are resolved.
+  // If allowDupes is false, and the new comment matches an existing one, it will just add an update message.
+  allowDupes := flag.Bool("dupes", false, "Allow duplicate comments")
 	flag.Parse()
   if *pr == "false" {
     // Passed when TravisCI is not within a pull request build, so bail.
@@ -203,14 +223,17 @@ func main() {
     }
     // Do we already have this comment? We send HTML or literal "\n"s, but we get back markdown (on the whole).
     for _, c := range comments {
-      if c.Path == *file && match(c.Body, *comment) && c.InReplyTo == 0 {
-        log.Printf("Skipping - PR already contains comment: %s", c.HtmlUrl)
+      if c.Path == *file && commentMatch(c.Body, *comment) && c.InReplyTo == 0 {
+        log.Printf("PR already contains comment, updating: %s", c.HtmlUrl)
+        if err := updateComment(*repo, c.ID, c.Body + "<br>Ping!"); err != nil {
+          log.Printf("Updating comment failed: %v", err)
+        }
         return
       }
     }
   }
 	// Post the comment.
-	if err := sendComment(*repo, *pr, *prefix+*comment, *commit, *file, *position); err != nil {
+	if err := addComment(*repo, *pr, *prefix+*comment, *commit, *file, *position); err != nil {
 		log.Printf("Posting comment failed: %v", err)
 	}
 }
