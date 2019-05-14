@@ -83,9 +83,21 @@ type GitHubReviewComment struct {
 
 // Fetch the comments for the pull request.
 func getComments(repo, pr string) ([]GitHubReviewComment, error) {
+	// Get the GitHub auth token from environment variables. Strictly speaking this may not be needed but helps to avoid rate limiting.
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		return errors.New("Cannot send comment - no GITHUB_TOKEN environment variable")
+	}
 	var resp []GitHubReviewComment
 	url := fmt.Sprintf(fetchCommentsUrl, repo, pr)
-	r, err := http.Get(url)
+  // Send request.
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+	req.Header.Add("Authorization", "token "+token)
+	r, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return resp, err
 	}
