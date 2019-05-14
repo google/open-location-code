@@ -109,7 +109,9 @@ func sendComment(repo, pr, comment, commit, file string, position int) error {
 	if token == "" {
 		return errors.New("Cannot send comment - no GITHUB_TOKEN environment variable")
 	}
-	ghc := GitHubReviewCommentRequest{Body: comment}
+  // If the comment has <pre>, replace it with \n<pre> so that "---" strings in the preformatted section don't turn everything into a header.
+  comment = strings.replace("<pre>", "\n<pre>", -1)
+  ghc := GitHubReviewCommentRequest{Body: comment}
 	url := fmt.Sprintf(commentOnPRUrl, repo, pr)
 	// If both file and commit have been specified, we can post the comment to a file.
 	if file != "" && commit != "" {
@@ -190,6 +192,6 @@ func main() {
   }
 	// Post the comment.
 	if err := sendComment(*repo, *pr, *prefix+*comment, *commit, *file, *position); err != nil {
-		log.Print("Posting comment failed: %v", err)
+		log.Printf("Posting comment failed: %v", err)
 	}
 }
