@@ -90,7 +90,7 @@ func getComments(repo, pr string) ([]GitHubReviewComment, error) {
 		return resp, err
 	}
 	if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-    log.Printf("Error decoding JSON: $v\n%v", err, r.Body)
+    log.Printf("Error decoding JSON response: %v\n%s", err, string(r.Body))
 		return resp, err
 	}
 	if r.Status != "200 OK" {
@@ -141,7 +141,10 @@ func sendComment(repo, pr, comment, commit, file string, position int) error {
 	}
 	// Decode the response.
 	var resp GitHubReviewCommentResponse
-	json.NewDecoder(r.Body).Decode(&resp)
+	if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
+    log.Printf("Error decoding JSON response: %v\n%s", err, string(r.Body))
+    return err
+  }
 	if r.Status == "201 Created" {
 		log.Printf("Comment added: %s", resp.HtmlUrl)
 		return nil
