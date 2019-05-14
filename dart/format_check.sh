@@ -3,11 +3,6 @@
 # with dartanalyzer.
 # Run from within the dart directory.
 
-set -e
-# Get the functions to allow posting to pull requests.
-source ../travis-utils/comment_funcs.sh
-set +e
-
 DART_FMT_CMD=dartfmt
 $DART_FMT_CMD --version >/dev/null 2>&1
 if [ $? -ne 0 ]; then
