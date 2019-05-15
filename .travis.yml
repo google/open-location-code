@@ -15,7 +15,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
-        - cd ${OLC_PATH} && bash clang_check.sh
+        - cd ${OLC_PATH} && bash checks.sh
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp

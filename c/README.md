@@ -7,7 +7,7 @@ This is the C implementation of the Open Location Code API.
 Code style is based on Googles formatting rules. Code must be formatted
 using `clang-format`.
 
-The `clang_check.sh` script will check for formatting errors, output them,
+The `checks.sh` script will check for formatting errors, output them,
 and automatically format files.
 
 # Usage
