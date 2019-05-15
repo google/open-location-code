@@ -1,6 +1,5 @@
 #!/bin/bash
-# Check the format of all the C files using clang-format.
-# Run from within the c directory (or clang-format won't find it's config file).
+
 
 CLANG_FORMAT="clang-format-5.0"
 if hash $CLANG_FORMAT 2>/dev/null; then
@@ -19,28 +18,18 @@ if [ ! -f ".clang-format" ]; then
 fi
 
 RETURN=0
-for FILE in `find * | egrep "\.(c|cc|h)$"`; do
+:
+for FILE in `ls *.[ch] */*.[ch]`; do
   DIFF=`diff $FILE <($CLANG_FORMAT $FILE)`
   if [ $? -ne 0 ]; then
     if [ -z "$TRAVIS" ]; then
-      echo -e "\e[1;34mFormatting $FILE\e[0m"
+      echo "Formatting $FILE" >&2
       $CLANG_FORMAT -i $FILE
     else
-      echo -e "\e[1;31m$FILE has formatting errors:\e[0m"
-      echo "$DIFF"
-      go run ../travis-utils/github_comments.go --pr "$TRAVIS_PULL_REQUEST" \
-          --comment '**File has `clang-format` errors that must be fixed**. Here is a diff, or run `clang_check.sh`:'"<br><pre>$DIFF</pre>" \
-          --file "c/$FILE" \
-          --commit "$TRAVIS_PULL_REQUEST_SHA"
+      echo -e "\e[31m$FILE has formatting errors:\e[30m" >&2
+      echo "$DIFF" >&2
     fi
     RETURN=1
   fi
 done
-exit $RETURN
-
-if [ $RETURN -ne 0 ]; then
-  echo -e "\e[1;31mFiles have issues that must be addressed\e[0m"
-else
-  echo -e "\e[1;32mFiles pass all checks\e[0m"
-fi
 exit $RETURN
