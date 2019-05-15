@@ -82,7 +82,7 @@ matrix:
       env: OLC_PATH=js
       script:
         - cd js
-        - sh test/run_tests.sh
+        - bash checks.sh
 
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
