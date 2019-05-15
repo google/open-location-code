@@ -35,7 +35,8 @@ if [ $? -ne 0 ]; then
   echo "\e[1;31mCannot find eslint, check your installation\e[0m"
 else
   # Run eslint on the source file.
-  LINT=`$ESLINT src/openlocationcode.js`
+  FILE=src/openlocationcode.js
+  LINT=`$ESLINT $FILE`
   if [ $? -ne 0 ]; then
     echo -e "\e[1;31mFile has formatting errors:\e[0m"
     echo "$LINT"
@@ -44,7 +45,7 @@ else
       # On TravisCI, send a comment with the diff to the pull request.
       go run ../travis-utils/github_comments.go --pr "$TRAVIS_PULL_REQUEST" \
           --comment '**File has `eslint` errors that must be fixed**:'"<br><pre>$LINT</pre>" \
-          --file "dart/$FILE" \
+          --file "js/$FILE" \
           --commit "$TRAVIS_PULL_REQUEST_SHA"
     fi
   fi

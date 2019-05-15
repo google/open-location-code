@@ -117,7 +117,8 @@
   var PAIR_CODE_LENGTH_ = 10;
 
   // First place value of the pairs (if the last pair value is 1).
-  var PAIR_FIRST_PLACE_VALUE_ = ENCODING_BASE_**(PAIR_CODE_LENGTH_ / 2 - 1);
+  var PAIR_FIRST_PLACE_VALUE_ = Math.pow(
+      ENCODING_BASE_, (PAIR_CODE_LENGTH_ / 2 - 1));
 
   // Inverse of the precision of the pair section of the code.
   var PAIR_PRECISION_ = ENCODING_BASE_**3;
@@ -137,10 +138,12 @@
   var GRID_ROWS_ = 5;
 
   // First place value of the latitude grid (if the last place is 1).
-  var GRID_LAT_FIRST_PLACE_VALUE_ = GRID_ROWS_**(GRID_CODE_LENGTH_ - 1);
+  var GRID_LAT_FIRST_PLACE_VALUE_ = Math.pow(
+      GRID_ROWS_, (GRID_CODE_LENGTH_ - 1));
 
   // First place value of the longitude grid (if the last place is 1).
-  var GRID_LNG_FIRST_PLACE_VALUE_ = GRID_COLUMNS_**(GRID_CODE_LENGTH_ - 1);
+  var GRID_LNG_FIRST_PLACE_VALUE_ = Math.pow(
+      GRID_COLUMNS_, (GRID_CODE_LENGTH_ - 1));
 
   // Multiply latitude by this much to make it a multiple of the finest
   // precision.
