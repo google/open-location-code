@@ -14,16 +14,15 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
-  "io"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
-  "time"
+	"time"
 )
 
 const (
@@ -137,13 +136,13 @@ func addComment(repo, pr, comment, commit, file string, position int) error {
 	for _, c := range existingc {
 		if c.Path == file && commentMatch(c.Body, body) && c.InReplyTo == 0 {
 			if file == "" {
-        // Add the timestamp to the comment.
-        t := time.Now()
+				// Add the timestamp to the comment.
+				t := time.Now()
 				if err := updateIssueComment(repo, c.ID, c.Body+"<br>Ping! (Issue remains on "+t.UTC().Format(time.UnixDate)+")"); err != nil {
 					log.Printf("Updating issue comment failed: %v", err)
 				}
 			} else {
-				if err := replyToReviewComment(repo, pr, c.ID, "Ping!"); err != nil {
+				if err := replyToReviewComment(repo, pr, c.ID, commit, "Ping!"); err != nil {
 					log.Printf("Updating review comment failed: %v", err)
 				}
 			}
@@ -194,9 +193,10 @@ func updateIssueComment(repo string, id int, comment string) error {
 	return err
 }
 
-// replyToReviewComment replies to an existing review comment.
-func replyToReviewComment(repo, pr string, cid int, comment string) error {
-	ghc := GitHubCommentRequest{Body: comment, InReplyTo: cid}
+// replyToReviewComment replies to an existing review comment. We don't need the path but the commit may have changed.
+// (Passing the commit ID will update the commit ID associated with the entire thread.)
+func replyToReviewComment(repo, pr string, cid int, commit, comment string) error {
+	ghc := GitHubCommentRequest{Body: comment, CommitID: commit, InReplyTo: cid}
 	url := fmt.Sprintf(reviewCommentsUrl, repo, pr)
 	resp, err := makeCommentRequest(url, ghc)
 	if err == nil {
@@ -214,10 +214,10 @@ func makeCommentRequest(url string, ghc GitHubCommentRequest) (*GitHubCommentRes
 		return nil, err
 	}
 	// Send request.
-  bytes, err := callGitHubAPI("POST", url, b)
-  if err != nil {
-    return nil, err
-  }
+	bytes, err := callGitHubAPI("POST", url, b)
+	if err != nil {
+		return nil, err
+	}
 	var resp GitHubCommentResponse
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		log.Printf("Error decoding JSON response: %v\n%v", err, string(bytes))
@@ -229,10 +229,10 @@ func makeCommentRequest(url string, ghc GitHubCommentRequest) (*GitHubCommentRes
 // getComments fetches the comments using the passed URL.
 func getComments(url string) ([]GitHubComment, error) {
 	var resp []GitHubComment
-  bytes, err := callGitHubAPI("GET", url, nil)
-  if err != nil {
-    return resp, err
-  }
+	bytes, err := callGitHubAPI("GET", url, nil)
+	if err != nil {
+		return resp, err
+	}
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		log.Printf("Error decoding JSON response: %v\n%v", err, string(bytes))
 		return resp, err
@@ -252,7 +252,7 @@ func callGitHubAPI(method, url string, body io.Reader) ([]byte, error) {
 	if err != nil {
 		return []byte(""), err
 	}
-  // Add require headers.
+	// Add require headers.
 	req.Header.Add("Accept", "application/vnd.github.v3+json")
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	req.Header.Add("Authorization", "token "+token)
@@ -265,7 +265,7 @@ func callGitHubAPI(method, url string, body io.Reader) ([]byte, error) {
 	}
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(r.Body)
-  return buf.Bytes(), nil
+	return buf.Bytes(), nil
 }
 
 // commentMatch returns true if string b is within a, after stripping tags and everything other than letters and numbers.
