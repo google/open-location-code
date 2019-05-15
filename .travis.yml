@@ -34,7 +34,7 @@ matrix:
       script:
         - cd ${OLC_PATH}
         - pub get && pub run test
-        - bash check.sh
+        - bash checks.sh
 
     # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.
     - language: go
