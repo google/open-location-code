@@ -16,7 +16,7 @@
 
 library open_location_code.src.open_location_code;
 
-   import 'dart:math';
+import 'dart:math';
 
 /// A separator used to break the code into two parts to aid memorability.
 const separator = '+'; // 43 Ascii
@@ -83,7 +83,7 @@ final finalLngPrecision =
     pairPrecision * pow(gridColumns, gridCodeLength).toInt();
 
 /// Minimum length of a code that can be shortened.
-const minTrimmableCodeLen = (2 + 2).toInt();
+const minTrimmableCodeLen = 6;
 
 /// Decoder lookup table.
 /// Position is ASCII character value, value is:

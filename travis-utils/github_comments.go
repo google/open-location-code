@@ -137,14 +137,12 @@ func addComment(repo, pr, comment, commit, file string, position int) error {
 	for _, c := range existingc {
 		if c.Path == file && commentMatch(c.Body, body) && c.InReplyTo == 0 {
 			if file == "" {
-        log.Printf("Existing issue comment!")
-        // Add the time to the comment.
+        // Add the timestamp to the comment.
         t := time.Now()
 				if err := updateIssueComment(repo, c.ID, c.Body+"<br>Ping! (Issue remains on "+t.UTC().Format(time.UnixDate)+")"); err != nil {
 					log.Printf("Updating issue comment failed: %v", err)
 				}
 			} else {
-        log.Printf("Existing review comment!")
 				if err := replyToReviewComment(repo, pr, c.ID, "Ping!"); err != nil {
 					log.Printf("Updating review comment failed: %v", err)
 				}
@@ -191,7 +189,7 @@ func updateIssueComment(repo string, id int, comment string) error {
 	url := fmt.Sprintf(issueCommentEditUrl, repo, id)
 	resp, err := makeCommentRequest(url, ghc)
 	if err == nil {
-		log.Printf("Replied to existing comment: %s", resp.HtmlUrl)
+		log.Printf("Updated existing comment: %s", resp.HtmlUrl)
 	}
 	return err
 }
@@ -247,7 +245,7 @@ func callGitHubAPI(method, url string, body io.Reader) ([]byte, error) {
 	// Get the GitHub auth token from environment variables.
 	token := os.Getenv(githubToken)
 	if token == "" {
-		return []byte(""), errors.New("No GITHUB_TOKEN environment variable")
+		return []byte(""), fmt.Errorf("No %s environment variable", githubToken)
 	}
 	// Create request.
 	req, err := http.NewRequest(method, url, body)
