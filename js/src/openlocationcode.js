@@ -88,7 +88,7 @@
   OpenLocationCode.CODE_PRECISION_EXTRA = 11;
 
   // A separator used to break the code into two parts to aid memorability.
-    var SEPARATOR_ = '+';
+  var SEPARATOR_ = '+';
 
   // The number of characters to place before the separator.
   var SEPARATOR_POSITION_ = 8;
