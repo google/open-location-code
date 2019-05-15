@@ -1,14 +1,14 @@
 // Include the C library into this C++ test file.
 extern "C" {
-  #include "src/olc.h"
+#include "src/olc.h"
 }
 
-#include <chrono>
-#include <cstring>
-#include <cmath>
-#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <chrono>
+#include <cmath>
+#include <cstring>
+#include <fstream>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -72,14 +72,12 @@ std::vector<DecodingTestData> GetDecodingDataFromCsv() {
 
 TEST_P(DecodingChecks, Decode) {
   DecodingTestData test_data = GetParam();
-  OLC_CodeArea expected_area =
-      OLC_CodeArea{
-        OLC_LatLon{test_data.lo_lat_deg, test_data.lo_lng_deg},
-        OLC_LatLon{test_data.hi_lat_deg, test_data.hi_lng_deg},
-        test_data.length};
-  OLC_LatLon expected_center = OLC_LatLon{
-    (test_data.lo_lat_deg + test_data.hi_lat_deg)/2,
-    (test_data.lo_lng_deg + test_data.hi_lng_deg)/2};
+  OLC_CodeArea expected_area = OLC_CodeArea{
+      OLC_LatLon{test_data.lo_lat_deg, test_data.lo_lng_deg},
+      OLC_LatLon{test_data.hi_lat_deg, test_data.hi_lng_deg}, test_data.length};
+  OLC_LatLon expected_center =
+      OLC_LatLon{(test_data.lo_lat_deg + test_data.hi_lat_deg) / 2,
+                 (test_data.lo_lng_deg + test_data.hi_lng_deg) / 2};
   OLC_CodeArea got_area;
   OLC_LatLon got_center;
   OLC_Decode(test_data.code.c_str(), 0, &got_area);
@@ -211,7 +209,8 @@ TEST_P(ShortCodeChecks, ShortCode) {
   // Now extend the code using the reference location and check.
   if (test_data.test_type == "B" || test_data.test_type == "R") {
     char got[18];
-    OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got, 18);
+    OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got,
+                       18);
     EXPECT_EQ(test_data.full_code, got);
   }
 }
