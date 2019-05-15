@@ -142,7 +142,7 @@ func addComment(repo, pr, comment, commit, file string, position int) error {
 					log.Printf("Updating issue comment failed: %v", err)
 				}
 			} else {
-				if err := replyToReviewComment(repo, pr, c.ID, "Ping!"); err != nil {
+				if err := replyToReviewComment(repo, pr, c.ID, commit, "Ping!"); err != nil {
 					log.Printf("Updating review comment failed: %v", err)
 				}
 			}
@@ -193,9 +193,9 @@ func updateIssueComment(repo string, id int, comment string) error {
 	return err
 }
 
-// replyToReviewComment replies to an existing review comment.
-func replyToReviewComment(repo, pr string, cid int, comment string) error {
-	ghc := GitHubCommentRequest{Body: comment, InReplyTo: cid}
+// replyToReviewComment replies to an existing review comment. We don't need the path but the commit may have changed.
+func replyToReviewComment(repo, pr string, cid int, commit, comment string) error {
+	ghc := GitHubCommentRequest{Body: comment, CommitID: commit, InReplyTo: cid}
 	url := fmt.Sprintf(reviewCommentsUrl, repo, pr)
 	resp, err := makeCommentRequest(url, ghc)
 	if err == nil {
