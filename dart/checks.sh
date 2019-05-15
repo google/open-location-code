@@ -20,13 +20,13 @@ RETURN=0
 
 # For every dart file, check the formatting.
 for FILE in `find * | egrep "\.dart$"`; do
-  echo Checking $FILE
   FORMATTED=`$DART_FMT_CMD --set-exit-if-changed --fix "$FILE"`
   if [ $? -ne 0 ]; then
     if [ -z "$TRAVIS" ]; then
-      # Running locally, we can just format the file.
-      echo -e "\e[1;34mFormatting: $FILE\e[30m"
+      # Running locally, we can just format the file. Use colour codes.
+      echo -e "\e[1;34m"
       $DART_FMT_CMD --fix --overwrite $FILE
+      echo -e "\e[0m"
     else
       # On TravisCI, send a comment with the diff to the pull request.
       DIFF=`echo "$FORMATTED" | diff $FILE -`
@@ -34,7 +34,7 @@ for FILE in `find * | egrep "\.dart$"`; do
       echo "$DIFF"
       RETURN=1
       go run ../travis-utils/github_comments.go --pr "$TRAVIS_PULL_REQUEST" \
-          --comment '**File has `dartfmt` errors that must be fixed**. Here is a diff, or run `format_check.sh`:'"<br><pre>$DIFF</pre>" \
+          --comment '**File has `dartfmt` errors that must be fixed**. Here is a diff, or run `checks.sh`:'"<br><pre>$DIFF</pre>" \
           --file "dart/$FILE" \
           --commit "$TRAVIS_PULL_REQUEST_SHA"
     fi
