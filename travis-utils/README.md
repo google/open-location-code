@@ -40,9 +40,15 @@ comments.
 When commenting on a file, if the file has an existing comment with the same
 content, it will simply add a reply with "Ping!".
 
-![image showing a comment and a reply from the bot](comments.png)
+![image showing a file review comment and a reply from the bot](comments.png)
 
-Cavaets:
+Comments that are not associated with a file, or are associated with a file
+_that has not been changed by the pull request_, appear in the pull request
+conversation. Updates to them appear as "Ping!" messages with the timestamp.
+
+![image showing a comment for a file that has not been changed by the pull request, with a reply from the bot](badfile.png)
+
+Caveats:
 
  * Comments always appear on the left-hand side of the diff, even though they
    have the latest commit ID. (This appears to be a bug with GitHub API.)
