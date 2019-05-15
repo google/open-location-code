@@ -121,7 +121,7 @@
       ENCODING_BASE_, (PAIR_CODE_LENGTH_ / 2 - 1));
 
   // Inverse of the precision of the pair section of the code.
-  var PAIR_PRECISION_ = ENCODING_BASE_**3;
+  var PAIR_PRECISION_ = Math.pow(ENCODING_BASE_, 3);
 
   // The resolution values in degrees for each position in the lat/lng pair
   // encoding. These give the place value of each position, and therefore the
@@ -148,12 +148,12 @@
   // Multiply latitude by this much to make it a multiple of the finest
   // precision.
   var FINAL_LAT_PRECISION_ = PAIR_PRECISION_ *
-      GRID_ROWS_**(MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+      Math.pow(GRID_ROWS_, (MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_));
 
   // Multiply longitude by this much to make it a multiple of the finest
   // precision.
   var FINAL_LNG_PRECISION_ = PAIR_PRECISION_ *
-      GRID_COLUMNS_**(MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+      Math.pow(GRID_COLUMNS_, (MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_));
 
   // Minimum length of a code that can be shortened.
   var MIN_TRIMMABLE_CODE_LEN_ = 6;
@@ -356,8 +356,8 @@
         lngVal = Math.floor(lngVal / GRID_COLUMNS_);
       }
     } else {
-      latVal = Math.floor(latVal / GRID_ROWS_**GRID_CODE_LENGTH_);
-      lngVal = Math.floor(lngVal / GRID_COLUMNS_**GRID_CODE_LENGTH_);
+      latVal = Math.floor(latVal / Math.pow(GRID_ROWS_, GRID_CODE_LENGTH_));
+      lngVal = Math.floor(lngVal / Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_));
     }
     // Compute the pair section of the code.
     for (var i = 0; i < PAIR_CODE_LENGTH_ / 2; i++) {
