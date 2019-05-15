@@ -194,6 +194,7 @@ func updateIssueComment(repo string, id int, comment string) error {
 }
 
 // replyToReviewComment replies to an existing review comment. We don't need the path but the commit may have changed.
+// (Passing the commit ID will update the commit ID associated with the entire thread.)
 func replyToReviewComment(repo, pr string, cid int, commit, comment string) error {
 	ghc := GitHubCommentRequest{Body: comment, CommitID: commit, InReplyTo: cid}
 	url := fmt.Sprintf(reviewCommentsUrl, repo, pr)
