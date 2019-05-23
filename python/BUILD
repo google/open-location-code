@@ -7,9 +7,9 @@ py_library(
 
 py_test(
     name = "openlocationcode_test",
-    python_version = "PY3",
     size = "small",
     srcs = ["openlocationcode_test.py"],
     data = ["//test_data:test_data"],
+    python_version = "PY3",
     deps = [":openlocationcode"],
 )
