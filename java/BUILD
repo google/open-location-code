@@ -6,6 +6,18 @@ java_library(
 )
 
 java_test(
+    name = "BenchmarkTest",
+    size = "small",
+    srcs = [
+        "src/test/java/com/google/openlocationcode/BenchmarkTest.java",
+    ],
+    test_class = "com.google.openlocationcode.BenchmarkTest",
+    deps = [
+        ":openlocationcode",
+    ],
+)
+
+java_test(
     name = "DecodingTest",
     size = "small",
     srcs = [
