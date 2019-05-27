@@ -14,7 +14,7 @@
 
 package com.google.openlocationcode;
 
-                                                  import java.util.Objects;
+                      import java.util.Objects;
 
 /**
  * Convert locations to and from convenient short codes.
@@ -210,7 +210,10 @@ public final class OpenLocationCode {
 
     // Multiply values by their precision and convert to positive. Rounding
     // avoids/minimises errors due to floating point precision.
-    long latVal =        (long) (Math.round((latitude + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER * 1e6) / 1e6); long lngVal =        (long) (Math.round((longitude + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER * 1e6) / 1e6);
+    long latVal =
+        (long) (Math.round((latitude + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER * 1e6) / 1e6);
+    long lngVal =
+        (long) (Math.round((longitude + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER * 1e6) / 1e6);
 
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH) {
