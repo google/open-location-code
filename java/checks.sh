@@ -9,7 +9,7 @@ RETURN=0
 # ones with PMD since it logs it's errors at INFO level.
 RAW=`mvn -B spotless:check`
 if [ $? -ne 0 ]; then
-  FORMATTING=`cat "$RAW" | egrep "ERROR|PMD"`
+  FORMATTING=`echo "$RAW" | egrep "ERROR|PMD"`
   if [ -z "$TRAVIS" ]; then
     # Running locally, we can just format the file. Use colour codes.
     echo -e "\e[1;34m Reformatting files"
@@ -19,7 +19,7 @@ if [ $? -ne 0 ]; then
     # On TravisCI, send a comment with the diff to the pull request.
     echo -e '\e[1;31mProject has formatting errors, fix with `mvn spotless:apply`\e[0m'
     go run ../travis-utils/github_comments.go --pr "$TRAVIS_PULL_REQUEST" \
-        --comment '**Project has formatting errors, fix with `mvn spotless:apply`. Here is the report:'"<br><pre>$FORMATTING</pre>"
+        --comment '**Project has formatting errors**, fix with `mvn spotless:apply`. Here is the report:'"<br><pre>$FORMATTING</pre>"
     RETURN=1
   fi
 fi
@@ -28,7 +28,7 @@ fi
 # Strip out the download messages.
 RAW=`mvn -B pmd:pmd pmd:check`
 if [ $? -ne 0 ]; then
-  ANALYSIS=`cat "$RAW" | egrep -v Download`
+  ANALYSIS=`echo "$RAW" | egrep -v Download`
   if [ -z "$TRAVIS" ]; then
     # Running locally, output the errors.
     echo -e "\e[1;31m Static analysis errors - \e[0m"
