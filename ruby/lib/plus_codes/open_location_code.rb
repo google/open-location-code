@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../plus_codes'
 require_relative '../plus_codes/code_area'
 

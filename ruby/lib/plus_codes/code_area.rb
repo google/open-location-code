@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PlusCodes
   # [CodeArea] contains coordinates of a decoded Open Location Code(Plus+Codes).
   # The coordinates include the latitude and longitude of the lower left and
