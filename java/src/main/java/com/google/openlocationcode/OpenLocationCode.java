@@ -305,7 +305,7 @@ public final class OpenLocationCode {
     String clean =
         code.replace(String.valueOf(SEPARATOR), "").replace(String.valueOf(PADDING_CHARACTER), "");
 
-    // Initialise the values. We work them out as integers and convert them to floats at the end.
+    // Initialise the values. We work them out as integers and convert them to doubles at the end.
     long latVal = -LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
     long lngVal = -LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
     // Define the place value for the digits. We'll divide this down as we work through the code.
