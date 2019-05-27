@@ -45,7 +45,7 @@ matrix:
         - go test -bench=. ./go -v
         - go test ./tile_server/gridserver -v
 
-    # Java implementation. Lives in java/, tested with bazel.
+    # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
       jdk: oraclejdk8
       env: OLC_PATH=java
@@ -53,7 +53,7 @@ matrix:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
 
     # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
