@@ -263,7 +263,11 @@ public final class OpenLocationCode {
     this(latitude, longitude, CODE_PRECISION_NORMAL);
   }
 
-  /** Returns the string representation of the code. */
+  /**
+   * Returns the string representation of the code.
+   *
+   * @return The code.
+   */
   public String getCode() {
     return code;
   }
@@ -274,6 +278,7 @@ public final class OpenLocationCode {
    *
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
+   * @return The code.
    */
   public static String encode(double latitude, double longitude) {
     return new OpenLocationCode(latitude, longitude).getCode();
@@ -285,6 +290,8 @@ public final class OpenLocationCode {
    *
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
+   * @param codeLength The number of digits in the returned code.
+   * @return The code.
    */
   public static String encode(double latitude, double longitude, int codeLength) {
     return new OpenLocationCode(latitude, longitude, codeLength).getCode();
@@ -293,6 +300,8 @@ public final class OpenLocationCode {
   /**
    * Decodes {@link OpenLocationCode} object into {@link CodeArea} object encapsulating
    * latitude/longitude bounding box.
+   *
+   * @return A CodeArea object.
    */
   public CodeArea decode() {
     if (!isFullCode(code)) {
@@ -341,28 +350,47 @@ public final class OpenLocationCode {
    * latitude/longitude bounding box.
    *
    * @param code Open Location Code to be decoded.
+   * @return A CodeArea object.
    * @throws IllegalArgumentException if the provided code is not a valid Open Location Code.
    */
   public static CodeArea decode(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).decode();
   }
 
-  /** Returns whether this {@link OpenLocationCode} is a full Open Location Code. */
+  /**
+   * Returns whether this {@link OpenLocationCode} is a full Open Location Code.
+   *
+   * @return True if it is a full code.
+   */
   public boolean isFull() {
     return code.indexOf(SEPARATOR) == SEPARATOR_POSITION;
   }
 
-  /** Returns whether the provided Open Location Code is a full Open Location Code. */
+  /**
+   * Returns whether the provided Open Location Code is a full Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is a full code.
+   */
   public static boolean isFull(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isFull();
   }
 
-  /** Returns whether this {@link OpenLocationCode} is a short Open Location Code. */
+  /**
+   * Returns whether this {@link OpenLocationCode} is a short Open Location Code.
+   *
+   * @return True if it is short.
+   */
   public boolean isShort() {
     return code.indexOf(SEPARATOR) >= 0 && code.indexOf(SEPARATOR) < SEPARATOR_POSITION;
   }
 
-  /** Returns whether the provided Open Location Code is a short Open Location Code. */
+  /**
+   * Returns whether the provided Open Location Code is a short Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is short.
+   */
   public static boolean isShort(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isShort();
   }
@@ -370,6 +398,8 @@ public final class OpenLocationCode {
   /**
    * Returns whether this {@link OpenLocationCode} is a padded Open Location Code, meaning that it
    * contains less than 8 valid digits.
+   *
+   * @return True if this code is padded.
    */
   private boolean isPadded() {
     return code.indexOf(PADDING_CHARACTER) >= 0;
@@ -378,6 +408,9 @@ public final class OpenLocationCode {
   /**
    * Returns whether the provided Open Location Code is a padded Open Location Code, meaning that it
    * contains less than 8 valid digits.
+   *
+   * @param code The code to check.
+   * @return True if it is padded.
    */
   public static boolean isPadded(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isPadded();
@@ -387,6 +420,10 @@ public final class OpenLocationCode {
    * Returns short {@link OpenLocationCode} from the full Open Location Code created by removing
    * four or six digits, depending on the provided reference point. It removes as many digits as
    * possible.
+   *
+   * @param referenceLatitude Degrees.
+   * @param referenceLongitude Degrees.
+   * @return A short code if possible.
    */
   public OpenLocationCode shorten(double referenceLatitude, double referenceLongitude) {
     if (!isFull()) {
@@ -419,6 +456,10 @@ public final class OpenLocationCode {
   /**
    * Returns an {@link OpenLocationCode} object representing a full Open Location Code from this
    * (short) Open Location Code, given the reference location.
+   *
+   * @param referenceLatitude Degrees.
+   * @param referenceLongitude Degrees.
+   * @return The nearest matching full code.
    */
   public OpenLocationCode recover(double referenceLatitude, double referenceLongitude) {
     if (isFull()) {
@@ -470,6 +511,10 @@ public final class OpenLocationCode {
 
   /**
    * Returns whether the bounding box specified by the Open Location Code contains provided point.
+   *
+   * @param latitude Degrees.
+   * @param longitude Degrees.
+   * @return True if the coordinates are contained by the code.
    */
   public boolean contains(double latitude, double longitude) {
     CodeArea codeArea = decode();
@@ -503,7 +548,12 @@ public final class OpenLocationCode {
 
   // Exposed static helper methods.
 
-  /** Returns whether the provided string is a valid Open Location code. */
+  /**
+   * Returns whether the provided string is a valid Open Location code.
+   *
+   * @param code The code to check.
+   * @return True if it is a valid full or short code.
+   */
   public static boolean isValidCode(String code) {
     if (code == null || code.length() < 2) {
       return false;
@@ -580,7 +630,12 @@ public final class OpenLocationCode {
     return true;
   }
 
-  /** Returns if the code is a valid full Open Location Code. */
+  /**
+   * Returns if the code is a valid full Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is a valid full code.
+   */
   public static boolean isFullCode(String code) {
     try {
       return new OpenLocationCode(code).isFull();
@@ -589,7 +644,12 @@ public final class OpenLocationCode {
     }
   }
 
-  /** Returns if the code is a valid short Open Location Code. */
+  /**
+   * Returns if the code is a valid short Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is a valid short code.
+   */
   public static boolean isShortCode(String code) {
     try {
       return new OpenLocationCode(code).isShort();
