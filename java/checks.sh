@@ -7,8 +7,9 @@ RETURN=0
 # Check the formatting using the Maven spotless plugin (calling google-java-format).
 # Maven outputs all the downloads, so just pull out the ERROR lines, and the
 # ones with PMD since it logs it's errors at INFO level.
-SPOTLESS=`mvn -B spotless:check | egrep "ERROR|PMD"`
+RAW=`mvn -B spotless:check`
 if [ $? -ne 0 ]; then
+  FORMATTING=`cat "$RAW" | egrep "ERROR|PMD"`
   if [ -z "$TRAVIS" ]; then
     # Running locally, we can just format the file. Use colour codes.
     echo -e "\e[1;34m Reformatting files"
@@ -25,8 +26,9 @@ fi
 
 # Do the static code analysis using the PMD plugin.
 # Strip out the download messages.
-ANALYSIS=`mvn -B pmd:check | egrep -v Download`
+RAW=`mvn -B pmd:pmd pmd:check`
 if [ $? -ne 0 ]; then
+  ANALYSIS=`cat "$RAW" | egrep -v Download`
   if [ -z "$TRAVIS" ]; then
     # Running locally, output the errors.
     echo -e "\e[1;31m Static analysis errors - \e[0m"
