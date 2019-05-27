@@ -54,6 +54,7 @@ matrix:
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - bash checks.sh
 
     # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
