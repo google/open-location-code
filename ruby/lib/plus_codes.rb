@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 # Plus+Codes is a Ruby implementation of Google Open Location Code (Plus Codes).
 #
 # @author We-Ming Wu
 module PlusCodes
   # The character set used to encode coordinates.
-  CODE_ALPHABET = '23456789CFGHJMPQRVWX'.freeze
+  CODE_ALPHABET = '23456789CFGHJMPQRVWX'
 
   # The character used to pad a code
-  PADDING = '0'.freeze
+  PADDING = '0'
 
   # A separator used to separate the code into two parts.
-  SEPARATOR = '+'.freeze
+  SEPARATOR = '+'
 
   # The max number of characters can be placed before the separator.
   SEPARATOR_POSITION = 8
