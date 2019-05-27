@@ -5,12 +5,14 @@
 RETURN=0
 
 # Check the formatting using the Maven spotless plugin (calling google-java-format).
-FORMATTING=`mvn -B --no-transfer-progress -q spotless:check`
+# Maven outputs all the downloads, so just pull out the ERROR lines, and the
+# ones with PMD since it logs it's errors at INFO level.
+SPOTLESS=`mvn -B spotless:check | egrep "ERROR|PMD"`
 if [ $? -ne 0 ]; then
   if [ -z "$TRAVIS" ]; then
     # Running locally, we can just format the file. Use colour codes.
     echo -e "\e[1;34m Reformatting files"
-    #mvn spotless:apply
+    mvn spotless:apply
     echo -e "\e[0m"
   else
     # On TravisCI, send a comment with the diff to the pull request.
@@ -22,7 +24,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # Do the static code analysis using the PMD plugin.
-ANALYSIS=`mvn -B --no-transfer-progress -q pmd:check`
+# Strip out the download messages.
+ANALYSIS=`mvn -B pmd:check | egrep -v Download`
 if [ $? -ne 0 ]; then
   if [ -z "$TRAVIS" ]; then
     # Running locally, output the errors.
