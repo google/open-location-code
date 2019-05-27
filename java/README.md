@@ -13,6 +13,12 @@ to fail and comments to be added to your PR.
 You can ensure your files are formatted correctly either by installing
 google-java-format into your editor, or by running the `checks.sh` script.
 
+## Static Analysis
+
+Code is checked using [PMD](https://pmd.github.io). It is checked during the
+tests (by running the `checks.sh` script) as well as integrated into the Maven
+configuration.
+
 ## Building and Testing
 
 Note: the tests read their data from the [`test_data`](https://github.com/google/open-location-code/tree/master/test_data) directory.

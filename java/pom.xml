@@ -29,6 +29,25 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.9.0</version>
+        <configuration>
+            <failOnViolation>true</failOnViolation>
+            <printFailingErrors>true</printFailingErrors>
+            <violationSeverity>warning</violationSeverity>
+        </configuration>
+        <executions>
+          <execution>
+            <id>pmd</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.7.0</version>
         <configuration>
@@ -88,9 +107,9 @@
         </configuration>
       </plugin>
       <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>1.23.0</version>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>1.23.0</version>
         <dependencies>
           <dependency>
             <groupId>com.google.googlejavaformat</groupId>
@@ -114,6 +133,15 @@
       </plugin>
     </plugins>
   </build>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <distributionManagement>
     <snapshotRepository>
