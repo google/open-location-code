@@ -45,7 +45,7 @@ matrix:
         - go test -bench=. ./go -v
         - go test ./tile_server/gridserver -v
 
-    # Java implementation. Lives in java/, tested with bazel.
+    # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
       jdk: oraclejdk8
       env: OLC_PATH=java
