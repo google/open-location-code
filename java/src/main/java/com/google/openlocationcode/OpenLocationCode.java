@@ -14,7 +14,7 @@
 
 package com.google.openlocationcode;
 
-                      import java.util.Objects;
+import java.util.Objects;
 
 /**
  * Convert locations to and from convenient short codes.
@@ -188,7 +188,7 @@ public final class OpenLocationCode {
     // Limit the maximum number of digits in the code.
     codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
     // Check that the code length requested is valid.
-    if (codeLength < 4 || (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)) {
+    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < 4) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
     // Ensure that latitude and longitude are valid.
@@ -539,17 +539,16 @@ public final class OpenLocationCode {
     // Check the characters before the separator.
     boolean paddingStarted = false;
     for (int i = 0; i < separatorPosition; i++) {
+      if (CODE_ALPHABET.indexOf(code.charAt(i)) == -1 && code.charAt(i) != PADDING_CHARACTER) {
+        // Invalid character.
+        return false;
+      }
       if (paddingStarted) {
         // Once padding starts, there must not be anything but padding.
         if (code.charAt(i) != PADDING_CHARACTER) {
           return false;
         }
-        continue;
-      }
-      if (CODE_ALPHABET.indexOf(code.charAt(i)) != -1) {
-        continue;
-      }
-      if (PADDING_CHARACTER == code.charAt(i)) {
+      } else if (code.charAt(i) == PADDING_CHARACTER) {
         paddingStarted = true;
         // Short codes cannot have padding
         if (separatorPosition < SEPARATOR_POSITION) {
@@ -559,9 +558,7 @@ public final class OpenLocationCode {
         if (i != 2 && i != 4 && i != 6) {
           return false;
         }
-        continue;
       }
-      return false; // Illegal character.
     }
 
     // Check the characters after the separator.
