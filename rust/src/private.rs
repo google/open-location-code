@@ -1,6 +1,5 @@
 use consts::{
-    CODE_ALPHABET, ENCODING_BASE, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX,
-    PAIR_CODE_LENGTH,
+    CODE_ALPHABET, ENCODING_BASE, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH,
 };
 
 use interface::encode;
@@ -33,7 +32,8 @@ pub fn compute_latitude_precision(code_length: usize) -> f64 {
     if code_length <= PAIR_CODE_LENGTH {
         return (ENCODING_BASE as f64).powf((code_length as f64 / -2f64 + 2f64).floor());
     }
-    (ENCODING_BASE as f64).powf(-3f64) / GRID_ROWS.pow((code_length - PAIR_CODE_LENGTH) as u32) as f64
+    (ENCODING_BASE as f64).powf(-3f64)
+        / GRID_ROWS.pow((code_length - PAIR_CODE_LENGTH) as u32) as f64
 }
 
 pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
