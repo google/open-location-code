@@ -10,10 +10,8 @@ pub const PADDING_CHAR_STR: &'static str = "0";
 
 // The character set used to encode the values.
 pub const CODE_ALPHABET: [char; 20] = [
-'2', '3', '4', '5', '6',
-'7', '8', '9', 'C', 'F',
-'G', 'H', 'J', 'M', 'P',
-'Q', 'R', 'V', 'W', 'X',
+    '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'F', 'G', 'H', 'J', 'M', 'P', 'Q', 'R', 'V', 'W',
+    'X',
 ];
 
 // The base to use to convert numbers to/from.
@@ -36,9 +34,7 @@ pub const MAX_CODE_LENGTH: usize = 15;
 // The resolution values in degrees for each position in the lat/lng pair
 // encoding. These give the place value of each position, and therefore the
 // dimensions of the resulting area.
-pub const PAIR_RESOLUTIONS: [f64; 5] = [
-    20.0f64, 1.0f64, 0.05f64, 0.0025f64, 0.000125f64
-];
+pub const PAIR_RESOLUTIONS: [f64; 5] = [20.0f64, 1.0f64, 0.05f64, 0.0025f64, 0.000125f64];
 
 // Number of columns in the grid refinement method.
 pub const GRID_COLUMNS: f64 = 4f64;

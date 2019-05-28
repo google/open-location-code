@@ -10,3 +10,4 @@ exclude = ["rust.iml"]
 
 [dependencies]
 geo = "^0.4.3"
+rand = "^0.6.5"

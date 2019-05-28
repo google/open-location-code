@@ -1,4 +1,4 @@
-use geo::{Point};
+use geo::Point;
 
 pub struct CodeArea {
     pub south: f64,
@@ -12,9 +12,12 @@ pub struct CodeArea {
 impl CodeArea {
     pub fn new(south: f64, west: f64, north: f64, east: f64, code_length: usize) -> CodeArea {
         CodeArea {
-            south: south, west: west, north: north, east: east,
+            south: south,
+            west: west,
+            north: north,
+            east: east,
             center: Point::new((west + east) / 2f64, (south + north) / 2f64),
-            code_length: code_length
+            code_length: code_length,
         }
     }
 
@@ -24,8 +27,7 @@ impl CodeArea {
             self.west + other.west,
             self.north + other.north,
             self.east + other.east,
-            self.code_length + other.code_length
+            self.code_length + other.code_length,
         )
     }
 }
-
