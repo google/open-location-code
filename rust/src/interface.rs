@@ -118,17 +118,18 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     // Convert to integers.
     let mut lat_val = (((lat + LATITUDE_MAX) * 2.5e7f64 * 1e6).round() / 1e6f64) as i64;
     let mut lng_val = (((lng + LONGITUDE_MAX) * 8.192e6f64 * 1e6).round() / 1e6f64) as i64;
+    //let mut lat_val = ((lat + LATITUDE_MAX) * 8.192e6f64) as i64;
     //let mut lng_val = ((lng + LONGITUDE_MAX) * 8.192e6f64) as i64;
     
     let mut rev_code = String::with_capacity(trimmed_code_length + 1);
     
     if code_length > PAIR_CODE_LENGTH {
       for _i in 0..GRID_CODE_LENGTH {
-        let lat_digit = lat_val % GRID_ROWS;
+        let lat_digit = lat_val % GRID_ROWS as i64;
         let lng_digit = lng_val % GRID_COLUMNS as i64;
         let ndx = (lat_digit * GRID_COLUMNS as i64 + lng_digit) as usize;
         rev_code.push(CODE_ALPHABET[ndx]);
-        lat_val /= GRID_ROWS;
+        lat_val /= GRID_ROWS as i64;
         lng_val /= GRID_COLUMNS as i64;
       }
     } else {
@@ -183,24 +184,23 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
 
     let mut lat = -LATITUDE_MAX;
     let mut lng = -LONGITUDE_MAX;
-    let mut lat_res: i64 = ENCODING_BASE * ENCODING_BASE;
-    let mut lng_res: i64 = ENCODING_BASE * ENCODING_BASE;
+    let mut lat_res: f64 = (ENCODING_BASE * ENCODING_BASE) as f64;
+    let mut lng_res: f64 = lat_res;
 
     for (idx, chr) in code.chars().enumerate() {
         if idx < PAIR_CODE_LENGTH {
             if idx % 2 == 0 {
-                lat_res /= ENCODING_BASE;
+                lat_res /= ENCODING_BASE as f64;
                 lat += lat_res * code_value(chr) as f64;
             } else {
-                lng_res /= ENCODING_BASE;
+                lng_res /= ENCODING_BASE as f64;
                 lng += lng_res * code_value(chr) as f64;
             }
         } else if idx < MAX_CODE_LENGTH {
-            lat_res /= GRID_ROWS;
-            lng_res /= GRID_COLUMNS;
-            lat += lat_res * (code_value(chr) as f64 / GRID_COLUMNS).trunc();
-
-            lng += lng_res * (code_value(chr) as f64 % GRID_COLUMNS);
+            lat_res /= GRID_ROWS as f64;
+            lng_res /= GRID_COLUMNS as f64;
+            lat += lat_res * (code_value(chr) as f64 / GRID_COLUMNS as f64).trunc();
+            lng += lng_res * (code_value(chr) % GRID_COLUMNS) as f64;
         }
     }
     Ok(CodeArea::new(
