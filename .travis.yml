@@ -119,8 +119,11 @@ matrix:
     # Rust implementation. Lives in rust/
     - language: rust
       env: OLC_PATH=rust
+      before_script:
+        - rustup component add rustfmt
       # Adding caching of .cargo doesn't improve the build/test times.
       script:
         - cd rust/
-        - cargo build --verbose --all
-        - cargo test --verbose --all
+        - cargo fmt --all -- --check
+        - cargo build
+        - cargo test -- --nocapture

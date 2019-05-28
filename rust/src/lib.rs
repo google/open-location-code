@@ -7,5 +7,4 @@ mod codearea;
 pub use codearea::CodeArea;
 
 mod interface;
-pub use interface::{is_valid, is_short, is_full, encode, decode, shorten, recover_nearest};
-
+pub use interface::{decode, encode, is_full, is_short, is_valid, recover_nearest, shorten};

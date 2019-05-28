@@ -3,14 +3,14 @@ use geo::Point;
 use codearea::CodeArea;
 
 use consts::{
-    SEPARATOR, SEPARATOR_POSITION, PADDING_CHAR, PADDING_CHAR_STR, CODE_ALPHABET, ENCODING_BASE,
-    LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH, MAX_CODE_LENGTH, PAIR_RESOLUTIONS, GRID_COLUMNS, GRID_ROWS,
-    MIN_TRIMMABLE_CODE_LEN,
+    CODE_ALPHABET, ENCODING_BASE, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX,
+    MAX_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH,
+    PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION,
 };
 
 use private::{
-    code_value, normalize_longitude, clip_latitude, compute_latitude_precision, prefix_by_reference,
-    narrow_region,
+    clip_latitude, code_value, compute_latitude_precision, narrow_region, normalize_longitude,
+    prefix_by_reference,
 };
 
 /// Determines if a code is a valid Open Location Code.
@@ -62,7 +62,7 @@ pub fn is_valid(_code: &str) -> bool {
             return false;
         }
         // Extract the padding from the code (mutates code)
-        let padding: String = code.drain(ppos..eppos+1).collect();
+        let padding: String = code.drain(ppos..eppos + 1).collect();
         if padding.chars().any(|c| c != PADDING_CHAR) {
             // Padding must be one, contiguous block of padding chars
             return false;
@@ -80,8 +80,7 @@ pub fn is_valid(_code: &str) -> bool {
 /// A short Open Location Code is a sequence created by removing four or more
 /// digits from an Open Location Code. It must include a separator character.
 pub fn is_short(_code: &str) -> bool {
-    is_valid(_code) &&
-        _code.find(SEPARATOR).unwrap() < SEPARATOR_POSITION
+    is_valid(_code) && _code.find(SEPARATOR).unwrap() < SEPARATOR_POSITION
 }
 
 /// Determines if a code is a valid full Open Location Code.
@@ -143,9 +142,7 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
         }
     }
     if digit < SEPARATOR_POSITION {
-        code.push_str(
-            PADDING_CHAR_STR.repeat(SEPARATOR_POSITION - digit).as_str()
-        );
+        code.push_str(PADDING_CHAR_STR.repeat(SEPARATOR_POSITION - digit).as_str());
         code.push(SEPARATOR);
     }
     code
@@ -159,7 +156,8 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
     if !is_full(_code) {
         return Err(format!("Code must be a valid full code: {}", _code));
     }
-    let mut code = _code.to_string()
+    let mut code = _code
+        .to_string()
         .replace(SEPARATOR, "")
         .replace(PADDING_CHAR_STR, "")
         .to_uppercase();
@@ -189,7 +187,13 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
             lng += lng_res * (code_value(chr) as f64 % GRID_COLUMNS);
         }
     }
-    Ok(CodeArea::new(lat, lng, lat + lat_res, lng + lng_res, code.len()))
+    Ok(CodeArea::new(
+        lat,
+        lng,
+        lat + lat_res,
+        lng + lng_res,
+        code.len(),
+    ))
 }
 
 /// Remove characters from the start of an OLC code.
@@ -218,13 +222,16 @@ pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
 
     let codearea: CodeArea = decode(_code).unwrap();
     if codearea.code_length < MIN_TRIMMABLE_CODE_LEN {
-        return Err(format!("Code length must be at least {}", MIN_TRIMMABLE_CODE_LEN));
+        return Err(format!(
+            "Code length must be at least {}",
+            MIN_TRIMMABLE_CODE_LEN
+        ));
     }
 
     // How close are the latitude and longitude to the code center.
-    let range = (codearea.center.lat() - clip_latitude(ref_pt.lat())).abs().max(
-        (codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs()
-    );
+    let range = (codearea.center.lat() - clip_latitude(ref_pt.lat()))
+        .abs()
+        .max((codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs());
 
     for i in 0..PAIR_RESOLUTIONS.len() - 2 {
         // Check if we're close enough to shorten. The range must be less than 1/2
@@ -299,6 +306,8 @@ pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String
     } else if ref_lng - half_res > longitude {
         longitude += resolution;
     }
-    Ok(encode(Point::new(longitude, latitude), code_area.code_length))
+    Ok(encode(
+        Point::new(longitude, latitude),
+        code_area.code_length,
+    ))
 }
-
