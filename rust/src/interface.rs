@@ -116,8 +116,10 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     }
 
     // Convert to integers.
-    let mut lat_val = (((lat + LATITUDE_MAX) * 2.5e7f64 * 1e6).round() / 1e6f64) as i64;
-    let mut lng_val = (((lng + LONGITUDE_MAX) * 8.192e6f64 * 1e6).round() / 1e6f64) as i64;
+    let mut lat_val =
+        (((lat + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
+    let mut lng_val =
+        (((lng + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
 
     // Compute the code digits. This largely ignores the requested length - it
     // generates either a 10 digit code, or a 15 digit code, and then truncates
@@ -137,15 +139,16 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
             lng_val /= GRID_COLUMNS as i64;
         }
     } else {
-        lat_val /= 3125;
-        lng_val /= 1024;
+        // Adjust latitude and longitude values to skip the grid digits.
+        lat_val /= GRID_ROWS.pow(GRID_CODE_LENGTH as u32) as i64;
+        lng_val /= GRID_COLUMNS.pow(GRID_CODE_LENGTH as u32) as i64;
     }
     // Compute the pair section of the code.
     for i in 0..PAIR_CODE_LENGTH / 2 {
         rev_code.push(CODE_ALPHABET[(lng_val % ENCODING_BASE as i64) as usize]);
+        lng_val /= ENCODING_BASE as i64;
         rev_code.push(CODE_ALPHABET[(lat_val % ENCODING_BASE as i64) as usize]);
         lat_val /= ENCODING_BASE as i64;
-        lng_val /= ENCODING_BASE as i64;
         // If we are at the separator position, add the separator.
         if i == 0 {
             rev_code.push(SEPARATOR);
