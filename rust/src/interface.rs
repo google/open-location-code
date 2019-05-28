@@ -1,15 +1,16 @@
 use geo::Point;
+use std::cmp;
 
 use codearea::CodeArea;
 
 use consts::{
-    CODE_ALPHABET, ENCODING_BASE, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX,
+    CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX,
     MAX_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH,
     PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION,
 };
 
 use private::{
-    clip_latitude, code_value, compute_latitude_precision, narrow_region, normalize_longitude,
+    clip_latitude, code_value, compute_latitude_precision, normalize_longitude,
     prefix_by_reference,
 };
 
@@ -104,47 +105,62 @@ pub fn is_full(_code: &str) -> bool {
 /// 11 or 12 are probably the limit of useful codes.
 pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     let mut lat = clip_latitude(pt.lat());
-    let mut lng = normalize_longitude(pt.lng());
+    let lng = normalize_longitude(pt.lng());
 
-    let mut trimmed_code_length = code_length;
-    if trimmed_code_length > MAX_CODE_LENGTH {
-        trimmed_code_length = MAX_CODE_LENGTH;
-    }
-
+    let trimmed_code_length = cmp::min(code_length, MAX_CODE_LENGTH);
+    
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
     if lat > LATITUDE_MAX || (LATITUDE_MAX - lat) < 1e-10f64 {
         lat -= compute_latitude_precision(trimmed_code_length);
     }
-
-    lat += LATITUDE_MAX;
-    lng += LONGITUDE_MAX;
-
-    let mut code = String::with_capacity(trimmed_code_length + 1);
-    let mut digit = 0;
-    while digit < trimmed_code_length {
-        narrow_region(digit, &mut lat, &mut lng);
-
-        let lat_digit = lat as usize;
-        let lng_digit = lng as usize;
-        if digit < PAIR_CODE_LENGTH {
-            code.push(CODE_ALPHABET[lat_digit]);
-            code.push(CODE_ALPHABET[lng_digit]);
-            digit += 2;
-        } else {
-            code.push(CODE_ALPHABET[4 * lat_digit + lng_digit]);
-            digit += 1;
-        }
-        lat -= lat_digit as f64;
-        lng -= lng_digit as f64;
-        if digit == SEPARATOR_POSITION {
-            code.push(SEPARATOR);
-        }
+    
+    // Convert to integers.
+    let mut lat_val = (((lat + LATITUDE_MAX) * 2.5e7f64 * 1e6).round() / 1e6f64) as i64;
+    let mut lng_val = (((lng + LONGITUDE_MAX) * 8.192e6f64 * 1e6).round() / 1e6f64) as i64;
+    //let mut lng_val = ((lng + LONGITUDE_MAX) * 8.192e6f64) as i64;
+    
+    let mut rev_code = String::with_capacity(trimmed_code_length + 1);
+    
+    if code_length > PAIR_CODE_LENGTH {
+      for _i in 0..GRID_CODE_LENGTH {
+        let lat_digit = lat_val % GRID_ROWS;
+        let lng_digit = lng_val % GRID_COLUMNS as i64;
+        let ndx = (lat_digit * GRID_COLUMNS as i64 + lng_digit) as usize;
+        rev_code.push(CODE_ALPHABET[ndx]);
+        lat_val /= GRID_ROWS;
+        lng_val /= GRID_COLUMNS as i64;
+      }
+    } else {
+      lat_val /= 3125;
+      lng_val /= 1024;
     }
-    if digit < SEPARATOR_POSITION {
-        code.push_str(PADDING_CHAR_STR.repeat(SEPARATOR_POSITION - digit).as_str());
-        code.push(SEPARATOR);
+    let enc_base = ENCODING_BASE as i64;
+    // Compute the pair section of the code.
+    for i in 0..PAIR_CODE_LENGTH / 2 {
+      rev_code.push(CODE_ALPHABET[(lng_val % enc_base) as usize]);
+      rev_code.push(CODE_ALPHABET[(lat_val % enc_base) as usize]);
+      lat_val /= enc_base;
+      lng_val /= enc_base;
+      // If we are at the separator position, add the separator.
+      if i == 0 {
+        rev_code.push(SEPARATOR);
+      }
     }
+    // Reverse the characters in the code.
+    let mut code = rev_code.chars().rev().collect::<String>();
+
+    // If we need to pad the code, replace some of the digits.
+    if code_length < SEPARATOR_POSITION {
+      code = code.chars().take(code_length).collect();
+      code.push_str(
+          PADDING_CHAR_STR.repeat(SEPARATOR_POSITION - code_length).as_str()
+      );
+      code.push(SEPARATOR);
+    } else {
+      code = code.chars().take(code_length + 1).collect();
+    }
+    
     code
 }
 
@@ -167,8 +183,8 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
 
     let mut lat = -LATITUDE_MAX;
     let mut lng = -LONGITUDE_MAX;
-    let mut lat_res = ENCODING_BASE * ENCODING_BASE;
-    let mut lng_res = ENCODING_BASE * ENCODING_BASE;
+    let mut lat_res: i64 = ENCODING_BASE * ENCODING_BASE;
+    let mut lng_res: i64 = ENCODING_BASE * ENCODING_BASE;
 
     for (idx, chr) in code.chars().enumerate() {
         if idx < PAIR_CODE_LENGTH {
