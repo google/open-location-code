@@ -36,11 +36,11 @@ public class DecodingTest {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
       this.code = parts[0];
-      this.length = Integer.valueOf(parts[1]);
-      this.decodedLatitudeLo = Double.valueOf(parts[2]);
-      this.decodedLongitudeLo = Double.valueOf(parts[3]);
-      this.decodedLatitudeHi = Double.valueOf(parts[4]);
-      this.decodedLongitudeHi = Double.valueOf(parts[5]);
+      this.length = Integer.parseInt(parts[1]);
+      this.decodedLatitudeLo = Double.parseDouble(parts[2]);
+      this.decodedLongitudeLo = Double.parseDouble(parts[3]);
+      this.decodedLatitudeHi = Double.parseDouble(parts[4]);
+      this.decodedLongitudeHi = Double.parseDouble(parts[5]);
     }
   }
 
@@ -66,6 +66,11 @@ public class DecodingTest {
 
       Assert.assertEquals(
           "Wrong length for code " + testData.code, testData.length, decoded.getLength());
+      Assert.assertEquals(
+          "Wrong low latitude for code " + testData.code,
+          testData.decodedLatitudeLo,
+          decoded.getSouthLatitude(),
+          PRECISION);
       Assert.assertEquals(
           "Wrong high latitude for code " + testData.code,
           testData.decodedLatitudeHi,

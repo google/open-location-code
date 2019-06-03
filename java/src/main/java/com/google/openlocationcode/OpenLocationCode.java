@@ -226,8 +226,8 @@ public final class OpenLocationCode {
         lngVal /= GRID_COLUMNS;
       }
     } else {
-      latVal /= Math.pow(GRID_ROWS, GRID_CODE_LENGTH);
-      lngVal /= Math.pow(GRID_COLUMNS, GRID_CODE_LENGTH);
+      latVal = (long) (latVal / Math.pow(GRID_ROWS, GRID_CODE_LENGTH));
+      lngVal = (long) (lngVal / Math.pow(GRID_COLUMNS, GRID_CODE_LENGTH));
     }
     // Compute the pair section of the code.
     for (int i = 0; i < PAIR_CODE_LENGTH / 2; i++) {
@@ -681,7 +681,7 @@ public final class OpenLocationCode {
    */
   private static double computeLatitudePrecision(int codeLength) {
     if (codeLength <= CODE_PRECISION_NORMAL) {
-      return Math.pow(ENCODING_BASE, Math.floor(codeLength / -2 + 2));
+      return Math.pow(ENCODING_BASE, (double) (codeLength / -2 + 2));
     }
     return Math.pow(ENCODING_BASE, -3) / Math.pow(GRID_ROWS, codeLength - PAIR_CODE_LENGTH);
   }
