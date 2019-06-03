@@ -1,16 +1,17 @@
 use geo::Point;
+use std::cmp;
 
 use codearea::CodeArea;
 
 use consts::{
-    CODE_ALPHABET, ENCODING_BASE, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX,
-    MAX_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH,
-    PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION,
+    CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX,
+    LAT_INTEGER_MULTIPLIER, LNG_INTEGER_MULTIPLIER, LONGITUDE_MAX, MAX_CODE_LENGTH,
+    MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH, PAIR_RESOLUTIONS,
+    SEPARATOR, SEPARATOR_POSITION,
 };
 
 use private::{
-    clip_latitude, code_value, compute_latitude_precision, narrow_region, normalize_longitude,
-    prefix_by_reference,
+    clip_latitude, code_value, compute_latitude_precision, normalize_longitude, prefix_by_reference,
 };
 
 /// Determines if a code is a valid Open Location Code.
@@ -104,12 +105,9 @@ pub fn is_full(_code: &str) -> bool {
 /// 11 or 12 are probably the limit of useful codes.
 pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     let mut lat = clip_latitude(pt.lat());
-    let mut lng = normalize_longitude(pt.lng());
+    let lng = normalize_longitude(pt.lng());
 
-    let mut trimmed_code_length = code_length;
-    if trimmed_code_length > MAX_CODE_LENGTH {
-        trimmed_code_length = MAX_CODE_LENGTH;
-    }
+    let trimmed_code_length = cmp::min(code_length, MAX_CODE_LENGTH);
 
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
@@ -117,35 +115,60 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
         lat -= compute_latitude_precision(trimmed_code_length);
     }
 
-    lat += LATITUDE_MAX;
-    lng += LONGITUDE_MAX;
+    // Convert to integers.
+    let mut lat_val =
+        (((lat + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
+    let mut lng_val =
+        (((lng + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
 
-    let mut code = String::with_capacity(trimmed_code_length + 1);
-    let mut digit = 0;
-    while digit < trimmed_code_length {
-        narrow_region(digit, &mut lat, &mut lng);
+    // Compute the code digits. This largely ignores the requested length - it
+    // generates either a 10 digit code, or a 15 digit code, and then truncates
+    // it to the requested length.
 
-        let lat_digit = lat as usize;
-        let lng_digit = lng as usize;
-        if digit < PAIR_CODE_LENGTH {
-            code.push(CODE_ALPHABET[lat_digit]);
-            code.push(CODE_ALPHABET[lng_digit]);
-            digit += 2;
-        } else {
-            code.push(CODE_ALPHABET[4 * lat_digit + lng_digit]);
-            digit += 1;
+    // Build up the code digits in reverse order.
+    let mut rev_code = String::with_capacity(trimmed_code_length + 1);
+
+    // First do the grid digits.
+    if code_length > PAIR_CODE_LENGTH {
+        for _i in 0..GRID_CODE_LENGTH {
+            let lat_digit = lat_val % GRID_ROWS as i64;
+            let lng_digit = lng_val % GRID_COLUMNS as i64;
+            let ndx = (lat_digit * GRID_COLUMNS as i64 + lng_digit) as usize;
+            rev_code.push(CODE_ALPHABET[ndx]);
+            lat_val /= GRID_ROWS as i64;
+            lng_val /= GRID_COLUMNS as i64;
         }
-        lat -= lat_digit as f64;
-        lng -= lng_digit as f64;
-        if digit == SEPARATOR_POSITION {
-            code.push(SEPARATOR);
+    } else {
+        // Adjust latitude and longitude values to skip the grid digits.
+        lat_val /= GRID_ROWS.pow(GRID_CODE_LENGTH as u32) as i64;
+        lng_val /= GRID_COLUMNS.pow(GRID_CODE_LENGTH as u32) as i64;
+    }
+    // Compute the pair section of the code.
+    for i in 0..PAIR_CODE_LENGTH / 2 {
+        rev_code.push(CODE_ALPHABET[(lng_val % ENCODING_BASE as i64) as usize]);
+        lng_val /= ENCODING_BASE as i64;
+        rev_code.push(CODE_ALPHABET[(lat_val % ENCODING_BASE as i64) as usize]);
+        lat_val /= ENCODING_BASE as i64;
+        // If we are at the separator position, add the separator.
+        if i == 0 {
+            rev_code.push(SEPARATOR);
         }
     }
-    if digit < SEPARATOR_POSITION {
-        code.push_str(PADDING_CHAR_STR.repeat(SEPARATOR_POSITION - digit).as_str());
+    let mut code: String;
+    // If we need to pad the code, replace some of the digits.
+    if code_length < SEPARATOR_POSITION {
+        code = rev_code.chars().rev().take(code_length).collect();
+        code.push_str(
+            PADDING_CHAR_STR
+                .repeat(SEPARATOR_POSITION - code_length)
+                .as_str(),
+        );
         code.push(SEPARATOR);
+    } else {
+        code = rev_code.chars().rev().take(code_length + 1).collect();
     }
-    code
+
+    return code;
 }
 
 /// Decodes an Open Location Code into the location coordinates.
@@ -165,35 +188,36 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
         code = code.chars().take(MAX_CODE_LENGTH).collect();
     }
 
-    let mut lat = -LATITUDE_MAX;
-    let mut lng = -LONGITUDE_MAX;
-    let mut lat_res = ENCODING_BASE * ENCODING_BASE;
-    let mut lng_res = ENCODING_BASE * ENCODING_BASE;
+    // Work out the values as integers and convert to floating point at the end.
+    let mut lat: i64 = -90 * LAT_INTEGER_MULTIPLIER;
+    let mut lng: i64 = -180 * LNG_INTEGER_MULTIPLIER;
+    let mut lat_place_val: i64 = LAT_INTEGER_MULTIPLIER * ENCODING_BASE.pow(2) as i64;
+    let mut lng_place_val: i64 = LNG_INTEGER_MULTIPLIER * ENCODING_BASE.pow(2) as i64;
 
     for (idx, chr) in code.chars().enumerate() {
         if idx < PAIR_CODE_LENGTH {
             if idx % 2 == 0 {
-                lat_res /= ENCODING_BASE;
-                lat += lat_res * code_value(chr) as f64;
+                lat_place_val /= ENCODING_BASE as i64;
+                lat += lat_place_val * code_value(chr) as i64;
             } else {
-                lng_res /= ENCODING_BASE;
-                lng += lng_res * code_value(chr) as f64;
+                lng_place_val /= ENCODING_BASE as i64;
+                lng += lng_place_val * code_value(chr) as i64;
             }
-        } else if idx < MAX_CODE_LENGTH {
-            lat_res /= GRID_ROWS;
-            lng_res /= GRID_COLUMNS;
-            lat += lat_res * (code_value(chr) as f64 / GRID_COLUMNS).trunc();
-
-            lng += lng_res * (code_value(chr) as f64 % GRID_COLUMNS);
+        } else {
+            lat_place_val /= GRID_ROWS as i64;
+            lng_place_val /= GRID_COLUMNS as i64;
+            lat += lat_place_val * (code_value(chr) / GRID_COLUMNS) as i64;
+            lng += lng_place_val * (code_value(chr) % GRID_COLUMNS) as i64;
         }
     }
-    Ok(CodeArea::new(
-        lat,
-        lng,
-        lat + lat_res,
-        lng + lng_res,
-        code.len(),
-    ))
+    // Convert to floating point values.
+    let lat_lo: f64 = lat as f64 / LAT_INTEGER_MULTIPLIER as f64;
+    let lng_lo: f64 = lng as f64 / LNG_INTEGER_MULTIPLIER as f64;
+    let lat_hi: f64 =
+        (lat + lat_place_val) as f64 / (ENCODING_BASE.pow(3) * GRID_ROWS.pow(5)) as f64;
+    let lng_hi: f64 =
+        (lng + lng_place_val) as f64 / (ENCODING_BASE.pow(3) * GRID_COLUMNS.pow(5)) as f64;
+    Ok(CodeArea::new(lat_lo, lng_lo, lat_hi, lng_hi, code.len()))
 }
 
 /// Remove characters from the start of an OLC code.
