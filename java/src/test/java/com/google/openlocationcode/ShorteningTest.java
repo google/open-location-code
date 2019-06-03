@@ -33,8 +33,8 @@ public class ShorteningTest {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
       this.code = parts[0];
-      this.referenceLatitude = Double.valueOf(parts[1]);
-      this.referenceLongitude = Double.valueOf(parts[2]);
+      this.referenceLatitude = Double.parseDouble(parts[1]);
+      this.referenceLongitude = Double.parseDouble(parts[2]);
       this.shortCode = parts[3];
       this.testType = parts[4];
     }

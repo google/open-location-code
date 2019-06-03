@@ -33,9 +33,9 @@ public class EncodingTest {
       if (parts.length != 4) {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
-      this.latitude = Double.valueOf(parts[0]);
-      this.longitude = Double.valueOf(parts[1]);
-      this.length = Integer.valueOf(parts[2]);
+      this.latitude = Double.parseDouble(parts[0]);
+      this.longitude = Double.parseDouble(parts[1]);
+      this.length = Integer.parseInt(parts[2]);
       this.code = parts[3];
     }
   }

@@ -36,9 +36,9 @@ public class ValidityTest {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
       this.code = parts[0];
-      this.isValid = Boolean.valueOf(parts[1]);
-      this.isShort = Boolean.valueOf(parts[2]);
-      this.isFull = Boolean.valueOf(parts[3]);
+      this.isValid = Boolean.parseBoolean(parts[1]);
+      this.isShort = Boolean.parseBoolean(parts[2]);
+      this.isFull = Boolean.parseBoolean(parts[3]);
     }
   }
 
