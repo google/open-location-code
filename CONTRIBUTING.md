@@ -2,7 +2,7 @@
 
 The Open Location Code project strongly encourages technical contributions.
 
-We hope you'll become an ongoing participant in our open source community but we also welcome one-off contributions for the issues you're particularly passionate about.
+We hope you'll become an ongoing participant in our open source community, but we also welcome one-off contributions for the issues you're particularly passionate about.
 
 - [Filing issues](#filing-issues)
   * [Bugs](#bugs)
@@ -38,7 +38,7 @@ If you are adding Open Location Codes to your project, please contact the [Open 
 
 The Open Location Code project accepts and greatly appreciates code contributions!
 
-If you are contributing code to the project consider [joining the Open Location Code project on GitHub](https://goo.gl/forms/T65peVtfQfEoDWeD3).
+If you are contributing code to the project, consider [joining the Open Location Code project on GitHub](https://goo.gl/forms/T65peVtfQfEoDWeD3).
 
 A few things to note:
 
@@ -59,7 +59,7 @@ Follow this process for contributing a new implementation:
 
 The Open Location Code project hosted at GitHub requires all contributors to sign a Contributor License Agreement ([individual](https://developers.google.com/open-source/cla/individual) or [corporation](https://developers.google.com/open-source/cla/corporate)) in order to protect contributors, users and Google in issues of intellectual property.
 
-When you create a Pull Request a check will be run to ensure that you have signed the CLA.  Make sure that you sign the CLA with the same email address you associate with your commits (likely via the `user.email` Git config as described on GitHub's [Set up Git](https://help.github.com/articles/set-up-git/) page).
+When you create a Pull Request, a check will be run to ensure that you have signed the CLA.  Make sure that you sign the CLA with the same email address you associate with your commits (likely via the `user.email` Git config as described on GitHub's [Set up Git](https://help.github.com/articles/set-up-git/) page).
 
 ## Ongoing participation
 
