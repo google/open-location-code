@@ -15,8 +15,8 @@ use private::{
 };
 
 /// Determines if a code is a valid Open Location Code.
-pub fn is_valid(_code: &str) -> bool {
-    let mut code: String = _code.to_string();
+pub fn is_valid(code: &str) -> bool {
+    let mut code: String = code.to_string();
     if code.len() < 3 {
         // A code must have at-least a separator character + 1 lat/lng pair
         return false;
@@ -80,8 +80,8 @@ pub fn is_valid(_code: &str) -> bool {
 ///
 /// A short Open Location Code is a sequence created by removing four or more
 /// digits from an Open Location Code. It must include a separator character.
-pub fn is_short(_code: &str) -> bool {
-    is_valid(_code) && _code.find(SEPARATOR).unwrap() < SEPARATOR_POSITION
+pub fn is_short(code: &str) -> bool {
+    is_valid(code) && code.find(SEPARATOR).unwrap() < SEPARATOR_POSITION
 }
 
 /// Determines if a code is a valid full Open Location Code.
@@ -91,8 +91,8 @@ pub fn is_short(_code: &str) -> bool {
 /// and also that the latitude and longitude values are legal. If the prefix
 /// character is present, it must be the first character. If the separator
 /// character is present, it must be after four characters.
-pub fn is_full(_code: &str) -> bool {
-    is_valid(_code) && !is_short(_code)
+pub fn is_full(code: &str) -> bool {
+    is_valid(code) && !is_short(code)
 }
 
 /// Encode a location into an Open Location Code.
@@ -175,11 +175,11 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
 ///
 /// Returns a CodeArea object that includes the coordinates of the bounding
 /// box - the lower left, center and upper right.
-pub fn decode(_code: &str) -> Result<CodeArea, String> {
-    if !is_full(_code) {
-        return Err(format!("Code must be a valid full code: {}", _code));
+pub fn decode(code: &str) -> Result<CodeArea, String> {
+    if !is_full(code) {
+        return Err(format!("Code must be a valid full code: {}", code));
     }
-    let mut code = _code
+    let mut code = code
         .to_string()
         .replace(SEPARATOR, "")
         .replace(PADDING_CHAR_STR, "")
@@ -236,15 +236,15 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
 ///
 /// It returns either the original code, if the reference location was not
 /// close enough, or the .
-pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
-    if !is_full(_code) {
-        return Ok(_code.to_string());
+pub fn shorten(code: &str, ref_pt: Point<f64>) -> Result<String, String> {
+    if !is_full(code) {
+        return Ok(code.to_string());
     }
-    if _code.find(PADDING_CHAR).is_some() {
+    if code.find(PADDING_CHAR).is_some() {
         return Err("Cannot shorten padded codes".to_owned());
     }
 
-    let codearea: CodeArea = decode(_code).unwrap();
+    let codearea: CodeArea = decode(code).unwrap();
     if codearea.code_length < MIN_TRIMMABLE_CODE_LEN {
         return Err(format!(
             "Code length must be at least {}",
@@ -263,12 +263,12 @@ pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
         // use 0.3 instead of 0.5 as a multiplier.
         let idx = PAIR_RESOLUTIONS.len() - 2 - i;
         if range < (PAIR_RESOLUTIONS[idx] * 0.3f64) {
-            let mut code = _code.to_string();
+            let mut code = code.to_string();
             code.drain(..((idx + 1) * 2));
             return Ok(code);
         }
     }
-    Ok(_code.to_string())
+    Ok(code.to_string())
 }
 
 /// Recover the nearest matching code to a specified location.
@@ -297,18 +297,17 @@ pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
 /// the nearest match, not necessarily the match within the same cell. If the
 /// passed code was not a valid short code, but was a valid full code, it is
 /// returned unchanged.
-pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
-    if !is_short(_code) {
-        if is_full(_code) {
-            return Ok(_code.to_string().to_uppercase());
+pub fn recover_nearest(code: &str, ref_pt: Point<f64>) -> Result<String, String> {
+    if !is_short(code) {
+        if is_full(code) {
+            return Ok(code.to_string().to_uppercase());
         } else {
-            return Err(format!("Passed short code is not valid: {}", _code));
+            return Err(format!("Passed short code is not valid: {}", code));
         }
     }
 
-    let prefix_len = SEPARATOR_POSITION - _code.find(SEPARATOR).unwrap();
-    let mut code = prefix_by_reference(ref_pt, prefix_len);
-    code.push_str(_code);
+    let prefix_len = SEPARATOR_POSITION - code.find(SEPARATOR).unwrap();
+    let mut code = prefix_by_reference(ref_pt, prefix_len) + code;
 
     let code_area = decode(code.as_str()).unwrap();
 
