@@ -39,7 +39,7 @@ class OpenLocationCode(code: String) {
      * @return The code.
      */
     val code: String = code.toUpperCase().also { normalized ->
-        require(isValidCode(normalized)) { "The provided code '$code' is not a valid Open Location Code." }
+        require(isValidCodeAlreadyUpper(normalized)) { "The provided code '$code' is not a valid Open Location Code." }
     }
 
     /**
@@ -481,11 +481,17 @@ class OpenLocationCode(code: String) {
          */
         @JvmStatic
         fun isValidCode(code: String?): Boolean {
-            if (code == null || code.length < 2) {
+            if (code == null) {
                 return false
             }
-            val normalizedCode = code.toUpperCase()
+            return isValidCodeAlreadyUpper(code.toUpperCase())
+        }
 
+        @JvmStatic
+        private fun isValidCodeAlreadyUpper(normalizedCode: String): Boolean {
+            if (normalizedCode.length < 2) {
+                return false
+            }
             // There must be exactly one separator.
             val separatorPosition = normalizedCode.indexOf(SEPARATOR)
             if (separatorPosition == -1) {
