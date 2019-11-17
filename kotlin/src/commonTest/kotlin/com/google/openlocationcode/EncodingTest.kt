@@ -3,6 +3,7 @@ package com.google.openlocationcode
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class EncodingTest {
 
@@ -37,7 +38,7 @@ class EncodingTest {
 
     @Test
     fun testEncodeFromLatLong() {
-        for (testData in testDataList) {
+        for (testData in testDataList.filter { it.code.isNotBlank() }) {
             assertEquals(
                 testData.code,
                 OpenLocationCode.encode(testData.latitude, testData.longitude, testData.length),
@@ -45,4 +46,17 @@ class EncodingTest {
             )
         }
     }
+
+    @Test
+    fun testEncodeThrowsIllegalArgumentException() {
+        try {
+            for (testData in testDataList.filter { it.code.isBlank() }) {
+                OpenLocationCode.encode(testData.latitude, testData.longitude, testData.length);
+            }
+            fail("Expected IllegalArgumentException")
+        } catch (ex: IllegalArgumentException) {
+            // pass!
+        }
+    }
+
 }

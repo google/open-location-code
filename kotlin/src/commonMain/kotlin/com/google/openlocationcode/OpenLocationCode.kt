@@ -329,7 +329,7 @@ class OpenLocationCode(code: String) {
             // Limit the maximum number of digits in the code.
             val fixedCodeLength = min(codeLength, MAX_DIGIT_COUNT)
             // Check that the code length requested is valid.
-            require(!(fixedCodeLength < PAIR_CODE_LENGTH && fixedCodeLength % 2 == 1 || fixedCodeLength < 4)) { "Illegal code length $fixedCodeLength" }
+            require(!(fixedCodeLength < PAIR_CODE_LENGTH && fixedCodeLength % 2 == 1 || fixedCodeLength < 2)) { "Illegal code length $fixedCodeLength" }
             // Ensure that latitude and longitude are valid.
 
             val clippedLatitude = clipLatitude(latitude).let { clippedLatitude ->
