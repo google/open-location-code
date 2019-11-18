@@ -2,6 +2,7 @@ package com.google.openlocationcode.java;
 
 import com.google.openlocationcode.OpenLocationCode;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -12,6 +13,7 @@ import java.util.Random;
 
 /** Benchmark the encode and decode methods. */
 @RunWith(JUnit4.class)
+@Ignore("No sense running this again after the common version")
 public class BenchmarkTest {
 
   public static final int LOOPS = 1000000;
