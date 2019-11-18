@@ -20,4 +20,14 @@ This library is *not* currently published to a public maven repository.  You can
 ./gradlew publishToMavenLocal
 ``` 
 
-The build could also be extended to build for JavaScript and native platforms by adding additional targets.
+The JVM version can be used from Java as well and uses an API that is almost identical to the Java version.  
+
+The build could also be extended to build other platforms by adding additional targets.
+
+The main point of this port was to allow other Kotlin platforms from the same codebase.  Possibilities include:
+
+* JavaScript
+* iOS or Mac Framework (Objective-C / Swift)
+* Android (via JVM version or as an Android library)
+* Linux / Windows native
+* Other native platforms
