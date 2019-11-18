@@ -9,8 +9,10 @@ gradle wrapper --gradle-version 5.6.4
 ## To build:
 
 ```shell script
-./gradlew clean build test
+./gradlew clean jvmTest nodejsTest
 ```
+
+This will build and run the Java and Node.js unit tests and benchmark.
 
 ## To use:
 
@@ -26,8 +28,10 @@ The build could also be extended to build other platforms by adding additional t
 
 The main point of this port was to allow other Kotlin platforms from the same codebase.  Possibilities include:
 
-* JavaScript
+* JavaScript in Browser or Node.js
 * iOS or Mac Framework (Objective-C / Swift)
 * Android (via JVM version or as an Android library)
 * Linux / Windows native
 * Other native platforms
+
+see: [Kotlin supported platforms](https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#supported-platforms)

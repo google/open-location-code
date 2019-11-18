@@ -24,6 +24,20 @@ kotlin {
       withJava()
     }
 
+    js('nodejs') {
+        nodejs()
+    }
+
+//    js {
+//        compilations.all.kotlinOptions {
+//            moduleKind = 'umd'
+//            metaInfo = true
+//            sourceMap = true
+//            main = 'noCall'
+//            sourceMapEmbedSources = 'always'
+//        }
+//    }
+
     sourceSets {
         commonMain {
             dependencies {
@@ -50,5 +64,28 @@ kotlin {
             }
         }
 
+        nodejsMain {
+            dependencies {
+                implementation kotlin('stdlib-js')
+            }
+        }
+
+        nodejsTest {
+            dependencies {
+                implementation kotlin('test-js')
+            }
+        }
+
+//        jsMain {
+//            dependencies {
+//                implementation kotlin('stdlib-js')
+//            }
+//        }
+//
+//        jsTest {
+//            dependencies {
+//                implementation kotlin('test-js')
+//            }
+//        }
     }
 }
