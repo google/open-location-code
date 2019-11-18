@@ -1,2 +1,2 @@
 rootProject.name = 'openlocationcode-kotlin'
-
+enableFeaturePreview("GRADLE_METADATA")

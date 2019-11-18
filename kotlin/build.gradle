@@ -1,10 +1,11 @@
 plugins {
     id 'org.jetbrains.kotlin.multiplatform' version '1.3.50'
+    id 'maven-publish'
 }
 
 /*
 
-TODO: publishing for common and JVM modules
+TODO: publishing for JVM modules, JS build, and what other platforms?
 
  */
 
