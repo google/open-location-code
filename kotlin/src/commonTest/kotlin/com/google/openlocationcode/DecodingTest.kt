@@ -1,7 +1,11 @@
 package com.google.openlocationcode
 
 
-import kotlin.test.*
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class DecodingTest {
     data class TestData(

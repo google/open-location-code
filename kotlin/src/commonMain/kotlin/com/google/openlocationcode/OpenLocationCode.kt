@@ -2,7 +2,11 @@ package com.google.openlocationcode
 
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.round
 
 /**
  * Convert locations to and from convenient short codes.
@@ -13,10 +17,12 @@ import kotlin.math.*
  *
  * This provides both object and static methods.
  *
- * Create an object with: OpenLocationCode code = new OpenLocationCode("7JVW52GR+2V");
- * OpenLocationCode code = new OpenLocationCode("52GR+2V"); OpenLocationCode code = new
- * OpenLocationCode(27.175063, 78.042188); OpenLocationCode code = new OpenLocationCode(27.175063,
- * 78.042188, 11);
+ * Create an object with:
+ * val code = OpenLocationCode("7JVW52GR+2V")
+ * val code = OpenLocationCode("52GR+2V")
+ * val code = OpenLocationCode.fromString("7JVW52GR+2V")
+ * val code = OpenLocationCode.fromLatLong(27.175063, 78.042188)
+ * val code = OpenLocationCode.fromLatLong(27.175063, 78.042188, 11)
  *
  * Once you have a code object, you can apply the other methods to it, such as to shorten:
  * code.shorten(27.176, 78.05)

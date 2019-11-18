@@ -1,6 +1,11 @@
 package com.google.openlocationcode
 
-class CharBuffer(private val maxLen: Int, private val paddingChar: Char = ' ') {
+/**
+ * A wrapper around an array to act in replacement for StringBuilder which does not allow overwrite specific characters
+ * nor does StringBuilder in Kotlin common allow conversion to a CharArray without using a (currently) experimental
+ * API, this can be removed when that is allowed.
+ */
+internal class CharBuffer(private val maxLen: Int, private val paddingChar: Char = ' ') {
     private var actualLength = 0
     private val buffer = CharArray(maxLen) { paddingChar }
 
