@@ -53,7 +53,11 @@ func Encode(lat, lng float64, codeLen int) string {
 	} else if codeLen > maxCodeLen {
 		codeLen = maxCodeLen
 	}
-	lat, lng = clipLatitude(lat), normalizeLng(lng)
+
+	// Clip lat and lng to prevent DoS attacks using very large values (100% CPU)
+	lat, lng = clipLatitude(lat), clipLongitude(lng)
+	lng = normalizeLng(lng)
+
 	// Latitude 90 needs to be adjusted to be just less, so the returned code
 	// can also be decoded.
 	if lat == latMax {

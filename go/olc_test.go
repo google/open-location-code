@@ -132,13 +132,27 @@ func TestCheck(t *testing.T) {
 }
 
 func TestEncode(t *testing.T) {
-	for i, elt := range encoding {
-		got := Encode(elt.lat, elt.lng, elt.length)
-		if got != elt.code {
-			t.Errorf("%d. got %q for (%v,%v,%d), wanted %q.", i, got, elt.lat, elt.lng, elt.length, elt.code)
-			t.FailNow()
+	t.Run("csv", func(t *testing.T) {
+		for i, elt := range encoding {
+			got := Encode(elt.lat, elt.lng, elt.length)
+			if got != elt.code {
+				t.Fatalf("%d. got %q for (%v,%v,%d), wanted %q.", i, got, elt.lat, elt.lng, elt.length, elt.code)
+			}
 		}
-	}
+	})
+
+	t.Run("clip", func(t *testing.T) {
+		length := 11
+		lat := 50000000000000.0
+		lng := 100000000000000.0
+		code := "C2X2X2X2+X2R"
+
+		got := Encode(lat, lng, length)
+
+		if got != code {
+			t.Fatalf("got %q for (%v,%v,%d), wanted %q.", got, lat, lng, length, code)
+		}
+	})
 }
 
 func TestDecode(t *testing.T) {
