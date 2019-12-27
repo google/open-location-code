@@ -109,6 +109,7 @@ matrix:
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.7
+      dist: bionic
       env: OLC_PATH=python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
@@ -120,6 +121,7 @@ matrix:
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.8
+      dist: bionic
       env: OLC_PATH=python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
