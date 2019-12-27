@@ -71,31 +71,7 @@ matrix:
 
     # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
-      jdk: oraclejdk9
-      # Oracle Java 9 requires dist: xenial
-      dist: xenial
-      env: OLC_PATH=java
-      script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
-        - chmod +x install.sh
-        - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
-
-    # Java implementation. Lives in java/, tested with bazel and maven.
-    - language: java
       jdk: openjdk9
-      env: OLC_PATH=java
-      script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
-        - chmod +x install.sh
-        - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
-
-    # Java implementation. Lives in java/, tested with bazel and maven.
-    - language: java
-      jdk: oraclejdk10
-      # Oracle Java 10 requires dist: xenial
-      dist: xenial
       env: OLC_PATH=java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
@@ -135,27 +111,7 @@ matrix:
 
     # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
-      jdk: oraclejdk12
-      env: OLC_PATH=java
-      script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
-        - chmod +x install.sh
-        - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
-
-    # Java implementation. Lives in java/, tested with bazel and maven.
-    - language: java
       jdk: openjdk12
-      env: OLC_PATH=java
-      script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
-        - chmod +x install.sh
-        - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
-
-    # Java implementation. Lives in java/, tested with bazel and maven.
-    - language: java
-      jdk: oraclejdk13
       env: OLC_PATH=java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
