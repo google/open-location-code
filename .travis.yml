@@ -48,8 +48,8 @@ matrix:
     # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
       jdk: oraclejdk8
-      # Java 8 requires dist: xenial
-      dist: xenial
+      # Java 8 requires dist: trusty
+      dist: trusty
       env: OLC_PATH=java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
@@ -60,8 +60,8 @@ matrix:
     # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
       jdk: openjdk8
-      # Java 8 requires dist: xenial
-      dist: xenial
+      # Java 8 requires dist: trusty
+      dist: trusty
       env: OLC_PATH=java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
