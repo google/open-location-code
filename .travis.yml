@@ -3,7 +3,7 @@
 
 # Use sudo: required slows boot time but gives us 7.5GB of ram to prevent Bazel running OOM.
 sudo: required
-dist: trusty
+dist: bionic
 
 matrix:
   include:
@@ -46,14 +46,94 @@ matrix:
         - go test ./tile_server/gridserver -v
 
     # Java implementation. Lives in java/, tested with bazel and maven.
+    # Only testing LTS releases of oraclejdk
+    # Ref: https://www.oracle.com/technetwork/java/java-se-support-roadmap.html
     - language: java
       jdk: oraclejdk8
+      # Java 8 requires dist: trusty
+      dist: trusty
       env: OLC_PATH=java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
         - ./install.sh --user && rm -f install.sh
         - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+
+    # Java implementation. Lives in java/, tested with bazel and maven.
+    - language: java
+      jdk: openjdk8
+      # Java 8 requires dist: trusty
+      dist: trusty
+      env: OLC_PATH=java
+      script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+
+    # Java implementation. Lives in java/, tested with bazel and maven.
+    - language: java
+      jdk: openjdk9
+      env: OLC_PATH=java
+      script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+
+    # Java implementation. Lives in java/, tested with bazel and maven.
+    - language: java
+      jdk: openjdk10
+      env: OLC_PATH=java
+      script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+
+    ## TODO: Fix java11+ issues with javadoc archive
+    ## Ref: https://travis-ci.org/google/open-location-code/jobs/630142096#L2404
+    # # Java implementation. Lives in java/, tested with bazel and maven.
+    # # Only testing LTS releases of oraclejdk
+    # # Ref: https://www.oracle.com/technetwork/java/java-se-support-roadmap.html
+    # - language: java
+    #   jdk: oraclejdk11
+    #   env: OLC_PATH=java
+    #   script:
+    #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+    #     - chmod +x install.sh
+    #     - ./install.sh --user && rm -f install.sh
+    #     - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+    #
+    # # Java implementation. Lives in java/, tested with bazel and maven.
+    # - language: java
+    #   jdk: openjdk11
+    #   env: OLC_PATH=java
+    #   script:
+    #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+    #     - chmod +x install.sh
+    #     - ./install.sh --user && rm -f install.sh
+    #     - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+    #
+    # # Java implementation. Lives in java/, tested with bazel and maven.
+    # - language: java
+    #   jdk: openjdk12
+    #   env: OLC_PATH=java
+    #   script:
+    #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+    #     - chmod +x install.sh
+    #     - ./install.sh --user && rm -f install.sh
+    #     - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+    #
+    # # Java implementation. Lives in java/, tested with bazel and maven.
+    # - language: java
+    #   jdk: openjdk13
+    #   env: OLC_PATH=java
+    #   script:
+    #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+    #     - chmod +x install.sh
+    #     - ./install.sh --user && rm -f install.sh
+    #     - ~/bin/bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
 
     # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
@@ -98,6 +178,28 @@ matrix:
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.6
+      env: OLC_PATH=python
+      script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - cd ${OLC_PATH} && bash format_check.sh
+
+    # Python implementation. Lives in python/, tested with bazel.
+    - language: python
+      python: 3.7
+      env: OLC_PATH=python
+      script:
+        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
+        - chmod +x install.sh
+        - ./install.sh --user && rm -f install.sh
+        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+        - cd ${OLC_PATH} && bash format_check.sh
+
+    # Python implementation. Lives in python/, tested with bazel.
+    - language: python
+      python: 3.8
       env: OLC_PATH=python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
