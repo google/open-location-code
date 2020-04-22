@@ -3,3 +3,5 @@
 *.jar
 # Ignore generated Maven files
 target/*
+*.iml
+.idea
