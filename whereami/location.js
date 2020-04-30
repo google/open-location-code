@@ -12,16 +12,6 @@ var locationOptions = {
   timeout: 27000
 };
 
-// Convert a latitude and longitude into a 10 digit plus code.
-function createPluscode(lat, lng) {
-  var a = (lat + 90) * 1e6, b = (lng + 180) * 1e6, c = '';
-  for (var i = 0; i < 10; i++) {
-    c = '23456789CFGHJMPQRVWX'.charAt(b / 125 % 20) + c;
-    b = [a, a = b / 20][0];
-  }
-  return c.substring(0, 8) + '+' + c.substring(8);
-}
-
 // Make a request to the Google Geocoding API to convert the lat/lng into
 // a plus code and locality.
 function geocode(lat, lng) {
@@ -57,9 +47,10 @@ function geocode(lat, lng) {
 
 // Turn a location into a plus code and display it.
 function receivePosition(position) {
-  var pc = createPluscode(position.coords.latitude, position.coords.longitude);
+  var pc = OpenLocationCode.encode(position.coords.latitude, position.coords.longitude, 11);
   document.getElementById('area_code').textContent = pc.substring(0, 4);
-  document.getElementById('local_code').textContent = pc.substring(4);
+  document.getElementById('local_code').textContent = pc.substring(4, 11);
+  document.getElementById('precise_code').textContent = pc.substring(11);
   // Hide the fetching message and display the location section.
   document.getElementById('fetching').classList.add('hide');
   document.getElementById('location').classList.remove('hide');
@@ -99,7 +90,7 @@ function getLocation() {
     return;
   }
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
+    navigator.geolocation.watchPosition(
         receivePosition, positionError, locationOptions);
   } else {
     document.getElementById('fetching').classList.add('hide');

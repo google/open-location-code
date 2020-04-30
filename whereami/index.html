@@ -16,9 +16,15 @@
         display: none;
       }
       #area_code {
-        padding-right: 0.15em;
+        opacity: 0.8;
+        font-size: 80%;
+      }
+      #precise_code {
+        opacity: 0.8;
+        font-size: 80%;
       }
     </style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.min.js"></script>
     <script type="text/javascript" src="location.js"></script>
   </head>
   <body>
@@ -36,14 +42,14 @@
     <div id="location" class="hide">
       Your location is:
       <div id="code_locality" class="hide">something</div>
-      <div id="code_only"><span id="area_code"></span><span id="local_code"></span></div>
+      <div id="code_only"><span id="area_code"></span><span id="local_code"></span><span id="precise_code"></div>
       <div id="accuracy_not_available">(Accuracy not available)</div>
       <div id="accuracy" class="hide">
         with accuracy +/- <span id="accuracy_meters">?</span> meters
       </div>
     </div>
     <script type="text/javascript">
-      getLocation();
+        getLocation();
     </script>
   </body>
 </html>
