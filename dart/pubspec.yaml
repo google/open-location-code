@@ -2,5 +2,7 @@ name: open_location_code
 description: Open Location Codes are short, generated codes that can be used like street addresses, for places where street addresses don't exist.
 version: 0.0.1
 homepage: http://openlocationcode.com/
+environment:
+  sdk: '<3.0.0'
 dev_dependencies:
   test: '>=0.12.0'
