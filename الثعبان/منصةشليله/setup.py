@@ -1,6 +1,6 @@
-from setuptools import setup
-
-# This call to setup() does all the work
+من  setuptools  استيراد  الإعداد
+منصةشليله [عدل]
+# هذه الدعوة للإعداد () تؤدي كل العم
 setup(
     name="openlocationcode",
     version="1.0.1",
