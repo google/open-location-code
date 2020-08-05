@@ -1,5 +1,9 @@
 # Override rubocop defaults.
 
+Layout/LineLength:
+  Enabled: true
+  Max: 80
+
 Metrics/AbcSize:
   Enabled: false
 
