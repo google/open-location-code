@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.files         = Dir['lib/**/*']
   s.test_files    = Dir['test/**/*']
   s.require_paths = ['lib']
+  s.required_ruby_version = '>= 2.4.0'
 
   s.add_development_dependency 'test-unit'
 end
