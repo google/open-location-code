@@ -12,12 +12,12 @@ pub struct CodeArea {
 impl CodeArea {
     pub fn new(south: f64, west: f64, north: f64, east: f64, code_length: usize) -> CodeArea {
         CodeArea {
-            south: south,
-            west: west,
-            north: north,
-            east: east,
+            south,
+            west,
+            north,
+            east,
             center: Point::new((west + east) / 2f64, (south + north) / 2f64),
-            code_length: code_length,
+            code_length,
         }
     }
 
