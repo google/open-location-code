@@ -168,7 +168,7 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
         code = rev_code.chars().rev().take(code_length + 1).collect();
     }
 
-    return code;
+    code
 }
 
 /// Decodes an Open Location Code into the location coordinates.
