@@ -2,6 +2,7 @@ import 'package:open_location_code/open_location_code.dart' as olc;
 import 'package:test/test.dart';
 import 'dart:math';
 
+
 void main() {
   test('Benchmarking encode and decode', () {
     var now = DateTime.now();
