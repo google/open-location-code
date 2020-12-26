@@ -3,14 +3,19 @@ This is the pl/sql implementation of the Open Location Code.
 
 The library file is in `pluscode_functions.sql`.
 
+All functions are installed in the public Schema.
+
 # Tests
 
 Unit tests require docker,
 [DockerDesktop](https://www.docker.com/)
+
 Download the pluscode_functions.sql file.
+
 Download the tests_script_l.sql file.
 
 Before run the tests :
+
 A - Upload and run postgresql image name : pgtest port 5433
 docker run --name pgtest -e POSTGRES_PASSWORD=postgres -d -p 5433:5432 postgres
 
