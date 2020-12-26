@@ -17,19 +17,19 @@ Download the tests_script_l.sql file.
 Before run the tests :
 
 A - Upload and run postgresql image name : pgtest port 5433
-docker run --name pgtest -e POSTGRES_PASSWORD=postgres -d -p 5433:5432 postgres
+`docker run --name pgtest -e POSTGRES_PASSWORD=postgres -d -p 5433:5432 postgres`
 
 B - COPY file with olc functions in the container
-docker cp c:/path/to/file/pluscode_functions.sql pgtest:/pluscode_functions.sql
+`docker cp c:/path/to/file/pluscode_functions.sql pgtest:/pluscode_functions.sql`
 
 C - COPY file with Tests in the container
-docker cp c:/path/to/file/tests_script_l.sql pgtest:/tests_script_l.sql
+`docker cp c:/path/to/file/tests_script_l.sql pgtest:/tests_script_l.sql`
 
 D - Execute openlocation.sql in db
-docker exec -u postgres pgtest psql postgres postgres -f ./pluscode_functions.sql
+`docker exec -u postgres pgtest psql postgres postgres -f ./pluscode_functions.sql`
 
 Then Execute tests script
-docker exec -u postgres pgtest psql postgres postgres -f ./tests_script_l.sql
+`docker exec -u postgres pgtest psql postgres postgres -f ./tests_script_l.sql`
 
 
 ## pluscode_encode()
