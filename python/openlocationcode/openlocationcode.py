@@ -179,8 +179,6 @@ def isValid(code):
     return True
 
 
-
-
 def isShort(code):
     """
     Determines if a code is a valid short code.
@@ -196,8 +194,6 @@ def isShort(code):
     if sep >= 0 and sep < SEPARATOR_POSITION_:
         return True
     return False
-
-
 
 
 def isFull(code):
@@ -228,10 +224,7 @@ def isFull(code):
     return True
 
 
-
-
 def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
-
     """
     Encode a location into an Open Location Code.
     Produces a code of the specified length, or the default length if no length
@@ -248,7 +241,6 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
       codeLength: The number of significant digits in the output code, not
           including any separator characters.
     """
-      
     if codeLength < 2 or (codeLength < PAIR_CODE_LENGTH_ and
                           codeLength % 2 == 1):
         raise ValueError('Invalid Open Location Code length - ' +
@@ -305,8 +297,6 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
                                          codeLength) + SEPARATOR_
 
 
-
-
 def decode(code):
     """
     Decodes an Open Location Code into the location coordinates.
@@ -318,7 +308,6 @@ def decode(code):
       A CodeArea object that provides the latitude and longitude of two of the
       corners of the area, the center, and the length of the original code.
     """
-      
     if not isFull(code):
         raise ValueError(
             'Passed Open Location Code is not a valid full code - ' + str(code))
@@ -380,8 +369,6 @@ def decode(code):
                                           14), round(lat + latPrecision, 14),
                     round(lng + lngPrecision, 14),
                     min(len(code), MAX_DIGIT_COUNT_))
-
-
 
 
 
@@ -455,8 +442,6 @@ def recoverNearest(code, referenceLatitude, referenceLongitude):
                   codeArea.codeLength)
 
 
-
-
 def shorten(code, latitude, longitude):
     """
      Remove characters from the start of an OLC code.
@@ -505,8 +490,6 @@ def shorten(code, latitude, longitude):
     return code
 
 
-
-
 def clipLatitude(latitude):
     """
      Clip a latitude into the range -90 to 90.
@@ -514,8 +497,6 @@ def clipLatitude(latitude):
        latitude: A latitude in signed decimal degrees.
     """
     return min(90, max(-90, latitude))
-
-
 
 
 def computeLatitudePrecision(codeLength):
@@ -530,8 +511,6 @@ def computeLatitudePrecision(codeLength):
     return pow(20, -3) / pow(GRID_ROWS_, codeLength - 10)
 
 
-
-
 def normalizeLongitude(longitude):
     """
      Normalize a longitude into the range -180 to 180, not including 180.
@@ -543,8 +522,6 @@ def normalizeLongitude(longitude):
     while longitude >= 180:
         longitude = longitude - 360
     return longitude
-
-
 
 
 class CodeArea(object):
