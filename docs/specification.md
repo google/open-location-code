@@ -29,7 +29,7 @@ The "0" character (U+0030) is used as a padding character before the format sepa
 
 ## Encoding
 
-Code digits and ordering do not change in RTL languages.
+Code digits and ordering do not change in right-to-left (RTL) languages.
 
 The latitude number must be clipped to be in the range -90 to 90.
 
