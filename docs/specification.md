@@ -98,9 +98,9 @@ NB: This table assumes one degree is 111321 meters, and that all distances are c
 ## Decoding
 
 The coordinates obtained when decoding are the south-west corner.
-(The north-west corner and center coordinates can be obtained by adding the precison values.)
+(The north-east corner and center coordinates can be obtained by adding the precison values.)
 
-This implies that the north-west coordinates are not included in the area of the code, with the exception of codes whose northern latitude is 90 degrees.
+This implies that the north-east coordinates are not included in the area of the code, with the exception of codes whose northern latitude is 90 degrees.
 
 ## Short Codes
 
