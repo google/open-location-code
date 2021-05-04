@@ -375,20 +375,8 @@ def decode(code):
 def recoverNearest(code, referenceLatitude, referenceLongitude):
     """
      Recover the nearest matching code to a specified location.
-     Given a short Open Location Code of between four and seven characters,
-     this recovers the nearest matching full code to the specified location.
-     The number of characters that will be prepended to the short code, depends
-     on the length of the short code and whether it starts with the separator.
-     If it starts with the separator, four characters will be prepended. If it
-     does not, the characters that will be prepended to the short code, where S
-     is the supplied short code and R are the computed characters, are as
-     follows:
-     SSSS    -> RRRR.RRSSSS
-     SSSSS   -> RRRR.RRSSSSS
-     SSSSSS  -> RRRR.SSSSSS
-     SSSSSSS -> RRRR.SSSSSSS
-     Note that short codes with an odd number of characters will have their
-     last character decoded using the grid refinement algorithm.
+     Given a short code of between four and seven characters, this recovers
+     the nearest matching full code to the specified location.
      Args:
        code: A valid OLC character sequence.
        referenceLatitude: The latitude (in signed decimal degrees) to use to
