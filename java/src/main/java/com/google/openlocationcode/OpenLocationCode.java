@@ -670,10 +670,10 @@ public final class OpenLocationCode {
       return longitude;
     }
 
-    final long CIRCLE_DEG = 2 * LONGITUDE_MAX; //360 degrees
+    final long CIRCLE_DEG = 2 * LONGITUDE_MAX; // 360 degrees
     return (((longitude % CIRCLE_DEG) + CIRCLE_DEG + LONGITUDE_MAX) % CIRCLE_DEG) - LONGITUDE_MAX;
   }
-  
+
   /**
    * Compute the latitude precision value for a given code length. Lengths <= 10 have the same
    * precision for latitude and longitude, but lengths > 10 have different precisions due to the
