@@ -665,13 +665,13 @@ public final class OpenLocationCode {
   }
 
   private static double normalizeLongitude(double longitude) {
-    if ((longitude >= -LONGITUDE_MAX) && (longitude < LONGITUDE_MAX)) {
+    if (longitude >= -LONGITUDE_MAX && longitude < LONGITUDE_MAX) {
       // longitude is within proper range, no normalization necessary
       return longitude;
     }
 
     final long CIRCLE_DEG = 2 * LONGITUDE_MAX; // 360 degrees
-    return (((longitude % CIRCLE_DEG) + CIRCLE_DEG + LONGITUDE_MAX) % CIRCLE_DEG) - LONGITUDE_MAX;
+    return (longitude % CIRCLE_DEG + CIRCLE_DEG + LONGITUDE_MAX) % CIRCLE_DEG - LONGITUDE_MAX;
   }
 
   /**
