@@ -665,15 +665,15 @@ public final class OpenLocationCode {
   }
 
   private static double normalizeLongitude(double longitude) {
-    while (longitude < -LONGITUDE_MAX) {
-      longitude = longitude + LONGITUDE_MAX * 2;
+    if ((longitude >= -LONGITUDE_MAX) && (longitude < LONGITUDE_MAX)) {
+      // longitude is within proper range, no normalization necessary
+      return longitude;
     }
-    while (longitude >= LONGITUDE_MAX) {
-      longitude = longitude - LONGITUDE_MAX * 2;
-    }
-    return longitude;
-  }
 
+    final long CIRCLE_DEG = 2 * LONGITUDE_MAX; //360 degrees
+    return (((longitude % CIRCLE_DEG) + CIRCLE_DEG + LONGITUDE_MAX) % CIRCLE_DEG) - LONGITUDE_MAX;
+  }
+  
   /**
    * Compute the latitude precision value for a given code length. Lengths <= 10 have the same
    * precision for latitude and longitude, but lengths > 10 have different precisions due to the
