@@ -29,7 +29,7 @@ public class EncodingTest {
     private final String code;
 
     public TestData(String line) {
-      String[] parts = line.split(",");
+      String[] parts = line.split(",", -1);
       if (parts.length != 4) {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
@@ -58,12 +58,24 @@ public class EncodingTest {
   @Test
   public void testEncodeFromLatLong() {
     for (TestData testData : testDataList) {
+      if (testData.code.isEmpty()) {
+        continue;
+      }
       Assert.assertEquals(
           String.format(
               "Latitude %f, longitude %f and length %d were wrongly encoded.",
               testData.latitude, testData.longitude, testData.length),
           testData.code,
           OpenLocationCode.encode(testData.latitude, testData.longitude, testData.length));
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testEncodeThrowsIllegalArgumentException() {
+    for (TestData testData : testDataList) {
+      if (testData.code.isEmpty()) {
+        OpenLocationCode.encode(testData.latitude, testData.longitude, testData.length);
+      }
     }
   }
 }
