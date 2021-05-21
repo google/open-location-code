@@ -1,18 +1,42 @@
 # Open Location Code JavaScript API
 This is the JavaScript implementation of the Open Location Code API.
 
-The library file is in `src/openlocationcode.js`. There is also a minified version, and both are also available using the following CDNs:
+The library file is in `src/openlocationcode.js`. There is also a
+minified version, and both are also available using the following CDNs:
 
 * [jsDelivr](https://www.jsdelivr.com)
   * https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.js
   * https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.min.js
 * [cdnjs](https://cdnjs.com/)
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/latest/openlocationcode.js
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/latest/openlocationcode.min.js
+  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.js
+  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.min.js
 
-Unit tests are included and can be executed by installing gulp, gulp-qunit
-and gulp-util and running gulp. Unit tests are automatically run on pull
-and push requests and visible at https://travis-ci.org/google/open-location-code.
+## Releasing
+
+Once changes have been made and merged, start a new PR:
+
+* run `gulp minify` to update the minified Javascript in `src`.
+* update the `version` tag in the `package.json` file
+
+To update the CDNs, you will have to add a new release tag. Note that release
+tags are applied globally to the repository, so if you are making a change
+across multiple implementations, consider waiting until all are updated before
+adding the release tag.
+
+# Tests
+
+Unit tests require [gulp](https://www.npmjs.com/package/gulp),
+[karma](https://karma-runner.github.io) and
+[jasmine](https://jasmine.github.io).
+
+Execute the tests with `sh test/run_tests.sh`. This will install the
+dependencies, run `eslint` and then run the tests as long as there were no
+eslint errors.
+
+Unit tests are automatically run on pull and push requests and visible at
+https://travis-ci.org/google/open-location-code.
+
+# Examples
 
 Example web pages illustrating converting map clicks to Open Location Codes,
 and using Googles Maps API to extend place codes to full codes are in the

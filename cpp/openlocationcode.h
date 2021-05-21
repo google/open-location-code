@@ -3,9 +3,9 @@
 // The aim is to provide a more convenient way for humans to handle geographic
 // coordinates than latitude and longitude pairs.
 //
-// The codes can be easily read and remembered, and truncating codes converts
-// them from a point to an area, meaning that where extreme accuracy is not
-// required the codes can be shortened.
+// The codes can be easily read and remembered, and truncating codes enlarges
+// the area they represent, meaning that where extreme accuracy is not required
+// the codes can be shortened.
 #ifndef LOCATION_OPENLOCATIONCODE_OPENLOCATIONCODE_H_
 #define LOCATION_OPENLOCATIONCODE_OPENLOCATIONCODE_H_
 
@@ -90,6 +90,9 @@ extern const size_t kMaximumDigitCount;
 extern const char kPaddingCharacter;
 // The alphabet of the codes.
 extern const char kAlphabet[];
+// Lookup table of the alphabet positions of characters 'C' through 'X',
+// inclusive. A value of -1 means the character isn't part of the alphabet.
+extern const int kPositionLUT['X' - 'C' + 1];
 // The number base used for the encoding.
 extern const size_t kEncodingBase;
 // How many characters use the pair algorithm.
@@ -98,9 +101,6 @@ extern const size_t kPairCodeLength;
 extern const size_t kGridColumns;
 // Number of rows in the grid refinement method.
 extern const size_t kGridRows;
-// Defines the minimum pair resolution (in degrees) to remove when shortening a
-// code.
-extern const double kMinShortenDegrees;
 // Gives the exponent used for the first pair.
 extern const size_t kInitialExponent;
 // Size of the initial grid in degrees. This is the size of the area represented

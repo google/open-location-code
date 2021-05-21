@@ -1,0 +1,169 @@
+<!doctype html>
+<!--
+  This can be used to test the tile serving.
+  In a browser, open this as a local file.
+  You will have to start the app server instance without the host option, so that it
+  will serve as "localhost".
+-->
+<html lang="en">
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+          integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+            integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+            crossorigin=""></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.1.3/css/ol.css" type="text/css">
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.1.3/build/ol.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <style>
+      html,body {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 100;
+      }
+      h2 {
+        font-weight: 100;
+      }
+      .map {
+        height: 600px;
+      }
+      #ol_vector_code {
+        background: white;
+        border-radius: 2px;
+        font-size: 24px;
+        padding: 5px;
+        position: absolute;
+        text-align: center;
+        top: 10px;
+        left: 50px;
+        min-width: 200px;
+      }
+    </style>
+    <title>Tile layers examples</title>
+  </head>
+  <body>
+    <h2>OpenLayers vector WMS tiles</h2>
+    <p>
+      Uses the option <code>zoomadjust=2</code> to fetch a more detailed grid level than the
+      default.
+    </p>
+    <div style="position: relative;">
+      <div id="ol_vector_xyz" class="map"></div>
+      <div id="ol_vector_code">Click cell, get plus code</div>
+    </div>
+
+    <script type="text/javascript">
+      // Define the path to the plus code grid server.
+      var gridServer = 'http://localhost:8080/grid/';
+    </script>
+
+    <script type="text/javascript">
+      // OpenLayers example, with GeoJSON WMS tiles.
+
+      // Create the vector layer.
+      var olVectorLayer = new ol.layer.VectorTile({
+        source: new ol.source.VectorTile({
+          maxZoom: 25,
+          attributions: 'plus.codes',
+          format: new ol.format.GeoJSON(),
+          // Using WMS tile numbering.
+          url: gridServer + 'wms/{z}/{x}/{y}.json?zoomadjust=2'
+        }),
+      });
+      // Create the map, with Openstreetmap map tiles and the vector layer.
+      var olVectorMap = new ol.Map({
+        target: 'ol_vector_xyz',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          olVectorLayer,
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([8.54, 47.5]),
+          zoom: 4
+        })
+      });
+      // Define an action so that clicking on the map will display the global code.
+      var selectPointerMove = new ol.interaction.Select({
+        condition: ol.events.condition.click
+      });
+      selectPointerMove.on('select', (e) => {
+        document.getElementById("ol_vector_code").innerHTML =
+          e.target.getFeatures().getArray()[0].get("global_code");
+      });
+      olVectorMap.addInteraction(selectPointerMove);
+    </script>
+
+    <h2>OpenLayers image TMS tiles</h2>
+    <p>
+      Uses the options <code>linecol=0xff0000ff&labelcol=0xff000060</code> to set the lines to
+      red and the labels to a non-opaque red.
+    </p>
+    <div id="ol_image_tms" class="map"></div>
+
+    <script type="text/javascript">
+      // OpenLayers example, with Openstreetmap map tiles and TMS-numbered image tiles.
+      var olImageMap = new ol.Map({
+        target: 'ol_image_tms',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          new ol.layer.Tile({
+            source: new ol.source.XYZ({
+              attributions: 'plus.codes',
+              // XYZ layers use WMS tile numbering, use -y for TMS.
+              url: gridServer + 'tms/{z}/{x}/{-y}.png?linecol=0xff0000ff&labelcol=0xff000060'
+            }),
+          }),
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([8.54, 47.5]),
+          zoom: 4
+        })
+      });
+    </script>
+
+    <h2>Leaflet image TMS tiles</h2>
+    <p>
+    <div id="ll_image_tms" class="map"></div>
+
+    <script type="text/javascript">
+      // Leaflet example, with Openstreetmap map tiles and TMS-numbered image tiles.
+      var llImageMap = L.map('ll_image_tms', {maxZoom: 21}).setView([47.5, 8.54], 4);
+      L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'}
+      ).addTo(llImageMap);
+      L.tileLayer(
+        gridServer + 'tms/{z}/{x}/{y}.png',
+        {
+          tms: true,
+          attribution: 'grid by plus codes'
+        }
+      ).addTo(llImageMap);
+    </script>
+
+    <h2>Google Maps API image WMS tiles</h2>
+    <div id="g_image_wms" class="map"></div>
+
+    <script type="text/javascript">
+      // Google Maps API example, with WMS image tiles.
+      var googleImageMap = new google.maps.Map(
+        document.getElementById('g_image_wms'),
+        {
+          zoom: 4, center: {lat: 47.5, lng: 8.54}
+        });
+      var googleImageTiles = new google.maps.ImageMapType({
+        getTileUrl: function(coord, zoom) {
+          return [gridServer, 'wms/',
+              zoom, '/', coord.x, '/', coord.y, '.png'].join('');
+        },
+        tileSize: new google.maps.Size(256, 256)
+      });
+      googleImageMap.overlayMapTypes.push(googleImageTiles);
+    </script>
+  </body>
+</html>

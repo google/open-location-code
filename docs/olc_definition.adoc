@@ -30,14 +30,14 @@ specific local knowledge.
 
 This is due to a variety of factors, including:
 
-- Streets that are unnamed or have been renamed a few times
-- Unofficial roadways or settlements (e.g., slums such as Kibera in Kenya
+* Streets that are unnamed or have been renamed a few times
+* Unofficial roadways or settlements (e.g., slums such as Kibera in Kenya
 and Dharavi in India)
-- Newly constructed streets whose names are not widely known
-- Areas that have the same or similarly named streets in close proximity
-- Locally used names of streets that differ from the official names. These
+* Newly constructed streets whose names are not widely known
+* Areas that have the same or similarly named streets in close proximity
+* Locally used names of streets that differ from the official names. These
  could be completely different names or abbreviations of the official names
-- Unusual orderings of building numbers - non-consecutive or not aligned
+* Unusual orderings of building numbers - non-consecutive or not aligned
  with the street.
 
 Often, the most precise and easily accessible street maps are online.
@@ -79,9 +79,9 @@ Three approaches are usually used to provide a location in these
 circumstances. The most common solution is to provide simplified directions
 instead of an address. This results in addresses such as:
 
-- 11th km of Old Road from Heraklion to Re <<arolithos>>
-- in front of old civil engineering lab, Oke Ado Road, Ogbomosho <<ogbomosho>>
-- Up the winding road, 600 m from the bridge, Past Lazy Dog, past English
+* 11th km of Old Road from Heraklion to Re <<arolithos>>
+* in front of old civil engineering lab, Oke Ado Road, Ogbomosho <<ogbomosho>>
+* Up the winding road, 600 m from the bridge, Past Lazy Dog, past English
 Bakery on the left at Hotel Mountain Dew, Manali, Himachal Pradesh <<manali>>
 
 These directions rely on detailed local knowledge and are difficult or
@@ -109,14 +109,14 @@ phone, in print and handwritten.
 We believe that these codes need to meet the following requirements for
 widespread adoption.
 
-- Easy to use
-- Complete
-- Flexible precision
-- Indicate proximity
-- Cultural independence
-- Functions offline
-- Easy to implement
-- Free
+* Easy to use
+* Complete
+* Flexible precision
+* Indicate proximity
+* Cultural independence
+* Functions offline
+* Easy to implement
+* Free
 
 *Easy to use*: The codes must be short enough to be remembered and used. This
 means that they need to be shorter than latitude and longitude and about the
@@ -165,10 +165,10 @@ Open Location Code is a new way to express location that meets these
 requirements. It is shorter than latitude and longitude because it uses a
 higher number base. It uses a number base of 20 because:
 
-- In base 20, 10 characters can represent a 14x14 meter area suitable for
+* In base 20, 10 characters can represent a 14x14 meter area suitable for
 many buildings
-- Using a number base of 20 makes some calculations easier
-- We could identify a 20 character subset from 0-9A-Z that doesn't spell words.
+* Using a number base of 20 makes some calculations easier
+* We could identify a 20 character subset from 0-9A-Z that doesn't spell words.
 
 The characters that are used in Open Location Codes were chosen by computing
 all possible 20 character combinations from 0-9A-Z and scoring them on how
@@ -215,7 +215,7 @@ A 10 digit code will be precise enough for many locations. However, in
 areas where building density is high (such as informal settlements,
 semi-detached houses or apartment blocks), such an area could extend over
 several dwellings. A 12 digit code would be less than 1 square meter. An
-11 digit code would be preferable because it it shorter, and a slightly
+11 digit code would be preferable because it is shorter, and a slightly
 lower precision area could be acceptable.
 
 From 11 digits on, a different algorithm is used. The areas are slightly
@@ -226,9 +226,9 @@ cell is identified by a single digit. The digit for the cell
 containing the desired location is added to the code.
 
 Using a single grid refinement step, we have an 11 digit code that
-represents a 1/32000° by 1/40000° area (roughly 3.4 by 2.7 meters).
+represents a 1/32000° by 1/40000° area (roughly 3.4 by 2.7 meters at the equator).
 
-.A 10 digit code divided into its grid. Each small square is approximately 2.6m x 2.8m
+.A 10 digit code divided into its grid. In this location, each small square is approximately 2.6m x 2.8m
 image::images/olc_11_grid.png[width=406,height=272,align="center"]
 
 The first approach (where a pair of digits is added for each step)
@@ -276,10 +276,10 @@ have to remember from four to seven digits of their code.
 A "+" symbol is inserted into the code after the eighth digit. This performs
 two key functions:
 
-- It allows us to recognise shortened code fragments such as MQPX+9G. Because
+* It allows us to recognise shortened code fragments such as MQPX+9G. Because
 we know that the "+" is after the eighth digit, we know that there are four
 digits to be recovered for this code.
-- It allows us to distinguish four or six digit codes from postal codes.
+* It allows us to distinguish four or six digit codes from postal codes.
 
 But this means that we have a problem if we want to represent the 1x1 degree
 area 6GCR. The solution here is to use zero, as a padding symbol, giving us
@@ -291,26 +291,26 @@ digits.
 Open Location Code has some imperfections, driven by usability compromises
 or the encoding methodology. The key ones are listed here.
 
-- To prevent the codes including words, some letters are not used. For
+* To prevent the codes including words, some letters are not used. For
 example, A and B are not used in the codes. The codes W9 and WC are next to
 each other, but this isn't immediately obvious
-- The character set is defined in Latin characters. We have considered
+* The character set is defined in Latin characters. We have considered
 defining different character sets for different languages, but there can be
 problems identifying the language if visually similar characters are used.
 For example, it is difficult to distinguish the latin "H" from the cyrillic
 "Н". Although latin characters may not be the first choice in many areas, it
 is probably the most common second choice throughout the world
-- Code areas distort at high latitudes due to longitude convergence. The
+* Code areas distort at high latitudes due to longitude convergence. The
 practical impact of these disadvantages are not significant due to the low
 populations at the north or south poles, and the ability to use codes
 representing small areas to approximate point locations
-- Code discontinuities at the poles and longitude 180. Codes on either side
+* Code discontinuities at the poles and longitude 180. Codes on either side
 of the 180th meridian, although they are close, will differ significantly.
 Similarly, locations at the poles, although physically close, can also have
 significantly different encodings. The fact that there are no significant
 population centers affected means that this is an imperfection we are
 willing to accept
-- Open Location Codes cannot exactly represent coordinates at latitude 90.
+* Open Location Codes cannot exactly represent coordinates at latitude 90.
 The codes for latitude 90 would normally have an area whose lower latitude
 is at 90 degrees and an upper latitude of 90 + the height of the code area,
 but this would result in meaningless coordinates. Instead, when encoding
@@ -321,143 +321,7 @@ shortcoming since there is no permanent settlement at the North Pole.
 
 == Open Location Code Specification
 
-. The valid digits used in Open Location Codes and their values are
-shown below:
-+
-[options="header,autowidth"]
-|=======================
-|Decimal|OLC
-|0|2
-|1|3
-|2|4
-|3|5
-|4|6
-|5|7
-|6|8
-|7|9
-|8|C
-|9|F
-|10|G
-|11|H
-|12|J
-|13|M
-|14|P
-|15|Q
-|16|R
-|17|V
-|18|W
-|19|X
-|=======================
-+
-. In addition to the above characters, a full Open Location Code must include a
-single "+" as a separator after the eighth digit.
-
-. Open Location Codes with less than eight digits can be suffixed with zeros
-with a "+" used as the final character. Zeros may not be followed by any
-other digit.
-
-. Processing of Open Location Codes must be case insensitive.
-
-. Open Location Code implementations must return upper case codes. They must
-include the "+" character and zero padding when returning codes.
-
-. Latitude and longitude coordinates must be provided in decimal degrees,
-based on WGS84. Latitude coordinates will be clipped, longitude coordinates
-will be normalised.
-
-. Encoding a latitude and longitude to an Open Location Code of up to 10
-characters is done by:
-  - Clip the latitude to the range -90 to 90
-  - Normalise the longitude to the range -180 to 180
-  - If the latitude is 90, compute the height of the area based on the
-  requested code length and subtract the height from the latitude. (This
-  ensures the area represented does not exceed 90 degrees latitude.)
-  - Adding 90 to the latitude
-  - Adding 180 to the longitude
-  - Encoding up to five latitude and five longitude characters (10 in total) by
-converting each value into base 20 (starting with a positional value of 20)
-and using the Open Location Code digits
-  - Interleave the latitude and longitude digits, starting with latitude.
-
-. To extend Open Location Codes with 10 digits, divide the area of the
-code into a 4x5 grid and append the letter identifying the grid cell as
-shown. Repeat as many times as necessary.
-+
-[options="autowidth"]
-|=======================
-|R|V|W|X
-|J|M|P|Q
-|C|F|G|H
-|6|7|8|9
-|2|3|4|5
-|=======================
-+
-
-. Open Location Codes with even numbered lengths of 10 digits or less
-have the same height and width in degrees:
-  - A two digit code must have a height and width of 20°
-  - A four digit code must have a height and width of 1°
-  - A six digit code must have a height and width of 0.05°
-  - An eight digit code must have a height and width of 0.0025°
-  - A ten digit code must have a height and width of 0.000125°.
-
-. Open Location Codes with lengths of more than 10 digits have different
-heights and widths:
-  - An 11 digit code has a height of 0.000025°, and a width of 0.00003125°
-  - Subsequent lengths divide the height by five and the width by four.
-
-. Decoding an Open Location Code provides the coordinates of the south west
-corner. The north east coordinates are obtained by adding the height and
-width to the south west corner.
-
-. The area of an Open Location Code is defined as including the south west
-coordinates but excluding the north east coordinates.
-
-. The two standard code lengths are 10 digits (1/8000° x 1/8000°), and 11
-digits (1/40000° x 1/32000°). Other code lengths are considered
-non-standard for household addressing, although they may be used for other
-purposes.
-
-. Using a reference location, the first four digits of a
-code with at least eight digits may be removed if both the latitude and
-longitude of a reference location are within +/- 0.25° of the latitude and
-longitude of the Open Location Code center.
-
-. Using a reference location, the first six digits of a
-code with at least eight digits may be removed if both the latitude and
-longitude of the reference location are within +/- 0.0125° of the latitude
-and longitude of the Open Location Code center.
-
-. Only Open Location Codes with at least eight digits may be shortened by
-omitting leading digits. Short codes must always include the "+"
-character.
-
-. When recovering a full Open Location Code from a short Open Location Code
-the number of digits to recover can be computed from the position of the "+"
-character.
-
-. When recovering a full Open Location Code from a short Open Location Code
-using a reference location, the method must return the nearest matching code
-to the reference location, taking note that this will not necessarily have
-the same leading digits as the code produced by encoding the reference
-location.
-
-. Open Location Code implementations must provide the following methods:
-  - a method to convert a latitude and longitude into a 10 digit Open
-  Location Code
-  - a method to convert a latitude and longitude into an arbitrary length
-  Open Location Code
-  - a method to decode an Open Location Code into, at a minimum, the
-  latitude and longitude of the south-west corner and the areas height and
-  width
-  - a method to determine if a string is a valid sequence of Open Location
-  Code characters
-  - a method to determine if a string is a valid full Open Location Code
-  - a method to determine if a string is a valid short Open Location Code
-  - a method to remove four or six digits from the front of an Open Location
-  Code given a reference location
-  - a method to recover a full Open Location Code from a short code and a
-  reference location.
+Refer to link:specification.md[Open Location Code Specification].
 
 [bibliography]
 == Notes

@@ -18,6 +18,14 @@ G+,false,false,false
 8FWC2_45+G6,false,false,false
 8FWC2η45+G6,false,false,false
 8FWC2345+G6+,false,false,false
+8FWC2345G6+,false,false,false
 8FWC2300+G6,false,false,false
 WC2300+G6g,false,false,false
 WC2345+G,false,false,false
+WC2300+,false,false,false
+# Validate that codes at and exceeding 15 digits are still valid when all their
+# digits are valid, and invalid when not.
+849VGJQF+VX7QR3J,true,false,true
+849VGJQF+VX7QR3U,false,false,false
+849VGJQF+VX7QR3JW,true,false,true
+849VGJQF+VX7QR3JU,false,false,false

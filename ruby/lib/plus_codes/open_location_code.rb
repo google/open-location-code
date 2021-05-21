@@ -1,22 +1,22 @@
+# frozen_string_literal: true
+
 require_relative '../plus_codes'
 require_relative '../plus_codes/code_area'
 
 module PlusCodes
-
-  # [OpenLocationCode] implements the Google Open Location Code(Plus+Codes) algorithm.
+  # [OpenLocationCode] implements the Google Open Location Code(Plus+Codes)
+  # algorithm.
   #
   # @author We-Ming Wu
   class OpenLocationCode
-
-    # Determines if a string is a valid sequence of Open Location Code(Plus+Codes) characters.
+    # Determines if a string is a valid sequence of Open Location Code
+    # (Plus+Codes) characters.
     #
     # @param code [String] a plus+codes
     # @return [TrueClass, FalseClass] true if the code is valid, false otherwise
     def valid?(code)
-      valid_length?(code) &&
-      valid_separator?(code) &&
-      valid_padding?(code) &&
-      valid_character?(code)
+      valid_length?(code) && valid_separator?(code) && valid_padding?(code) &&
+        valid_character?(code)
     end
 
     # Determines if a string is a valid short Open Location Code(Plus+Codes).
@@ -39,28 +39,56 @@ module PlusCodes
     #
     # @param latitude [Numeric] a latitude in degrees
     # @param longitude [Numeric] a longitude in degrees
-    # @param code_length [Integer] the number of characters in the code, this excludes the separator
+    # @param code_length [Integer] the number of characters in the code, this
+    # excludes the separator
     # @return [String] a plus+codes
     def encode(latitude, longitude, code_length = PAIR_CODE_LENGTH)
-      raise ArgumentError,
-      "Invalid Open Location Code(Plus+Codes) length: #{code_length}" if invalid_length?(code_length)
+      if invalid_length?(code_length)
+        raise ArgumentError, 'Invalid Open Location Code(Plus+Codes) length'
+      end
 
+      code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
       latitude = clip_latitude(latitude)
       longitude = normalize_longitude(longitude)
       latitude -= precision_by_length(code_length) if latitude == 90
 
-      lat = (latitude + 90).to_r
-      lng = (longitude + 180).to_r
-
-      digit = 0
       code = ''
-      while digit < code_length
-        lat, lng = narrow_region(digit, lat, lng)
-        digit, lat, lng = build_code(digit, code, lat, lng)
-        code << SEPARATOR if (digit == SEPARATOR_POSITION)
-      end
 
-      digit < SEPARATOR_POSITION ? padded(code) : code
+      # Compute the code.
+      # This approach converts each value to an integer after multiplying it by
+      # the final precision. This allows us to use only integer operations, so
+      # avoiding any accumulation of floating point representation errors.
+      lat_val = 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
+      lat_val += latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
+      lng_val = 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
+      lng_val += longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
+      lat_val = lat_val.to_i
+      lng_val = lng_val.to_i
+
+      # Compute the grid part of the code if necessary.
+      if code_length > PAIR_CODE_LENGTH
+        (0..MAX_CODE_LENGTH - PAIR_CODE_LENGTH - 1).each do
+          index = (lat_val % 5) * 4 + (lng_val % 4)
+          code = CODE_ALPHABET[index] + code
+          lat_val = lat_val.div 5
+          lng_val = lng_val.div 4
+        end
+      else
+        lat_val = lat_val.div LAT_GRID_PRECISION
+        lng_val = lng_val.div LNG_GRID_PRECISION
+      end
+      (0..PAIR_CODE_LENGTH / 2 - 1).each do |i|
+        code = CODE_ALPHABET[lng_val % 20] + code
+        code = CODE_ALPHABET[lat_val % 20] + code
+        lat_val = lat_val.div 20
+        lng_val = lng_val.div 20
+        code = "+#{code}" if i.zero?
+      end
+      # If we don't need to pad the code, return the requested section.
+      return code[0, code_length + 1] if code_length >= SEPARATOR_POSITION
+
+      # Pad and return the code.
+      "#{code[0, code_length]}#{PADDING * (SEPARATOR_POSITION - code_length)}+"
     end
 
     # Decodes an Open Location Code(Plus+Codes) into a [CodeArea].
@@ -68,8 +96,10 @@ module PlusCodes
     # @param code [String] a plus+codes
     # @return [CodeArea] a code area which contains the coordinates
     def decode(code)
-      raise ArgumentError,
-      "Open Location Code(Plus+Codes) is not a valid full code: #{code}" unless full?(code)
+      unless full?(code)
+        raise ArgumentError,
+              "Open Location Code(Plus+Codes) is not a valid full code: #{code}"
+      end
 
       code = code.gsub(SEPARATOR, '')
       code = code.gsub(/#{PADDING}+/, '')
@@ -82,7 +112,7 @@ module PlusCodes
       lng_resolution = 400.to_r
 
       digit = 0
-      while digit < code.length
+      while digit < [code.length, MAX_CODE_LENGTH].min
         if digit < PAIR_CODE_LENGTH
           lat_resolution /= 20
           lng_resolution /= 20
@@ -100,20 +130,24 @@ module PlusCodes
         end
       end
 
-      CodeArea.new(south_latitude, west_longitude, lat_resolution, lng_resolution)
+      CodeArea.new(south_latitude, west_longitude, lat_resolution,
+                   lng_resolution, digit)
     end
 
-    # Recovers a full Open Location Code(Plus+Codes) from a short code and a reference location.
+    # Recovers a full Open Location Code(Plus+Codes) from a short code and a
+    # reference location.
     #
     # @param short_code [String] a plus+codes
     # @param reference_latitude [Numeric] a reference latitude in degrees
     # @param reference_longitude [Numeric] a reference longitude in degrees
     # @return [String] a plus+codes
     def recover_nearest(short_code, reference_latitude, reference_longitude)
-      return short_code if full?(short_code)
-      raise ArgumentError,
-      "Open Location Code(Plus+Codes) is not valid: #{short_code}" unless short?(short_code)
+      return short_code.upcase if full?(short_code)
 
+      unless short?(short_code)
+        raise ArgumentError,
+              "Open Location Code(Plus+Codes) is not valid: #{short_code}"
+      end
       ref_lat = clip_latitude(reference_latitude)
       ref_lng = normalize_longitude(reference_longitude)
 
@@ -125,33 +159,38 @@ module PlusCodes
       half_res = resolution / 2
 
       latitude = code_area.latitude_center
-      if (ref_lat + half_res < latitude && latitude - resolution >= -90)
+      if ref_lat + half_res < latitude && latitude - resolution >= -90
         latitude -= resolution
-      elsif (ref_lat - half_res > latitude && latitude + resolution <= 90)
+      elsif ref_lat - half_res > latitude && latitude + resolution <= 90
         latitude += resolution
       end
 
       longitude = code_area.longitude_center
-      if (ref_lng + half_res < longitude)
+      if ref_lng + half_res < longitude
         longitude -= resolution
-      elsif (ref_lng - half_res > longitude)
+      elsif ref_lng - half_res > longitude
         longitude += resolution
       end
 
       encode(latitude, longitude, code.length - SEPARATOR.length)
     end
 
-    # Removes four, six or eight digits from the front of an Open Location Code(Plus+Codes) given a reference location.
+    # Removes four, six or eight digits from the front of an Open Location Code
+    # (Plus+Codes) given a reference location.
     #
     # @param code [String] a plus+codes
     # @param latitude [Numeric] a latitude in degrees
     # @param longitude [Numeric] a longitude in degrees
     # @return [String] a short plus+codes
     def shorten(code, latitude, longitude)
-      raise ArgumentError,
-      "Open Location Code(Plus+Codes) is a valid full code: #{code}" unless full?(code)
-      raise ArgumentError,
-      "Cannot shorten padded codes: #{code}" unless code.index(PADDING).nil?
+      unless full?(code)
+        raise ArgumentError,
+              "Open Location Code(Plus+Codes) is a valid full code: #{code}"
+      end
+      unless code.index(PADDING).nil?
+        raise ArgumentError,
+              "Cannot shorten padded codes: #{code}"
+      end
 
       code_area = decode(code)
       lat_diff = (latitude - code_area.latitude_center).abs
@@ -175,7 +214,7 @@ module PlusCodes
     end
 
     def narrow_region(digit, latitude, longitude)
-      if digit == 0
+      if digit.zero?
         latitude /= 20
         longitude /= 20
       elsif digit < PAIR_CODE_LENGTH
@@ -202,16 +241,19 @@ module PlusCodes
     end
 
     def valid_length?(code)
-      !code.nil? && code.length >= 2 + SEPARATOR.length && code.split(SEPARATOR).last.length != 1
+      !code.nil? && code.length >= 2 + SEPARATOR.length &&
+        code.split(SEPARATOR).last.length != 1
     end
 
     def valid_separator?(code)
       separator_idx = code.index(SEPARATOR)
-      code.count(SEPARATOR) == 1 && separator_idx <= SEPARATOR_POSITION && separator_idx.even?
+      code.count(SEPARATOR) == 1 && separator_idx <= SEPARATOR_POSITION &&
+        separator_idx.even?
     end
 
     def valid_padding?(code)
       if code.include?(PADDING)
+        return false if code.index(SEPARATOR) < SEPARATOR_POSITION
         return false if code.start_with?(PADDING)
         return false if code[-2..-1] != PADDING + SEPARATOR
 
@@ -237,11 +279,10 @@ module PlusCodes
 
     def precision_by_length(code_length)
       if code_length <= PAIR_CODE_LENGTH
-        precision = 20 ** ((code_length / -2).to_i + 2)
-      else
-        precision = (20 ** -3) / (5 ** (code_length - PAIR_CODE_LENGTH))
+        return (20**((code_length / -2).to_i + 2)).to_r
       end
-      precision.to_r
+
+      (1.0 / ((20**3) * (5**(code_length - PAIR_CODE_LENGTH)))).to_r
     end
 
     def clip_latitude(latitude)
@@ -249,14 +290,9 @@ module PlusCodes
     end
 
     def normalize_longitude(longitude)
-      until longitude < 180
-        longitude -= 360
-      end
-      until longitude >= -180
-        longitude += 360
-      end
+      longitude -= 360 until longitude < 180
+      longitude += 360 until longitude >= -180
       longitude
     end
   end
-
 end

@@ -1,3 +1,5 @@
 # Ignore class and jar files
 *.class
 *.jar
+# Ignore generated Maven files
+target/*

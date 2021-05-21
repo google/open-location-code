@@ -1,0 +1,23 @@
+# Override rubocop defaults.
+
+Layout/LineLength:
+  Enabled: true
+  Max: 80
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false

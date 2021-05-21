@@ -1,0 +1,964 @@
+{
+  "type": "FeatureCollection", "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 31], [11, 32], [12, 32], [12, 31]]]
+      },
+      "properties": {"global_code": "8F3H0000+", "name": "8F3H"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 31], [12, 32], [13, 32], [13, 31]]]
+      },
+      "properties": {"global_code": "8F3J0000+", "name": "8F3J"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 31], [13, 32], [14, 32], [14, 31]]]
+      },
+      "properties": {"global_code": "8F3M0000+", "name": "8F3M"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 31], [14, 32], [15, 32], [15, 31]]]
+      },
+      "properties": {"global_code": "8F3P0000+", "name": "8F3P"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 31], [15, 32], [16, 32], [16, 31]]]
+      },
+      "properties": {"global_code": "8F3Q0000+", "name": "8F3Q"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 31], [16, 32], [17, 32], [17, 31]]]
+      },
+      "properties": {"global_code": "8F3R0000+", "name": "8F3R"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 31], [17, 32], [18, 32], [18, 31]]]
+      },
+      "properties": {"global_code": "8F3V0000+", "name": "8F3V"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 31], [18, 32], [19, 32], [19, 31]]]
+      },
+      "properties": {"global_code": "8F3W0000+", "name": "8F3W"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 31], [19, 32], [20, 32], [20, 31]]]
+      },
+      "properties": {"global_code": "8F3X0000+", "name": "8F3X"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 31], [20, 32], [21, 32], [21, 31]]]
+      },
+      "properties": {"global_code": "8G320000+", "name": "8G32"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 31], [21, 32], [22, 32], [22, 31]]]
+      },
+      "properties": {"global_code": "8G330000+", "name": "8G33"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 31], [22, 32], [23, 32], [23, 31]]]
+      },
+      "properties": {"global_code": "8G340000+", "name": "8G34"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 32], [11, 33], [12, 33], [12, 32]]]
+      },
+      "properties": {"global_code": "8F4H0000+", "name": "8F4H"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 32], [12, 33], [13, 33], [13, 32]]]
+      },
+      "properties": {"global_code": "8F4J0000+", "name": "8F4J"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 32], [13, 33], [14, 33], [14, 32]]]
+      },
+      "properties": {"global_code": "8F4M0000+", "name": "8F4M"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 32], [14, 33], [15, 33], [15, 32]]]
+      },
+      "properties": {"global_code": "8F4P0000+", "name": "8F4P"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 32], [15, 33], [16, 33], [16, 32]]]
+      },
+      "properties": {"global_code": "8F4Q0000+", "name": "8F4Q"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 32], [16, 33], [17, 33], [17, 32]]]
+      },
+      "properties": {"global_code": "8F4R0000+", "name": "8F4R"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 32], [17, 33], [18, 33], [18, 32]]]
+      },
+      "properties": {"global_code": "8F4V0000+", "name": "8F4V"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 32], [18, 33], [19, 33], [19, 32]]]
+      },
+      "properties": {"global_code": "8F4W0000+", "name": "8F4W"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 32], [19, 33], [20, 33], [20, 32]]]
+      },
+      "properties": {"global_code": "8F4X0000+", "name": "8F4X"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 32], [20, 33], [21, 33], [21, 32]]]
+      },
+      "properties": {"global_code": "8G420000+", "name": "8G42"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 32], [21, 33], [22, 33], [22, 32]]]
+      },
+      "properties": {"global_code": "8G430000+", "name": "8G43"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 32], [22, 33], [23, 33], [23, 32]]]
+      },
+      "properties": {"global_code": "8G440000+", "name": "8G44"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 33], [11, 34], [12, 34], [12, 33]]]
+      },
+      "properties": {"global_code": "8F5H0000+", "name": "8F5H"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 33], [12, 34], [13, 34], [13, 33]]]
+      },
+      "properties": {"global_code": "8F5J0000+", "name": "8F5J"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 33], [13, 34], [14, 34], [14, 33]]]
+      },
+      "properties": {"global_code": "8F5M0000+", "name": "8F5M"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 33], [14, 34], [15, 34], [15, 33]]]
+      },
+      "properties": {"global_code": "8F5P0000+", "name": "8F5P"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 33], [15, 34], [16, 34], [16, 33]]]
+      },
+      "properties": {"global_code": "8F5Q0000+", "name": "8F5Q"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 33], [16, 34], [17, 34], [17, 33]]]
+      },
+      "properties": {"global_code": "8F5R0000+", "name": "8F5R"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 33], [17, 34], [18, 34], [18, 33]]]
+      },
+      "properties": {"global_code": "8F5V0000+", "name": "8F5V"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 33], [18, 34], [19, 34], [19, 33]]]
+      },
+      "properties": {"global_code": "8F5W0000+", "name": "8F5W"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 33], [19, 34], [20, 34], [20, 33]]]
+      },
+      "properties": {"global_code": "8F5X0000+", "name": "8F5X"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 33], [20, 34], [21, 34], [21, 33]]]
+      },
+      "properties": {"global_code": "8G520000+", "name": "8G52"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 33], [21, 34], [22, 34], [22, 33]]]
+      },
+      "properties": {"global_code": "8G530000+", "name": "8G53"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 33], [22, 34], [23, 34], [23, 33]]]
+      },
+      "properties": {"global_code": "8G540000+", "name": "8G54"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 34], [11, 35], [12, 35], [12, 34]]]
+      },
+      "properties": {"global_code": "8F6H0000+", "name": "8F6H"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 34], [12, 35], [13, 35], [13, 34]]]
+      },
+      "properties": {"global_code": "8F6J0000+", "name": "8F6J"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 34], [13, 35], [14, 35], [14, 34]]]
+      },
+      "properties": {"global_code": "8F6M0000+", "name": "8F6M"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 34], [14, 35], [15, 35], [15, 34]]]
+      },
+      "properties": {"global_code": "8F6P0000+", "name": "8F6P"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 34], [15, 35], [16, 35], [16, 34]]]
+      },
+      "properties": {"global_code": "8F6Q0000+", "name": "8F6Q"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 34], [16, 35], [17, 35], [17, 34]]]
+      },
+      "properties": {"global_code": "8F6R0000+", "name": "8F6R"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 34], [17, 35], [18, 35], [18, 34]]]
+      },
+      "properties": {"global_code": "8F6V0000+", "name": "8F6V"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 34], [18, 35], [19, 35], [19, 34]]]
+      },
+      "properties": {"global_code": "8F6W0000+", "name": "8F6W"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 34], [19, 35], [20, 35], [20, 34]]]
+      },
+      "properties": {"global_code": "8F6X0000+", "name": "8F6X"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 34], [20, 35], [21, 35], [21, 34]]]
+      },
+      "properties": {"global_code": "8G620000+", "name": "8G62"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 34], [21, 35], [22, 35], [22, 34]]]
+      },
+      "properties": {"global_code": "8G630000+", "name": "8G63"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 34], [22, 35], [23, 35], [23, 34]]]
+      },
+      "properties": {"global_code": "8G640000+", "name": "8G64"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 35], [11, 36], [12, 36], [12, 35]]]
+      },
+      "properties": {"global_code": "8F7H0000+", "name": "8F7H"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 35], [12, 36], [13, 36], [13, 35]]]
+      },
+      "properties": {"global_code": "8F7J0000+", "name": "8F7J"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 35], [13, 36], [14, 36], [14, 35]]]
+      },
+      "properties": {"global_code": "8F7M0000+", "name": "8F7M"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 35], [14, 36], [15, 36], [15, 35]]]
+      },
+      "properties": {"global_code": "8F7P0000+", "name": "8F7P"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 35], [15, 36], [16, 36], [16, 35]]]
+      },
+      "properties": {"global_code": "8F7Q0000+", "name": "8F7Q"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 35], [16, 36], [17, 36], [17, 35]]]
+      },
+      "properties": {"global_code": "8F7R0000+", "name": "8F7R"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 35], [17, 36], [18, 36], [18, 35]]]
+      },
+      "properties": {"global_code": "8F7V0000+", "name": "8F7V"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 35], [18, 36], [19, 36], [19, 35]]]
+      },
+      "properties": {"global_code": "8F7W0000+", "name": "8F7W"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 35], [19, 36], [20, 36], [20, 35]]]
+      },
+      "properties": {"global_code": "8F7X0000+", "name": "8F7X"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 35], [20, 36], [21, 36], [21, 35]]]
+      },
+      "properties": {"global_code": "8G720000+", "name": "8G72"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 35], [21, 36], [22, 36], [22, 35]]]
+      },
+      "properties": {"global_code": "8G730000+", "name": "8G73"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 35], [22, 36], [23, 36], [23, 35]]]
+      },
+      "properties": {"global_code": "8G740000+", "name": "8G74"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 36], [11, 37], [12, 37], [12, 36]]]
+      },
+      "properties": {"global_code": "8F8H0000+", "name": "8F8H"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 36], [12, 37], [13, 37], [13, 36]]]
+      },
+      "properties": {"global_code": "8F8J0000+", "name": "8F8J"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 36], [13, 37], [14, 37], [14, 36]]]
+      },
+      "properties": {"global_code": "8F8M0000+", "name": "8F8M"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 36], [14, 37], [15, 37], [15, 36]]]
+      },
+      "properties": {"global_code": "8F8P0000+", "name": "8F8P"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 36], [15, 37], [16, 37], [16, 36]]]
+      },
+      "properties": {"global_code": "8F8Q0000+", "name": "8F8Q"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 36], [16, 37], [17, 37], [17, 36]]]
+      },
+      "properties": {"global_code": "8F8R0000+", "name": "8F8R"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 36], [17, 37], [18, 37], [18, 36]]]
+      },
+      "properties": {"global_code": "8F8V0000+", "name": "8F8V"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 36], [18, 37], [19, 37], [19, 36]]]
+      },
+      "properties": {"global_code": "8F8W0000+", "name": "8F8W"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 36], [19, 37], [20, 37], [20, 36]]]
+      },
+      "properties": {"global_code": "8F8X0000+", "name": "8F8X"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 36], [20, 37], [21, 37], [21, 36]]]
+      },
+      "properties": {"global_code": "8G820000+", "name": "8G82"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 36], [21, 37], [22, 37], [22, 36]]]
+      },
+      "properties": {"global_code": "8G830000+", "name": "8G83"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 36], [22, 37], [23, 37], [23, 36]]]
+      },
+      "properties": {"global_code": "8G840000+", "name": "8G84"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 37], [11, 38], [12, 38], [12, 37]]]
+      },
+      "properties": {"global_code": "8F9H0000+", "name": "8F9H"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 37], [12, 38], [13, 38], [13, 37]]]
+      },
+      "properties": {"global_code": "8F9J0000+", "name": "8F9J"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 37], [13, 38], [14, 38], [14, 37]]]
+      },
+      "properties": {"global_code": "8F9M0000+", "name": "8F9M"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 37], [14, 38], [15, 38], [15, 37]]]
+      },
+      "properties": {"global_code": "8F9P0000+", "name": "8F9P"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 37], [15, 38], [16, 38], [16, 37]]]
+      },
+      "properties": {"global_code": "8F9Q0000+", "name": "8F9Q"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 37], [16, 38], [17, 38], [17, 37]]]
+      },
+      "properties": {"global_code": "8F9R0000+", "name": "8F9R"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 37], [17, 38], [18, 38], [18, 37]]]
+      },
+      "properties": {"global_code": "8F9V0000+", "name": "8F9V"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 37], [18, 38], [19, 38], [19, 37]]]
+      },
+      "properties": {"global_code": "8F9W0000+", "name": "8F9W"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 37], [19, 38], [20, 38], [20, 37]]]
+      },
+      "properties": {"global_code": "8F9X0000+", "name": "8F9X"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 37], [20, 38], [21, 38], [21, 37]]]
+      },
+      "properties": {"global_code": "8G920000+", "name": "8G92"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 37], [21, 38], [22, 38], [22, 37]]]
+      },
+      "properties": {"global_code": "8G930000+", "name": "8G93"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 37], [22, 38], [23, 38], [23, 37]]]
+      },
+      "properties": {"global_code": "8G940000+", "name": "8G94"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 38], [11, 39], [12, 39], [12, 38]]]
+      },
+      "properties": {"global_code": "8FCH0000+", "name": "8FCH"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 38], [12, 39], [13, 39], [13, 38]]]
+      },
+      "properties": {"global_code": "8FCJ0000+", "name": "8FCJ"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 38], [13, 39], [14, 39], [14, 38]]]
+      },
+      "properties": {"global_code": "8FCM0000+", "name": "8FCM"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 38], [14, 39], [15, 39], [15, 38]]]
+      },
+      "properties": {"global_code": "8FCP0000+", "name": "8FCP"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 38], [15, 39], [16, 39], [16, 38]]]
+      },
+      "properties": {"global_code": "8FCQ0000+", "name": "8FCQ"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 38], [16, 39], [17, 39], [17, 38]]]
+      },
+      "properties": {"global_code": "8FCR0000+", "name": "8FCR"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 38], [17, 39], [18, 39], [18, 38]]]
+      },
+      "properties": {"global_code": "8FCV0000+", "name": "8FCV"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 38], [18, 39], [19, 39], [19, 38]]]
+      },
+      "properties": {"global_code": "8FCW0000+", "name": "8FCW"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 38], [19, 39], [20, 39], [20, 38]]]
+      },
+      "properties": {"global_code": "8FCX0000+", "name": "8FCX"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 38], [20, 39], [21, 39], [21, 38]]]
+      },
+      "properties": {"global_code": "8GC20000+", "name": "8GC2"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 38], [21, 39], [22, 39], [22, 38]]]
+      },
+      "properties": {"global_code": "8GC30000+", "name": "8GC3"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 38], [22, 39], [23, 39], [23, 38]]]
+      },
+      "properties": {"global_code": "8GC40000+", "name": "8GC4"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 39], [11, 40], [12, 40], [12, 39]]]
+      },
+      "properties": {"global_code": "8FFH0000+", "name": "8FFH"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 39], [12, 40], [13, 40], [13, 39]]]
+      },
+      "properties": {"global_code": "8FFJ0000+", "name": "8FFJ"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 39], [13, 40], [14, 40], [14, 39]]]
+      },
+      "properties": {"global_code": "8FFM0000+", "name": "8FFM"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 39], [14, 40], [15, 40], [15, 39]]]
+      },
+      "properties": {"global_code": "8FFP0000+", "name": "8FFP"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 39], [15, 40], [16, 40], [16, 39]]]
+      },
+      "properties": {"global_code": "8FFQ0000+", "name": "8FFQ"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 39], [16, 40], [17, 40], [17, 39]]]
+      },
+      "properties": {"global_code": "8FFR0000+", "name": "8FFR"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 39], [17, 40], [18, 40], [18, 39]]]
+      },
+      "properties": {"global_code": "8FFV0000+", "name": "8FFV"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 39], [18, 40], [19, 40], [19, 39]]]
+      },
+      "properties": {"global_code": "8FFW0000+", "name": "8FFW"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 39], [19, 40], [20, 40], [20, 39]]]
+      },
+      "properties": {"global_code": "8FFX0000+", "name": "8FFX"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 39], [20, 40], [21, 40], [21, 39]]]
+      },
+      "properties": {"global_code": "8GF20000+", "name": "8GF2"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 39], [21, 40], [22, 40], [22, 39]]]
+      },
+      "properties": {"global_code": "8GF30000+", "name": "8GF3"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 39], [22, 40], [23, 40], [23, 39]]]
+      },
+      "properties": {"global_code": "8GF40000+", "name": "8GF4"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[11, 40], [11, 41], [12, 41], [12, 40]]]
+      },
+      "properties": {"global_code": "8FGH0000+", "name": "8FGH"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[12, 40], [12, 41], [13, 41], [13, 40]]]
+      },
+      "properties": {"global_code": "8FGJ0000+", "name": "8FGJ"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[13, 40], [13, 41], [14, 41], [14, 40]]]
+      },
+      "properties": {"global_code": "8FGM0000+", "name": "8FGM"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[14, 40], [14, 41], [15, 41], [15, 40]]]
+      },
+      "properties": {"global_code": "8FGP0000+", "name": "8FGP"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[15, 40], [15, 41], [16, 41], [16, 40]]]
+      },
+      "properties": {"global_code": "8FGQ0000+", "name": "8FGQ"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[16, 40], [16, 41], [17, 41], [17, 40]]]
+      },
+      "properties": {"global_code": "8FGR0000+", "name": "8FGR"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[17, 40], [17, 41], [18, 41], [18, 40]]]
+      },
+      "properties": {"global_code": "8FGV0000+", "name": "8FGV"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[18, 40], [18, 41], [19, 41], [19, 40]]]
+      },
+      "properties": {"global_code": "8FGW0000+", "name": "8FGW"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[19, 40], [19, 41], [20, 41], [20, 40]]]
+      },
+      "properties": {"global_code": "8FGX0000+", "name": "8FGX"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[20, 40], [20, 41], [21, 41], [21, 40]]]
+      },
+      "properties": {"global_code": "8GG20000+", "name": "8GG2"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[21, 40], [21, 41], [22, 41], [22, 40]]]
+      },
+      "properties": {"global_code": "8GG30000+", "name": "8GG3"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[22, 40], [22, 41], [23, 41], [23, 40]]]
+      },
+      "properties": {"global_code": "8GG40000+", "name": "8GG4"}
+    }
+  ]
+}

@@ -10,24 +10,23 @@ import (
 // MinTrimmableCodeLen is the minimum length of a code that is able to be shortened.
 const MinTrimmableCodeLen = 6
 
+var (
+	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
+)
+
 // Shorten removes characters from the start of an OLC code.
 //
 // This uses a reference location to determine how many initial characters
 // can be removed from the OLC code. The number of characters that can be
 // removed depends on the distance between the code center and the reference
 // location.
-// The minimum number of characters that will be removed is four. If more than
-// four characters can be removed, the additional characters will be replaced
-// with the padding character. At most eight characters will be removed.
+//
+// The minimum number of characters that will be removed is four. At most eight
+// characters will be removed.
+//
 // The reference location must be within 50% of the maximum range. This ensures
 // that the shortened code will be able to be recovered using slightly different
 // locations.
-//
-// * code: A full, valid code to shorten.
-// * lat: A latitude, in signed decimal degrees, to use as the reference
-//       point.
-// * lng: A longitude, in signed decimal degrees, to use as the reference
-//       point.
 func Shorten(code string, lat, lng float64) (string, error) {
 	if err := CheckFull(code); err != nil {
 		return code, err
@@ -37,7 +36,6 @@ func Shorten(code string, lat, lng float64) (string, error) {
 	}
 	code = strings.ToUpper(code)
 	area, err := Decode(code)
-	debug("Shorten(%s) area=%v error=%v", code, area, err)
 	if err != nil {
 		return code, err
 	}
@@ -51,7 +49,6 @@ func Shorten(code string, lat, lng float64) (string, error) {
 	centerLat, centerLng := area.Center()
 	distance := math.Max(math.Abs(centerLat-lat), math.Abs(centerLng-lng))
 
-	//debug("Shorten lat=%f lng=%f centerLat=%f centerLng=%f distance=%.10f", lat, lng, centerLat, centerLng, distance)
 	for i := len(pairResolutions) - 2; i >= 1; i-- {
 		// Check if we're close enough to shorten. The range must be less than 1/2
 		// the resolution to shorten at all, and we want to allow some safety, so
@@ -66,39 +63,15 @@ func Shorten(code string, lat, lng float64) (string, error) {
 
 // RecoverNearest recovers the nearest matching code to a specified location.
 //
-// Given a short Open Location Code of between four and seven characters,
+// Given a short Open Location Code with from four to eight digits missing,
 // this recovers the nearest matching full code to the specified location.
-// The number of characters that will be prepended to the short code, depends
-// on the length of the short code and whether it starts with the separator.
-// If it starts with the separator, four characters will be prepended. If it
-// does not, the characters that will be prepended to the short code, where S
-// is the supplied short code and R are the computed characters, are as
-// follows:
-//
-// SSSS    -> RRRR.RRSSSS
-// SSSSS   -> RRRR.RRSSSSS
-// SSSSSS  -> RRRR.SSSSSS
-// SSSSSSS -> RRRR.SSSSSSS
-//
-// Note that short codes with an odd number of characters will have their
-// last character decoded using the grid refinement algorithm.
-//
-// * code: A valid short OLC character sequence.
-// * lat, lng: The latitude and longitude (in signed decimal degrees)
-//   to use to find the nearest matching full code.
-//
-// Returns:
-//   The nearest full Open Location Code to the reference location that matches
-//   the short code. Note that the returned code may not have the same
-//   computed characters as the reference location. This is because it returns
-//   the nearest match, not necessarily the match within the same cell. If the
-//   passed code was not a valid short code, but was a valid full code, it is
-//   returned unchanged.
 func RecoverNearest(code string, lat, lng float64) (string, error) {
+	// Return uppercased code if a full code was passed.
+	if err := CheckFull(code); err == nil {
+		return strings.ToUpper(code), nil
+	}
+	// Return error if not a short code
 	if err := CheckShort(code); err != nil {
-		if err = CheckFull(code); err == nil {
-			return code, nil
-		}
 		return code, ErrNotShort
 	}
 	// Ensure that latitude and longitude are valid.
@@ -126,20 +99,20 @@ func RecoverNearest(code string, lat, lng float64) (string, error) {
 	// than half the resolution, we need to move it south or north but keep it
 	// within -90 to 90 degrees.
 	centerLat, centerLng := area.Center()
-	if lat + halfRes < centerLat && centerLat - resolution >= -latMax {
+	if lat+halfRes < centerLat && centerLat-resolution >= -latMax {
 		// If the proposed code is more than half a cell north of the reference location,
 		// it's too far, and the best match will be one cell south.
 		centerLat -= resolution
-	} else if lat - halfRes > centerLat && centerLat + resolution <= latMax {
+	} else if lat-halfRes > centerLat && centerLat+resolution <= latMax {
 		// If the proposed code is more than half a cell south of the reference location,
 		// it's too far, and the best match will be one cell north.
 		centerLat += resolution
 	}
 
 	// How many degrees longitude is the code from the reference?
-	if lng + halfRes < centerLng {
+	if lng+halfRes < centerLng {
 		centerLng -= resolution
-	} else if lng - halfRes > centerLng {
+	} else if lng-halfRes > centerLng {
 		centerLng += resolution
 	}
 

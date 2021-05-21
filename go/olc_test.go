@@ -15,18 +15,22 @@
 package olc
 
 import (
-	"bytes"
-	"io/ioutil"
+	"bufio"
+	"encoding/csv"
 	"math"
+	"math/rand"
+	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 )
 
 var (
 	validity []validityTest
 	encoding []encodingTest
+	decoding []decodingTest
 	shorten  []shortenTest
 )
 
@@ -37,7 +41,14 @@ type (
 	}
 
 	encodingTest struct {
+		lat, lng float64
+		length   int
+		code     string
+	}
+
+	decodingTest struct {
 		code                                 string
+		length                               int
 		lat, lng, latLo, lngLo, latHi, lngHi float64
 	}
 
@@ -51,40 +62,59 @@ type (
 
 func init() {
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(4)
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range mustReadLines("validity") {
+		for _, cols := range mustReadLines("validityTests.csv") {
 			validity = append(validity, validityTest{
-				code:    string(cols[0]),
-				isValid: cols[1][0] == 't',
-				isShort: cols[2][0] == 't',
-				isFull:  cols[3][0] == 't',
+				code:    cols[0],
+				isValid: cols[1] == "true",
+				isShort: cols[2] == "true",
+				isFull:  cols[3] == "true",
 			})
 		}
 	}()
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range mustReadLines("encoding") {
+		for _, cols := range append(
+			mustReadLines("encoding.csv"),
+		) {
 			encoding = append(encoding, encodingTest{
-				code: string(cols[0]),
-				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
-				latLo: mustFloat(cols[3]), lngLo: mustFloat(cols[4]),
-				latHi: mustFloat(cols[5]), lngHi: mustFloat(cols[6]),
+				lat:    mustFloat(cols[0]),
+				lng:    mustFloat(cols[1]),
+				length: mustInt(cols[2]),
+				code:   cols[3],
 			})
 		}
 	}()
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range mustReadLines("shortCode") {
+		for _, cols := range append(
+			mustReadLines("decoding.csv"),
+		) {
+			decoding = append(decoding, decodingTest{
+				code:   cols[0],
+				length: mustInt(cols[1]),
+				latLo:  mustFloat(cols[2]),
+				lngLo:  mustFloat(cols[3]),
+				latHi:  mustFloat(cols[4]),
+				lngHi:  mustFloat(cols[5]),
+			})
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		for _, cols := range mustReadLines("shortCodeTests.csv") {
 			shorten = append(shorten, shortenTest{
-				code: string(cols[0]),
-				lat:  mustFloat(cols[1]), lng: mustFloat(cols[2]),
-				short: string(cols[3]),
-				tType: string(cols[4]),
+				code:  cols[0],
+				lat:   mustFloat(cols[1]),
+				lng:   mustFloat(cols[2]),
+				short: cols[3],
+				tType: cols[4],
 			})
 		}
 	}()
@@ -96,46 +126,31 @@ func TestCheck(t *testing.T) {
 		err := Check(elt.code)
 		got := err == nil
 		if got != elt.isValid {
-			t.Errorf("%d. %q validity is %t (err=%v), awaited %t.", i, elt.code, got, err, elt.isValid)
+			t.Errorf("%d. %q validity is %t (err=%v), wanted %t.", i, elt.code, got, err, elt.isValid)
 		}
 	}
 }
 
 func TestEncode(t *testing.T) {
 	for i, elt := range encoding {
-		n := len(stripCode(elt.code))
-		code := Encode(elt.lat, elt.lng, n)
-		if code != elt.code {
-			t.Errorf("%d. got %q for (%v,%v,%d), awaited %q.", i, code, elt.lat, elt.lng, n, elt.code)
+		got := Encode(elt.lat, elt.lng, elt.length)
+		if got != elt.code {
+			t.Errorf("%d. got %q for (%v,%v,%d), wanted %q.", i, got, elt.lat, elt.lng, elt.length, elt.code)
 			t.FailNow()
 		}
 	}
 }
 
 func TestDecode(t *testing.T) {
-	check := func(i int, code, name string, got, want float64) {
-		if !closeEnough(got, want) {
-			t.Errorf("%d. %q want %s=%f, got %f", i, code, name, want, got)
-			t.FailNow()
-		}
-	}
-	for i, elt := range encoding {
-		area, err := Decode(elt.code)
+	for i, elt := range decoding {
+		got, err := Decode(elt.code)
 		if err != nil {
 			t.Errorf("%d. %q: %v", i, elt.code, err)
 			continue
 		}
-		code := Encode(elt.lat, elt.lng, area.Len)
-		if code != elt.code {
-			t.Errorf("%d. encode (%f,%f) got %q, awaited %q", i, elt.lat, elt.lng, code, elt.code)
+		if got.Len != elt.length || !closeEnough(got.LatLo, elt.latLo) || !closeEnough(got.LatHi, elt.latHi) || !closeEnough(got.LngLo, elt.lngLo) || !closeEnough(got.LngHi, elt.lngHi) {
+			t.Errorf("%d: got (%v) wanted (%v)", i, got, elt)
 		}
-		C := func(name string, got, want float64) {
-			check(i, elt.code, name, got, want)
-		}
-		C("latLo", area.LatLo, elt.latLo)
-		C("latHi", area.LatHi, elt.latHi)
-		C("lngLo", area.LngLo, elt.lngLo)
-		C("lngHi", area.LngHi, elt.lngHi)
 	}
 }
 
@@ -171,34 +186,30 @@ func closeEnough(a, b float64) bool {
 	return a == b || math.Abs(a-b) <= 0.0000000001
 }
 
-func mustReadLines(name string) [][][]byte {
-	rows, err := readLines(filepath.Join("..", "test_data", name+"Tests.csv"))
+func mustReadLines(name string) [][]string {
+	csvFile, err := os.Open(filepath.Join("..", "test_data", name))
 	if err != nil {
 		panic(err)
 	}
-	return rows
+	reader := csv.NewReader(bufio.NewReader(csvFile))
+	reader.Comment = '#'
+	if records, err := reader.ReadAll(); err != nil {
+		panic(err)
+	} else {
+		return records
+	}
 }
 
-func readLines(path string) (rows [][][]byte, err error) {
-	data, err := ioutil.ReadFile(path)
+func mustFloat(a string) float64 {
+	f, err := strconv.ParseFloat(a, 64)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	for _, row := range bytes.Split(data, []byte{'\n'}) {
-		if j := bytes.IndexByte(row, '#'); j >= 0 {
-			row = row[:j]
-		}
-		row = bytes.TrimSpace(row)
-		if len(row) == 0 {
-			continue
-		}
-		rows = append(rows, bytes.Split(row, []byte{','}))
-	}
-	return rows, nil
+	return f
 }
 
-func mustFloat(a []byte) float64 {
-	f, err := strconv.ParseFloat(string(a), 64)
+func mustInt(a string) int {
+	f, err := strconv.Atoi(a)
 	if err != nil {
 		panic(err)
 	}
@@ -207,7 +218,7 @@ func mustFloat(a []byte) float64 {
 
 func TestFuzzCrashers(t *testing.T) {
 	for i, code := range []string{
-		"+975722X988X29qqX297" +
+		"975722X9+88X29qqX297" +
 			"5722X888X2975722X888" +
 			"X2975722X988X29qqX29" +
 			"75722X888X2975722X88" +
@@ -231,49 +242,51 @@ func TestFuzzCrashers(t *testing.T) {
 			"29qqX2975722X888X297" +
 			"5722X888X2975722X988" +
 			"X20",
-
-		"+qqX2975722X888X2975" +
-			"722X888X2975722X988X" +
-			"29qqX2975722X888X297" +
-			"5722X888X2975722X988" +
-			"X29qqX2975722X888X29" +
-			"75722X888X2975722X98" +
-			"8X29qqX2975722X88qqX" +
-			"2975722X888X2975722X" +
-			"888X2975722X988X29qq" +
-			"X2975722X888X2975722" +
-			"X888X2975722X988X29q" +
-			"qX2975722X888X297572" +
-			"2X888X2975722X988X29" +
-			"qqX2975722X88qqX2975" +
-			"722X888X2975722X888X" +
-			"2975722X988X29qqX297" +
-			"5722X888X2975722X888" +
-			"X2975722X988X29qqX29" +
-			"75722X888X2975722X88" +
-			"8X2975722X988X29qqX2" +
-			"975722X88qqX2975722X" +
-			"888X2975722X888X2975" +
-			"722X988X29qqX2975722" +
-			"X888X2975722X888X297" +
-			"5722X988X29qqX297572" +
-			"2X888X2975722X888X29" +
-			"75722X988X29qqX29757" +
-			"2",
 	} {
 		if err := Check(code); err != nil {
 			t.Logf("%d. %q Check: %v", i, code, err)
 		}
 		area, err := Decode(code)
 		if err != nil {
-			t.Logf("%d. %q Decode: %v", i, code, err)
+			t.Errorf("%d. %q Decode: %v", i, code, err)
 		}
 		if _, err = Decode(Encode(area.LatLo, area.LngLo, len(code))); err != nil {
-			t.Logf("%d. Lo Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatLo, area.LngLo, len(code), err)
+			t.Errorf("%d. Lo Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatLo, area.LngLo, len(code), err)
 		}
 		if _, err = Decode(Encode(area.LatHi, area.LngHi, len(code))); err != nil {
-			t.Logf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
+			t.Errorf("%d. Hi Decode(Encode(%q, %f, %f, %d))): %v", i, code, area.LatHi, area.LngHi, len(code), err)
 		}
+	}
+}
 
+func BenchmarkEncode(b *testing.B) {
+	// Build the random lat/lngs.
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	lat := make([]float64, b.N)
+	lng := make([]float64, b.N)
+	for i := 0; i < b.N; i++ {
+		lat[i] = r.Float64()*180 - 90
+		lng[i] = r.Float64()*360 - 180
+	}
+	// Reset the timer and run the benchmark.
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		Encode(lat[i], lng[i], maxCodeLen)
+	}
+}
+
+func BenchmarkDecode(b *testing.B) {
+	// Build random lat/lngs and encode them.
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	codes := make([]string, b.N)
+	for i := 0; i < b.N; i++ {
+		codes[i] = Encode(r.Float64()*180-90, r.Float64()*360-180, maxCodeLen)
+	}
+	// Reset the timer and run the benchmark.
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		Decode(codes[i])
 	}
 }
