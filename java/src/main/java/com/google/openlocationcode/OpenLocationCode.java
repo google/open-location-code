@@ -170,12 +170,11 @@ public final class OpenLocationCode {
    * @throws IllegalArgumentException when the passed code is not valid.
    */
   public OpenLocationCode(String code) {
-    String newCode = code.toUpperCase(Locale.ROOT);
-    if (!isValidCode(newCode)) {
+    if (!isValidCode(code)) {
       throw new IllegalArgumentException(
           "The provided code '" + code + "' is not a valid Open Location Code.");
     }
-    this.code = newCode;
+    this.code = code.toUpperCase(Locale.ROOT);
   }
 
   /**
