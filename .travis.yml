@@ -9,7 +9,7 @@ matrix:
   include:
     # C implementation. Lives in c/, tested with bazel.
     - language: c
-      env: OLC_PATH=c
+      env: OLC_PATH=Implementations/c
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -19,7 +19,7 @@ matrix:
 
     # C++ implementation. Lives in cpp/, tested with bazel.
     - language: cpp
-      env: OLC_PATH=cpp
+      env: OLC_PATH=Implementations/cpp
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -30,7 +30,7 @@ matrix:
     # Dart implementation. Lives in dart/
     - language: dart
       dart: stable
-      env: OLC_PATH=dart
+      env: OLC_PATH=Implementations/dart
       script:
         - cd ${OLC_PATH}
         - pub get && pub run test
@@ -39,7 +39,7 @@ matrix:
     # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.
     - language: go
       go: stable
-      env: OLC_PATH=go
+      env: OLC_PATH=Implementations/go
       script:
         - diff -u <(echo -n) <(gofmt -d -s ./go)
         - go test -bench=. ./go -v
@@ -52,7 +52,7 @@ matrix:
       jdk: oraclejdk8
       # Java 8 requires dist: trusty
       dist: trusty
-      env: OLC_PATH=java
+      env: OLC_PATH=Implementations/java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -64,7 +64,7 @@ matrix:
       jdk: openjdk8
       # Java 8 requires dist: trusty
       dist: trusty
-      env: OLC_PATH=java
+      env: OLC_PATH=Implementations/java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -74,7 +74,7 @@ matrix:
     # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
       jdk: openjdk9
-      env: OLC_PATH=java
+      env: OLC_PATH=Implementations/java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -84,7 +84,7 @@ matrix:
     # Java implementation. Lives in java/, tested with bazel and maven.
     - language: java
       jdk: openjdk10
-      env: OLC_PATH=java
+      env: OLC_PATH=Implementations/java
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -98,7 +98,7 @@ matrix:
     # # Ref: https://www.oracle.com/technetwork/java/java-se-support-roadmap.html
     # - language: java
     #   jdk: oraclejdk11
-    #   env: OLC_PATH=java
+    #   env: OLC_PATH=Implementations/java
     #   script:
     #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
     #     - chmod +x install.sh
@@ -108,7 +108,7 @@ matrix:
     # # Java implementation. Lives in java/, tested with bazel and maven.
     # - language: java
     #   jdk: openjdk11
-    #   env: OLC_PATH=java
+    #   env: OLC_PATH=Implementations/java
     #   script:
     #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
     #     - chmod +x install.sh
@@ -118,7 +118,7 @@ matrix:
     # # Java implementation. Lives in java/, tested with bazel and maven.
     # - language: java
     #   jdk: openjdk12
-    #   env: OLC_PATH=java
+    #   env: OLC_PATH=Implementations/java
     #   script:
     #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
     #     - chmod +x install.sh
@@ -128,7 +128,7 @@ matrix:
     # # Java implementation. Lives in java/, tested with bazel and maven.
     # - language: java
     #   jdk: openjdk13
-    #   env: OLC_PATH=java
+    #   env: OLC_PATH=Implementations/java
     #   script:
     #     - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
     #     - chmod +x install.sh
@@ -139,7 +139,7 @@ matrix:
     # We use language "c" because bazel will install all the dependencies we need, and we use path "js" for the node_js tests.
     # The Bazel configuration is cached. This saves about 3-4 minutes in the tests.
     - language: c
-      env: OLC_PATH=js/closure
+      env: OLC_PATH=Implementations/js/closure
       before_cache:
         # Bazel will fail to install if the installation is in the cache.
         - rm -fr ${HOME}/.cache/bazel/_bazel_${USER}/install
@@ -159,7 +159,7 @@ matrix:
     # Javascript implementation. Lives in js/.
     - language: node_js
       node_js: "node"
-      env: OLC_PATH=js
+      env: OLC_PATH=Implementations/js
       script:
         - cd js
         - bash checks.sh
@@ -167,7 +167,7 @@ matrix:
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 2.7
-      env: OLC_PATH=python
+      env: OLC_PATH=Implementations/python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -178,7 +178,7 @@ matrix:
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.6
-      env: OLC_PATH=python
+      env: OLC_PATH=Implementations/python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -189,7 +189,7 @@ matrix:
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.7
-      env: OLC_PATH=python
+      env: OLC_PATH=Implementations/python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -200,7 +200,7 @@ matrix:
     # Python implementation. Lives in python/, tested with bazel.
     - language: python
       python: 3.8
-      env: OLC_PATH=python
+      env: OLC_PATH=Implementations/python
       script:
         - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-installer-linux-x86_64.sh"
         - chmod +x install.sh
@@ -211,7 +211,7 @@ matrix:
     # Ruby implementation. Lives in ruby/
     - language: ruby
       rvm: 2.6.3
-      env: OLC_PATH=ruby
+      env: OLC_PATH=Implementations/ruby
       script:
         - gem install rubocop
         - gem install test-unit
@@ -220,7 +220,7 @@ matrix:
 
     # Rust implementation. Lives in rust/
     - language: rust
-      env: OLC_PATH=rust
+      env: OLC_PATH=Implementations/rust
       before_script:
         - rustup component add rustfmt
       # Adding caching of .cargo doesn't improve the build/test times.
