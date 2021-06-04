@@ -17,9 +17,53 @@
 0.5,179.5,4,6VGX0000+
 1,1,11,6FH32222+222
 ################################################################################
-#
-# Special cases over 90 latitude and 180 longitude
-#
+# North Pole and latitudes > 90N
+# Plus Codes Specification:
+# > This area includes exactly the coordinates:...
+# > (If the northern bound is 90° N and the western bound is 180° W) the North Pole (i.e. the point at 90° N);
+################################################################################
+90,-180,2,C2000000+
+90,-180,4,C2X20000+
+90,-180,6,C2X2X200+
+90,-180,8,C2X2X2X2+
+90,-180,10,C2X2X2X2+X2
+90,-180,11,C2X2X2X2+X2R
+90,-180,12,C2X2X2X2+X2RR
+90,-180,13,C2X2X2X2+X2RRR
+90,-180,14,C2X2X2X2+X2RRRR
+90,-180,15,C2X2X2X2+X2RRRRR
+90,0,15,C2X2X2X2+X2RRRRR
+90,180,15,C2X2X2X2+X2RRRRR
+91,-180,15,C2X2X2X2+X2RRRRR
+################################################################################
+# South Pole and latitudes < 90S
+# Plus Codes Specification:
+# > This area includes exactly the coordinates:...
+# > (If the southern bound is 90° S and the western bound is 180° W) the South Pole (i.e. the point at 90° S); and
+################################################################################
+-90,-180,2,22000000+
+-90,-180,4,22220000+
+-90,-180,6,22222200+
+-90,-180,8,22222222+
+-90,-180,10,22222222+22
+-90,-180,11,22222222+222
+-90,-180,12,22222222+2222
+-90,-180,13,22222222+22222
+-90,-180,14,22222222+222222
+-90,-180,15,22222222+2222222
+-90,0,15,22222222+2222222
+-90,180,15,22222222+2222222
+-91,-180,15,22222222+2222222
+################################################################################
+# Open Location Code API Specification:
+# > Implementations MUST follow these REQUIREMENTS for all public methods:...
+# > Longitude inputs MUST NOT cause runtime performance linearly dependant on the longitude.
+################################################################################
+90,-360000000180,2,22000000+
+################################################################################
+# Open Location Code API Specification:
+# > Implementations MUST follow these REQUIREMENTS for all public methods:...
+# > Longitude inputs MUST treat values outside the range from (including) 180° W to (excluding) 180° E as if they were the equivalent longitude in this range.
 ################################################################################
 90,1,4,CFX30000+
 92,1,4,CFX30000+
