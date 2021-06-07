@@ -49,7 +49,7 @@ Recovering shortened codes works by providing the short code and a reference loc
 
 This repository includes implementations in various computer languages. Additionally, are linking to other known implementations.
 
-| Language | Location | Validated against OLC API Spec 1.0.5 |
+| Language | Location | Validated against OLC API Spec 1.1.0 |
 | -------- | -------- | ----------------- |
 | c | [c](./Implementations/c) | NO |
 | common-lisp | [ralph-schleicher/open-location-code](https://github.com/ralph-schleicher/open-location-code) | NO |

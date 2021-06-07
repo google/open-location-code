@@ -4,7 +4,7 @@
 
 All substantial changes changes to this document are listed here.
 
-* Version 1.0.5 / 2021-06-04 / [William Entriken](https://github.com/fulldecent/)
+* Version 1.1.0 / 2021-06-04 / [William Entriken](https://github.com/fulldecent/)
   * Update to match nomenclature in [Plus Codes specification](./Plus%20Codes%20Specification.md)
   * Separate REQUIRED and OPTIONAL public methods
   * Specify the number of significant digits that a short code Plus Code may omit

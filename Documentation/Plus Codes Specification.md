@@ -4,7 +4,7 @@
 
 All substantial changes changes to this document are listed here.
 
-* Version 1.0.5 / 2021-06-04 / [William Entriken](https://github.com/fulldecent/)
+* Version 1.1.0 / 2021-06-04 / [William Entriken](https://github.com/fulldecent/)
   * Separate Plus Codes specification from [Open Location Code API specification](./Open Location Code API Specification.md)
   * Define codes for north and south poles
   * Specify which code levels of full codes may be shortened to which code levels of short codes
