@@ -17,6 +17,17 @@
 0.5,179.5,4,6VGX0000+
 1,1,11,6FH32222+222
 ################################################################################
+# Corners and edges of bounds
+# Plus Codes Specification:
+# > This area includes exactly the coordinates:...
+# > 1. Inside (excluding) the bounds;
+0,0.1,2,6F000000+
+# > 2. On the western bound between (excluding) the northern and southern bounds;
+0,0,2,6F000000+
+# > 5. (If the southern bound is not 90° S) on the southern bound from (excluding) the western bound to (including) the eastern bound.
+-10,0,2,6F000000+
+-10,0.1,2,6F000000+
+################################################################################
 # North Pole and latitudes > 90N
 # Plus Codes Specification:
 # > This area includes exactly the coordinates:...
