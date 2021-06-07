@@ -51,19 +51,19 @@ This repository includes implementations in various computer languages. Addition
 
 | Language | Location | Validated against OLC API Spec 1.1.0 |
 | -------- | -------- | ----------------- |
-| c | [c](./Implementations/c) | NO |
+| c | [c](./c) | NO |
 | common-lisp | [ralph-schleicher/open-location-code](https://github.com/ralph-schleicher/open-location-code) | NO |
-| cpp | [cpp](./Implementations/cpp) | NO |
+| cpp | [cpp](./cpp) | NO |
 | csharp | [JonMcPherson/open-location-code](https://github.com/JonMcPherson/open-location-code) | NO |
-| dart | [dart](./Implementations/dart) | NO |
+| dart | [dart](./dart) | NO |
 | emacs | [davby02/olc](https://gitlab.liu.se/davby02/olc) | NO |
-| go | [go](./Implementations/go) | NO |
-| java | [java](./Implementations/java) | NO |
-| js | [js](./Implementations/js) | NO |
-| plpgsql | [plpgsql](./Implementations/plpgsql) | NO |
-| python | [python](./Implementations/python) | NO |
-| ruby | [ruby](./Implementations/ruby) | NO |
-| rust | [rust](./Implementations/rust) | NO |
+| go | [go](./go) | NO |
+| java | [java](./java) | NO |
+| js | [js](./js) | NO |
+| plpgsql | [plpgsql](./plpgsql) | NO |
+| python | [python](./python) | NO |
+| ruby | [ruby](./ruby) | NO |
+| rust | [rust](./rust) | NO |
 | swift | [google/open-location-code-swift](https://github.com/google/open-location-code-swift) | NO |
 | typescript | [tspoke/typescript-open-location-code](https://github.com/tspoke/typescript-open-location-code) | NO |
-| visualbasic | [visualbasic](./Implementations/visualbasic) | NO |
+| visualbasic | [visualbasic](./visualbasic) | NO |
