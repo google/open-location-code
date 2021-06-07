@@ -18,8 +18,8 @@ A **Plus Code** represents a locus of coordinates ("**area**") with **bounds** o
 
 1. Inside (excluding) the bounds;
 2. On the western bound between (excluding) the northern and southern bounds;
-3. (If the northern bound is 90° N and the western bound is 180° W) the North Pole (i.e. the point at 90° N);
-4. (If the southern bound is 90° S and the western bound is 180° W) the South Pole (i.e. the point at 90° S); and
+3. (If the northern bound is 90° N and the western bound is 0° W) the North Pole (i.e. the point at 90° N);
+4. (If the southern bound is 90° S and the western bound is 0° W) the South Pole (i.e. the point at 90° S); and
 5. (If the southern bound is not 90° S) on the southern bound from (including) the western bound to (excluding) the eastern bound.
 
 This specification references latitudes and longitudes on Earth under [WGS 84](https://earth-info.nga.mil), which is the standard used by the Global Positioning System. If another geodetic is used, that context MUST be agreed between the producer and consumer of a Plus Code.
