@@ -54,7 +54,7 @@ Implementations MUST follow these REQUIREMENTS for all public methods:
 * Latitude inputs MUST treat a latitude greater than 90° N as if it were the North Pole (i.e. at 90° N).
 * Latitude inputs MUST treat a latitude lower than 90° S as if it were the South Pole (i.e. at 90° S).
 * Longitude inputs MUST treat values outside the range from (including) 180° W to (excluding) 180° E as if they were the equivalent longitude in this range.
-* Longitude inputs MUST NOT cause runtime performance linearly dependent on the longitude. E.g. use `LONGITUDE % 360`, not `WHILE (LONGITUDE > 180) LONGITUDE -= 360`.
+* Longitude inputs MUST NOT cause runtime performance linearly dependent on the longitude. E.g. use use a modulo operator, not a subtracting/adding while loop.
 
 ## OPTIONAL notes for all public methods
 
