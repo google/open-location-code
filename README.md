@@ -7,7 +7,7 @@ Open Location Code is a technology that gives a way of encoding location into a 
 
 The technology is designed to produce codes that can be used as a replacement for street addresses, especially in places where buildings aren't numbered or streets aren't named.
 
-Plus Codes represent an area, not a point. As digits are added to a code, the area shrinks, so a long code is more precise than a short code.
+Plus Codes represent an area, not a point. As digits are added to a code, the area shrinks, so a full code is more precise than a short code.
 
 Codes that are similar are located closer together than codes that are different.
 
