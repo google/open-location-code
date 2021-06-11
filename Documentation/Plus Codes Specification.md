@@ -68,7 +68,7 @@ The format separator is defined as the plus ("+") character ([U+002B](http://uni
 
 A Plus Code uses significant digits to encode its southern and western bounds. The significant digits of a Plus Code represent latitude (north) and then longitude (east) offsets from the starting location 90° S, 180° W. 
 
-A significant digit in digit places 1, 3, 5, 7 and 9 represents an offset north equal to the north-south distance for that code length (see the next higher code length in the code length table above) multiplied by the significant digit value.
+A significant digit in digit places 1, 3, 5, 7 and 9 represents an offset north equal to the north-south distance for that code length (find the code length for one more than the digit place in the code length table above) multiplied by the significant digit value.
 
 A significant digit in digit places 2, 4, 6, 8 and 10 represents an offset east equal to the west-east distance for that code length multiplied by the significant digit value.
 
