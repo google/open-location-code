@@ -6,7 +6,8 @@ All substantial changes changes to this document are listed here.
 
 * Version 1.1.0 / 2021-06-04 / [William Entriken](https://github.com/fulldecent/)
   * Separate Plus Codes specification from [Open Location Code API specification](./Open Location Code API Specification.md)
-  * Define codes for north and south poles
+  * Define one code for the North Pole at each code level
+  * Define one code for the South Pole at each code level (breaking change, previously many codes included the South Pole)
   * Specify which code levels of full codes may be shortened to which code levels of short codes
   * Establish consistent wording/naming
 * Version 1.0.0 / 2019-04-29 / [Doug Rinckes](https://github.com/drinckes), Google / Philipp Bunge, Google
