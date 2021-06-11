@@ -31,7 +31,7 @@ The **center** of a Plus Code area is defined as the arithmetic mean of its boun
 
 Plus Codes are characterized by their **code length**. This specifies the distance between the northern & southern bounds and the western & eastern bounds. Plus codes MUST use one of these code lengths:
 
-| Code length | North-south distance | West-east distance |  Precision   |
+| Code length | North-south distance | West-east distance | Longest edge |
 | :---------: | -------------------- | ------------------ | :----------: |
 |      2      | 20 degrees           | 20 degrees         |  < 2300 km   |
 |      4      | 1 degrees            | 1 degrees          |   < 120 km   |
