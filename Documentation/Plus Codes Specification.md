@@ -114,7 +114,3 @@ Therefore, the set of short code representations exactly matches the Perl Compat
 ```perl
 /^([2-9CFGHJMPQRVWX]{2})?([2-9CFGHJMPQRVWX]{2})?[2-9CFGHJMPQRVWX]{2}\+([2-9CFGHJMPQRVWX]{2,7})?$/
 ```
-
-## Copyright
-
-The authors dedicate this document to the public domain under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
