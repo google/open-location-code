@@ -95,7 +95,7 @@ Therefore, the set of full codes exactly matches the [Perl Compatible Regular Ex
 
 ## Short code
 
-A **short code** Plus Code is meaningful only when the producer and consumer of the Plus Code can agree on the approximate latitude and longitude of a **reference location**. A short code can be easier to use and remember than a full code.
+A **short code** Plus Code is meaningful only when the producer and consumer of the Plus Code agree on the approximate latitude and longitude of a **reference location**. A short code can be easier to use and remember than a full code.
 
 Plus Codes with code length less than 8 SHALL NOT be represented as short codes.
 

@@ -39,7 +39,7 @@ An implementation MAY implement these methods.
 | `encode`           | Latitude, longitude, code length                             | The full code Plus Code with specified code length with area that contains the specified coordinates |
 | `decode`           | Full code Plus Code string                                   | The southern parallel and western meridian for the Plus Code area |
 | `shorten`          | Full code Plus Code, reference location latitude and longitude | The short code Plus Code representing the input where all significant digits that are allowed to be omitted are omitted; or if no digits are allowed to be omitted then the input is returned |
-| `recoverNearest`   | Short code Plus Code, reference location latitude and longitude | The unique full code Plus Code nearest (latitudinal distance + longitudinal distance) to the reference location |
+| `recoverNearest`   | Short code Plus Code, reference location latitude and longitude | The unique full code Plus Code represented by the input |
 
 Implementations are RECOMMENDED to use the method names above. Note that the OPTIONAL `decode` public method overrides and tightens the specification for the REQUIRED `decode` public method. Note that The OPTIONAL `encode` public method adds a parameter. This MAY be implemented as an overloaded method or another way that is customary for the programming language.
 
