@@ -90,7 +90,7 @@ Every full code MUST include significant digits in digit places 1 up through the
 Therefore, the set of full codes exactly matches the [Perl Compatible Regular Expression](http://pcre.org):
 
 ````perl
-^[2-9C][2-9CFGHJMPQRV](0{6}\+|[2-9CFGHJMPQRVWX]{2}(0000\+|[2-9CFGHJMPQRVWX]{2}(00\+|[2-9CFGHJMPQRVWX]{2}\+([2-9CFGHJMPQRVWX]{2,7})?)))$
+/^[2-9C][2-9CFGHJMPQRV](0{6}\+|[2-9CFGHJMPQRVWX]{2}(0000\+|[2-9CFGHJMPQRVWX]{2}(00\+|[2-9CFGHJMPQRVWX]{2}\+([2-9CFGHJMPQRVWX]{2,7})?)))$/
 ````
 
 ## Short code

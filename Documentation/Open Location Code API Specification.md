@@ -26,7 +26,7 @@ An implementation of the Open Location Code API SHALL implement these REQUIRED m
 
 Implementations are RECOMMENDED to use the method names above.
 
-Note: it is possible to implement `isFull` using a Perl Compatible Regular Expression, see the Plus Code specification.
+Note: it is possible to implement `isFull` using a Perl Compatible Regular Expression, see the Plus Code specification and use case-insensitive matching.
 
 ## OPTIONAL public methods
 
@@ -45,7 +45,7 @@ Implementations are RECOMMENDED to use the method names above. Note that the OPT
 
 An implementation MAY implement `shorten` using separate `shortenBy4` and `shortenBy6` methods.
 
-Note: it is possible to implement `isValid` and `isShort` using a Perl Compatible Regular Expression, see the Plus Code specification.
+Note: it is possible to implement `isValid` and `isShort` using a Perl Compatible Regular Expression, see the Plus Code specification and use case-insensitive matching.
 
 ## REQUIREMENTS for all public methods
 
