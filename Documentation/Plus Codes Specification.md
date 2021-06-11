@@ -25,7 +25,7 @@ A **Plus Code** represents a locus of coordinates ("**area**") with **bounds** o
 
 This specification references latitudes and longitudes on Earth under [WGS 84](https://earth-info.nga.mil), which is the standard used by the Global Positioning System. If another geodetic is used, that context MUST be agreed between the producer and consumer of a Plus Code.
 
-The **center** of a Plus Code area is defined as the arithmetic mean of its bound's parallels and meridians.
+The **center** of a Plus Code is defined as the arithmetic mean of its bound's parallels and meridians.
 
 ## Precision
 
