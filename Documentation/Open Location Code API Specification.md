@@ -6,10 +6,9 @@ All substantial changes changes to this document are listed here.
 
 * Version 1.1.0 / 2021-06-04 / [William Entriken](https://github.com/fulldecent/)
   * Update to match nomenclature in [Plus Codes specification](./Plus%20Codes%20Specification.md)
-  * Separate REQUIRED and OPTIONAL public methods
   * Specify the number of significant digits that a short code Plus Code may omit
   * `isFull`, `isShort`, `isValid` methods must now validate whether the input actually is a valid Plus Code ignoring case (breaking change, previously `true` could be returned for some invalid inputs)
-  * `isValid`  became optional (breaking change)
+  * Public methods are specified as REQUIRED or OPTIONAL (breaking change: previously it may have been unclear which methods were REQUIRED)
 
 - Version 1.0.0 / 2014-10-27 / [Doug Rinckes](https://github.com/drinckes), Google / Philipp Bunge, Google
   - Initial public release
