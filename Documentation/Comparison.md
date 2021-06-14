@@ -57,13 +57,13 @@ Figure 1. 9x, g2, g7 and G2 code locations compared
 
 With just two levels, we can see that the cell "g2" (red, upper left of the cell marked g) is next to the cell 9X, but further from g7 (which is next to G2). Using real Geohash-36 codes, "bdg345476Q" is next to "bdbtTVTXWB" but several kilometers from "bdg3Hhg4Xd".
 
-Geohash-36 codes may be one character shorter than full code Plus Codes for similar accuracies.
+Geohash-36 codes may be one character shorter than Plus Codes for similar accuracies.
 
 The Geohash-36 definition includes an optional altitude specification, and an optional checksum, neither of which are provided by Plus Code.
 
 ## MapCode
 
-MapCodes can be defined globally or within a containing territory [MapCode]. The global codes are a similar length to Plus Codes, but codes defined within a territory are shorter than full code Plus Codes, and a similar length to short Plus Codes.
+MapCodes can be defined globally or within a containing territory [MapCode]. The global codes are a similar length to Plus Codes, but codes defined within a territory are shorter than Plus Codes, and a similar length to short Plus Codes.
 
 To decode the identifiers, a data file needs to be maintained and distributed. The identifiers are mostly ISO-3166 codes for the territory names which can lead to issues in disputed areas. Not all territory names are unique and the recommendation is to use a country-state (e.g., "US-AL") identifier in these cases.
 

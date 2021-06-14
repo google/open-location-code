@@ -83,7 +83,7 @@ A significant digit in places 11 and higher represents:
 
 ## Full code
 
-A **full code** Plus Code is globally usable and requires no other reference to interpret.
+A **full code** representation of a Plus Code is globally usable and requires no other reference to interpret.
 
 Every full code MUST include significant digits in digit places 1 up through the code length. If the code length is less than 8, then the padding character is placed in digit places after the last significant digit up to and including the 8th digit place. The format separator is added after the 8th digit place.
 
@@ -93,9 +93,11 @@ Therefore, the set of full codes exactly matches the [Perl Compatible Regular Ex
 /^[2-9C][2-9CFGHJMPQRV](0{6}\+|[2-9CFGHJMPQRVWX]{2}(0000\+|[2-9CFGHJMPQRVWX]{2}(00\+|[2-9CFGHJMPQRVWX]{2}\+([2-9CFGHJMPQRVWX]{2,7})?)))$/
 ````
 
+The full code representation is the default representation of a Plus Code.
+
 ## Short code
 
-A **short code** Plus Code is meaningful only when the producer and consumer of the Plus Code agree on the approximate latitude and longitude of a **reference location**. A short code can be easier to use and remember than a full code.
+A **short code** representation of a Plus Code is meaningful only when the producer and consumer agree on the approximate latitude and longitude of a **reference location**. A short code can be easier to use and remember than a full code.
 
 Plus Codes with code length less than 8 SHALL NOT be represented as short codes.
 
@@ -105,7 +107,7 @@ The latitudinal distance (in degrees) and longitudinal distance (in degrees) bet
 * If both distances are less than 0.5 degrees, digit places 1–2 or 1–4 MAY be omitted.
 * If both distances are less than 1/40 degrees, digit places 1–2, 1–4 or 1–6 MAY be omitted.
 
-A short code represents the unique full code Plus Code nearest (latitudinal distance + longitudinal distance) to the reference location.
+A short code represents the unique full code nearest (latitudinal distance + longitudinal distance) to the reference location.
 
 :information_source: Note that omitted digits places of a short code will not necessarily be the same as the reference location.
 

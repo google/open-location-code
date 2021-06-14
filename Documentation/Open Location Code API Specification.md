@@ -6,7 +6,7 @@ All substantial changes changes to this document are listed here.
 
 * Version 1.1.0 / 2021-06-04 / [William Entriken](https://github.com/fulldecent/)
   * Update to match nomenclature in [Plus Codes specification](./Plus%20Codes%20Specification.md)
-  * Specify the number of significant digits that a short code Plus Code may omit
+  * Specify the number of significant digits that a short code may omit
   * `isFull`, `isShort`, `isValid` methods must now validate whether the input actually is a valid Plus Code ignoring case (breaking change, previously `true` could be returned for some invalid inputs)
   * Public methods are specified as REQUIRED or OPTIONAL (breaking change: previously it may have been unclear which methods were REQUIRED)
 
@@ -19,9 +19,9 @@ An implementation of the Open Location Code API SHALL implement these REQUIRED m
 
 | Method name          | Input(s)                        | Output(s)                                                    |
 | -------------------- | ------------------------------- | ------------------------------------------------------------ |
-| `isFull`             | Plus Code string                | True if this is a full code Plus Code, false otherwise       |
+| `isFull`             | Plus Code string                | True if this is a full code, false otherwise       |
 | `encode`             | Latitude, longitude             | The Plus Code with code length 10 with area that contains the specified coordinates |
-| `decode`             | Full code Plus Code string with length 10 | The southern parallel and western meridian for the Plus Code area |
+| `decode`             | Full code string with code length 10 | The southern parallel and western meridian for the Plus Code area |
 
 Implementations are RECOMMENDED to use the method names above.
 
@@ -34,11 +34,11 @@ An implementation MAY implement these methods.
 | Method name        | Input(s)                                                     | Output(s)                                                    |
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | `isValid`          | Plus Code string                                             | True if this is a Plus Code (full code or short code), false otherwise |
-| `isShort`          | Plus Code string                                             | True if this is a short code Plus Code, false otherwise      |
-| `encode`           | Latitude, longitude, code length                             | The full code Plus Code with specified code length with area that contains the specified coordinates |
-| `decode`           | Full code Plus Code string                                   | The southern parallel and western meridian for the Plus Code area |
-| `shorten`          | Full code Plus Code, reference location latitude and longitude | The short code Plus Code representing the input where all significant digits that are allowed to be omitted are omitted; or if no digits are allowed to be omitted then the input is returned |
-| `recoverNearest`   | Short code Plus Code, reference location latitude and longitude | The unique full code Plus Code represented by the input |
+| `isShort`          | Plus Code string                                             | True if this is a short code, false otherwise      |
+| `encode`           | Latitude, longitude, code length                             | The full code with specified code length with area that contains the specified coordinates |
+| `decode`           | Full code string                                   | The southern parallel and western meridian for the Plus Code area |
+| `shorten`          | Full code, reference location latitude and longitude | The short code representing the input where all significant digits that are allowed to be omitted are omitted; or if no digits are allowed to be omitted then the input is returned |
+| `recoverNearest`   | Short code, reference location latitude and longitude | The unique full code represented by the input |
 
 Implementations are RECOMMENDED to use the method names above. Note that the OPTIONAL `decode` public method overrides and tightens the specification for the REQUIRED `decode` public method. Note that The OPTIONAL `encode` public method adds a parameter. This MAY be implemented as an overloaded method or another way that is customary for the programming language.
 
