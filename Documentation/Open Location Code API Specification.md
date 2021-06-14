@@ -19,6 +19,7 @@ An implementation of the Open Location Code API SHALL implement these REQUIRED m
 
 | Method name          | Input(s)                        | Output(s)                                                    |
 | -------------------- | ------------------------------- | ------------------------------------------------------------ |
+| `isValid`          | Plus Code string                                             | True if this is a Plus Code (full code or short code), false otherwise |
 | `isFull`             | Plus Code string                | True if this is a full code, false otherwise       |
 | `encode`             | Latitude, longitude             | The Plus Code with code length 10 with area that contains the specified coordinates |
 | `decode`             | Full code string with code length 10 | The southern parallel and western meridian for the Plus Code area |
@@ -33,7 +34,6 @@ An implementation MAY implement these methods.
 
 | Method name        | Input(s)                                                     | Output(s)                                                    |
 | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| `isValid`          | Plus Code string                                             | True if this is a Plus Code (full code or short code), false otherwise |
 | `isShort`          | Plus Code string                                             | True if this is a short code, false otherwise      |
 | `encode`           | Latitude, longitude, code length                             | The full code with specified code length with area that contains the specified coordinates |
 | `decode`           | Full code string                                   | The southern parallel and western meridian for the Plus Code area |
