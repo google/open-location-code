@@ -101,13 +101,15 @@ A **short code** representation of a Plus Code is meaningful only when the produ
 
 Plus Codes with code length less than 8 SHALL NOT be represented as short codes.
 
-The latitudinal distance (in degrees) and longitudinal distance (in degrees) between the Plus Code area's center and the reference location determines which digit places can be omitted in the short code representation:
+The **2-D rectilinear distance** between two latitude/longitude coordinates is defined as the sum of (the absolute difference of latitudes) and (the absolute difference of longitudes).
+
+The 2-D rectilinear distance distance between a Plus Code's center and a reference location determines which digit places can be omitted in the short code representation:
 
 * If both distances are less than 10 degrees, digit places 1–2 MAY be omitted.
 * If both distances are less than 0.5 degrees, digit places 1–2 or 1–4 MAY be omitted.
 * If both distances are less than 1/40 degrees, digit places 1–2, 1–4 or 1–6 MAY be omitted.
 
-A short code represents the unique full code nearest (latitudinal distance + longitudinal distance) to the reference location.
+A short code represents the unique full code Plus Code nearest (minimal 2-D rectilinear distance, prefer southernmost and westernmost if tied) to the reference location.
 
 :information_source: Note that omitted digits places of a short code will not necessarily be the same as the reference location.
 
