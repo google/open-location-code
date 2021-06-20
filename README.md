@@ -50,7 +50,7 @@ A "+" character is used after eight digits, to break the code up into two parts
 and to distinguish codes from postal codes.
 
 There will be locations where a 10 digit code is not sufficiently precise, but
-refining it by a factor of 20 is i) unnecessarily precise and ii) requires extending
+refining it by a factor of 20 is i. unnecessarily precise and ii. requires extending
 the code by two digits. Instead, after 10 digits, the area is divided
 into a 4x5 grid and a single digit used to identify the grid square. A single
 grid refinement step reduces the area to approximately 3.5x2.8 meters.
