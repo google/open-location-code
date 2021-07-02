@@ -23,7 +23,7 @@ A **Plus Code** represents a locus of coordinates ("**area**") with **bounds** o
 4. (If the southern bound is 90° S and the western bound is 0° W) the South Pole (i.e. the point at 90° S); and
 5. (If the southern bound is not 90° S) on the southern bound from (including) the western bound to (excluding) the eastern bound.
 
-This specification references latitudes and longitudes on Earth under [WGS 84](https://earth-info.nga.mil), which is the standard used by the Global Positioning System. If another geodetic is used, that context MUST be agreed between the producer and consumer of a Plus Code.
+This specification references latitudes and longitudes on a sphere which MUST be agreed between the producer and consumer of a Plus Code. Typically Earth and the [WGS 84 geodetic](https://earth-info.nga.mil) are used, which is the standard used by the Global Positioning System.
 
 The **center** of a Plus Code is defined as the arithmetic mean of its bound's parallels and meridians.
 
@@ -43,6 +43,8 @@ Plus Codes are characterized by their **code length**. This specifies the distan
 |     13      | 1/1e6 degrees        | 1/512000 degrees   |   < 22 cm    |
 |     14      | 1/5e6 degrees        | 1/2.048e6 degrees  |    < 6 cm    |
 |     15      | 1/2.5e7 degrees      | 1/8.192e7 degrees  |   < 14 mm    |
+
+Longest edges above are provided for informational purposes only and are not normative, these assume a Plus Code over Earth with the WGS 84 geodetic.
 
 ## Formatting
 
