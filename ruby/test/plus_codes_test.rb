@@ -117,18 +117,20 @@ class PlusCodesTest < Test::Unit::TestCase
       @olc.encode(lat, lng, len)
     end
     duration_micros = (Time.now.to_f * 1e6).to_i - start_micros
-    printf("Encode benchmark: %d usec total, %d loops, %f usec per call\n",
-           duration_micros, test_data.length,
-           duration_micros.to_f / test_data.length)
+    printf('Encode benchmark: ')
+    printf("%<total>d usec total, %<loops>d loops, %<percall>f usec per call\n",
+           total: duration_micros, loops: test_data.length,
+           percall: duration_micros.to_f / test_data.length)
 
     start_micros = (Time.now.to_f * 1e6).to_i
     test_data.each do |_, _, _, code|
       @olc.decode(code)
     end
     duration_micros = (Time.now.to_f * 1e6).to_i - start_micros
-    printf("Decode benchmark: %d usec total, %d loops, %f usec per call\n",
-           duration_micros, test_data.length,
-           duration_micros.to_f / test_data.length)
+    printf('Decode benchmark: ')
+    printf("%<total>d usec total, %<loops>d loops, %<percall>f usec per call\n",
+           total: duration_micros, loops: test_data.length,
+           percall: duration_micros.to_f / test_data.length)
   end
 
   def read_csv_lines(csv_file)

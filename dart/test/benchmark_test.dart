@@ -2,7 +2,7 @@ import 'package:open_location_code/open_location_code.dart' as olc;
 import 'package:test/test.dart';
 import 'dart:math';
 
-main() {
+void main() {
   test('Benchmarking encode and decode', () {
     var now = DateTime.now();
     var random = Random(now.millisecondsSinceEpoch);
@@ -21,12 +21,12 @@ main() {
       olc.decode(code);
       testData.add([lat, lng, length, code]);
     }
-    Stopwatch stopwatch = Stopwatch()..start();
+    var stopwatch = Stopwatch()..start();
     for (var i = 0; i < testData.length; i++) {
       olc.encode(testData[i][0], testData[i][1], codeLength: testData[i][2]);
     }
     var duration = stopwatch.elapsedMicroseconds;
-    print('Encoding benchmark ${testData.length}, duration ${duration} usec, ' +
+    print('Encoding benchmark ${testData.length}, duration ${duration} usec, '
         'average ${duration / testData.length} usec');
 
     stopwatch = Stopwatch()..start();
@@ -34,7 +34,7 @@ main() {
       olc.decode(testData[i][3]);
     }
     duration = stopwatch.elapsedMicroseconds;
-    print('Decoding benchmark ${testData.length}, duration ${duration} usec, ' +
+    print('Decoding benchmark ${testData.length}, duration ${duration} usec, '
         'average ${duration / testData.length} usec');
   });
 }

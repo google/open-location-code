@@ -29,7 +29,7 @@ The "0" character (U+0030) is used as a padding character before the format sepa
 
 ## Encoding
 
-Code digits and ordering do not change in RTL languages.
+Code digits and ordering do not change in right-to-left (RTL) languages.
 
 The latitude number must be clipped to be in the range -90 to 90.
 
@@ -52,14 +52,14 @@ The following provides an algorithm to encode the values from least significant 
 ### Least significant five digits
 
 This differs from the above method in that each step produces a single character.
-This encodes latitude into base five and longitude into base four, and then multiplies the digits for each position together.
+This encodes latitude into base five and longitude into base four, and then combines the digits for each position together.
 
 The following provides an algorithm to encode the values from least significant digit to most significant digit:
-1. Add 90 to the latiude, multiply the fractional part by 2.5e7 and take the integer part as latitude
-1. Add 180 to the longitude, multiply the fractional part by 8.192e6 and take the integer part as longitude
-1. Multiply the integer part of longitude modulus 4 by the integer part of latitude modulus 5
-1. Prefix the existing code with the symbol with the above value
-1. Divide longitude by four and latitude by five
+1. Add 90 to the latiude, multiply the fractional part by 2.5e7 and take the integer part as latitude.
+1. Add 180 to the longitude, multiply the fractional part by 8.192e6 and take the integer part as longitude.
+1. Take the integer part of latitude modulus 5. Multiply that by 4, and add the integer part of the longitude modulus 4.
+1. Prefix the existing code with the symbol with the above value.
+1. Divide longitude by four and latitude by five.
 1. Repeat from step 2 four more times.
 
 ### Code length
@@ -98,9 +98,9 @@ NB: This table assumes one degree is 111321 meters, and that all distances are c
 ## Decoding
 
 The coordinates obtained when decoding are the south-west corner.
-(The north-west corner and center coordinates can be obtained by adding the precison values.)
+(The north-east corner and center coordinates can be obtained by adding the precison values.)
 
-This implies that the north-west coordinates are not included in the area of the code, with the exception of codes whose northern latitude is 90 degrees.
+This implies that the north-east coordinates are not included in the area of the code, with the exception of codes whose northern latitude is 90 degrees.
 
 ## Short Codes
 

@@ -38,8 +38,6 @@ If you are adding Open Location Codes to your project, please contact the [Open 
 
 The Open Location Code project accepts and greatly appreciates code contributions!
 
-If you are contributing code to the project, consider [joining the Open Location Code project on GitHub](https://goo.gl/forms/T65peVtfQfEoDWeD3).
-
 A few things to note:
 
 * The Open Location Code project follows the [fork & pull](https://help.github.com/articles/using-pull-requests/#fork--pull) model for accepting contributions.
