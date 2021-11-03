@@ -1,0 +1,40 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  # C implementation. Lives in c/, tested with bazel.
+  test-c:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: c
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        run: bazel test --test_output=all ${OLC_PATH}:all
+      - name: check formatting
+        run: cd ${OLC_PATH} && bash clang_check.sh
+        
+  # C++ implementation. Lives in cpp/, tested with bazel.
+  test-cpp:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: cpp
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        run: bazel test --test_output=all ${OLC_PATH}:all
+      - name: check formatting
+        run: cd ${OLC_PATH} && bash clang_check.sh
+        
+  # Dart implementation. Lives in dart/.
+  test-dart:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: dart
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+      - name: test
+        run: |
+          cd ${OLC_PATH}
+          pub get && pub run test
+          bash checks.sh
