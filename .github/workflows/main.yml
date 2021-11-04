@@ -90,3 +90,36 @@ jobs:
         run: |
           bazel test ${OLC_PATH}:all
           cd js && npm install && ./node_modules/.bin/eslint closure/*js
+
+  # Javascript implementation. Lives in js/.
+  test-js:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: js
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        run: |
+          cd ${OLC_PATH}
+          bash checks.sh
+          
+          
+  # Python implementation. Lives in python/, tested with bazel.
+  test-python:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: python
+    strategy:
+      matrix:
+        python: [ '2.7', '3.6', '3.7', '3.8' ]
+    name: test-python-${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: test
+        run: |
+          bazel test --test_output=all ${OLC_PATH}:all
+          cd ${OLC_PATH} && bash format_check.sh
