@@ -54,7 +54,10 @@ jobs:
         cd ${OLC_PATH}
         diff -u <(echo -n) <(gofmt -d -s ./)
         go test -bench=. ./ -v
-        go test ../tile_server/gridserver -v
+    - name: test-gridserver
+      run: |
+        cd tile_server/gridserver
+        go test ./ -v
         
   # Java implementation. Lives in java/, tested with bazel and maven.     
   test-java:
