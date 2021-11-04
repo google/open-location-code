@@ -60,7 +60,7 @@ jobs:
       OLC_PATH: java
     strategy:
       matrix:
-        java: [ '8', '11', '13', '15' ]
+        java: [ '8', '11', '16', '17' ]
     name: test-java-${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
