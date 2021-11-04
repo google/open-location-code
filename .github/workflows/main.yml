@@ -38,3 +38,40 @@ jobs:
           cd ${OLC_PATH}
           pub get && pub run test
           bash checks.sh
+
+
+  # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.
+  test-go:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+    - name: test
+      run: |
+        diff -u <(echo -n) <(gofmt -d -s ./go)
+        go test -bench=. ./go -v
+        go test ./tile_server/gridserver -v
+        - go test -bench=. ./go -v
+        - go test ./tile_server/gridserver -v
+        
+   
+  # Java implementation. Lives in java/, tested with bazel and maven.     
+  test-java:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: java
+    strategy:
+      matrix:
+        java: [ '8', '9', '10', '11', '13', '15' ]
+    name: test-java-${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+      - name: test
+        run: bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
