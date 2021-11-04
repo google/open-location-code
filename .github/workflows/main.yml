@@ -77,3 +77,16 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+        
+        
+  # Javascript Closure library implementation. Lives in js/closure, tested with bazel.  
+  test-js-closure:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: js/closure
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        run: |
+          bazel test ${OLC_PATH}:all
+          cd js && npm install && ./node_modules/.bin/eslint closure/*js
