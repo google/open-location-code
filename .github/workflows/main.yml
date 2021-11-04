@@ -42,6 +42,8 @@ jobs:
   # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.
   test-go:
     runs-on: ubuntu-latest
+    env:
+      OLC_PATH: go
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-go@v2
@@ -49,9 +51,10 @@ jobs:
         go-version: 1.17
     - name: test
       run: |
-        diff -u <(echo -n) <(gofmt -d -s ./go)
-        go test -bench=. ./go -v
-        go test ./tile_server/gridserver -v
+        cd ${OLC_PATH}
+        diff -u <(echo -n) <(gofmt -d -s ./)
+        go test -bench=. ./ -v
+        go test ../tile_server/gridserver -v
         
   # Java implementation. Lives in java/, tested with bazel and maven.     
   test-java:
