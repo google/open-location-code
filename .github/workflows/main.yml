@@ -78,7 +78,6 @@ jobs:
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
         
-        
   # Javascript Closure library implementation. Lives in js/closure, tested with bazel.  
   test-js-closure:
     runs-on: ubuntu-latest
@@ -102,7 +101,6 @@ jobs:
         run: |
           cd ${OLC_PATH}
           bash checks.sh
-          
           
   # Python implementation. Lives in python/, tested with bazel.
   test-python:
@@ -135,3 +133,34 @@ jobs:
             echo "$DIFF"
           fi
           exit 1
+          
+  # Ruby implementation. Lives in ruby/.
+  test-ruby:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: ruby
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.5'
+      - name: test
+        run: |
+          gem install rubocop
+          gem install test-unit
+          cd ${OLC_PATH} && ruby test/plus_codes_test.rb
+          rubocop --config rubocop.yml
+
+  # Rust implementation. Lives in rust/.
+  test-rust:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: rust
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        run: |
+          cd ${OLC_PATH}
+          cargo fmt --all -- --check
+          cargo build
+          cargo test -- --nocapture
