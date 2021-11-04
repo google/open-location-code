@@ -120,6 +120,18 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: test
+        run: bazel test --test_output=all ${OLC_PATH}:all
+      - name: check formatting
         run: |
-          bazel test --test_output=all ${OLC_PATH}:all
-          cd ${OLC_PATH} && bash format_check.sh
+          cd ${OLC_PATH}
+          pip install yapf
+          DIFF=`python -m yapf --diff *py`
+          if [ $? -eq 0 ]; then
+            echo -e "Python files are correctly formatted"
+            exit 0
+          else 
+            echo -e "Python files have formatting errors"
+            echo -e "These must be corrected using format_check.sh"
+            echo "$DIFF"
+          fi
+          exit 1
