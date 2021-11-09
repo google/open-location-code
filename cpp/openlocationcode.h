@@ -3,9 +3,9 @@
 // The aim is to provide a more convenient way for humans to handle geographic
 // coordinates than latitude and longitude pairs.
 //
-// The codes can be easily read and remembered, and truncating codes converts
-// them from a point to an area, meaning that where extreme accuracy is not
-// required the codes can be shortened.
+// The codes can be easily read and remembered, and truncating codes enlarges
+// the area they represent, meaning that where extreme accuracy is not required
+// the codes can be shortened.
 #ifndef LOCATION_OPENLOCATIONCODE_OPENLOCATIONCODE_H_
 #define LOCATION_OPENLOCATIONCODE_OPENLOCATIONCODE_H_
 

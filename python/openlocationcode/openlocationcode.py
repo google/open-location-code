@@ -129,15 +129,15 @@ FINAL_LNG_PRECISION_ = PAIR_PRECISION_ * GRID_COLUMNS_**(MAX_DIGIT_COUNT_ -
 MIN_TRIMMABLE_CODE_LEN_ = 6
 
 GRID_SIZE_DEGREES_ = 0.000125
-"""
-Determines if a code is valid.
-To be valid, all characters must be from the Open Location Code character
-set with at most one separator. The separator can be in any even-numbered
-position up to the eighth digit.
-"""
 
 
 def isValid(code):
+    """
+    Determines if a code is valid.
+    To be valid, all characters must be from the Open Location Code character
+    set with at most one separator. The separator can be in any even-numbered
+    position up to the eighth digit.
+    """
     # The separator is required.
     sep = code.find(SEPARATOR_)
     if code.count(SEPARATOR_) > 1:
@@ -179,15 +179,13 @@ def isValid(code):
     return True
 
 
-"""
-Determines if a code is a valid short code.
-A short Open Location Code is a sequence created by removing four or more
-digits from an Open Location Code. It must include a separator
-character.
-"""
-
-
 def isShort(code):
+    """
+    Determines if a code is a valid short code.
+    A short Open Location Code is a sequence created by removing four or more
+    digits from an Open Location Code. It must include a separator
+    character.
+    """
     # Check it's valid.
     if not isValid(code):
         return False
@@ -198,17 +196,15 @@ def isShort(code):
     return False
 
 
-"""
- Determines if a code is a valid full Open Location Code.
- Not all possible combinations of Open Location Code characters decode to
- valid latitude and longitude values. This checks that a code is valid
- and also that the latitude and longitude values are legal. If the prefix
- character is present, it must be the first character. If the separator
- character is present, it must be after four characters.
-"""
-
-
 def isFull(code):
+    """
+    Determines if a code is a valid full Open Location Code.
+    Not all possible combinations of Open Location Code characters decode to
+    valid latitude and longitude values. This checks that a code is valid
+    and also that the latitude and longitude values are legal. If the prefix
+    character is present, it must be the first character. If the separator
+    character is present, it must be after four characters.
+    """
     if not isValid(code):
         return False
     # If it's short, it's not full
@@ -228,25 +224,23 @@ def isFull(code):
     return True
 
 
-"""
- Encode a location into an Open Location Code.
- Produces a code of the specified length, or the default length if no length
- is provided.
- The length determines the accuracy of the code. The default length is
- 10 characters, returning a code of approximately 13.5x13.5 meters. Longer
- codes represent smaller areas, but lengths > 14 are sub-centimetre and so
- 11 or 12 are probably the limit of useful codes.
- Args:
-   latitude: A latitude in signed decimal degrees. Will be clipped to the
-       range -90 to 90.
-   longitude: A longitude in signed decimal degrees. Will be normalised to
-       the range -180 to 180.
-   codeLength: The number of significant digits in the output code, not
-       including any separator characters.
-"""
-
-
 def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
+    """
+    Encode a location into an Open Location Code.
+    Produces a code of the specified length, or the default length if no length
+    is provided.
+    The length determines the accuracy of the code. The default length is
+    10 characters, returning a code of approximately 13.5x13.5 meters. Longer
+    codes represent smaller areas, but lengths > 14 are sub-centimetre and so
+    11 or 12 are probably the limit of useful codes.
+    Args:
+      latitude: A latitude in signed decimal degrees. Will be clipped to the
+          range -90 to 90.
+      longitude: A longitude in signed decimal degrees. Will be normalised to
+          the range -180 to 180.
+      codeLength: The number of significant digits in the output code, not
+          including any separator characters.
+    """
     if codeLength < 2 or (codeLength < PAIR_CODE_LENGTH_ and
                           codeLength % 2 == 1):
         raise ValueError('Invalid Open Location Code length - ' +
@@ -303,19 +297,17 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
                                          codeLength) + SEPARATOR_
 
 
-"""
- Decodes an Open Location Code into the location coordinates.
- Returns a CodeArea object that includes the coordinates of the bounding
- box - the lower left, center and upper right.
- Args:
-   code: The Open Location Code to decode.
- Returns:
-   A CodeArea object that provides the latitude and longitude of two of the
-   corners of the area, the center, and the length of the original code.
-"""
-
-
 def decode(code):
+    """
+    Decodes an Open Location Code into the location coordinates.
+    Returns a CodeArea object that includes the coordinates of the bounding
+    box - the lower left, center and upper right.
+    Args:
+      code: The Open Location Code to decode.
+    Returns:
+      A CodeArea object that provides the latitude and longitude of two of the
+      corners of the area, the center, and the length of the original code.
+    """
     if not isFull(code):
         raise ValueError(
             'Passed Open Location Code is not a valid full code - ' + str(code))
@@ -379,37 +371,24 @@ def decode(code):
                     min(len(code), MAX_DIGIT_COUNT_))
 
 
-"""
- Recover the nearest matching code to a specified location.
- Given a short Open Location Code of between four and seven characters,
- this recovers the nearest matching full code to the specified location.
- The number of characters that will be prepended to the short code, depends
- on the length of the short code and whether it starts with the separator.
- If it starts with the separator, four characters will be prepended. If it
- does not, the characters that will be prepended to the short code, where S
- is the supplied short code and R are the computed characters, are as
- follows:
- SSSS    -> RRRR.RRSSSS
- SSSSS   -> RRRR.RRSSSSS
- SSSSSS  -> RRRR.SSSSSS
- SSSSSSS -> RRRR.SSSSSSS
- Note that short codes with an odd number of characters will have their
- last character decoded using the grid refinement algorithm.
- Args:
-   code: A valid OLC character sequence.
-   referenceLatitude: The latitude (in signed decimal degrees) to use to
-       find the nearest matching full code.
-   referenceLongitude: The longitude (in signed decimal degrees) to use
-       to find the nearest matching full code.
- Returns:
-   The nearest full Open Location Code to the reference location that matches
-   the short code. If the passed code was not a valid short code, but was a
-   valid full code, it is returned with proper capitalization but otherwise
-   unchanged.
-"""
-
 
 def recoverNearest(code, referenceLatitude, referenceLongitude):
+    """
+     Recover the nearest matching code to a specified location.
+     Given a short code of between four and seven characters, this recovers
+     the nearest matching full code to the specified location.
+     Args:
+       code: A valid OLC character sequence.
+       referenceLatitude: The latitude (in signed decimal degrees) to use to
+           find the nearest matching full code.
+       referenceLongitude: The longitude (in signed decimal degrees) to use
+           to find the nearest matching full code.
+     Returns:
+       The nearest full Open Location Code to the reference location that matches
+       the short code. If the passed code was not a valid short code, but was a
+       valid full code, it is returned with proper capitalization but otherwise
+       unchanged.
+    """
     # if code is a valid full code, return it properly capitalized
     if isFull(code):
         return code.upper()
@@ -451,31 +430,29 @@ def recoverNearest(code, referenceLatitude, referenceLongitude):
                   codeArea.codeLength)
 
 
-"""
- Remove characters from the start of an OLC code.
- This uses a reference location to determine how many initial characters
- can be removed from the OLC code. The number of characters that can be
- removed depends on the distance between the code center and the reference
- location.
- The minimum number of characters that will be removed is four. If more than
- four characters can be removed, the additional characters will be replaced
- with the padding character. At most eight characters will be removed.
- The reference location must be within 50% of the maximum range. This ensures
- that the shortened code will be able to be recovered using slightly different
- locations.
- Args:
-   code: A full, valid code to shorten.
-   latitude: A latitude, in signed decimal degrees, to use as the reference
-       point.
-   longitude: A longitude, in signed decimal degrees, to use as the reference
-       point.
- Returns:
-   Either the original code, if the reference location was not close enough,
-   or the .
-"""
-
-
 def shorten(code, latitude, longitude):
+    """
+     Remove characters from the start of an OLC code.
+     This uses a reference location to determine how many initial characters
+     can be removed from the OLC code. The number of characters that can be
+     removed depends on the distance between the code center and the reference
+     location.
+     The minimum number of characters that will be removed is four. If more than
+     four characters can be removed, the additional characters will be replaced
+     with the padding character. At most eight characters will be removed.
+     The reference location must be within 50% of the maximum range. This ensures
+     that the shortened code will be able to be recovered using slightly different
+     locations.
+     Args:
+       code: A full, valid code to shorten.
+       latitude: A latitude, in signed decimal degrees, to use as the reference
+           point.
+       longitude: A longitude, in signed decimal degrees, to use as the reference
+           point.
+     Returns:
+       Either the original code, if the reference location was not close enough,
+       or the .
+    """
     if not isFull(code):
         raise ValueError('Passed code is not valid and full: ' + str(code))
     if code.find(PADDING_CHARACTER_) != -1:
@@ -501,39 +478,33 @@ def shorten(code, latitude, longitude):
     return code
 
 
-"""
- Clip a latitude into the range -90 to 90.
- Args:
-   latitude: A latitude in signed decimal degrees.
-"""
-
-
 def clipLatitude(latitude):
+    """
+     Clip a latitude into the range -90 to 90.
+     Args:
+       latitude: A latitude in signed decimal degrees.
+    """
     return min(90, max(-90, latitude))
 
 
-"""
- Compute the latitude precision value for a given code length. Lengths <=
- 10 have the same precision for latitude and longitude, but lengths > 10
- have different precisions due to the grid method having fewer columns than
- rows.
-"""
-
-
 def computeLatitudePrecision(codeLength):
+    """
+     Compute the latitude precision value for a given code length. Lengths <=
+     10 have the same precision for latitude and longitude, but lengths > 10
+     have different precisions due to the grid method having fewer columns than
+     rows.
+    """
     if codeLength <= 10:
         return pow(20, math.floor((codeLength / -2) + 2))
     return pow(20, -3) / pow(GRID_ROWS_, codeLength - 10)
 
 
-"""
- Normalize a longitude into the range -180 to 180, not including 180.
- Args:
-   longitude: A longitude in signed decimal degrees.
-"""
-
-
 def normalizeLongitude(longitude):
+    """
+     Normalize a longitude into the range -180 to 180, not including 180.
+     Args:
+       longitude: A longitude in signed decimal degrees.
+    """
     while longitude < -180:
         longitude = longitude + 360
     while longitude >= 180:
@@ -541,25 +512,22 @@ def normalizeLongitude(longitude):
     return longitude
 
 
-"""
- Coordinates of a decoded Open Location Code.
- The coordinates include the latitude and longitude of the lower left and
- upper right corners and the center of the bounding box for the area the
- code represents.
- Attributes:
-   latitude_lo: The latitude of the SW corner in degrees.
-   longitude_lo: The longitude of the SW corner in degrees.
-   latitude_hi: The latitude of the NE corner in degrees.
-   longitude_hi: The longitude of the NE corner in degrees.
-   latitude_center: The latitude of the center in degrees.
-   longitude_center: The longitude of the center in degrees.
-   code_length: The number of significant characters that were in the code.
-       This excludes the separator.
-"""
-
-
 class CodeArea(object):
-
+    """
+     Coordinates of a decoded Open Location Code.
+     The coordinates include the latitude and longitude of the lower left and
+     upper right corners and the center of the bounding box for the area the
+     code represents.
+     Attributes:
+       latitude_lo: The latitude of the SW corner in degrees.
+       longitude_lo: The longitude of the SW corner in degrees.
+       latitude_hi: The latitude of the NE corner in degrees.
+       longitude_hi: The longitude of the NE corner in degrees.
+       latitude_center: The latitude of the center in degrees.
+       longitude_center: The longitude of the center in degrees.
+       code_length: The number of significant characters that were in the code.
+           This excludes the separator.
+    """
     def __init__(self, latitudeLo, longitudeLo, latitudeHi, longitudeHi,
                  codeLength):
         self.latitudeLo = latitudeLo
