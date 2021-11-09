@@ -19,15 +19,15 @@ import 'package:test/test.dart';
 import 'utils.dart';
 
 // code,lat,lng,latLo,lngLo,latHi,lngHi
-checkEncodeDecode(String csvLine) {
-  List<String> elements = csvLine.split(",");
-  String code = elements[0];
+void checkEncodeDecode(String csvLine) {
+  var elements = csvLine.split(',');
+  var code = elements[0];
   num len = int.parse(elements[1]);
   num latLo = double.parse(elements[2]);
   num lngLo = double.parse(elements[3]);
   num latHi = double.parse(elements[4]);
   num lngHi = double.parse(elements[5]);
-  olc.CodeArea codeArea = olc.decode(code);
+  var codeArea = olc.decode(code);
   expect(codeArea.codeLength, equals(len));
   expect(codeArea.south, closeTo(latLo, 0.001));
   expect(codeArea.north, closeTo(latHi, 0.001));
@@ -35,7 +35,7 @@ checkEncodeDecode(String csvLine) {
   expect(codeArea.east, closeTo(lngHi, 0.001));
 }
 
-main() {
+void main() {
   test('Check decode', () {
     csvLinesFromFile('decoding.csv').forEach(checkEncodeDecode);
   });

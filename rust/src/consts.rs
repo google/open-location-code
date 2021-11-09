@@ -6,7 +6,7 @@ pub const SEPARATOR_POSITION: usize = 8;
 
 // The character used to pad codes.
 pub const PADDING_CHAR: char = '0';
-pub const PADDING_CHAR_STR: &'static str = "0";
+pub const PADDING_CHAR_STR: &str = "0";
 
 // The character set used to encode the values.
 pub const CODE_ALPHABET: [char; 20] = [

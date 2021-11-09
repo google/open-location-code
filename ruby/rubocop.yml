@@ -1,5 +1,12 @@
 # Override rubocop defaults.
 
+AllCops:
+  TargetRubyVersion: 2.5
+
+Layout/LineLength:
+  Enabled: true
+  Max: 80
+
 Metrics/AbcSize:
   Enabled: false
 
