@@ -17,7 +17,7 @@
 import 'package:open_location_code/open_location_code.dart' as olc;
 import 'package:test/test.dart';
 
-main() {
+void main() {
   test('Clip latitude test', () {
     expect(olc.clipLatitude(100.0), 90.0);
     expect(olc.clipLatitude(-100.0), -90.0);

@@ -82,13 +82,13 @@ module PlusCodes
         code = CODE_ALPHABET[lat_val % 20] + code
         lat_val = lat_val.div 20
         lng_val = lng_val.div 20
-        code = '+' + code if i.zero?
+        code = "+#{code}" if i.zero?
       end
       # If we don't need to pad the code, return the requested section.
       return code[0, code_length + 1] if code_length >= SEPARATOR_POSITION
 
       # Pad and return the code.
-      code[0, code_length] + PADDING * (SEPARATOR_POSITION - code_length) + '+'
+      "#{code[0, code_length]}#{PADDING * (SEPARATOR_POSITION - code_length)}+"
     end
 
     # Decodes an Open Location Code(Plus+Codes) into a [CodeArea].
