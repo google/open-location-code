@@ -102,14 +102,14 @@ const _decode = <int>[
 ]; //
 
 bool _matchesPattern(String string, Pattern pattern) =>
-    string.indexOf(pattern) >= 0;
+    string.contains(pattern);
 
 bool isValid(String code) {
   if (code == null || code.length == 1) {
     return false;
   }
 
-  int separatorIndex = code.indexOf(separator);
+  var separatorIndex = code.indexOf(separator);
   // There must be a single separator at an even index and position should be < SEPARATOR_POSITION.
   if (separatorIndex == -1 ||
       separatorIndex != code.lastIndexOf(separator) ||
@@ -268,17 +268,17 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   // Multiply values by their precision and convert to positive.
   // Force to integers so the division operations will have integer results.
   // Note: Dart requires rounding before truncating to ensure precision!
-  int latVal =
+  var latVal =
       ((latitude + latitudeMax) * finalLatPrecision * 1e6).round() ~/ 1e6;
-  int lngVal =
+  var lngVal =
       ((longitude + longitudeMax) * finalLngPrecision * 1e6).round() ~/ 1e6;
 
   // Compute the grid part of the code if necessary.
   if (codeLength > pairCodeLength) {
     for (var i = 0; i < maxDigitCount - pairCodeLength; i++) {
-      int lat_digit = latVal % gridRows;
-      int lng_digit = lngVal % gridColumns;
-      int ndx = lat_digit * gridColumns + lng_digit;
+      var lat_digit = latVal % gridRows;
+      var lng_digit = lngVal % gridColumns;
+      var ndx = lat_digit * gridColumns + lng_digit;
       code = codeAlphabet[ndx] + code;
       // Note! Integer division.
       latVal ~/= gridRows;

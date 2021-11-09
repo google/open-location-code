@@ -168,7 +168,7 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
         code = rev_code.chars().rev().take(code_length + 1).collect();
     }
 
-    return code;
+    code
 }
 
 /// Decodes an Open Location Code into the location coordinates.
@@ -307,7 +307,7 @@ pub fn recover_nearest(code: &str, ref_pt: Point<f64>) -> Result<String, String>
     }
 
     let prefix_len = SEPARATOR_POSITION - code.find(SEPARATOR).unwrap();
-    let mut code = prefix_by_reference(ref_pt, prefix_len) + code;
+    let code = prefix_by_reference(ref_pt, prefix_len) + code;
 
     let code_area = decode(code.as_str()).unwrap();
 

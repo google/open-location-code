@@ -1,7 +1,7 @@
 [package]
 name = "open-location-code"
 description = "Library for translating between GPS coordinates (WGS84) and Open Location Code"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["James Fysh <james.fysh@gmail.com>"]
 license = "Apache-2.0"
 repository = "https://github.com/google/open-location-code"
@@ -9,7 +9,7 @@ keywords = ["geography", "geospatial", "gis", "gps", "olc"]
 exclude = ["rust.iml"]
 
 [dependencies]
-geo = "^0.4.3"
+geo = "0.16.0"
 
 [dev-dependencies]
-rand = "^0.6.5"
+rand = "0.8.0"

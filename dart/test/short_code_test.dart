@@ -19,24 +19,24 @@ import 'package:test/test.dart';
 import 'utils.dart';
 
 // full code,lat,lng,shortcode
-checkShortCode(String csvLine) {
-  List<String> elements = csvLine.split(",");
-  String code = elements[0];
+void checkShortCode(String csvLine) {
+  var elements = csvLine.split(',');
+  var code = elements[0];
   num lat = double.parse(elements[1]);
   num lng = double.parse(elements[2]);
-  String shortCode = elements[3];
-  String testType = elements[4];
-  if (testType == "B" || testType == "S") {
-    String short = olc.shorten(code, lat, lng);
+  var shortCode = elements[3];
+  var testType = elements[4];
+  if (testType == 'B' || testType == 'S') {
+    var short = olc.shorten(code, lat, lng);
     expect(short, equals(shortCode));
   }
-  if (testType == "B" || testType == "R") {
-    String expanded = olc.recoverNearest(shortCode, lat, lng);
+  if (testType == 'B' || testType == 'R') {
+    var expanded = olc.recoverNearest(shortCode, lat, lng);
     expect(expanded, equals(code));
   }
 }
 
-main() {
+void main() {
   test('Check short codes', () {
     csvLinesFromFile('shortCodeTests.csv').forEach(checkShortCode);
   });

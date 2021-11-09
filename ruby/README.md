@@ -1,4 +1,4 @@
-# PlusCodes
+# Plus Codes
 
 Ruby implementation of Open Location Code library.
 

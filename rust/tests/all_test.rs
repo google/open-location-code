@@ -136,9 +136,9 @@ fn benchmark_test() {
     let loops = 100000;
     let mut bd: Vec<BenchmarkData> = Vec::new();
     for _i in 0..loops {
-        let lat = rng.gen_range(-90.0, 90.0);
-        let lng = rng.gen_range(-180.0, 180.0);
-        let mut len = rng.gen_range(2, 15);
+        let lat = rng.gen_range(-90.0..90.0);
+        let lng = rng.gen_range(-180.0..180.0);
+        let mut len = rng.gen_range(2..15);
         // Make sure the length is even if it's less than 10.
         if len < 10 && len % 2 == 1 {
             len += 1;

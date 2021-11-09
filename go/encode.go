@@ -53,15 +53,12 @@ func Encode(lat, lng float64, codeLen int) string {
 	} else if codeLen > maxCodeLen {
 		codeLen = maxCodeLen
 	}
+	// Clip the latitude. Normalise the longitude.
 	lat, lng = clipLatitude(lat), normalizeLng(lng)
 	// Latitude 90 needs to be adjusted to be just less, so the returned code
 	// can also be decoded.
 	if lat == latMax {
 		lat = normalizeLat(lat - computeLatPrec(codeLen))
-	}
-	// Normalise the longitude.
-	if lng == lngMax {
-		lng = normalizeLng(lng)
 	}
 	// Use a char array so we can build it up from the end digits, without having
 	// to keep reallocating strings.
