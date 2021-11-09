@@ -1,3 +1,4 @@
+//go:build gofuzz
 // +build gofuzz
 
 // Copyright 2015 Tamás Gulácsi. All rights reserved.
