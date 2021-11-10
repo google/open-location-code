@@ -1,7 +1,5 @@
 # Testing
-The preferred mechanism for testing is using the [Bazel](https://bazel.build/)
-build system. This uses files called `BUILD` ([example](https://github.com/google/open-location-code/blob/master/BUILD)
-to provide rules to build code and run tests).
+The preferred mechanism for testing is using the [Bazel](https://bazel.build/) build system. This uses files called `BUILD` ([example](https://github.com/google/open-location-code/blob/master/BUILD) to provide rules to build code and run tests).
 
 Create a `BUILD` file in your code directory with a [test rule](https://bazel.build/versions/master/docs/test-encyclopedia.html).
 You can then test your code by running:
@@ -17,13 +15,11 @@ bazel test ...:all
 ```
 
 ## Automated Integration Testing
-Changes are sent to [Travis CI](https://travis-ci.org)
-for integration testing after pushes, and you can see the current test status
-[here](https://travis-ci.org/google/open-location-code).
+On pushes and pull requests changes are tested via GitHub Actions. You can see the current test status in the [Actions tab](https://github.com/google/open-location-code/actions/workflows/main.yml?query=branch%3Amain).
 
-The testing configuration is controlled by the [`travis.yml`](.travis.yml) file.
+The testing configuration is controlled by the [`.github/workflows/main.yml`](.github/workflows/main.yml) file.
 
-### [.travis.yml](.travis.yml)
+### [.github/workflows/main.yml](.github/workflows/main.yml)
 This file defines each language configuration to be tested.
 
 Some languages can be tested natively, others are built and tested using bazel BUILD files.
@@ -31,41 +27,46 @@ Some languages can be tested natively, others are built and tested using bazel B
 An example of a language being tested natively is go:
 
 ```
-    # Go implementation. Lives in go/
-    - language: go
-      go: stable
-      env: OLC_PATH=go
-      script:
-        - go test ./go
+   # Go implementation. Lives in go/
+   test-go:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: go
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+    - name: test
+      run: go test ./${OLC_PATH}
 ```
 
-This defines the language, uses the `stable` version, sets an environment variable
-with the path and then runs the testing command `go test ./go`.
+This defines the language, uses the `1.17` version, sets an environment variable with the path and then runs the testing command `go test ./go`.
 
 An example of a language using bazel is Python:
 
 ```
-    # Python implementation. Lives in python/, tested with bazel.
-    - language: python
-      python: 2.7
-      env: OLC_PATH=python
-      script:
-        - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh"
-        - chmod +x install.sh
-        - ./install.sh --user && rm -f install.sh
-        - ~/bin/bazel test --test_output=all ${OLC_PATH}:all
+  # Python implementation. Lives in python/, tested with bazel.
+  test-python:
+    runs-on: ubuntu-latest
+    env:
+      OLC_PATH: python
+    strategy:
+      matrix:
+        python: [ '2.7', '3.6', '3.7', '3.8' ]
+    name: test-python-${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: test
+        run: bazel test --test_output=all ${OLC_PATH}:all
 ```
 
-The big difference is that the bazel software must be downloaded and
-installed before running the test command: 
-`~/bin/bazel test --test_output=all ${OLC_PATH}:all`.
-
-Note that this configuration tests python version 2.7. If you want to test multiple
-versions, you will need to define **another** language entry with the version
-specified. (You cannot specify multiple versions in a single language entry.)
+Bazel is pre-installed on GitHub-hosted runners which are used to run CI, so there's no need to install it. This example also shows how to test with multiple versions of a language.
 
 ### Adding Your Tests
 
-Simply add a new section to the `.travis.yml` file with the appropriate language,
-and either the native test command or install the bazel software and call the
-`bazel test` like the other examples.
+Simply add a new section to the `.github/workflows/main.yml` file with the appropriate language, and either the native test command or call `bazel test` like the other examples. More information about GitHub actions can be found in the [documentation](https://docs.github.com/en/actions/quickstart).
