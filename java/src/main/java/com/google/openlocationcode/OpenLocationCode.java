@@ -188,7 +188,7 @@ public final class OpenLocationCode {
     // Limit the maximum number of digits in the code.
     codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
     // Check that the code length requested is valid.
-    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < 4) {
+    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < 2) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
     // Ensure that latitude and longitude are valid.
