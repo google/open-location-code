@@ -670,6 +670,9 @@ public final class OpenLocationCode {
       return longitude;
     }
 
+    // % in Java uses truncated division with the remainder having the same sign as
+    // the dividend. For any input longitude < -360, the result of longitude%CIRCLE_DEG
+    // will still be negative but > -360, so we need to add 360 and apply % a second time.
     final long CIRCLE_DEG = 2 * LONGITUDE_MAX; // 360 degrees
     return (longitude % CIRCLE_DEG + CIRCLE_DEG + LONGITUDE_MAX) % CIRCLE_DEG - LONGITUDE_MAX;
   }
