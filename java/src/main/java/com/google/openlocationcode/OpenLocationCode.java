@@ -598,7 +598,7 @@ public final class OpenLocationCode {
     }
 
     // Check the characters before the separator.
-    boolean paddingStarted = null;
+    boolean paddingStarted = false;
     for (int i = 0; i < separatorPosition; i++) {
       if (CODE_ALPHABET.indexOf(code.charAt(i)) == -1 && code.charAt(i) != PADDING_CHARACTER) {
         // Invalid character.
