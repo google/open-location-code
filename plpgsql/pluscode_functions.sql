@@ -42,6 +42,34 @@ END;
 $BODY$;
 
 
+-- -- pluscode_computeLatitudePrecision ####
+-- -- Compute the latitude precision value for a given code length.
+-- -- PARAMETERS
+-- -- codeLength int // How long must be the pluscode
+-- -- EXAMPLE
+-- -- select pluscode_computeLatitudePrecision(11);
+CREATE OR REPLACE FUNCTION public.pluscode_computeLatitudePrecision(
+    codeLength int)
+RETURNS numeric
+    LANGUAGE 'plpgsql'
+    COST 100
+    IMMUTABLE
+AS $BODY$
+DECLARE
+    CODE_ALPHABET_ text := '23456789CFGHJMPQRVWX';
+    ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
+    PAIR_CODE_LENGTH_ int := 10;
+    GRID_ROWS_ int := 5;
+BEGIN
+    IF (codeLength <= PAIR_CODE_LENGTH_) THEN
+        RETURN power(ENCODING_BASE_, floor((codeLength / (-2)) + 2));
+    ELSE
+        RETURN power(ENCODING_BASE_, -3) / power(GRID_ROWS_, codeLength - PAIR_CODE_LENGTH_);
+    END IF;
+END;
+$BODY$;
+
+
 -- pluscode_normalizelongitude ####
 -- Normalize a longitude between -180 and 180 degrees (180 excluded).
 -- PARAMETERS
@@ -277,124 +305,93 @@ $BODY$;
 -- pluscode_encode ####
 -- Encode lat lng to get pluscode
 -- PARAMETERS
--- _lat numeric // latitude ref
--- _lng numeric // longitude ref
--- _codelength int// How long must be the pluscode
+-- latitude numeric // latitude ref
+-- longitude numeric // longitude ref
+-- codeLength int// How long must be the pluscode
 -- EXAMPLE
 -- select pluscode_encode(49.05,-0.108,12);
 CREATE OR REPLACE FUNCTION public.pluscode_encode(
-    _lat numeric,
-    _lng numeric,
-    _codelength integer DEFAULT 10)
+    latitude numeric,
+    longitude numeric,
+    codeLength int DEFAULT 10)
 RETURNS text
     LANGUAGE 'plpgsql'
     COST 100
     IMMUTABLE
 AS $BODY$
 DECLARE
-    code text DEFAULT '';
-    code_alphabet text := '23456789CFGHJMPQRVWX';
-    sum_lat_tosubstract numeric;
-    sum_lng_tosubstract numeric;
-    classic_code int := 10;
-    precision_up int := 0;
-    digit_sub FLOAT ARRAY  DEFAULT  ARRAY[20.0, 1.0, 0.05, 0.0025, 0.000125];
-    code_11_digit text default '';
-    latPlaceValue numeric;
-    lngPlaceValue numeric;
-    latitude numeric;
-    longitude numeric;
-    adjust_lat numeric;
-    adjust_lng numeric;
-    _row numeric;
-    _col numeric;
-    nb_rows int default 5;
-    nb_cols int default 4;
-    _isvalid_params boolean default false;
-
+    SEPARATOR_ text := '+';
+    SEPARATOR_POSITION_ int := 8;
+    PADDING_CHARACTER_ text := '0';
+    CODE_ALPHABET_ text := '23456789CFGHJMPQRVWX';
+    ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
+    LATITUDE_MAX_ int := 90;
+    LONGITUDE_MAX_ int := 180;
+    MAX_DIGIT_COUNT_ int := 15;
+    PAIR_CODE_LENGTH_ int := 10;
+    PAIR_PRECISION_ decimal := power(ENCODING_BASE_, 3);
+    GRID_CODE_LENGTH_ int := MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_;
+    GRID_COLUMNS_ int := 4;
+    GRID_ROWS_ int := 5;
+    FINAL_LAT_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+    FINAL_LNG_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+    code text := '';
+    latVal decimal := 0;
+    lngVal decimal := 0;
+    latDigit smallint;
+    lngDigit smallint;
+    ndx smallint;
+    i_ smallint;
 BEGIN
-    IF (_codelength < 2 OR (_codelength < 10 AND (_codelength % 2 = 1))) THEN
-        RAISE EXCEPTION 'OLCode is not valid --> %', _codelength
-        USING HINT = 'Use an int in this array [2,4,6,8,10,10+]';
-    END IF;
-    IF (_lat>90) OR (_lat<-90) THEN
-        RAISE EXCEPTION 'Latitude limit excedeed  --> %', _lat
-        USING HINT = 'Use a value between -90 and 90';
-    END IF;
-    IF (_lng>180) OR (_lng<-180) THEN
-        RAISE EXCEPTION 'Longitude limit excedeed  --> %', _lng
-        USING HINT = 'Use a value between -180 and 180';
+    IF ((codeLength < 2) OR ((codeLength < PAIR_CODE_LENGTH_) AND (codeLength % 2 = 1))) THEN
+        RAISE EXCEPTION 'Invalid Open Location Code length - %', codeLength
+        USING HINT = 'The Open Location Code length must be 2, 4, 6, 8, 10, 11, 12, 13, 14, or 15.';
     END IF;
 
-    --calculate precision
-    precision_up := _codelength - classic_code;
+    codeLength := LEAST(codeLength, MAX_DIGIT_COUNT_);
 
-    --block1 for 2 digits get the first couple of chars
-    code = code || substring(code_alphabet from floor((_lat+90)/digit_sub[1])::int + 1 for 1);
-    sum_lat_tosubstract := (floor((_lat+90)/digit_sub[1])::int ) * digit_sub[1];
-    code = code || substring(code_alphabet from floor((_lng+180)/digit_sub[1])::int + 1  for 1);
-    sum_lng_tosubstract := (floor((_lng+180)/digit_sub[1])::int) * digit_sub[1];
+    latitude := pluscode_clipLatitude(latitude);
+    longitude := pluscode_normalizeLongitude(longitude);
 
-    --block2 for 4 digits get the second couple of chars
-    IF (_codelength > 3) THEN
-    code = code || substring(code_alphabet from floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[2])::int + 1 for 1);
-    sum_lat_tosubstract = sum_lat_tosubstract + (floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[2])) * digit_sub[2];
-    code = code || substring(code_alphabet from floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[2])::int + 1 for 1);
-    sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[2])) * digit_sub[2];
-    ELSE code = code||'00';
+    IF (latitude = 90) THEN
+        latitude := latitude - pluscode_computeLatitudePrecision(codeLength);
     END IF;
 
-    --block3 for 6 digits get the third couple of chars
-    IF (_codelength > 5) THEN
-    code = code || substring(code_alphabet from floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[3])::int + 1 for 1);
-    sum_lat_tosubstract = sum_lat_tosubstract + (floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[3])) * digit_sub[3];
-    code = code || substring(code_alphabet from floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[3])::int + 1 for 1);
-    sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[3])) * digit_sub[3];
-    ELSE code = code||'00';
-    END IF;
+    latVal := floor(round((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_, 6));
+    lngVal := floor(round((longitude + LONGITUDE_MAX_) * FINAL_LNG_PRECISION_, 6));
 
-    --block4 for 8 digits get the fourth couple of chars
-    IF (_codelength > 7) THEN
-    code = code || substring(code_alphabet from floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[4])::int + 1 for 1);
-    sum_lat_tosubstract = sum_lat_tosubstract + (floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[4])) * digit_sub[4];
-    code = code || substring(code_alphabet from floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[4])::int + 1 for 1);
-    sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[4])) * digit_sub[4];
-    ELSE code = code||'00';
-    END IF;
-
-    code=code||'+';
-    --block5  for 10 digits get the fifth couple of chars
-    IF (_codelength > 9) THEN
-    code = code || substring(code_alphabet from floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[5])::int + 1 for 1);
-    sum_lat_tosubstract = sum_lat_tosubstract + (floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[5])) * digit_sub[5];
-    code = code || substring(code_alphabet from floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[5])::int + 1 for 1);
-    sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[5])) * digit_sub[5];
-    END IF;
-
-    --after 10 digits
-    IF precision_up > 0 THEN
-        code_11_digit = '';
-        latPlaceValue := 0.000125;
-        lngPlaceValue := 0.000125;
-        --delete degrees for lat and lng
-        latitude := _lat::numeric % 1.0::numeric;
-        longitude := _lng::numeric % 1.0::numeric;
-        adjust_lat := latitude::numeric % latPlaceValue::numeric;
-        adjust_lng := longitude::numeric % lngPlaceValue::numeric;
-        --loop for precision > 10
-        --use a grid 5*4
-        FOR it IN 1..precision_up LOOP
-            _row = floor(adjust_lat / ( latPlaceValue / nb_rows));
-            _col = floor(adjust_lng / ( lngPlaceValue / nb_cols));
-            latPlaceValue = latPlaceValue / nb_rows;
-            lngPlaceValue = lngPlaceValue / nb_cols;
-            adjust_lat = adjust_lat - (_row * latPlaceValue);
-            adjust_lng = adjust_lng - (_col * lngPlaceValue);
-            code_11_digit = code_11_digit || substring(code_alphabet from ((_row * nb_cols + _col))::int + 1 for 1);
+    IF (codeLength > PAIR_CODE_LENGTH_) THEN
+        i_ := 0;
+        WHILE (i_ < (MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_)) LOOP
+            latDigit := latVal % GRID_ROWS_;
+            lngDigit := lngVal % GRID_COLUMNS_;
+            ndx := (latDigit * GRID_COLUMNS_) + lngDigit;
+            code := substr(CODE_ALPHABET_, ndx + 1, 1) || code;
+            latVal := div(latVal, GRID_ROWS_);
+            lngVal := div(lngVal, GRID_COLUMNS_);
+            i_ := i_ + 1;
         END LOOP;
+    ELSE
+        latVal := div(latVal, power(GRID_ROWS_, GRID_CODE_LENGTH_));
+        lngVal := div(lngVal, power(GRID_COLUMNS_, GRID_CODE_LENGTH_));
     END IF;
 
-    RETURN code||code_11_digit ;
+    i_ := 0;
+    WHILE (i_ < (PAIR_CODE_LENGTH_ / 2)) LOOP
+        code := substr(CODE_ALPHABET_, (lngVal % ENCODING_BASE_)::integer + 1, 1) || code;
+        code := substr(CODE_ALPHABET_, (latVal % ENCODING_BASE_)::integer + 1, 1) || code;
+        latVal := div(latVal, ENCODING_BASE_);
+        lngVal := div(lngVal, ENCODING_BASE_);
+        i_ := i_ + 1;
+    END LOOP;
+
+    code := substr(code, 1, SEPARATOR_POSITION_) || SEPARATOR_ || substr(code, SEPARATOR_POSITION_ + 1);
+
+    IF (codeLength >= SEPARATOR_POSITION_) THEN
+        RETURN substr(code, 1, codeLength + 1);
+    ELSE
+        RETURN rpad(substr(code, 1, codeLength), SEPARATOR_POSITION_, PADDING_CHARACTER_) || SEPARATOR_;
+    END IF;
 END;
 $BODY$;
 
