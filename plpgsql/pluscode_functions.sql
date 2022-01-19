@@ -446,8 +446,8 @@ grid_lat_first_place_value_ int := power(grid_rows_, (grid_code_length_ - 1));
 grid_lng_first_place_value_ int := power(grid_columns_, (grid_code_length_ - 1));
 final_lat_precision_ numeric := pair_precision_ * power(grid_rows_, (max_digit_count_ - pair_code_length_));
 final_lng_precision_ numeric := pair_precision_ * power(grid_columns_, (max_digit_count_ - pair_code_length_));
-rowpv numeric := 0;
-colpv numeric := 0;
+rowpv numeric := grid_lat_first_place_value_;
+colpv numeric := grid_lng_first_place_value_;
 
 BEGIN
     IF (pluscode_isfull(code)) is FALSE THEN
