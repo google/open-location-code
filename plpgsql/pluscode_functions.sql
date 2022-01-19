@@ -27,7 +27,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_cliplatitude(
 RETURNS numeric
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 BEGIN
     IF lat < -90 THEN
@@ -35,7 +35,7 @@ BEGIN
     END IF;
     IF lat > 90 THEN
         RETURN 90;
-    ELSE 
+    ELSE
         RETURN lat;
     END IF;
 END;
@@ -53,7 +53,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_normalizelongitude(
 RETURNS numeric
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 BEGIN
     WHILE (lng < -180) LOOP
@@ -78,7 +78,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_isvalid(
 RETURNS boolean
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 DECLARE
 separator_ text := '+';
@@ -157,10 +157,10 @@ CREATE OR REPLACE FUNCTION public.pluscode_codearea(
     latitudehi numeric,
     longitudehi numeric,
     codelength integer)
-RETURNS TABLE(lat_lo numeric, lng_lo numeric, lat_hi numeric, lng_hi numeric, code_length numeric, lat_center numeric, lng_center numeric) 
+RETURNS TABLE(lat_lo numeric, lng_lo numeric, lat_hi numeric, lng_hi numeric, code_length numeric, lat_center numeric, lng_center numeric)
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
     ROWS 1000
 AS $BODY$
 DECLARE
@@ -187,7 +187,7 @@ BEGIN
         rlongitudeCenter := (longitudeLo + (longitudeHi - longitudeLo)/ 2);
     END IF;
 
-    RETURN QUERY SELECT 
+    RETURN QUERY SELECT
         rlatitudeLo::double precision::numeric as lat_lo,
         rlongitudeLo::double precision::numeric as lng_lo,
         rlatitudeHi::double precision::numeric as lat_hi,
@@ -210,7 +210,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_isshort(
 RETURNS boolean
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 DECLARE
 separator_ text := '+';
@@ -240,7 +240,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_isfull(
 RETURNS boolean
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 DECLARE
 code_alphabet text := '23456789CFGHJMPQRVWX';
@@ -289,7 +289,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_encode(
 RETURNS text
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 DECLARE
     code text DEFAULT '';
@@ -298,7 +298,7 @@ DECLARE
     sum_lng_tosubstract numeric;
     classic_code int := 10;
     precision_up int := 0;
-    digit_sub FLOAT ARRAY  DEFAULT  ARRAY[20.0, 1.0, 0.05, 0.0025, 0.000125]; 
+    digit_sub FLOAT ARRAY  DEFAULT  ARRAY[20.0, 1.0, 0.05, 0.0025, 0.000125];
     code_11_digit text default '';
     latPlaceValue numeric;
     lngPlaceValue numeric;
@@ -325,16 +325,16 @@ BEGIN
         RAISE EXCEPTION 'Longitude limit excedeed  --> %', _lng
         USING HINT = 'Use a value between -180 and 180';
     END IF;
-    
+
     --calculate precision
     precision_up := _codelength - classic_code;
-    
+
     --block1 for 2 digits get the first couple of chars
     code = code || substring(code_alphabet from floor((_lat+90)/digit_sub[1])::int + 1 for 1);
     sum_lat_tosubstract := (floor((_lat+90)/digit_sub[1])::int ) * digit_sub[1];
     code = code || substring(code_alphabet from floor((_lng+180)/digit_sub[1])::int + 1  for 1);
     sum_lng_tosubstract := (floor((_lng+180)/digit_sub[1])::int) * digit_sub[1];
-    
+
     --block2 for 4 digits get the second couple of chars
     IF (_codelength > 3) THEN
     code = code || substring(code_alphabet from floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[2])::int + 1 for 1);
@@ -343,7 +343,7 @@ BEGIN
     sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[2])) * digit_sub[2];
     ELSE code = code||'00';
     END IF;
-    
+
     --block3 for 6 digits get the third couple of chars
     IF (_codelength > 5) THEN
     code = code || substring(code_alphabet from floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[3])::int + 1 for 1);
@@ -352,7 +352,7 @@ BEGIN
     sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[3])) * digit_sub[3];
     ELSE code = code||'00';
     END IF;
-    
+
     --block4 for 8 digits get the fourth couple of chars
     IF (_codelength > 7) THEN
     code = code || substring(code_alphabet from floor(((_lat+90)-sum_lat_tosubstract)/digit_sub[4])::int + 1 for 1);
@@ -361,7 +361,7 @@ BEGIN
     sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[4])) * digit_sub[4];
     ELSE code = code||'00';
     END IF;
-    
+
     code=code||'+';
     --block5  for 10 digits get the fifth couple of chars
     IF (_codelength > 9) THEN
@@ -370,7 +370,7 @@ BEGIN
     code = code || substring(code_alphabet from floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[5])::int + 1 for 1);
     sum_lng_tosubstract = sum_lng_tosubstract + (floor(((_lng+180)-sum_lng_tosubstract)/digit_sub[5])) * digit_sub[5];
     END IF;
-    
+
     --after 10 digits
     IF precision_up > 0 THEN
         code_11_digit = '';
@@ -393,7 +393,7 @@ BEGIN
             code_11_digit = code_11_digit || substring(code_alphabet from ((_row * nb_cols + _col))::int + 1 for 1);
         END LOOP;
     END IF;
-    
+
     RETURN code||code_11_digit ;
 END;
 $BODY$;
@@ -407,10 +407,10 @@ $BODY$;
 -- select pluscode_decode('CCCCCCCC+');
 CREATE OR REPLACE FUNCTION public.pluscode_decode(
     code text)
-RETURNS TABLE(lat_lo numeric, lng_lo numeric, lat_hi numeric, lng_hi numeric, code_length numeric, lat_center numeric, lng_center numeric) 
+RETURNS TABLE(lat_lo numeric, lng_lo numeric, lat_hi numeric, lng_hi numeric, code_length numeric, lat_center numeric, lng_center numeric)
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
     ROWS 1000
 AS $BODY$
 DECLARE
@@ -457,11 +457,11 @@ BEGIN
     code:= stripped_code;
     normal_lat := -latitude_max_ * pair_precision_;
     normal_lng := -longitude_max_ * pair_precision_;
-    
+
     --how many digits must be used
     IF (char_length(code) > pair_code_length_) THEN
         digits := pair_code_length_;
-    ELSE 
+    ELSE
         digits := char_length(code);
     END IF;
     pv := pair_first_place_value_;
@@ -473,17 +473,17 @@ BEGIN
                 pv := pv/encoding_base_;
             END IF;
             iterator := iterator + 2;
-            
+
         END LOOP;
-    
+
     --convert values to degrees
     lat_precision := pv/ pair_precision_;
     lng_precision := pv/ pair_precision_;
-    
+
     IF (char_length(code) > pair_code_length_) THEN
         IF (char_length(code) > max_digit_count_) THEN
             digits := max_digit_count_;
-        ELSE 
+        ELSE
             digits := char_length(code);
         END IF;
         iterator_d := pair_code_length_;
@@ -504,7 +504,7 @@ BEGIN
         lat_precision := rowpv / final_lat_precision_;
         lng_precision := colpv / final_lng_precision_;
     END IF;
-    
+
     --merge the normal and extra precision of the code
     lat_out := normal_lat / pair_precision_ + grid_lat_ / final_lat_precision_;
     lng_out := normal_lng / pair_precision_ + grid_lng_ / final_lng_precision_;
@@ -512,7 +512,7 @@ BEGIN
     IF (char_length(code) > max_digit_count_ ) THEN
         digits := max_digit_count_;
         RAISE NOTICE 'lat_out max_digit_count_ %', lat_out;
-    ELSE 
+    ELSE
         digits := char_length(code);
         RAISE NOTICE 'digits char_length%', digits;
     END IF ;
@@ -524,7 +524,7 @@ BEGIN
             (lng_out+lng_precision)::numeric,
             digits::int
     );
-    RETURN QUERY SELECT 
+    RETURN QUERY SELECT
         return_record.lat_lo,
         return_record.lng_lo,
         return_record.lat_hi,
@@ -552,7 +552,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_shorten(
 RETURNS text
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 DECLARE
 padding_character text :='0';
@@ -567,38 +567,38 @@ BEGIN
     IF (pluscode_isfull(code)) is FALSE THEN
         RAISE EXCEPTION 'Code is not full and valid: %', code;
     END IF;
-    
+
     IF (POSITION(padding_character IN code) > 0) THEN
       RAISE EXCEPTION 'Code contains 0 character(s), not valid : %', code;
     END IF;
-    
+
     code := UPPER(code);
     code_area := pluscode_decode(code);
-    
+
     IF (code_area.code_length < min_trimmable_code_len ) THEN
         RAISE EXCEPTION 'Code must contain more than 6 character(s) : %',code;
     END IF;
-    
+
     --Are the latitude and longitude valid
-    IF (pg_typeof(latitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) OR (pg_typeof(longitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) THEN 
+    IF (pg_typeof(latitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) OR (pg_typeof(longitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) THEN
         RAISE EXCEPTION 'LAT || LNG are not numbers % !',pg_typeof(latitude)||' || '||pg_typeof(longitude);
     END IF;
-    
+
     latitude := pluscode_clipLatitude(latitude);
     longitude := pluscode_normalizelongitude(longitude);
-    
+
     lat_dif := ABS(code_area.lat_center - latitude);
     lng_dif := ABS(code_area.lng_center - longitude);
-    
+
     --calculate max distance with the center
     IF (lat_dif > lng_dif) THEN
         range_ := lat_dif;
     ELSE
         range_ := lng_dif;
     END IF;
-    
+
     iterator := ARRAY_LENGTH( pair_resolutions_, 1)-2;
-    
+
     WHILE ( iterator >= 1 )
     LOOP
         --is it close enough to shortent the code ?
@@ -628,7 +628,7 @@ CREATE OR REPLACE FUNCTION public.pluscode_recovernearest(
 RETURNS text
     LANGUAGE 'plpgsql'
     COST 100
-    IMMUTABLE 
+    IMMUTABLE
 AS $BODY$
 DECLARE
 padding_length int :=0;
@@ -649,15 +649,15 @@ BEGIN
         END IF;
         RAISE EXCEPTION 'NOT A VALID FULL CODE: %', code;
     END IF;
-    
+
     --Are the latitude and longitude valid
-    IF (pg_typeof(reference_latitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) OR (pg_typeof(reference_longitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) THEN 
+    IF (pg_typeof(reference_latitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) OR (pg_typeof(reference_longitude) NOT IN ('numeric','real','double precision','integer','bigint','float')) THEN
         RAISE EXCEPTION 'LAT || LNG are not numbers % !',pg_typeof(latitude)||' || '||pg_typeof(longitude);
     END IF;
-    
+
     reference_latitude := pluscode_clipLatitude(reference_latitude);
     reference_longitude := pluscode_normalizeLongitude(reference_longitude);
-    
+
     short_code := UPPER(short_code);
     -- Calculate the number of digits to recover.
     padding_length := separator_position_ - POSITION(separator_ in short_code)+1;
@@ -665,10 +665,10 @@ BEGIN
     resolution := power(20, 2 - (padding_length / 2));
     -- Half resolution for difference with the center
     half_resolution := resolution / 2.0;
-    
+
     -- Concatenate short_code and the calculated value --> encode(lat,lng)
     code_area := pluscode_decode(SUBSTRING(pluscode_encode(reference_latitude::numeric, reference_longitude::numeric) , 1 , padding_length) || short_code);
-    
+
     --Check if difference with the center is more than half_resolution
     --Keep value between -90 and 90
     IF (((reference_latitude + half_resolution) < code_area.lat_center) AND ((code_area.lat_center - resolution) >= -latitude_max)) THEN
@@ -676,16 +676,16 @@ BEGIN
     ELSIF (((reference_latitude - half_resolution) > code_area.lat_center) AND ((code_area.lat_center + resolution) <= latitude_max)) THEN
       code_area.lat_center := code_area.lat_center + resolution;
     END IF;
-    
+
     -- difference with the longitude reference
     IF (reference_longitude + half_resolution < code_area.lng_center ) THEN
       code_area.lng_center := code_area.lng_center - resolution;
     ELSIF (reference_longitude - half_resolution > code_area.lng_center) THEN
       code_area.lng_center := code_area.lng_center + resolution;
     END IF;
-    
+
     code_out := pluscode_encode(code_area.lat_center::numeric, code_area.lng_center::numeric, code_area.code_length::integer);
-    
+
 RETURN code_out;
 END;
 $BODY$;
