@@ -372,8 +372,8 @@ BEGIN
             i_ := i_ + 1;
         END LOOP;
     ELSE
-        latVal := div(latVal, power(GRID_ROWS_, GRID_CODE_LENGTH_));
-        lngVal := div(lngVal, power(GRID_COLUMNS_, GRID_CODE_LENGTH_));
+        latVal := div(latVal, power(GRID_ROWS_, GRID_CODE_LENGTH_)::integer);
+        lngVal := div(lngVal, power(GRID_COLUMNS_, GRID_CODE_LENGTH_)::integer);
     END IF;
 
     i_ := 0;
