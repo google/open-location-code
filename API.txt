@@ -49,9 +49,9 @@ decode:
 
 shorten:
     Passed a valid full Open Location Code and a latitude and longitude this
-    removes as many digits as possible (up to a maximum of eight) such that
-    the resulting code is the closest matching code to the passed location.
-    A safety factor may be included.
+    removes as many digits as possible and allowed by the Open Location Code
+    specification, such that the resulting code is the closest matching code
+    to the passed location. A safety factor may be included.
     
     If the code cannot be shortened, the original full code should be
     returned.
