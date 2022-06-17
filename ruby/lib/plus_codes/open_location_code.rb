@@ -198,7 +198,7 @@ module PlusCodes
       max_diff = [lat_diff, lng_diff].max
       [8, 6, 4].each do |removal_len|
         area_edge = precision_by_length(removal_len) * 0.3
-        return code[removal_len..-1] if max_diff < area_edge
+        return code[removal_len..] if max_diff < area_edge
       end
 
       code.upcase
@@ -255,7 +255,7 @@ module PlusCodes
       if code.include?(PADDING)
         return false if code.index(SEPARATOR) < SEPARATOR_POSITION
         return false if code.start_with?(PADDING)
-        return false if code[-2..-1] != PADDING + SEPARATOR
+        return false if code[-2..] != PADDING + SEPARATOR
 
         paddings = code.scan(/#{PADDING}+/)
         return false if !paddings.one? || paddings[0].length.odd?
