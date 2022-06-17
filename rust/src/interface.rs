@@ -43,12 +43,11 @@ pub fn is_valid(code: &str) -> bool {
 
     // Validate padding
     let padstart = code.find(PADDING_CHAR);
-    if padstart.is_some() {
+    if let Some(ppos) = padstart {
         if spos < SEPARATOR_POSITION {
             // Short codes cannot have padding
             return false;
         }
-        let ppos = padstart.unwrap();
         if ppos == 0 || ppos % 2 == 1 {
             // Padding must be "within" the string, starting at an even position
             return false;
