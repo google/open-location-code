@@ -40,14 +40,12 @@ LatLng CodeArea::GetCenter() const {
 }
 
 bool CodeArea::IsValid() const {
-  return code_length_ > 0 &&
-      latitude_lo_ < latitude_hi_ && longitude_lo_ < longitude_hi_ &&
-      latitude_lo_ >= -90.0 && latitude_hi_ <= 90.0 &&
-      longitude_lo_ >= -180.0 && longitude_hi_ <= 180.0;
+  return code_length_ > 0 && latitude_lo_ < latitude_hi_ &&
+         longitude_lo_ < longitude_hi_ && latitude_lo_ >= -90.0 &&
+         latitude_hi_ <= 90.0 && longitude_lo_ >= -180.0 &&
+         longitude_hi_ <= 180.0;
 }
 
-const CodeArea& CodeArea::InvalidCodeArea() {
-  return kInvalidCodeArea;
-}
+const CodeArea& CodeArea::InvalidCodeArea() { return kInvalidCodeArea; }
 
 }  // namespace openlocationcode
