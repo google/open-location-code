@@ -1,7 +1,7 @@
 Open Location Code
 ==================
 
-[![Build Status](https://api.travis-ci.org/google/open-location-code.svg?branch=master)](https://travis-ci.org/google/open-location-code)
+[![Build Status](https://github.com/google/open-location-code/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/google/open-location-code/actions/workflows/main.yml?query=branch%3Amain)
 [![CDNJS](https://img.shields.io/cdnjs/v/openlocationcode.svg)](https://cdnjs.com/libraries/openlocationcode)
 
 Open Location Code is a technology that gives a way of encoding location into a form that is
@@ -69,7 +69,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the wiki.
+Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the

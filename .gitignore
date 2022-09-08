@@ -5,3 +5,18 @@
 /bazel-*
 # Ignore outputs generated during Bazel bootstrapping.
 /output/
+# Ignore compiled files
+**/target/
+# Ignore intelliJ auto generated dir
+**/.idea/
+# Ignore iml extensions files
+**/*.iml
+# Ignore visual studio auto generated dir
+**/.vscode/
+# Ignore JS NPM modules
+/js/node_modules/
+/js/package-lock.json
+# Ignore dynamically generated test JSON files.
+/js/test/*json
+# Ignore Rust lockfile.
+/rust/Cargo.lock

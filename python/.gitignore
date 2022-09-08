@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+openlocationcode.egg-info/*
+dist/*

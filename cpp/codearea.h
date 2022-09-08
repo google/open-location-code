@@ -33,6 +33,6 @@ class CodeArea {
   size_t code_length_;
 };
 
-} // namespace openlocationcode
+}  // namespace openlocationcode
 
 #endif  // LOCATION_OPENLOCATIONCODE_CODEAREA_H_

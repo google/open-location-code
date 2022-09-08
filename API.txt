@@ -4,13 +4,10 @@ The following public methods should be provided by any Open Location Code
 implementation, subject to minor changes caused by language conventions.
 
 Note that any method that returns an Open Location Code should return
-upper case characters, with the prefix, and full codes should include
-a separator if they have five or more characters.
+upper case characters.
 
 Methods that accept Open Location Codes as parameters should be case
-insensitive, prefixes optional, and for full codes the separator character
-is optional (although if present, it is permissable to throw an error if
-there are more than one or if it is in the wrong position).
+insensitive.
 
 isValid:
   The isValid method takes a single parameter, a string, and returns a
@@ -42,7 +39,7 @@ isFull:
 encode:
     Encode a location into an Open Location Code. This takes a latitude and
     longitude and an optional length. If the length is not specified, a code
-    with 10 characters (excluding the prefix and separator) will be generated.
+    with 10 digits and an additional separator character will be generated.
 
 decode:
     Decodes an Open Location Code into the location coordinates. This method
@@ -52,7 +49,7 @@ decode:
 
 shorten:
     Passed a valid full Open Location Code and a latitude and longitude this
-    removes as many digits as possible (up to a maximum of eight) such that
+    removes as many digits as possible (up to a maximum of six) such that
     the resulting code is the closest matching code to the passed location.
     A safety factor may be included.
     

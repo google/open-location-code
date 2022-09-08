@@ -2,15 +2,13 @@ package com.google.openlocationcode;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.google.openlocationcode.OpenLocationCode;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +33,8 @@ public class ShorteningTest {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
       this.code = parts[0];
-      this.referenceLatitude = Double.valueOf(parts[1]);
-      this.referenceLongitude = Double.valueOf(parts[2]);
+      this.referenceLatitude = Double.parseDouble(parts[1]);
+      this.referenceLongitude = Double.parseDouble(parts[2]);
       this.shortCode = parts[3];
       this.testType = parts[4];
     }
@@ -46,7 +44,7 @@ public class ShorteningTest {
 
   @Before
   public void setUp() throws Exception {
-    InputStream testDataStream = new FileInputStream(getTestFile());
+    InputStream testDataStream = new FileInputStream(TestUtils.getTestFile("shortCodeTests.csv"));
     BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream, UTF_8));
     String line;
     while ((line = reader.readLine()) != null) {
@@ -55,20 +53,6 @@ public class ShorteningTest {
       }
       testDataList.add(new TestData(line));
     }
-  }
-
-  // Gets the test file, factoring in whether it's being built from Maven or Bazel.
-  private File getTestFile() {
-    String testPath;
-    String bazelRootPath = System.getenv("JAVA_RUNFILES");
-    System.out.println("bazel root path" + bazelRootPath);
-    if (bazelRootPath == null) {
-      File userDir = new File(System.getProperty("user.dir"));
-      testPath = userDir.getParent() + "/test_data";
-    } else {
-      testPath = bazelRootPath + "/openlocationcode/test_data";
-    }
-    return new File(testPath, "shortCodeTests.csv");
   }
 
   @Test
@@ -81,9 +65,7 @@ public class ShorteningTest {
       OpenLocationCode shortened =
           olc.shorten(testData.referenceLatitude, testData.referenceLongitude);
       Assert.assertEquals(
-          "Wrong shortening of code " + testData.code,
-          testData.shortCode,
-          shortened.getCode());
+          "Wrong shortening of code " + testData.code, testData.shortCode, shortened.getCode());
     }
   }
 

@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package olc implements Open Location Code.
+// Package olc implements the Open Location Code algorithm to convert latitude and longitude coordinates
+// into a shorter sequence of letters and numbers.
 //
-// See https://github.com/google/open-location-code .
+// The aim is to provide something that can be used like an address in locations that lack them, because
+// the streets are unnamed.
+//
+// Codes represent areas, and the size of the area depends on the length of the code. The typical code
+// length is 10 digits, and represents an area of 1/8000 x 1/8000 degrees, or roughly 13.75 x 13.75 meters.
+//
+// See https://github.com/google/open-location-code.
 package olc
 
 import (
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"strings"
-)
-
-var (
-	pairResolutions = [...]float64{20.0, 1.0, .05, .0025, .000125}
-
-	// Debug governs the debug output.
-	Debug = false
 )
 
 const (
@@ -40,14 +39,34 @@ const (
 
 	// Alphabet is the set of valid encoding characters.
 	Alphabet = "23456789CFGHJMPQRVWX"
+	encBase  = len(Alphabet)
 
-	pairCodeLen     = 10
-	gridCols        = 4
-	gridRows        = 5
-	gridSizeDegrees = 0.000125
+	maxCodeLen  = 15
+	pairCodeLen = 10
+	gridCodeLen = maxCodeLen - pairCodeLen
+	gridCols    = 4
+	gridRows    = 5
+	// First place value of the pairs (if the last pair value is 1). encBase^(pairs-1)
+	pairFPV = 160000
+	// Precision of the pair part of the code, in 1/degrees.
+	pairPrecision = 8000
+	// Full value of the latitude grid - gridRows**gridCodeLen.
+	gridLatFullValue = 3125
+	// Full value of the longitude grid - gridCols**gridCodeLen.
+	gridLngFullValue = 1024
+	// First place value of the latitude grid (if the last place is 1). gridRows^(gridCodeLen - 1)
+	gridLatFPV = gridLatFullValue / gridRows
+	// First place value of the longitude grid (if the last place is 1). gridCols^(gridCodeLen - 1)
+	gridLngFPV = gridLngFullValue / gridCols
+	// Latitude precision of a full length code. pairPrecision * gridRows**gridCodeLen
+	finalLatPrecision = pairPrecision * gridLatFullValue
+	// Longitude precision of a full length code. pairPrecision * gridCols**gridCodeLen
+	finalLngPrecision = pairPrecision * gridLngFullValue
 
 	latMax = 90
 	lngMax = 180
+
+	sepPos = 8
 )
 
 // CodeArea is the area represented by a location code.
@@ -62,7 +81,8 @@ func (area CodeArea) Center() (lat, lng float64) {
 		math.Min(area.LngLo+(area.LngHi-area.LngLo)/2, lngMax)
 }
 
-// Check checks the code whether it is a valid code, or not.
+// Check checks whether the passed string is a valid OLC code.
+// It could be a full code (8FVC9G8F+6W), a padded code (8FVC0000+) or a code fragment (9G8F+6W).
 func Check(code string) error {
 	if code == "" || len(code) == 1 && code[0] == Separator {
 		return errors.New("empty code")
@@ -120,6 +140,9 @@ func Check(code string) error {
 		return fmt.Errorf("only one char (%q) after separator", code[firstSep+1:])
 	}
 	if firstPad != -1 {
+		if firstSep < sepPos {
+			return errors.New("short codes cannot have padding")
+		}
 		if len(code)-firstPad-1%2 == 1 {
 			return errors.New("odd number of padding chars")
 		}
@@ -127,8 +150,8 @@ func Check(code string) error {
 	return nil
 }
 
-// CheckShort checks the code whether it is a valid short code, or not.
-// If it is a valid, but not short code, then it returns ErrNotShort.
+// CheckShort checks whether the passed string is a valid short code.
+// If it is valid full code, then it returns ErrNotShort.
 func CheckShort(code string) error {
 	if err := Check(code); err != nil {
 		return err
@@ -139,14 +162,13 @@ func CheckShort(code string) error {
 	return ErrNotShort
 }
 
-// CheckFull checks the code whether it is a valid full code.
+// CheckFull checks whether the passed string is a valid full code.
 // If it is short, it returns ErrShort.
 func CheckFull(code string) error {
-	if err := Check(code); err != nil {
-		return err
-	}
 	if err := CheckShort(code); err == nil {
 		return ErrShort
+	} else if err != ErrNotShort {
+		return err
 	}
 	if firstLat := strings.IndexByte(Alphabet, upper(code[0])) * encBase; firstLat >= latMax*2 {
 		return errors.New("latitude outside range")
@@ -167,9 +189,12 @@ func upper(b byte) byte {
 	return b
 }
 
-// stripCode strips the padding and separator characters from the code.
-func stripCode(code string) string {
-	return strings.Map(
+// StripCode strips the padding and separator characters from the code.
+//
+// The code is truncated to the first 15 digits, as Decode won't use more,
+// to avoid underflow errors.
+func StripCode(code string) string {
+	code = strings.Map(
 		func(r rune) rune {
 			if r == Separator || r == Padding {
 				return -1
@@ -177,6 +202,10 @@ func stripCode(code string) string {
 			return rune(upper(byte(r)))
 		},
 		code)
+	if len(code) > maxCodeLen {
+		return code[:maxCodeLen]
+	}
+	return code
 }
 
 // Because the OLC codes are an area, they can't start at 180 degrees, because they would then have something > 180 as their upper bound.
@@ -191,16 +220,21 @@ func normalize(value, max float64) float64 {
 	return value
 }
 
+// clipLatitude forces the latitude into the valid range.
+func clipLatitude(lat float64) float64 {
+	if lat > latMax {
+		return latMax
+	}
+	if lat < -latMax {
+		return -latMax
+	}
+	return lat
+}
+
 func normalizeLat(value float64) float64 {
 	return normalize(value, latMax)
 }
 
 func normalizeLng(value float64) float64 {
 	return normalize(value, lngMax)
-}
-
-func debug(format string, args ...interface{}) {
-	if Debug {
-		log.Printf(format, args...)
-	}
 }

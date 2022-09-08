@@ -134,10 +134,14 @@ Public Function OLCIsValid(ByVal code As String) As Boolean
     ' The separator is in an illegal position.
     OLCIsValid = False
   ElseIf paddingStart > 0 Then
-    ' Padding characters must be after an even number of digits.
-    If paddingStart < 2 Then
+    If separatorPos < SEPARATOR_POSITION_ Then
+      ' Short codes cannot have padding
+      OLCIsValid = False
+    ElseIf paddingStart < 2 Then
+      ' Cannot start with padding characters.
       OLCIsValid = False
     ElseIf paddingStart - 1 Mod 2 = 1 Then
+      ' Padding characters must be after an even number of digits.
       OLCIsValid = False
     ElseIf Len(code) > separatorPos Then
       ' Padded codes must not have anything after the separator.

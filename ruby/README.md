@@ -1,9 +1,34 @@
-# PlusCodes
+# Plus Codes
 
-Ruby implementation of Google Open Location Code(Plus+Codes)
+Ruby implementation of Open Location Code library.
 
-The latest source code can be found in this
-[PlusCodes Gem Github Repo](https://github.com/wnameless/plus_codes-ruby)
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
+
+Your code must pass tests, and must be formatted with
+[rubocop](https://github.com/rubocop-hq/rubocop). This will check all the ruby
+files and print a list of corrections you need to make - it will not format your
+file automatically.
+
+```
+gem install rubocop
+rubocop --config rubocop.yml
+```
+
+If you can't run it yourself, it is run as part of the TravisCI tests.
+
+
+### Testing
+
+```
+gem install test-unit
+ruby test/plus_codes_test.rb
+```
 
 ## Installation
 
@@ -63,9 +88,3 @@ olc.recover_nearest('CJ+2VX', 51.3708675, -1.217765625)
 ```
 
 ## Contributing
-
-1. Fork it ( https://github.com/wnameless/plus_codes-ruby/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request

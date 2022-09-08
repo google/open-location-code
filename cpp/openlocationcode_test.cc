@@ -1,8 +1,11 @@
 #include "openlocationcode.h"
 
-#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <chrono>
+#include <cmath>
+#include <cstring>
 #include <fstream>
 #include <string>
 
@@ -14,7 +17,7 @@ namespace internal {
 namespace {
 
 TEST(ParameterChecks, PairCodeLengthIsEven) {
-  EXPECT_EQ(0, internal::kPairCodeLength % 2);
+  EXPECT_EQ(0, (int)internal::kPairCodeLength % 2);
 }
 
 TEST(ParameterChecks, AlphabetIsOrdered) {
@@ -34,8 +37,8 @@ TEST(ParameterChecks, PositionLUTMatchesAlphabet) {
     const char c = 'C' + i;
     if (pos != -1) {
       // If the LUT entry indicates this character is in kAlphabet, verify it.
-      EXPECT_LT(pos, internal::kEncodingBase);
-      EXPECT_EQ(c, internal::kAlphabet[pos]);
+      EXPECT_LT(pos, (int)internal::kEncodingBase);
+      EXPECT_EQ(c, (int)internal::kAlphabet[pos]);
     } else {
       // Otherwise, verify this character is not in kAlphabet.
       EXPECT_EQ(std::strchr(internal::kAlphabet, c), nullptr);
@@ -45,10 +48,6 @@ TEST(ParameterChecks, PositionLUTMatchesAlphabet) {
 
 TEST(ParameterChecks, SeparatorPositionValid) {
   EXPECT_TRUE(internal::kSeparatorPosition <= internal::kPairCodeLength);
-}
-
-TEST(ParameterChecks, ShortenDegreesValid) {
-  EXPECT_TRUE(internal::kMinShortenDegrees >= internal::kGridSizeDegrees);
 }
 
 }  // namespace
@@ -63,8 +62,8 @@ std::vector<std::vector<std::string>> ParseCsv(
 
   std::ifstream input_stream(path_to_file, std::ifstream::binary);
   while (std::getline(input_stream, line)) {
-    // Ignore comments in the file
-    if (line.at(0) == '#') {
+    // Ignore blank lines and comments in the file
+    if (line.length() == 0 || line.at(0) == '#') {
       continue;
     }
     std::vector<std::string> line_records;
@@ -75,23 +74,75 @@ std::vector<std::vector<std::string>> ParseCsv(
     }
     csv_records.push_back(line_records);
   }
-  EXPECT_GT(csv_records.size(), 0);
+  EXPECT_GT(csv_records.size(), (size_t)0);
   return csv_records;
 }
 
-struct EncodingTestData {
+struct DecodingTestData {
   std::string code;
-  double lat_deg;
-  double lng_deg;
+  size_t length;
   double lo_lat_deg;
   double lo_lng_deg;
   double hi_lat_deg;
   double hi_lng_deg;
 };
 
+class DecodingChecks : public ::testing::TestWithParam<DecodingTestData> {};
+
+const std::string kDecodingTestsFile = "test_data/decoding.csv";
+
+std::vector<DecodingTestData> GetDecodingDataFromCsv() {
+  std::vector<DecodingTestData> data_results;
+  std::vector<std::vector<std::string>> csv_records =
+      ParseCsv(kDecodingTestsFile);
+  for (size_t i = 0; i < csv_records.size(); i++) {
+    DecodingTestData test_data = {};
+    test_data.code = csv_records[i][0];
+    test_data.length = atoi(csv_records[i][1].c_str());
+    test_data.lo_lat_deg = strtod(csv_records[i][2].c_str(), nullptr);
+    test_data.lo_lng_deg = strtod(csv_records[i][3].c_str(), nullptr);
+    test_data.hi_lat_deg = strtod(csv_records[i][4].c_str(), nullptr);
+    test_data.hi_lng_deg = strtod(csv_records[i][5].c_str(), nullptr);
+    data_results.push_back(test_data);
+  }
+  return data_results;
+}
+
+TEST_P(DecodingChecks, Decode) {
+  DecodingTestData test_data = GetParam();
+  CodeArea expected_rect =
+      CodeArea(test_data.lo_lat_deg, test_data.lo_lng_deg, test_data.hi_lat_deg,
+               test_data.hi_lng_deg, test_data.length);
+  // Decode the code and check we get the correct coordinates.
+  CodeArea actual_rect = Decode(test_data.code);
+  EXPECT_EQ(expected_rect.GetCodeLength(), actual_rect.GetCodeLength());
+  EXPECT_NEAR(expected_rect.GetCenter().latitude,
+              actual_rect.GetCenter().latitude, 1e-10);
+  EXPECT_NEAR(expected_rect.GetCenter().longitude,
+              actual_rect.GetCenter().longitude, 1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeLo(), actual_rect.GetLatitudeLo(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeLo(), actual_rect.GetLongitudeLo(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeHi(), actual_rect.GetLatitudeHi(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeHi(), actual_rect.GetLongitudeHi(),
+              1e-10);
+}
+
+INSTANTIATE_TEST_CASE_P(OLC_Tests, DecodingChecks,
+                        ::testing::ValuesIn(GetDecodingDataFromCsv()));
+
+struct EncodingTestData {
+  double lat_deg;
+  double lng_deg;
+  size_t length;
+  std::string code;
+};
+
 class EncodingChecks : public ::testing::TestWithParam<EncodingTestData> {};
 
-const std::string kEncodingTestsFile = "test_data/encodingTests.csv";
+const std::string kEncodingTestsFile = "test_data/encoding.csv";
 
 std::vector<EncodingTestData> GetEncodingDataFromCsv() {
   std::vector<EncodingTestData> data_results;
@@ -99,13 +150,10 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
       ParseCsv(kEncodingTestsFile);
   for (size_t i = 0; i < csv_records.size(); i++) {
     EncodingTestData test_data = {};
-    test_data.code = csv_records[i][0];
-    test_data.lat_deg = strtod(csv_records[i][1].c_str(), nullptr);
-    test_data.lng_deg = strtod(csv_records[i][2].c_str(), nullptr);
-    test_data.lo_lat_deg = strtod(csv_records[i][3].c_str(), nullptr);
-    test_data.lo_lng_deg = strtod(csv_records[i][4].c_str(), nullptr);
-    test_data.hi_lat_deg = strtod(csv_records[i][5].c_str(), nullptr);
-    test_data.hi_lng_deg = strtod(csv_records[i][6].c_str(), nullptr);
+    test_data.lat_deg = strtod(csv_records[i][0].c_str(), nullptr);
+    test_data.lng_deg = strtod(csv_records[i][1].c_str(), nullptr);
+    test_data.length = atoi(csv_records[i][2].c_str());
+    test_data.code = csv_records[i][3];
     data_results.push_back(test_data);
   }
   return data_results;
@@ -113,20 +161,10 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
 
 TEST_P(EncodingChecks, Encode) {
   EncodingTestData test_data = GetParam();
-  CodeArea expected_rect =
-      CodeArea(test_data.lo_lat_deg, test_data.lo_lng_deg, test_data.hi_lat_deg,
-               test_data.hi_lng_deg, CodeLength(test_data.code));
   LatLng lat_lng = LatLng{test_data.lat_deg, test_data.lng_deg};
   // Encode the test location and make sure we get the expected code.
-  std::string actual_code = Encode(lat_lng, CodeLength(test_data.code));
+  std::string actual_code = Encode(lat_lng, test_data.length);
   EXPECT_EQ(test_data.code, actual_code);
-  // Now decode the code and check we get the correct coordinates.
-  CodeArea actual_rect = Decode(test_data.code);
-  EXPECT_TRUE(actual_rect.IsValid());
-  EXPECT_NEAR(expected_rect.GetCenter().latitude,
-              actual_rect.GetCenter().latitude, 1e-10);
-  EXPECT_NEAR(expected_rect.GetCenter().longitude,
-              actual_rect.GetCenter().longitude, 1e-10);
 }
 
 INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
@@ -216,7 +254,8 @@ TEST_P(ShortCodeChecks, ShortCode) {
   }
   // Now extend the code using the reference location and check.
   if (test_data.test_type == "B" || test_data.test_type == "R") {
-    std::string actual_full = RecoverNearest(test_data.short_code, reference_loc);
+    std::string actual_full =
+        RecoverNearest(test_data.short_code, reference_loc);
     EXPECT_EQ(test_data.full_code, actual_full);
   }
 }
@@ -232,14 +271,63 @@ TEST(MaxCodeLengthChecks, MaxCodeLength) {
   EXPECT_EQ(long_code.size(), 1 + internal::kMaximumDigitCount);
   EXPECT_TRUE(IsValid(long_code));
   Decode(long_code);
-  // Extend the code and make sure it is no longer valid.
+  // Extend the code with a valid character and make sure it is still valid.
   std::string too_long_code = long_code + "W";
+  EXPECT_TRUE(IsValid(too_long_code));
+  // Extend the code with an invalid character and make sure it is invalid.
+  too_long_code = long_code + "U";
   EXPECT_FALSE(IsValid(too_long_code));
-  // Ensure too many characters after the separator also causes a fail, even if
-  // the total number of characters is ok.
-  too_long_code = long_code.substr(6) + "WW";
-  EXPECT_TRUE(too_long_code.size() < internal::kMaximumDigitCount);
-  EXPECT_FALSE(IsValid(too_long_code));
+}
+
+struct BenchmarkTestData {
+  LatLng lat_lng;
+  size_t len;
+  std::string code;
+};
+
+TEST(BenchmarkChecks, BenchmarkEncodeDecode) {
+  std::srand(std::time(0));
+  std::vector<BenchmarkTestData> tests;
+  const size_t loops = 1000000;
+  for (size_t i = 0; i < loops; i++) {
+    BenchmarkTestData test_data = {};
+    double lat = (double)rand() / RAND_MAX * 180 - 90;
+    double lng = (double)rand() / RAND_MAX * 360 - 180;
+    size_t rounding = pow(10, round((double)rand() / RAND_MAX * 10));
+    lat = round(lat * rounding) / rounding;
+    lng = round(lng * rounding) / rounding;
+    size_t len = round((double)rand() / RAND_MAX * 15);
+    if (len < 10 && len % 2 == 1) {
+      len += 1;
+    }
+    LatLng lat_lng = LatLng{lat, lng};
+    std::string code = Encode(lat_lng, len);
+    test_data.lat_lng = lat_lng;
+    test_data.len = len;
+    test_data.code = code;
+    tests.push_back(test_data);
+  }
+  auto start = std::chrono::high_resolution_clock::now();
+  for (auto td : tests) {
+    Encode(td.lat_lng, td.len);
+  }
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+                      std::chrono::high_resolution_clock::now() - start)
+                      .count();
+  std::cout << "Encoding " << loops << " locations took " << duration
+            << " usecs total, " << (float)duration / loops
+            << " usecs per call\n";
+
+  start = std::chrono::high_resolution_clock::now();
+  for (auto td : tests) {
+    Decode(td.code);
+  }
+  duration = std::chrono::duration_cast<std::chrono::microseconds>(
+                 std::chrono::high_resolution_clock::now() - start)
+                 .count();
+  std::cout << "Decoding " << loops << " locations took " << duration
+            << " usecs total, " << (float)duration / loops
+            << " usecs per call\n";
 }
 
 }  // namespace

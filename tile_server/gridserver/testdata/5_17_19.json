@@ -1,0 +1,15 @@
+{
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "geometry":{"type":"Polygon","coordinates":[[[0,30],[0,50],[20,50],[20,30]]]},
+      "properties":{"global_code":"8F000000+","name":"8F"}
+    },
+    {
+      "type":"Feature",
+      "geometry":{"type":"Polygon","coordinates":[[[20,30],[20,50],[40,50],[40,30]]]},
+      "properties":{"global_code":"8G000000+","name":"8G"}
+    }
+  ]
+}

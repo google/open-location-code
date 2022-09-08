@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection", "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-100, 10], [-100, 30], [-80, 30], [-80, 10]]]
+      },
+      "properties": {"global_code": "76000000+", "name": "76"}
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-80, 10], [-80, 30], [-60, 30], [-60, 10]]]
+      },
+      "properties": {"global_code": "77000000+", "name": "77"}
+    }
+  ]
+}
