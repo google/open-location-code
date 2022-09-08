@@ -208,8 +208,13 @@ CodeArea Decode(const std::string &code) {
   // Define the place value for the most significant pair.
   int pv = pow(internal::kEncodingBase, internal::kPairCodeLength / 2 - 1);
   for (size_t i = 0; i < digits - 1; i += 2) {
-    normal_lat += get_alphabet_position(clean_code[i]) * pv;
-    normal_lng += get_alphabet_position(clean_code[i + 1]) * pv;
+    const int lat_dval = get_alphabet_position(clean_code[i]);
+    const int lng_dval = get_alphabet_position(clean_code[i + 1]);
+    if (lat_dval < 0 || lng_dval < 0) {
+      return CodeArea::InvalidCodeArea();
+    }
+    normal_lat += lat_dval * pv;
+    normal_lng += lng_dval * pv;
     if (i < digits - 2) {
       pv /= internal::kEncodingBase;
     }
