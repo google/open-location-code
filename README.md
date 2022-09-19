@@ -49,7 +49,7 @@ wide by 14 meter high area within 6GCR.
 A "+" character is used after eight digits, to break the code up into two parts
 and to distinguish codes from postal codes.
 
-There will be locations where a 10 digit code is not sufficiently precise, but
+There will be locations where a 10-digit code is not sufficiently precise, but
 refining it by a factor of 20 is i) unnecessarily precise and ii) requires extending
 the code by two digits. Instead, after 10 digits, the area is divided
 into a 4x5 grid and a single digit used to identify the grid square. A single
@@ -69,7 +69,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki).
+Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki/Guidance-for-shortening-codes).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
@@ -87,7 +87,7 @@ languages. Each implementation provides the following functions:
 
  * Test a code to see if it is a valid sequence
  * Test a code to see if it is a valid full code
-   Not all valid sequences are valid full codes
+   (not all valid sequences are valid full codes)
  * Encode a latitude and longitude to a standard accuracy
    (14 meter by 14 meter) code
  * Encode a latitude and longitude to a code of any length
