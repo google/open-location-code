@@ -87,7 +87,7 @@ languages. Each implementation provides the following functions:
 
  * Test a code to see if it is a valid sequence
  * Test a code to see if it is a valid full code
-   Not all valid sequences are valid full codes
+   (not all valid sequences are valid full codes)
  * Encode a latitude and longitude to a standard accuracy
    (14 meter by 14 meter) code
  * Encode a latitude and longitude to a code of any length
