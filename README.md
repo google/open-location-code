@@ -18,11 +18,16 @@ code.
 Codes that are similar are located closer together than codes that are
 different.
 
-A location can be converted into a code, and a code can be converted back
-to a location completely offline.
+A location can be converted into a code, and this (full) code can be converted back to a location completely offline, without any data tables to lookup or online services required.
 
-There are no data tables to lookup or online services required. The
-algorithm is publicly available and can be used without restriction.
+Codes can be shortened for easier communication, in which case they can be used regionally or in combination with a reference location that all users of this short code need to be aware of. If the reference location is given in form of a location name, use of a geocoding service might be necessary to recover the original location.
+
+Algorithms to
+* encode and decode full codes,
+* shorten them relative to a reference location, and
+* recover a location from a short code and a reference location given as latitude/longitude pair 
+
+are publicly available and can be used without restriction. Geocoding services are not a part of the Open Location Code technology.
 
 Links
 -----
