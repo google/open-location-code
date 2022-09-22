@@ -50,6 +50,18 @@ devices for at least 15 years, and yet latitude and longitude coordinates
 are still not widely used by people to specify destinations. We think that
 this shows latitude and longitude are just too complicated for normal use.
 
+Q: How do short codes differ from full codes?
+A: A full code encodes a globally unique location and can be decoded offline and without any additional data. Short codes are generated from full codes by dropping characters from the start, which means that they can only be decoded relative to a reference location. This reference location must be communicated with the short code, if it isn't shared knowledge of all parties involved.
+
+Q: How can a reference location be communicated with a short code?
+A: Often, a reference location can be assumed to be shared knowledge and does not need to be explicitly given. For example, when talking to someone in the same city and agreeing to meet them at 
+"G98H+F2", there will typically be just one location with that short code in any given city.
+
+If a reference location needs to be communicated, it is often sensible to just append the name of the city. For example, if postal or rescue services in an area make use of Open Location Code, using "G98H+F2 Berlin" should allow mail to be delivered or an ambulance to navigate to its intended destination. If short codes need to be encoded and decoded algorithmically, for example by using a lookup table or by making use of a (reverse) geocoding API, the same data or API should be used for both encoding and decoding.
+
+Q: Can a global lookup table for short codes be added to this repository?
+Providing this data is not within the scope of this repository, and issues opened to request such data will be closed. If online geocoding APIs can not be used, it is often useful to first think about the actual requirements of the Open Location Code application, as regional instead of global data will often suffice. This data might already exist for a specific application, or can potentially be extracted from open GIS or map data available online. The community mailing list can be used to ask for help with such data.
+
 Q: Why don't Open Location Codes include altitude?
 A: We didn't want to append it as a suffix or bury it in the code because we
 want to be able to truncate the codes reliably. We also didn't want to
