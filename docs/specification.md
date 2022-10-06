@@ -112,7 +112,7 @@ The resulting code must include the "+" character (the format separator).
 
 Codes that include padding characters must not be shortened.
 
-Digits can be removed from the code, until the precision of the position is less than twice the maximum of the latitude or longitude offset between the code center and the reference location.
+Digits can be removed from the code, while the precision of the position is more than twice the maximum of the latitude or longitude offset between the code center and the reference location.
 Recovery of the original code must meet the same criteria.
 
 For example, 8FVC9G8F+6W has the center 47.365562,8.524813. The following table shows what it can be shortened to, relative to various locations:
