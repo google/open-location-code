@@ -27,13 +27,14 @@
 #
 # Codes represent rectangular areas rather than points, and the longer the
 # code, the smaller the area. A 10 character code represents a 13.5x13.5
-# meter area (at the equator. An 11 character code represents approximately
+# meter area (at the equator). An 11 character code represents approximately
 # a 2.8x3.5 meter area.
 #
 # Two encoding algorithms are used. The first 10 characters are pairs of
 # characters, one for latitude and one for longitude, using base 20. Each pair
 # reduces the area of the code by a factor of 400. Only even code lengths are
-# sensible, since an odd-numbered length would have sides in a ratio of 20:1.
+# sensible, since an odd-numbered length would have sides in a ratio of 20:1
+# (which would not be a square).
 #
 # At position 11, the algorithm changes so that each character selects one
 # position from a 4x5 grid. This allows single-character refinements.
