@@ -18,11 +18,16 @@ code.
 Codes that are similar are located closer together than codes that are
 different.
 
-A location can be converted into a code, and a code can be converted back
-to a location completely offline.
+A location can be converted into a code, and this (full) code can be converted back to a location completely offline, without any data tables to lookup or online services required.
 
-There are no data tables to lookup or online services required. The
-algorithm is publicly available and can be used without restriction.
+Codes can be shortened for easier communication, in which case they can be used regionally or in combination with a reference location that all users of this short code need to be aware of. If the reference location is given in form of a location name, use of a geocoding service might be necessary to recover the original location.
+
+Algorithms to
+* encode and decode full codes,
+* shorten them relative to a reference location, and
+* recover a location from a short code and a reference location given as latitude/longitude pair 
+
+are publicly available and can be used without restriction. Geocoding services are not a part of the Open Location Code technology.
 
 Links
 -----
@@ -49,7 +54,7 @@ wide by 14 meter high area within 6GCR.
 A "+" character is used after eight digits, to break the code up into two parts
 and to distinguish codes from postal codes.
 
-There will be locations where a 10 digit code is not sufficiently precise, but
+There will be locations where a 10-digit code is not sufficiently precise, but
 refining it by a factor of 20 is i) unnecessarily precise and ii) requires extending
 the code by two digits. Instead, after 10 digits, the area is divided
 into a 4x5 grid and a single digit used to identify the grid square. A single
@@ -69,7 +74,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki).
+Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki/Guidance-for-shortening-codes).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
@@ -87,7 +92,7 @@ languages. Each implementation provides the following functions:
 
  * Test a code to see if it is a valid sequence
  * Test a code to see if it is a valid full code
-   Not all valid sequences are valid full codes
+   (not all valid sequences are valid full codes)
  * Encode a latitude and longitude to a standard accuracy
    (14 meter by 14 meter) code
  * Encode a latitude and longitude to a code of any length
