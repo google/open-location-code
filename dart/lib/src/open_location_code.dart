@@ -104,7 +104,7 @@ const _decode = <int>[
 bool _matchesPattern(String string, Pattern pattern) =>
     string.contains(pattern);
 
-bool isValid(String code) {
+bool isValid(String? code) {
   if (code == null || code.length == 1) {
     return false;
   }
@@ -134,8 +134,8 @@ bool isValid(String code) {
     if (padMatch.length != 1) {
       return false;
     }
-    var matchLength = padMatch.first.group(0).length;
-    if (matchLength.isOdd || matchLength > separatorPosition - 2) {
+    var matchLength = padMatch.first.group(0)?.length;
+    if (matchLength!.isOdd || matchLength > separatorPosition - 2) {
       return false;
     }
     // If the code is long enough to end with a separator, make sure it does.
