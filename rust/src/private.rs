@@ -40,8 +40,8 @@ pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
     let precision = compute_latitude_precision(code_length);
     let mut code = encode(
         Point::new(
-            (pt.lng() / precision).floor() * precision,
-            (pt.lat() / precision).floor() * precision,
+            (pt.x() / precision).floor() * precision,
+            (pt.y() / precision).floor() * precision,
         ),
         PAIR_CODE_LENGTH,
     );
