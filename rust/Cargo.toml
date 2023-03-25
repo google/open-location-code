@@ -9,7 +9,7 @@ keywords = ["geography", "geospatial", "gis", "gps", "olc"]
 exclude = ["rust.iml"]
 
 [dependencies]
-geo = "0.16.0"
+geo = "0.24.1"
 
 [dev-dependencies]
-rand = "0.8.0"
+rand = "0.8.5"
