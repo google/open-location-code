@@ -76,7 +76,7 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
       - name: test
-        run: bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package
+        run: bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package -Dsurefire.useFile=false -DdisableXmlReport=true
         
   # Javascript Closure library implementation. Lives in js/closure, tested with bazel.  
   test-js-closure:
