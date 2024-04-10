@@ -48,8 +48,8 @@ previous area. And so on - each pair of digits reduces the area to
 1/400th of the previous area.
 
 As an example, the Parliament Buildings in Nairobi, Kenya are located at
-6GCRPR6C+24. 6GCR is the area from 2S 36E to 1S 37E. PR6C+24 is a 14 meter
-wide by 14 meter high area within 6GCR.
+6GCRPR6C+24. 6GCR is the area from 2°S 36°E to 1°S 37°E. PR6C+24 is a 14
+by 14 meter wide area within 6GCR.
 
 A "+" character is used after eight digits, to break the code up into two parts
 and to distinguish codes from postal codes.
