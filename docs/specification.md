@@ -35,6 +35,15 @@ The latitude number must be clipped to be in the range -90 to 90.
 
 The longitude number must be normalised to be in the range -180 to 180.
 
+### Code length
+
+The minimum valid length of an Open Location Code is two digits.
+The maximum length of an Open Location Code is 15 digits.
+
+Below 10 digits, only even numbers are valid lengths.
+
+The default length for most purposes is 10 digits.
+
 ### Most significant 10 digits
 
 Summary:
@@ -61,15 +70,6 @@ The following provides an algorithm to encode the values from least significant 
 1. Prefix the existing code with the symbol with the above value.
 1. Divide longitude by four and latitude by five.
 1. Repeat from step 2 four more times.
-
-### Code length
-
-The minimum valid length of an Open Location Code is two digits.
-The maximum length of an Open Location Code is 15 digits.
-
-Below 10 digits, only even numbers are valid lengths.
-
-The default length for most purposes is 10 digits.
 
 ### Formatting
 
