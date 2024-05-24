@@ -1,7 +1,7 @@
 Open Location Code
 ==================
 
-[![Build Status](https://api.travis-ci.org/google/open-location-code.svg?branch=master)](https://travis-ci.org/google/open-location-code)
+[![Build Status](https://github.com/google/open-location-code/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/google/open-location-code/actions/workflows/main.yml?query=branch%3Amain)
 [![CDNJS](https://img.shields.io/cdnjs/v/openlocationcode.svg)](https://cdnjs.com/libraries/openlocationcode)
 
 Open Location Code is a technology that gives a way of encoding location into a form that is
@@ -18,11 +18,16 @@ code.
 Codes that are similar are located closer together than codes that are
 different.
 
-A location can be converted into a code, and a code can be converted back
-to a location completely offline.
+A location can be converted into a code, and this (full) code can be converted back to a location completely offline, without any data tables to lookup or online services required.
 
-There are no data tables to lookup or online services required. The
-algorithm is publicly available and can be used without restriction.
+Codes can be shortened for easier communication, in which case they can be used regionally or in combination with a reference location that all users of this short code need to be aware of. If the reference location is given in form of a location name, use of a geocoding service might be necessary to recover the original location.
+
+Algorithms to
+* encode and decode full codes,
+* shorten them relative to a reference location, and
+* recover a location from a short code and a reference location given as latitude/longitude pair 
+
+are publicly available and can be used without restriction. Geocoding services are not a part of the Open Location Code technology.
 
 Links
 -----
@@ -43,13 +48,13 @@ previous area. And so on - each pair of digits reduces the area to
 1/400th of the previous area.
 
 As an example, the Parliament Buildings in Nairobi, Kenya are located at
-6GCRPR6C+24. 6GCR is the area from 2S 36E to 1S 37E. PR6C+24 is a 14 meter
-wide by 14 meter high area within 6GCR.
+6GCRPR6C+24. 6GCR is the area from 2°S 36°E to 1°S 37°E. PR6C+24 is a 14
+by 14 meter wide area within 6GCR.
 
 A "+" character is used after eight digits, to break the code up into two parts
 and to distinguish codes from postal codes.
 
-There will be locations where a 10 digit code is not sufficiently precise, but
+There will be locations where a 10-digit code is not sufficiently precise, but
 refining it by a factor of 20 is i) unnecessarily precise and ii) requires extending
 the code by two digits. Instead, after 10 digits, the area is divided
 into a 4x5 grid and a single digit used to identify the grid square. A single
@@ -69,7 +74,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki).
+Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki/Guidance-for-shortening-codes).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
@@ -87,7 +92,7 @@ languages. Each implementation provides the following functions:
 
  * Test a code to see if it is a valid sequence
  * Test a code to see if it is a valid full code
-   Not all valid sequences are valid full codes
+   (not all valid sequences are valid full codes)
  * Encode a latitude and longitude to a standard accuracy
    (14 meter by 14 meter) code
  * Encode a latitude and longitude to a code of any length

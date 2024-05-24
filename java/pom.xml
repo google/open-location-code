@@ -7,7 +7,7 @@
     <artifactId>oss-parent</artifactId>
     <version>7</version>
   </parent>
- 
+
   <groupId>com.google.openlocationcode</groupId>
   <artifactId>openlocationcode</artifactId>
   <version>1.0.4</version>
@@ -15,19 +15,19 @@
 
   <name>Open Location Code</name>
   <url>https://github.com/google/open-location-code</url>
-  
+
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
       <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
- 
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -41,6 +41,18 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.2</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>com.google.openlocationcode</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
         </configuration>
       </plugin>
       <plugin>
@@ -149,7 +161,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>
       <plugin>

@@ -46,6 +46,8 @@ A few things to note:
 
 ## Contributing a new implementation
 
+If you have an implementation in your own repository, that's great! Just add a link to it in our [wiki](https://github.com/google/open-location-code/wiki/Other-Implementations).
+
 Follow this process for contributing a new implementation:
 
 * Look at the existing implementations, to get an idea of the usage and how much work is involved.
