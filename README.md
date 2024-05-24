@@ -33,7 +33,7 @@ Links
 -----
  * [Demonstration site](http://plus.codes/)
  * [Mailing list](https://groups.google.com/forum/#!forum/open-location-code)
- * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/wiki/Evaluation-of-Location-Encoding-Systems)
+ * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/tree/main/docs/wiki/Evaluation-of-Location-Encoding-Systems.md)
  * [Open Location Code definition](https://github.com/google/open-location-code/blob/master/docs/olc_definition.adoc)
 
 Description
@@ -74,7 +74,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki/Guidance-for-shortening-codes).
+Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/tree/main/docs/wiki/Guidance-for-shortening-codes.md).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
