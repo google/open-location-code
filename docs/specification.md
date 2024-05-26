@@ -26,6 +26,7 @@ The "+" character (U+002B) is used as a non-significant character to aid formatt
 ### Padding Character
 
 The "0" character (U+0030) is used as a padding character before the format separator.
+Thus the 1x1 degree area `6GCR` is `6GCR0000+`. 
 
 ## Encoding
 
