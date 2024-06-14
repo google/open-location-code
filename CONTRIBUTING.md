@@ -42,6 +42,7 @@ A few things to note:
 
 * The Open Location Code project follows the [fork & pull](https://help.github.com/articles/using-pull-requests/#fork--pull) model for accepting contributions.
 * We follow [Google's JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html).  More generally make sure to follow the same comment and coding style as the rest of the project.
+* Do not try to address multiple issues in a single pull request. In some cases, you might even resolve a single issue with multiple PRs (e.g. if you are changing multiple implementations).
 * Include [tests](TESTING.md) when contributing code.  There are tests that you can use as examples.
 
 ## Contributing a new implementation
