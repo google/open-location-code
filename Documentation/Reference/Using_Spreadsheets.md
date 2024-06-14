@@ -12,7 +12,7 @@ The [plus codes youtube channel](https://www.youtube.com/c/pluscodes) has some [
 
 ## Excel/LibreOffice
 
-VBA script and instructions are checked into github [here](https://github.com/google/open-location-code/tree/master/visualbasic).
+VBA script and instructions are checked into github [here](https://github.com/google/open-location-code/blob/main/visualbasic).
 
 LibreOffice does sometimes have problems.
 This may be due to slightly unreliable VBA support in some versions.

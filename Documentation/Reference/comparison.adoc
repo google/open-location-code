@@ -153,7 +153,7 @@ Open Post Codes <<openpostcode-site>> can be defined globally or within a contai
 Codes, but codes defined within a country are shorter than full Open
 Location Codes, and a similar length to short Open Location Codes.
 
-Four countries are defined: Ireland, Hong Kong, Yemen and India. 
+Four countries are defined: Ireland, Hong Kong, Yemen and India.
 
 Every location on the planet has a global code. Locations within the
 countries where Open Post Code has been defined also have a local code.
@@ -249,7 +249,7 @@ information such as contact details, photos etc in addition to the location.
 
 We felt that the attributes of the above systems didn't sufficiently meet
 our requirements. As a result, we defined a new coding system and termed it
-Open Location Code; codes created using this system are referred to as 'plus codes' (see the link:https://github.com/google/open-location-code/wiki/Naming-Guidelines[Naming Guidelines]).
+Open Location Code; codes created using this system are referred to as 'plus codes' (see the link:../Specification/Naming_Guidelines.md[Naming Guidelines]).
 
 Plus codes are 10 to 11 characters long. They can also be used in a
 short form of four to seven characters, similar to telephone numbers and

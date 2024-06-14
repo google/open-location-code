@@ -25,7 +25,7 @@ Codes can be shortened for easier communication, in which case they can be used 
 Algorithms to
 * encode and decode full codes,
 * shorten them relative to a reference location, and
-* recover a location from a short code and a reference location given as latitude/longitude pair 
+* recover a location from a short code and a reference location given as latitude/longitude pair
 
 are publicly available and can be used without restriction. Geocoding services are not a part of the Open Location Code technology.
 
@@ -33,8 +33,8 @@ Links
 -----
  * [Demonstration site](http://plus.codes/)
  * [Mailing list](https://groups.google.com/forum/#!forum/open-location-code)
- * [Comparison of existing location encoding systems](https://github.com/google/open-location-code/wiki/Evaluation-of-Location-Encoding-Systems)
- * [Open Location Code definition](https://github.com/google/open-location-code/blob/master/docs/olc_definition.adoc)
+ * [Comparison of existing location encoding systems](Documentation/Reference/comparison.adoc)
+ * [Open Location Code definition](Documentation/Specification/olc_definition.adoc)
 
 Description
 -----------
@@ -74,7 +74,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the [wiki](https://github.com/google/open-location-code/wiki/Guidance-for-shortening-codes).
+Guidelines for shortening codes are in the [wiki](Documentation/Specification/Short_Code_Guidance.md).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
