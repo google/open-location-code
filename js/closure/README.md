@@ -33,7 +33,7 @@ Included is a `BUILD` file that uses the [Bazel](https://bazel.build/) build sys
 
 The tests use the [Closure Rules for Basel](https://github.com/bazelbuild/rules_closure) project although this is retrieved automatically and you don't have to install anything.
 
-The test cases have been copied from the [`test_data`](https://github.com/google/open-location-code/tree/master/test_data) directory due to restrictions on loading data files within the test runner.
+The test cases have been copied from the [`test_data`](https://github.com/google/open-location-code/blob/main/test_data) directory due to restrictions on loading data files within the test runner.
 
 Run the tests from the top-level github directory with:
 

@@ -3,7 +3,7 @@
 This page gives guidelines for how to support plus codes in a website or mapping application.
 These guidelines should make it clear that adding support for OLC is not onerous, but actually quite easy.
 
-> Note that with the availability of the [plus codes API](https://github.com/google/open-location-code/wiki/Plus-code-API), these instructions really only apply to apps that require offline support.
+> Note that with the availability of the [https://plus.codes website API](plus.codes_Website_API.md), these instructions really only apply to apps that require offline support.
 If your app or site can rely on a network connection, integrating with the API will give a better solution.
 
 # Supporting plus codes for search
