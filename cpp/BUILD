@@ -44,6 +44,21 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "codearea_test",
+    size = "small",
+    srcs = ["codearea_test.cc"],
+    copts = [
+        "-pthread",
+        "-Iexternal/gtest/include",
+    ],
+    linkopts = ["-pthread"],
+    deps = [
+        ":codearea",
+        "@gtest//:main",
+    ],
+)
+
 cc_binary(
     name = "openlocationcode_example",
     srcs = [
