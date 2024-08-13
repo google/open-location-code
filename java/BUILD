@@ -3,6 +3,7 @@ java_library(
     srcs = [
         "src/main/java/com/google/openlocationcode/OpenLocationCode.java",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -15,6 +16,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -31,6 +33,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -47,6 +50,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -63,6 +67,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -79,6 +84,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -92,6 +98,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -105,6 +112,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -118,4 +126,5 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
