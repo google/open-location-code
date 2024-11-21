@@ -8,7 +8,7 @@ This page explains how you can access the Open Location Code functions from Exce
 
 There is an [add-on for Google Sheets](https://gsuite.google.com/marketplace/app/plus_codes/604254879289) that allows you to create plus codes from latitude and longitude coordinates, and to decode them as well.
 
-The [plus codes youtube channel](https://www.youtube.com/c/pluscodes) has some [videos showing how to install and use the add-on](https://www.youtube.com/playlist?list=PLaBfOq9xgeeBgOLyKnw8kvpFpZ_9v_sHa).
+The [Google Maps YouTube channel](https://www.youtube.com/@googlemaps) has some [videos showing how to install and use the add-on](https://www.youtube.com/playlist?list=PLcRbp4LqBpwE5ofG2MN08D_4DJAk9gZBI).
 
 ## Excel/LibreOffice
 
