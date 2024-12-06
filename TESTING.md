@@ -1,5 +1,5 @@
 # Testing
-The preferred mechanism for testing is using the [Bazel](https://bazel.build/) build system. This uses files called `BUILD` ([example](https://github.com/google/open-location-code/blob/master/BUILD) to provide rules to build code and run tests).
+The preferred mechanism for testing is using the [Bazel](https://bazel.build/) build system. This uses files called `BUILD` ([example](https://github.com/google/open-location-code/blob/main/python/BUILD) to provide rules to build code and run tests).
 
 Create a `BUILD` file in your code directory with a [test rule](https://bazel.build/versions/master/docs/test-encyclopedia.html).
 You can then test your code by running:
@@ -57,7 +57,7 @@ An example of a language using bazel is Python:
     name: test-python-${{ matrix.python }}
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}

@@ -48,7 +48,7 @@ pub const GRID_ROWS: usize = 5;
 // Minimum length of a code that can be shortened.
 pub const MIN_TRIMMABLE_CODE_LEN: usize = 6;
 
-// What to multiple latitude degrees by to get an integer value. There are three pairs representing
+// What to multiply latitude degrees by to get an integer value. There are three pairs representing
 // decimal digits, and five digits in the grid.
 pub const LAT_INTEGER_MULTIPLIER: i64 = (ENCODING_BASE
     * ENCODING_BASE
@@ -59,7 +59,7 @@ pub const LAT_INTEGER_MULTIPLIER: i64 = (ENCODING_BASE
     * GRID_ROWS
     * GRID_ROWS) as i64;
 
-// What to multiple longitude degrees by to get an integer value. There are three pairs representing
+// What to multiply longitude degrees by to get an integer value. There are three pairs representing
 // decimal digits, and five digits in the grid.
 pub const LNG_INTEGER_MULTIPLIER: i64 = (ENCODING_BASE
     * ENCODING_BASE
