@@ -134,7 +134,12 @@ bool isValid(String code) {
     if (padMatch.length != 1) {
       return false;
     }
-    var matchLength = padMatch.first.group(0).length;
+    var matches = padMatch.first.group(0);
+    if (matches == null) {
+      return false;
+    }
+
+    var matchLength = matches.length;
     if (matchLength.isOdd || matchLength > separatorPosition - 2) {
       return false;
     }
