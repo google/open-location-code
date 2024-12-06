@@ -62,7 +62,9 @@ func Encode(lat, lng float64, codeLen int) string {
 	}
 	// Use a char array so we can build it up from the end digits, without having
 	// to keep reallocating strings.
-	var code [15]byte
+	var code [16]byte
+	// Avoid the need for string concatenation by filling in the Separator manually.
+	code[sepPos] = Separator
 
 	// Compute the code.
 	// This approach converts each value to an integer after multiplying it by
@@ -74,8 +76,8 @@ func Encode(lat, lng float64, codeLen int) string {
 	var latVal int64 = int64(math.Round((lat+latMax)*finalLatPrecision*1e6) / 1e6)
 	var lngVal int64 = int64(math.Round((lng+lngMax)*finalLngPrecision*1e6) / 1e6)
 
-	pos := maxCodeLen - 1
 	// Compute the grid part of the code if necessary.
+	pos := maxCodeLen
 	if codeLen > pairCodeLen {
 		for i := 0; i < gridCodeLen; i++ {
 			latDigit := latVal % int64(gridRows)
@@ -90,22 +92,31 @@ func Encode(lat, lng float64, codeLen int) string {
 		latVal /= gridLatFullValue
 		lngVal /= gridLngFullValue
 	}
-	pos = pairCodeLen - 1
+
+	// Compute the pair after the Separator as a special case rather than
+	// introduce an if statement to the loop which will only be executed once.
+	// This also allows us to remove two unnecessary divides at the end of the loop.
+	latNdx := latVal % int64(encBase)
+	lngNdx := lngVal % int64(encBase)
+	code[sepPos+2] = Alphabet[lngNdx]
+	code[sepPos+1] = Alphabet[latNdx]
+
 	// Compute the pair section of the code.
-	for i := 0; i < pairCodeLen/2; i++ {
-		latNdx := latVal % int64(encBase)
-		lngNdx := lngVal % int64(encBase)
+	pos = sepPos - 1
+	for i := 0; i < sepPos/2; i++ {
+		latVal /= int64(encBase)
+		lngVal /= int64(encBase)
+		latNdx = latVal % int64(encBase)
+		lngNdx = lngVal % int64(encBase)
 		code[pos] = Alphabet[lngNdx]
 		pos -= 1
 		code[pos] = Alphabet[latNdx]
 		pos -= 1
-		latVal /= int64(encBase)
-		lngVal /= int64(encBase)
 	}
 
 	// If we don't need to pad the code, return the requested section.
 	if codeLen >= sepPos {
-		return string(code[:sepPos]) + string(Separator) + string(code[sepPos:codeLen])
+		return string(code[:codeLen+1])
 	}
 	// Pad and return the code.
 	return string(code[:codeLen]) + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)

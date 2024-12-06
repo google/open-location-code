@@ -1,5 +1,8 @@
 # Override rubocop defaults.
 
+AllCops:
+  TargetRubyVersion: 2.6
+
 Layout/LineLength:
   Enabled: true
   Max: 80

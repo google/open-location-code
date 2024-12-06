@@ -2,7 +2,7 @@
 
 ## Input values
 
-Open Location Code encodes two numbers into a single, short string.
+Open Location Code encodes two numbers, latitude and longitude, in degrees, into a single, short string.
 
 The latitude and longitude should be WGS84 values. If other datums are used it must be stated and made clear that these will produce different locations if plotted.
 
@@ -112,7 +112,7 @@ The resulting code must include the "+" character (the format separator).
 
 Codes that include padding characters must not be shortened.
 
-Digits can be removed from the code, until the precision of the position is less than twice the maximum of the latitude or longitude offset between the code center and the reference location.
+Digits can be removed from the code, while the precision of the position is more than twice the maximum of the latitude or longitude offset between the code center and the reference location.
 Recovery of the original code must meet the same criteria.
 
 For example, 8FVC9G8F+6W has the center 47.365562,8.524813. The following table shows what it can be shortened to, relative to various locations:
@@ -126,19 +126,87 @@ For example, 8FVC9G8F+6W has the center 47.365562,8.524813. The following table 
 
 Note: A code that has been shortened will not necessarily have the same initial four digits as the reference location.
 
-## Library Implementation Requirements
+### Generating Short Codes
 
-Open Location Code library implementations must provide:
-* a method to convert a latitude and longitude into a 10 digit Open Location Code
-* a method to decode a 10 digit Open Location Code into, at a minimum, the latitude and longitude of the south-west corner and the height and width
-* a method to determine if a string is a valid sequence of Open Location Code characters
-* a method to determine if a string is a valid full Open Location Code
-* decode and validation methods must not be case-sensitive
+Being able to say _WF8Q+WF, Praia_ is significantly easier than remembering and using _796RWF8Q+WF_.
+With that in mind, how do you choose the locality to use as a reference?
 
-Open Location Code library implementations can provide:
-* a method to convert a latitude and longitude into any valid length Open Location Code
-* a method to decode any valid length Open Location Code, providing additional information such as center coordinates
-* a method to to convert a valid Open Location Code into a short code, given a reference location
-* a method to recover a full Open Location Code from a short code and a reference location.
-* a method to determine if a string is a valid short Open Location Code
+Ideally, you need to use both the bounding box of the locality, as well as its center point.
 
+Given a global code, _796RWF8Q+WF_, you can eliminate the first **four** digits of the code if:
+ * The center point of the feature is within **0.4** degrees latitude and **0.4** degrees longitude
+ * The bounding box of the feature is less than **0.8** degrees high and wide.
+
+(These values are chosen because a four digit Open Location Code is 1x1 degrees.)
+
+If there is no suitable locality close enough or small enough, you can eliminate the first **two** digits of the code if:
+ * The center point of the feature is within **8** degrees latitude and **8** degrees longitude
+ * The bounding box of the feature is less than **16** degrees high and wide.
+
+(These values are chosen because a two digit Open Location Code is 20x20 degrees.)
+
+The values above are slightly smaller than the maximums to allow for different geocoder backends placing localities in slightly different positions.
+Although they could be increased there will be a risk that a shortened code will recover to a different location than the original, and people misdirected.
+
+Note: Usually your feature will be a town or city, but you could also use geographical features such as lakes or mountains, if they are the best local reference.
+If a settlement (such as neighbourhood, town or city) is to be used, you should choose the most prominent feature that meets the requirements, to avoid using obscure features that may not be widely known.
+(Basically, prefer city or town over neighbourhood.)
+
+## API Requirements
+
+The following public methods should be provided by any Open Location Code implementation, subject to minor changes caused by language conventions.
+
+Note that any method that returns an Open Location Code should return upper case characters.
+
+Methods that accept Open Location Codes as parameters should be case insensitive.
+
+Capitalisation should follow the language convention, for example the method `isValid` in golang would be `IsValid`.
+
+Errors should be returned following the language convention. For example exceptions in Python and Java, `error` objects in golang.
+
+### `isValid`
+
+The `isValid` method takes a single parameter, a string, and returns a boolean indicating whether the string is a valid Open Location Code sequence.
+
+### `isShort`
+
+The `isShort` method takes a single parameter, a string, and returns a boolean indicating whether the string is a valid short Open Location Code.
+
+ See [Short Codes](#short-codes) above.
+
+### `isFull`
+
+Determines if a code is a valid full (i.e. not shortened) Open Location Code.
+
+Not all possible combinations of Open Location Code characters decode to valid latitude and longitude values.
+This checks that a code is valid and that the resulting latitude and longitude values are legal.
+Full codes must include the format separator character and it must be after eight characters.
+
+### `encode`
+
+Encode a location into an Open Location Code.
+This takes a latitude and longitude and an optional length.
+If the length is not specified, a code with 10 digits (and the format separator character) will be returned.
+
+### `decode`
+
+Decodes an Open Location Code into the location coordinates.
+This method takes a string.
+If the string is a valid full Open Location Code, it returns:
+- the latitude and longitude of the SW corner of the bounding box;
+- the latitude and longitude of the NE corner of the bounding box;
+- the latitude and longitude of the center of the bounding box;
+- the number of digits in the original code.
+
+### `shorten`
+
+Passed a valid full Open Location Code and a latitude and longitude this removes as many digits as possible (up to a maximum of six) such that the resulting code is the closest matching code to the passed location.
+A safety factor may be included.
+
+If the code cannot be shortened, the original full code should be returned.
+
+Since the only really useful shortenings are removing the first four or six characters, methods such as `shortenBy4` or `shortenBy6` could be provided instead.
+
+### `recoverNearest`
+
+This method is passed a valid short Open Location Code and a latitude and longitude, and returns the nearest matching full Open Location Code to the specified location.

@@ -184,7 +184,7 @@ used for formatting are referred to as "characters".
 Open Location Codes are encodings of WGS84 latitude and longitude
 coordinates in degrees. Decoding a code returns an area, not a point. The
 area of a code depends on the length (longer codes are more precise with
-smaller areas). A two-digit code has height and width<<height_width>> of 20
+smaller areas). A two-digit code has height and width <<height_width>> of 20
 degrees, and with each pair of digits added to the code, both height and
 width are divided by 20.
 
@@ -199,7 +199,7 @@ to be truncated, resulting in a larger area.
 
 [[fig_olc_area]]
 .Comparing areas of four and six digit Open Location Codes
-image::images/code_areas.png[width=400,height=350,align="center"]
+image::../images/code_areas.png[width=400,height=350,align="center"]
 
 The large rectangle in <<fig_olc_area>> is the Open Location Code 8FVC (1
 degree height and width). The smaller rectangle is the code 8FVC22 (1/20
@@ -209,7 +209,7 @@ A 10 digit code represents a 1/8000° by 1/8000° area. (At the equator,
 this is approximately 13.9 meters x 13.9 meters.)
 
 .10 digit Open Location Code (1/8000 degree resolution), 10.5m x 13.9m
-image::images/olc_10_character.png[width=406,height=272,align="center"]
+image::../images/olc_10_character.png[width=406,height=272,align="center"]
 
 A 10 digit code will be precise enough for many locations. However, in
 areas where building density is high (such as informal settlements,
@@ -229,7 +229,7 @@ Using a single grid refinement step, we have an 11 digit code that
 represents a 1/32000° by 1/40000° area (roughly 3.4 by 2.7 meters at the equator).
 
 .A 10 digit code divided into its grid. In this location, each small square is approximately 2.6m x 2.8m
-image::images/olc_11_grid.png[width=406,height=272,align="center"]
+image::../images/olc_11_grid.png[width=406,height=272,align="center"]
 
 The first approach (where a pair of digits is added for each step)
 provides codes that can be visually compared, or alphabetically ordered to
@@ -326,7 +326,7 @@ Refer to link:specification.md[Open Location Code Specification].
 [bibliography]
 == Notes
 
-- [[[poste_restante]]]Post restante (French: lit. post remaining or general
+- [[[poste_restante]]] Post restante (French: lit. post remaining or general
 delivery) is a service where a delivery is made to a post office that holds
 the package until the recipient calls for it.
 - [[[height_width]]] "Height" and "width" are used as a shorthand for north/south
