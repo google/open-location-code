@@ -1,37 +1,43 @@
-# Rule to build the library.
 cc_library(
     name = "openlocationcode",
     srcs = [
         "src/olc.c",
     ],
-    copts = ["-std=c99"],
+    copts = [
+        "-std=c99",
+        "-Wall",
+        "-Wextra",
+        "-O2",
+    ],
     hdrs = [
         "src/olc.h",
         "src/olc_private.h",
     ],
-    visibility = ["//visibility:public"],
+    includes = ["src"],
+    visibility = ["//visibility:private"],
 )
 
-# Rule to build and run the unit tests.
 cc_test(
     name = "openlocationcode_test",
     size = "small",
     srcs = ["openlocationcode_test.cc"],
     copts = [
         "-pthread",
-        "-Iexternal/gtest/include",
+        "-I@googletest//:include",
     ],
+    linkopts = ["-pthread"],
+    linkstatic = False,
     data = [
         "//test_data",
     ],
-    linkopts = ["-pthread"],
     deps = [
         ":openlocationcode",
-        "@gtest//:main",
+        "@googletest//:gtest_main",
     ],
+    testonly = True,
+    visibility = ["//visibility:private"],
 )
 
-# Rule to build and run the example.
 cc_binary(
     name = "openlocationcode_example",
     srcs = [
@@ -40,4 +46,5 @@ cc_binary(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
