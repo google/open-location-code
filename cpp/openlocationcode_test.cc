@@ -170,6 +170,15 @@ TEST_P(EncodingChecks, Encode) {
 INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
                         ::testing::ValuesIn(GetEncodingDataFromCsv()));
 
+TEST(DecodingChecks, DecodeOutOfRange) {
+  // Leading longitude digit "W" is out of range.
+  EXPECT_FALSE(Decode(std::string("9W4Q0000+")).IsValid());
+  // Leading latitude digit "F" is out of range.
+  EXPECT_FALSE(Decode(std::string("F2+")).IsValid());
+  // Invalid digits in post-separator portion.
+  EXPECT_FALSE(Decode(std::string("7Q7Q7Q7Q+5Z")).IsValid());
+}
+
 struct ValidityTestData {
   std::string code;
   bool is_valid;

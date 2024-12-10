@@ -53,6 +53,22 @@ cc_test(
     testonly = True,
 )
 
+# Unit test for code area library
+cc_test(
+    name = "codearea_test",
+    size = "small",
+    srcs = ["codearea_test.cc"],
+    copts = [
+        "-pthread",
+        "-Iexternal/gtest/include",
+    ],
+    linkopts = ["-pthread"],
+    deps = [
+        ":codearea",
+        "@gtest//:main",
+    ],
+)
+
 # Example binary for open location codes
 cc_binary(
     name = "openlocationcode_example",

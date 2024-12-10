@@ -20,6 +20,10 @@ class CodeArea {
   double GetLongitudeHi() const;
   size_t GetCodeLength() const;
   LatLng GetCenter() const;
+  // Returns whether or not this area was a valid decode result.
+  bool IsValid() const;
+  // Returns an invalid CodeArea object.
+  static const CodeArea& InvalidCodeArea();
 
  private:
   double latitude_lo_;
