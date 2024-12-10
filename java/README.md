@@ -20,7 +20,7 @@ executed by running `mvn pmd:pmd pmd:check`.
 
 ## Building and Testing
 
-Note: the tests read their data from the [`test_data`](https://github.com/google/open-location-code/tree/master/test_data) directory.
+Note: the tests read their data from the [`test_data`](https://github.com/google/open-location-code/blob/main/test_data) directory.
 
 ### Maven
 
