@@ -5,7 +5,7 @@ from io import open
 import random
 import time
 import unittest
-from openlocationcode import openlocationcode as olc
+from python.openlocationcode import openlocationcode as olc
 
 # Location of test data files.
 _TEST_DATA = 'test_data'
