@@ -93,7 +93,7 @@ TEST_P(DecodingChecks, Decode) {
   EXPECT_NEAR(expected_center.lon, got_center.lon, 1e-10);
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, DecodingChecks,
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, DecodingChecks,
                         ::testing::ValuesIn(GetDecodingDataFromCsv()));
 
 struct EncodingTestData {
@@ -127,11 +127,11 @@ TEST_P(EncodingChecks, Encode) {
   OLC_LatLon loc = OLC_LatLon{test_data.lat_deg, test_data.lng_deg};
   char got_code[18];
   // Encode the test location and make sure we get the expected code.
-  OLC_Encode(&loc, test_data.length, got_code, 18);
+  OLC_Encode(&loc, test_data.length, got_code);
   EXPECT_EQ(test_data.code, got_code);
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, EncodingChecks,
                         ::testing::ValuesIn(GetEncodingDataFromCsv()));
 
 struct ValidityTestData {
@@ -167,7 +167,7 @@ TEST_P(ValidityChecks, Validity) {
   EXPECT_EQ(test_data.is_short, OLC_IsShort(test_data.code.c_str(), 0));
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, ValidityChecks,
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, ValidityChecks,
                         ::testing::ValuesIn(GetValidityDataFromCsv()));
 
 struct ShortCodeTestData {
@@ -205,18 +205,18 @@ TEST_P(ShortCodeChecks, ShortCode) {
   // Shorten the code using the reference location and check.
   if (test_data.test_type == "B" || test_data.test_type == "S") {
     char got[18];
-    OLC_Shorten(test_data.full_code.c_str(), 0, &reference_loc, got, 18);
+    OLC_Shorten(test_data.full_code.c_str(), 0, &reference_loc, got);
     EXPECT_EQ(test_data.short_code, got);
   }
   // Now extend the code using the reference location and check.
   if (test_data.test_type == "B" || test_data.test_type == "R") {
     char got[18];
-    OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got, 18);
+    OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got);
     EXPECT_EQ(test_data.full_code, got);
   }
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, ShortCodeChecks,
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, ShortCodeChecks,
                         ::testing::ValuesIn(GetShortCodeDataFromCsv()));
 
 TEST(MaxCodeLengthChecks, MaxCodeLength) {
@@ -254,13 +254,13 @@ TEST(BenchmarkChecks, BenchmarkEncodeDecode) {
     test_data.latlon.lat = lat;
     test_data.latlon.lon = lon;
     test_data.len = len;
-    OLC_Encode(&test_data.latlon, test_data.len, test_data.code, 18);
+    OLC_Encode(&test_data.latlon, test_data.len, test_data.code);
     tests.push_back(test_data);
   }
   char code[18];
   auto start = std::chrono::high_resolution_clock::now();
   for (auto td : tests) {
-    OLC_Encode(&td.latlon, td.len, code, 18);
+    OLC_Encode(&td.latlon, td.len, code);
   }
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
                       std::chrono::high_resolution_clock::now() - start)

@@ -82,8 +82,7 @@ int OLC_IsFull(const char* code, size_t size) {
   return is_full(&info);
 }
 
-int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
-               int maxlen) {
+int OLC_Encode(const OLC_LatLon* location, size_t length, char* code) {
   // Limit the maximum number of digits in the code.
   if (length > kMaximumDigitCount) {
     length = kMaximumDigitCount;
@@ -159,8 +158,8 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   return char_count;
 }
 
-int OLC_EncodeDefault(const OLC_LatLon* location, char* code, int maxlen) {
-  return OLC_Encode(location, kPairCodeLength, code, maxlen);
+int OLC_EncodeDefault(const OLC_LatLon* location, char* code) {
+  return OLC_Encode(location, kPairCodeLength, code);
 }
 
 int OLC_Decode(const char* code, size_t size, OLC_CodeArea* decoded) {
@@ -172,7 +171,7 @@ int OLC_Decode(const char* code, size_t size, OLC_CodeArea* decoded) {
 }
 
 int OLC_Shorten(const char* code, size_t size, const OLC_LatLon* reference,
-                char* shortened, int maxlen) {
+                char* shortened) {
   CodeInfo info;
   if (analyse(code, size, &info) <= 0) {
     return 0;
@@ -224,7 +223,7 @@ int OLC_Shorten(const char* code, size_t size, const OLC_LatLon* reference,
 }
 
 int OLC_RecoverNearest(const char* short_code, size_t size,
-                       const OLC_LatLon* reference, char* code, int maxlen) {
+                       const OLC_LatLon* reference, char* code) {
   CodeInfo info;
   if (analyse(short_code, size, &info) <= 0) {
     return 0;
@@ -235,7 +234,7 @@ int OLC_RecoverNearest(const char* short_code, size_t size,
     decode(&info, &code_area);
     OLC_LatLon center;
     OLC_GetCenter(&code_area, &center);
-    return OLC_Encode(&center, code_area.len, code, maxlen);
+    return OLC_Encode(&center, code_area.len, code);
   }
   if (!is_short(&info)) {
     return 0;
@@ -261,7 +260,7 @@ int OLC_RecoverNearest(const char* short_code, size_t size,
   // Use the reference location to pad the supplied short code and decode it.
   OLC_LatLon latlon = {lat, lon};
   char encoded[256];
-  OLC_EncodeDefault(&latlon, encoded, 256);
+  OLC_EncodeDefault(&latlon, encoded);
 
   char new_code[256];
   int pos = 0;
@@ -304,7 +303,7 @@ int OLC_RecoverNearest(const char* short_code, size_t size,
     center.lon += resolution;
   }
 
-  return OLC_Encode(&center, len + padding_length, code, maxlen);
+  return OLC_Encode(&center, len + padding_length, code);
 }
 
 // private functions
