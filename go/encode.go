@@ -44,15 +44,7 @@ const (
 // codes represent smaller areas, but lengths > 14 are sub-centimetre and so
 // 11 or 12 are probably the limit of useful codes.
 func Encode(lat, lng float64, codeLen int) string {
-	if codeLen <= 0 {
-		codeLen = pairCodeLen
-	} else if codeLen < 2 {
-		codeLen = 2
-	} else if codeLen < pairCodeLen && codeLen%2 == 1 {
-		codeLen++
-	} else if codeLen > maxCodeLen {
-		codeLen = maxCodeLen
-	}
+	codeLen = clipCodeLen(codeLen)
 	// Clip the latitude. Normalise the longitude.
 	lat, lng = clipLatitude(lat), normalizeLng(lng)
 	// Latitude 90 needs to be adjusted to be just less, so the returned code
@@ -63,56 +55,47 @@ func Encode(lat, lng float64, codeLen int) string {
 	// Use a char array so we can build it up from the end digits, without having
 	// to keep reallocating strings.
 	var code [16]byte
-	// Avoid the need for string concatenation by filling in the Separator manually.
-	code[sepPos] = Separator
 
 	// Compute the code.
 	// This approach converts each value to an integer after multiplying it by
 	// the final precision. This allows us to use only integer operations, so
 	// avoiding any accumulation of floating point representation errors.
-
-	// Multiply values by their precision and convert to positive.
-	// Note: Go requires rounding before truncating to ensure precision!
-	var latVal int64 = int64(math.Round((lat+latMax)*finalLatPrecision*1e6) / 1e6)
-	var lngVal int64 = int64(math.Round((lng+lngMax)*finalLngPrecision*1e6) / 1e6)
+	latVal, lngVal := roundLatLngToInts(lat, lng)
 
 	// Compute the grid part of the code if necessary.
-	pos := maxCodeLen
 	if codeLen > pairCodeLen {
-		for i := 0; i < gridCodeLen; i++ {
-			latDigit := latVal % int64(gridRows)
-			lngDigit := lngVal % int64(gridCols)
-			ndx := latDigit*gridCols + lngDigit
-			code[pos] = Alphabet[ndx]
-			pos -= 1
-			latVal /= int64(gridRows)
-			lngVal /= int64(gridCols)
-		}
+		code[sepPos+7], latVal, lngVal = latLngGrid(latVal, lngVal)
+		code[sepPos+6], latVal, lngVal = latLngGrid(latVal, lngVal)
+		code[sepPos+5], latVal, lngVal = latLngGrid(latVal, lngVal)
+		code[sepPos+4], latVal, lngVal = latLngGrid(latVal, lngVal)
+		code[sepPos+3], latVal, lngVal = latLngGrid(latVal, lngVal)
 	} else {
 		latVal /= gridLatFullValue
 		lngVal /= gridLngFullValue
 	}
 
-	// Compute the pair after the Separator as a special case rather than
-	// introduce an if statement to the loop which will only be executed once.
-	// This also allows us to remove two unnecessary divides at the end of the loop.
+	// The first pair after the separator is a special case as it handles the
+	// transition from the grid.
 	latNdx := latVal % int64(encBase)
 	lngNdx := lngVal % int64(encBase)
 	code[sepPos+2] = Alphabet[lngNdx]
 	code[sepPos+1] = Alphabet[latNdx]
 
+	// Avoid the need for string concatenation by filling in the Separator manually.
+	code[sepPos] = Separator
+
 	// Compute the pair section of the code.
-	pos = sepPos - 1
-	for i := 0; i < sepPos/2; i++ {
-		latVal /= int64(encBase)
-		lngVal /= int64(encBase)
-		latNdx = latVal % int64(encBase)
-		lngNdx = lngVal % int64(encBase)
-		code[pos] = Alphabet[lngNdx]
-		pos -= 1
-		code[pos] = Alphabet[latNdx]
-		pos -= 1
-	}
+	code[7], lngVal = lngIter(lngVal)
+	code[6], latVal = latIter(latVal)
+
+	code[5], lngVal = lngIter(lngVal)
+	code[4], latVal = latIter(latVal)
+
+	code[3], lngVal = lngIter(lngVal)
+	code[2], latVal = latIter(latVal)
+
+	code[1], lngVal = lngIter(lngVal)
+	code[0], latVal = latIter(latVal)
 
 	// If we don't need to pad the code, return the requested section.
 	if codeLen >= sepPos {
@@ -120,6 +103,52 @@ func Encode(lat, lng float64, codeLen int) string {
 	}
 	// Pad and return the code.
 	return string(code[:codeLen]) + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
+}
+
+func roundLatLngToInts(lat, lng float64) (int64, int64) {
+	// To round, we:
+	// 1) Offset latitude and longitude so that all values are positive.
+	// 2) Multiply by the final precision before conversion to integer to preserve precision.
+	// 3) Multiply by desired rounding precision and add 1.
+	// 4) Bit shift to undo the multiply used for rounding.
+
+	// Precision of rounding is equal to 2^roundPrecision.
+	// A value of 20 corresponds to sub-centimetre precision.
+	const roundPrecision = 20
+	latVal := int64((lat+latMax)*finalLatPrecision*(1<<roundPrecision)+1) >> roundPrecision
+	lngVal := int64((lng+lngMax)*finalLngPrecision*(1<<roundPrecision)+1) >> roundPrecision
+	return latVal, lngVal
+
+}
+
+func clipCodeLen(codeLen int) int {
+	if codeLen <= 0 {
+		return pairCodeLen
+	} else if codeLen < pairCodeLen && codeLen%2 == 1 {
+		return codeLen + 1
+	} else if codeLen > maxCodeLen {
+		return maxCodeLen
+	}
+	return codeLen
+}
+
+func latLngGrid(latVal, lngVal int64) (byte, int64, int64) {
+	latDigit := latVal % int64(gridRows)
+	lngDigit := lngVal % int64(gridCols)
+	ndx := latDigit*gridCols + lngDigit
+	return Alphabet[ndx], latVal / int64(gridRows), lngVal / int64(gridCols)
+}
+
+func latIter(latVal int64) (byte, int64) {
+	latVal /= int64(encBase)
+	latNdx := latVal % int64(encBase)
+	return Alphabet[latNdx], latVal
+}
+
+func lngIter(lngVal int64) (byte, int64) {
+	lngVal /= int64(encBase)
+	lngNdx := lngVal % int64(encBase)
+	return Alphabet[lngNdx], lngVal
 }
 
 // computeLatPrec computes the precision value for a given code length.
