@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * Convert locations to and from convenient short codes.
  *
- * <p>Open Location Codes are short, ~10 character codes that can be used instead of street
+ * <p>Plus codes are short, ~10 character codes that can be used instead of street
  * addresses. The codes can be generated and decoded offline, and use a reduced character set that
  * minimises the chance of codes including words.
  *

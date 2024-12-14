@@ -2,7 +2,8 @@ Android Open Location Code Demonstrator
 =======================================
 
 This is the source code for an Android app that uses
-[Open Location Codes](http://openlocationcode.com) and displays them on a map.
+[Open Location Code](https://maps.google.com/pluscodes/) and displays them on a
+map.
 
 It displays the current location, computes the code for that location, and uses
 a bundled set of place names to shorten the code to a more convenient form.

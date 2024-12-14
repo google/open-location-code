@@ -6,7 +6,7 @@ The wiki is where you can find out information about using the software, the cod
 
 * [External Implementations](External_Implementations.md) - need an Ada or Typescript library?
 * [Frequently Asked Questions (FAQ)](FAQ.md)
-* [Who is using Plus Codes?](Reference/Plus_Code_Users.md)
+* [Who is using plus codes?](Reference/Plus_Code_Users.md)
 
 ### Specification and technical implementation
 
@@ -14,7 +14,7 @@ The wiki is where you can find out information about using the software, the cod
 * [Open Location Code Specification](Specification/specification.md)
 * [Guidance for Shortening Codes](Specification/Short_Code_Guidance.md)
 * [Open Location Code Reference API](Specification/API.md)
-* [Plus Codes and Open Location Code Naming Guidelines](Specification/Naming_Guidelines.md)
+* [Plus codes and Open Location Code Naming Guidelines](Specification/Naming_Guidelines.md)
 
 ### Technical
 

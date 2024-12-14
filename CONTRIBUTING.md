@@ -35,7 +35,7 @@ To make a suggestion [file an issue](https://github.com/google/open-location-cod
 
 If you are intending to implement, please see the [Contributing code](#contributing-code) section below for next steps.
 
-If you are adding Open Location Codes to your project, please contact the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code) so we can suggest how you can make the most of the codes.
+If you are adding Open Location Code to your project, please contact the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code) so we can suggest how you can make the most of the codes.
 
 ## Contributing code
 
@@ -43,12 +43,12 @@ The Open Location Code project accepts and greatly appreciates code contribution
 
 A few things to note:
 
-* The Open Location Code project follows the [fork & pull](https://help.github.com/articles/using-pull-requests/#fork--pull) model for accepting contributions.
-* We follow [Google's JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html).
+- The Open Location Code project follows the [fork & pull](https://help.github.com/articles/using-pull-requests/#fork--pull) model for accepting contributions.
+- We follow [Google's JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html).
   More generally make sure to follow the same comment and coding style as the rest of the project.
-* Do not try to address multiple issues in a single pull request.
+- Do not try to address multiple issues in a single pull request.
   In some cases, you might even resolve a single issue with multiple PRs (e.g. if you are changing multiple implementations).
-* Include [tests](TESTING.md) when contributing code.
+- Include [tests](TESTING.md) when contributing code.
   There are tests that you can use as examples.
 
 ## Contributing a new implementation
@@ -57,11 +57,11 @@ If you have an implementation in your own repository, that's great!
 Unfortunately we can't accept implementations in languages we're not familiar with as we won't be able to maintain or test them.
 You can add a link to it in our [list of external implementations](Documentation/External_Implementations.md).
 
-* Look at the existing implementations, to get an idea of the usage and how much work is involved.
-* If you copy the code structure and algorithms from an existing implementation, you'll have a much shorter review cycle.
-* [Create a new GitHub issue](https://github.com/google/open-location-code/issues/new) to start discussion of the new feature.
-* Follow the guidelines for [Contributing code](#contributing-code) described above.
-* Don't forget to add tests!
+- Look at the existing implementations, to get an idea of the usage and how much work is involved.
+- If you copy the code structure and algorithms from an existing implementation, you'll have a much shorter review cycle.
+- [Create a new GitHub issue](https://github.com/google/open-location-code/issues/new) to start discussion of the new feature.
+- Follow the guidelines for [Contributing code](#contributing-code) described above.
+- Don't forget to add tests!
 
 ## Contributor License Agreement
 
@@ -78,4 +78,3 @@ We actively encourage ongoing participation by community members.
 
 Technical issues, designs, etc. are discussed on [GitHub issues](https://github.com/google/open-location-code/issues) and [pull requests](https://github.com/google/open-location-code/pulls),
 or the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code)<!-- Uncomment if this becomes sensible --><!-- and [Stack Overflow under the Open Location Code tag](http://stackoverflow.com/questions/tagged/open-location-code) -->.
-
