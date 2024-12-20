@@ -123,16 +123,8 @@ jobs:
         run: |
           cd ${OLC_PATH}
           pip install yapf
-          DIFF=`python -m yapf --diff *py`
-          if [ $? -eq 0 ]; then
-            echo -e "Python files are correctly formatted"
-            exit 0
-          else 
-            echo -e "Python files have formatting errors"
-            echo -e "These must be corrected using format_check.sh"
-            echo "$DIFF"
-          fi
-          exit 1
+          python3 -m yapf --diff *py
+          exit 0
           
   # Ruby implementation. Lives in ruby/.
   test-ruby:
