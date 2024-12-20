@@ -14,30 +14,32 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 
 # io_bazel_rules_go and bazel_gazelle archives from https://github.com/bazel-contrib/bazel-gazelle
 # Required by io_bazel_rules_webtesting
-#http_archive(
-#    name = "io_bazel_rules_go",
-#    integrity = "sha256-M6zErg9wUC20uJPJ/B3Xqb+ZjCPn/yxFF3QdQEmpdvg=",
-#    urls = [
-#        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.48.0/rules_go-v0.48.0.zip",
-#        "https://github.com/bazelbuild/rules_go/releases/download/v0.48.0/rules_go-v0.48.0.zip",
-#    ],
-#)
-#
-#http_archive(
-#    name = "bazel_gazelle",
-#    integrity = "sha256-12v3pg/YsFBEQJDfooN6Tq+YKeEWVhjuNdzspcvfWNU=",
-#    urls = [
-#        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.37.0/bazel-gazelle-v0.37.0.tar.gz",
-#        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.37.0/bazel-gazelle-v0.37.0.tar.gz",
-#    ],
-#)
+http_archive(
+    name = "io_bazel_rules_go",
+    integrity = "sha256-M6zErg9wUC20uJPJ/B3Xqb+ZjCPn/yxFF3QdQEmpdvg=",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.48.0/rules_go-v0.48.0.zip",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.48.0/rules_go-v0.48.0.zip",
+    ],
+)
+
+http_archive(
+    name = "bazel_gazelle",
+    integrity = "sha256-12v3pg/YsFBEQJDfooN6Tq+YKeEWVhjuNdzspcvfWNU=",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.37.0/bazel-gazelle-v0.37.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.37.0/bazel-gazelle-v0.37.0.tar.gz",
+    ],
+)
 
 # io_bazel_rules_webtesting required by io_bazel_rules_closure
 http_archive(
     name = "io_bazel_rules_webtesting",
-    integrity = "sha256-6au3ZYtqEpdAwLPvb1ojcIZOECpbpf/KLOpWWCntglo=",
+    #integrity = "sha256-6au3ZYtqEpdAwLPvb1ojcIZOECpbpf/KLOpWWCntglo=",
+    integrity = "sha256-DA0651aX6kGTFmbPP52zcebpVDa4y+FZUzKCHAO/r28=",
     urls = [
-       "https://github.com/bazelbuild/rules_webtesting/releases/download/0.3.5/rules_webtesting.tar.gz",
+       #"https://github.com/bazelbuild/rules_webtesting/releases/download/0.3.5/rules_webtesting.tar.gz",
+       "https://github.com/bazelbuild/rules_webtesting/archive/0.3.4.tar.gz",
     ],
 )
 
