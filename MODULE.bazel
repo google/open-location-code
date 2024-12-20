@@ -13,6 +13,13 @@ bazel_dep(name = "rules_python", version = "0.33.2")
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
+    name = "io_bazel_rules_webtesting",
+    urls = [
+       "https://github.com/bazelbuild/rules_webtesting/releases/download/0.3.5/rules_webtesting.tar.gz",
+    ],
+)
+
+http_archive(
     name = "io_bazel_rules_closure",
     strip_prefix = "rules_closure-0.14.0",
     urls = [
