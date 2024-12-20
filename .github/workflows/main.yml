@@ -123,7 +123,7 @@ jobs:
         run: |
           cd ${OLC_PATH}
           pip install yapf
-          DIFF=`python -m yapf --diff *py`
+          DIFF=`python3 -m yapf --diff *py`
           if [ $? -eq 0 ]; then
             echo -e "Python files are correctly formatted"
             exit 0
