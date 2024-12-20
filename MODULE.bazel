@@ -21,3 +21,6 @@ http_archive(
         "https://github.com/bazelbuild/rules_closure/archive/0.12.0.tar.gz",
     ],
 )
+load("@io_bazel_rules_closure//closure:repositories.bzl", "rules_closure_dependencies", "rules_closure_toolchains")
+rules_closure_dependencies()
+rules_closure_toolchains()
