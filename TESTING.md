@@ -78,7 +78,7 @@ More information about GitHub actions can be found in the [documentation](https:
 
 ## Bazel version
 
-Currently (2004), Bazel version 8 or later cannot be used for testing. (See issue #662.)
+Currently (2004), Bazel version 8 or later cannot be used for testing. (See issue google/open-location-code#662.)
 The `js/closure` tests require using https://github.com/bazelbuild/rules_closure, which is not yet available as a Bazel module.
 That dependency must be specified using a Bazel `WORKSPACE` file, and the version of Bazel to use is specified in the `.bazeliskrc` file.
 
