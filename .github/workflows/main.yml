@@ -17,7 +17,7 @@ jobs:
   # C implementation. Lives in c/, tested with bazel.
   # Use Mac with Apple Silicon for this test because of different floating point math
   # which can affect test results https://github.com/google/open-location-code/issues/652
-  test-c:
+  test-c-macos-latest:
     runs-on: macos-latest
     env:
       OLC_PATH: c
