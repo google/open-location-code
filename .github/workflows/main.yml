@@ -8,6 +8,7 @@ jobs:
       OLC_PATH: c
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all
       - name: check formatting
@@ -20,6 +21,7 @@ jobs:
       OLC_PATH: cpp
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all
       - name: check formatting
@@ -70,6 +72,7 @@ jobs:
     name: test-java-${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Setup java
         uses: actions/setup-java@v2
         with:
@@ -85,6 +88,7 @@ jobs:
       OLC_PATH: js/closure
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: |
           bazel test ${OLC_PATH}:all
@@ -113,6 +117,7 @@ jobs:
     name: test-python-${{ matrix.python }}
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Set up Python 
         uses: actions/setup-python@v2
         with:
