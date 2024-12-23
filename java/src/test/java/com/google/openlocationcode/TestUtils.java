@@ -11,7 +11,7 @@ public class TestUtils {
       File userDir = new File(System.getProperty("user.dir"));
       testPath = userDir.getParent() + "/test_data";
     } else {
-      testPath = bazelRootPath + "/openlocationcode/test_data";
+      testPath = bazelRootPath + "/_main/test_data";
     }
     return new File(testPath, testFile);
   }

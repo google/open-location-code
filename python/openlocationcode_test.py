@@ -5,7 +5,7 @@ from io import open
 import random
 import time
 import unittest
-from openlocationcode import openlocationcode as olc
+from python.openlocationcode import openlocationcode as olc
 
 # Location of test data files.
 _TEST_DATA = 'test_data'
@@ -27,8 +27,9 @@ class TestValidity(unittest.TestCase):
                 # all values should be booleans except the code
                 for i in range(1, len(headermap)):
                     td[i] = (td[i] == 'true')
-                self.testdata.append(
-                    {headermap[i]: v for i, v in enumerate(td)})
+                self.testdata.append({
+                    headermap[i]: v for i, v in enumerate(td)
+                })
 
     def test_validcodes(self):
         for td in self.testdata:
@@ -64,8 +65,9 @@ class TestShorten(unittest.TestCase):
                     headermap), 'Wrong format of testing data: {0}'.format(line)
                 td[1] = float(td[1])
                 td[2] = float(td[2])
-                self.testdata.append(
-                    {headermap[i]: v for i, v in enumerate(td)})
+                self.testdata.append({
+                    headermap[i]: v for i, v in enumerate(td)
+                })
 
     def test_full2short(self):
         for td in self.testdata:
@@ -96,8 +98,9 @@ class TestEncoding(unittest.TestCase):
                 # first 3 keys should be numbers
                 for i in range(0, 3):
                     td[i] = float(td[i])
-                self.testdata.append(
-                    {headermap[i]: v for i, v in enumerate(td)})
+                self.testdata.append({
+                    headermap[i]: v for i, v in enumerate(td)
+                })
 
     def test_encoding(self):
         for td in self.testdata:
@@ -131,8 +134,9 @@ class TestDecoding(unittest.TestCase):
                 # all values should be numbers except the code
                 for i in range(1, len(headermap)):
                     td[i] = float(td[i])
-                self.testdata.append(
-                    {headermap[i]: v for i, v in enumerate(td)})
+                self.testdata.append({
+                    headermap[i]: v for i, v in enumerate(td)
+                })
 
     def test_decoding(self):
         precision = 10

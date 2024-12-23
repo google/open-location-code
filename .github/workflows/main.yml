@@ -8,6 +8,7 @@ jobs:
       OLC_PATH: c
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all
       - name: check formatting
@@ -20,6 +21,7 @@ jobs:
       OLC_PATH: cpp
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all
       - name: check formatting
@@ -66,10 +68,11 @@ jobs:
       OLC_PATH: java
     strategy:
       matrix:
-        java: [ '8', '11', '16', '17' ]
+        java: [ '17', '21' ]
     name: test-java-${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Setup java
         uses: actions/setup-java@v2
         with:
@@ -85,6 +88,7 @@ jobs:
       OLC_PATH: js/closure
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: |
           bazel test ${OLC_PATH}:all
@@ -113,6 +117,7 @@ jobs:
     name: test-python-${{ matrix.python }}
     steps:
       - uses: actions/checkout@v2
+      - uses: bazelbuild/setup-bazelisk@v3
       - name: Set up Python 
         uses: actions/setup-python@v2
         with:
@@ -123,16 +128,8 @@ jobs:
         run: |
           cd ${OLC_PATH}
           pip install yapf
-          DIFF=`python -m yapf --diff *py`
-          if [ $? -eq 0 ]; then
-            echo -e "Python files are correctly formatted"
-            exit 0
-          else 
-            echo -e "Python files have formatting errors"
-            echo -e "These must be corrected using format_check.sh"
-            echo "$DIFF"
-          fi
-          exit 1
+          python3 -m yapf --diff *py
+          exit 0
           
   # Ruby implementation. Lives in ruby/.
   test-ruby:
@@ -143,7 +140,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.6'
+          ruby-version: '3.3.6'
       - name: test
         run: |
           gem install rubocop
