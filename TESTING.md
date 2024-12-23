@@ -7,13 +7,13 @@ Create a `BUILD` file in your code directory with a [test rule](https://bazel.bu
 You can then test your code by running:
 
 ```sh
-bazel test <dir>:<rule>
+bazelisk test <dir>:<rule>
 ```
 
 All tests can be run with:
 
 ```sh
-bazel test ...:all
+bazelisk test ...:all
 ```
 
 ## Automated Integration Testing
@@ -25,7 +25,7 @@ The testing configuration is controlled by the [`.github/workflows/main.yml`](.g
 ### [.github/workflows/main.yml](.github/workflows/main.yml)
 This file defines each language configuration to be tested.
 
-Some languages can be tested natively, others are built and tested using bazel BUILD files.
+Some languages can be tested natively, others are built and tested using Bazel BUILD files.
 
 An example of a language being tested natively is go:
 
@@ -46,10 +46,10 @@ An example of a language being tested natively is go:
 
 This defines the language, uses the `1.17` version, sets an environment variable with the path and then runs the testing command `go test ./go`.
 
-An example of a language using bazel is Python:
+An example of a language using Bazel is Python:
 
 ```
-  # Python implementation. Lives in python/, tested with bazel.
+  # Python implementation. Lives in python/, tested with Bazel.
   test-python:
     runs-on: ubuntu-latest
     env:
@@ -65,7 +65,7 @@ An example of a language using bazel is Python:
         with:
           python-version: ${{ matrix.python }}
       - name: test
-        run: bazel test --test_output=all ${OLC_PATH}:all
+        run: bazelisk test --test_output=all ${OLC_PATH}:all
 ```
 
 Bazel is pre-installed on GitHub-hosted runners which are used to run CI, so there's no need to install it.
@@ -73,7 +73,7 @@ This example also shows how to test with multiple versions of a language.
 
 ### Adding Your Tests
 
-Simply add a new section to the `.github/workflows/main.yml` file with the appropriate language, and either the native test command or call `bazel test` like the other examples.
+Simply add a new section to the `.github/workflows/main.yml` file with the appropriate language, and either the native test command or call `bazelisk test` like the other examples.
 More information about GitHub actions can be found in the [documentation](https://docs.github.com/en/actions/quickstart).
 
 ## Bazel version
