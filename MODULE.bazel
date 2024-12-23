@@ -4,36 +4,7 @@ module(
 )
 
 bazel_dep(name = "googletest", version = "1.15.2")
-bazel_dep(name = "rules_proto", version = "7.0.2")  # Deprecated (moved), TODO find new URL
+bazel_dep(name = "rules_proto", version = "7.0.2")
 bazel_dep(name = "rules_java", version = "8.6.1")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_python", version = "0.40.0")
-
-# External dependency archives
-http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-# io_bazel_rules_closure for the JS/Closure tests.
-http_archive(
-    name = "io_bazel_rules_closure",
-    strip_prefix = "rules_closure-0.14.0",
-    urls = [
-        "https://github.com/bazelbuild/rules_closure/archive/0.14.0.tar.gz",
-    ],
-)
-
-# io_bazel_rules_webtesting:
-# Use master from github because rules_closure-0.13.0 needs
-# io_bazel_rules_webtesting//web/versioned:browsers-0.3.4.bzl
-# but that hasn't been rolled into a release yet.
-http_archive(
-    name = "io_bazel_rules_webtesting",
-    strip_prefix = "rules_webtesting-master",
-    urls = [
-        "https://github.com/bazelbuild/rules_webtesting/archive/refs/heads/master.zip",
-    ],
-)
-
-# gazelle and rules_go required by the closure package I think.
-bazel_dep(name = "gazelle", version = "0.40.0", repo_name = "bazel_gazelle")
-bazel_dep(name = "rules_go", version = "0.51.0", repo_name = "io_bazel_rules_go")
-
