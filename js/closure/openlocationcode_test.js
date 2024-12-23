@@ -28,13 +28,13 @@ const testSuite = goog.require('goog.testing.testSuite');
 goog.require('goog.testing.asserts');
 
 const /** @const {string} */ DECODING_TEST_FILE =
-    '/filez/openlocationcode/test_data/decoding.csv';
+    '/filez/_main/test_data/decoding.csv';
 const /** @const {string} */ ENCODING_TEST_FILE =
-    '/filez/openlocationcode/test_data/encoding.csv';
+    '/filez/_main/test_data/encoding.csv';
 const /** @const {string} */ SHORT_CODE_TEST_FILE =
-    '/filez/openlocationcode/test_data/shortCodeTests.csv';
+    '/filez/_main/test_data/shortCodeTests.csv';
 const /** @const {string} */ VALIDITY_TEST_FILE =
-    '/filez/openlocationcode/test_data/validityTests.csv';
+    '/filez/_main/test_data/validityTests.csv';
 
 // Initialise the async test framework.
 const /** @const {!AsyncTestCase} */ asyncTestCase = AsyncTestCase.createAndInstall();

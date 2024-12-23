@@ -19,10 +19,10 @@ closure_js_test(
     entry_points = ["goog:openlocationcode_test"],
     deps = [
         ":openlocationcode_lib",
-        "@io_bazel_rules_closure//closure/library/net:eventtype",
-        "@io_bazel_rules_closure//closure/library/net:xhrio",
-        "@io_bazel_rules_closure//closure/library/testing:asserts",
-        "@io_bazel_rules_closure//closure/library/testing:asynctestcase",
-        "@io_bazel_rules_closure//closure/library/testing:testsuite",
+        "@com_google_javascript_closure_library//closure/goog/net:eventtype",
+        "@com_google_javascript_closure_library//closure/goog/net:xhrio",
+        "@com_google_javascript_closure_library//closure/goog/testing:asserts",
+        "@com_google_javascript_closure_library//closure/goog/testing:asynctestcase",
+        "@com_google_javascript_closure_library//closure/goog/testing:testsuite",
     ],
 )
