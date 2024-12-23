@@ -1,6 +1,6 @@
 # Where Are Plus Codes Being Used?
 
-This page lists the sites, apps and organisations that support Plus Codes / Open Location Code.
+This page lists the sites, apps and organisations that support plus codes / Open Location Code.
 
 # Organisations
 

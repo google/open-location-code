@@ -111,8 +111,8 @@ cell marked g) is next to the cell 9X, but further from g7 (which is next to
 G2). Using real Geohash-36 codes, "bdg345476Q" is next to "bdbtTVTXWB" but
 several kilometers from "bdg3Hhg4Xd".
 
-Geohash-36 codes may be one character shorter than full Open Location Codes
-for similar accuracies.
+Geohash-36 codes may be one character shorter than full plus code for similar
+accuracies.
 
 The Geohash-36 definition includes an optional altitude specification, and
 an optional checksum, neither of which are provided by Open Location Code.
@@ -120,9 +120,9 @@ an optional checksum, neither of which are provided by Open Location Code.
 == MapCode
 
 MapCodes can be defined globally or within a containing territory
-<<mapcode>>. The global codes are a similar length to Open Location Codes,
-but codes defined within a territory are shorter than full Open Location
-Codes, and a similar length to short Open Location Codes.
+<<mapcode>>. The global codes are a similar length to plus codes, but codes
+defined within a territory are shorter than full plus codes, and a similar
+length to short plus codes.
 
 To decode the identifiers, a data file needs to be maintained and
 distributed. The identifiers are mostly ISO-3166 codes for the territory
@@ -149,9 +149,9 @@ character set.
 == Open Post Code
 
 Open Post Codes <<openpostcode-site>> can be defined globally or within a containing country
-<<openpostcode>>. The global codes are a similar length to Open Location
-Codes, but codes defined within a country are shorter than full Open
-Location Codes, and a similar length to short Open Location Codes.
+<<openpostcode>>. The global codes are a similar length to plus codes, but
+codes defined within a country are shorter than full plus code, and a similar
+length to short plus codes.
 
 Four countries are defined: Ireland, Hong Kong, Yemen and India.
 
@@ -208,7 +208,7 @@ Natural Area Codes have a discontinuity at longitude 180 and at the poles.
 == Maidenhead Locator System (MLS)
 
 Maidenhead Locator System codes explicitly represent areas, and can be
-truncated in a similar way to Open Location Codes. The accuracy and length of the codes is similar. MLS cannot generate words, but it can generate sequences that may appear to be words (e.g. when reading "1" as "l") <<mls>>.
+truncated in a similar way to plus codes. The accuracy and length of the codes is similar. MLS cannot generate words, but it can generate sequences that may appear to be words (e.g. when reading "1" as "l") <<mls>>.
 
 Maidenhead Locator System codes are based on an interleaving of latitude and
 longitude, and so are truncatable, and nearby locations have similar codes.

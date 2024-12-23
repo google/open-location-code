@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
     name="openlocationcode",
     version="1.0.1",
-    description="Python library for Open Location Code (Plus Codes)",
+    description="Python library for Open Location Code (plus codes)",
     url="https://github.com/google/open-location-code",
     author="Google",
     author_email="open-location-code@googlegroups.com",

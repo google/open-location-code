@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.date          = Date.today.to_s
   s.email         = ['open-location-code@googlegroups.com',
                      'wnameless@gmail.com']
-  s.summary       = 'Ruby implementation of Open Location Code (Plus Codes)'
+  s.summary       = 'Ruby implementation of Open Location Code (plus codes)'
   s.description   = s.summary
   s.homepage      = 'https://github.com/google/open-location-code'
   s.license       = 'Apache License, Version 2.0'
