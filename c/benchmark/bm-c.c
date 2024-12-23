@@ -13,7 +13,7 @@ static void encode(void) {
   // Encodes latitude and longitude into a Plus+Code.
   location.lat = data_pos_lat;
   location.lon = data_pos_lon;
-  len = OLC_EncodeDefault(&location, code, 256);
+  len = OLC_EncodeDefault(&location, code);
 
   ASSERT_STR_EQ(code, "8FVC2222+22");
   ASSERT_INT_EQ(len, 11);
@@ -27,7 +27,7 @@ static void encode_len(void) {
   // Encodes latitude and longitude into a Plus+Code with a preferred length.
   location.lat = data_pos_lat;
   location.lon = data_pos_lon;
-  len = OLC_Encode(&location, data_pos_len, code, 256);
+  len = OLC_Encode(&location, data_pos_len, code);
 
   ASSERT_STR_EQ(code, "8FVC2222+22GCCCC");
   ASSERT_INT_EQ(len, 16);
@@ -71,7 +71,7 @@ static void shorten(void) {
   OLC_LatLon location;
   location.lat = data_ref_lat;
   location.lon = data_ref_lon;
-  int len = OLC_Shorten(data_code_12, 0, &location, code, 256);
+  int len = OLC_Shorten(data_code_12, 0, &location, code);
 
   ASSERT_STR_EQ(code, "CJ+2VX");
   ASSERT_INT_EQ(len, 6);
@@ -83,7 +83,7 @@ static void recover(void) {
   location.lat = data_ref_lat;
   location.lon = data_ref_lon;
   // Extends a Plus+Code by the given reference latitude and longitude.
-  int len = OLC_RecoverNearest(data_code_6, 0, &location, code, 256);
+  int len = OLC_RecoverNearest(data_code_6, 0, &location, code);
 
   ASSERT_STR_EQ(code, "9C3W9QCJ+2VX");
   ASSERT_INT_EQ(len, 12);
