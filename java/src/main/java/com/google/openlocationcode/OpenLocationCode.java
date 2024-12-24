@@ -14,32 +14,28 @@
 
 package com.google.openlocationcode;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Convert locations to and from convenient short codes.
  *
- * Open Location Codes are short, ~10 character codes that can be used instead of street
+ * <p>Open Location Codes are short, ~10 character codes that can be used instead of street
  * addresses. The codes can be generated and decoded offline, and use a reduced character set that
  * minimises the chance of codes including words.
  *
- * This provides both object and static methods.
+ * <p>This provides both object and static methods.
  *
- * Create an object with:
- * OpenLocationCode code = new OpenLocationCode("7JVW52GR+2V");
- * OpenLocationCode code = new OpenLocationCode("52GR+2V");
- * OpenLocationCode code = new OpenLocationCode(27.175063, 78.042188);
- * OpenLocationCode code = new OpenLocationCode(27.175063, 78.042188, 11);
+ * <p>Create an object with: OpenLocationCode code = new OpenLocationCode("7JVW52GR+2V");
+ * OpenLocationCode code = new OpenLocationCode("52GR+2V"); OpenLocationCode code = new
+ * OpenLocationCode(27.175063, 78.042188); OpenLocationCode code = new OpenLocationCode(27.175063,
+ * 78.042188, 11);
  *
- * Once you have a code object, you can apply the other methods to it, such as to shorten:
+ * <p>Once you have a code object, you can apply the other methods to it, such as to shorten:
  * code.shorten(27.176, 78.05)
  *
- * Recover the nearest match (if the code was a short code):
- * code.recover(27.176, 78.05)
+ * <p>Recover the nearest match (if the code was a short code): code.recover(27.176, 78.05)
  *
- * Or decode a code into its coordinates, returning a CodeArea object.
- * code.decode()
+ * <p>Or decode a code into its coordinates, returning a CodeArea object. code.decode()
  *
  * @author Jiri Semecky
  * @author Doug Rinckes
@@ -64,28 +60,40 @@ public final class OpenLocationCode {
   // The max number of digits to process in a plus code.
   public static final int MAX_DIGIT_COUNT = 15;
 
-  // Note: The double type can't be used because of the rounding arithmetic due to floating point
-  // implementation. Eg. "8.95 - 8" can give result 0.9499999999999 instead of 0.95 which
-  // incorrectly classify the points on the border of a cell. Therefore all the calculation is done
-  // using BigDecimal.
-
-  // The base to use to convert numbers to/from.
-  private static final BigDecimal ENCODING_BASE = new BigDecimal(CODE_ALPHABET.length());
-
-  // The maximum value for latitude in degrees.
-  private static final BigDecimal LATITUDE_MAX = new BigDecimal(90);
-
-  // The maximum value for longitude in degrees.
-  private static final BigDecimal LONGITUDE_MAX = new BigDecimal(180);
-
   // Maximum code length using just lat/lng pair encoding.
   private static final int PAIR_CODE_LENGTH = 10;
 
+  // Number of digits in the grid coding section.
+  private static final int GRID_CODE_LENGTH = MAX_DIGIT_COUNT - PAIR_CODE_LENGTH;
+
+  // The base to use to convert numbers to/from.
+  private static final int ENCODING_BASE = CODE_ALPHABET.length();
+
+  // The maximum value for latitude in degrees.
+  private static final long LATITUDE_MAX = 90;
+
+  // The maximum value for longitude in degrees.
+  private static final long LONGITUDE_MAX = 180;
+
   // Number of columns in the grid refinement method.
-  private static final BigDecimal GRID_COLUMNS = new BigDecimal(4);
+  private static final int GRID_COLUMNS = 4;
 
   // Number of rows in the grid refinement method.
-  private static final BigDecimal GRID_ROWS = new BigDecimal(5);
+  private static final int GRID_ROWS = 5;
+
+  // Value to multiple latitude degrees to convert it to an integer with the maximum encoding
+  // precision. I.e. ENCODING_BASE**3 * GRID_ROWS**GRID_CODE_LENGTH
+  private static final long LAT_INTEGER_MULTIPLIER = 8000 * 3125;
+
+  // Value to multiple longitude degrees to convert it to an integer with the maximum encoding
+  // precision. I.e. ENCODING_BASE**3 * GRID_COLUMNS**GRID_CODE_LENGTH
+  private static final long LNG_INTEGER_MULTIPLIER = 8000 * 1024;
+
+  // Value of the most significant latitude digit after it has been converted to an integer.
+  private static final long LAT_MSP_VALUE = LAT_INTEGER_MULTIPLIER * ENCODING_BASE * ENCODING_BASE;
+
+  // Value of the most significant longitude digit after it has been converted to an integer.
+  private static final long LNG_MSP_VALUE = LNG_INTEGER_MULTIPLIER * ENCODING_BASE * ENCODING_BASE;
 
   /**
    * Coordinates of a decoded Open Location Code.
@@ -93,19 +101,19 @@ public final class OpenLocationCode {
    * <p>The coordinates include the latitude and longitude of the lower left and upper right corners
    * and the center of the bounding box for the area the code represents.
    */
- public static class CodeArea {
+  public static class CodeArea {
 
-    private final BigDecimal southLatitude;
-    private final BigDecimal westLongitude;
-    private final BigDecimal northLatitude;
-    private final BigDecimal eastLongitude;
+    private final double southLatitude;
+    private final double westLongitude;
+    private final double northLatitude;
+    private final double eastLongitude;
     private final int length;
 
     public CodeArea(
-        BigDecimal southLatitude,
-        BigDecimal westLongitude,
-        BigDecimal northLatitude,
-        BigDecimal eastLongitude,
+        double southLatitude,
+        double westLongitude,
+        double northLatitude,
+        double eastLongitude,
         int length) {
       this.southLatitude = southLatitude;
       this.westLongitude = westLongitude;
@@ -115,35 +123,35 @@ public final class OpenLocationCode {
     }
 
     public double getSouthLatitude() {
-      return southLatitude.doubleValue();
+      return southLatitude;
     }
 
     public double getWestLongitude() {
-      return westLongitude.doubleValue();
+      return westLongitude;
     }
 
     public double getLatitudeHeight() {
-      return northLatitude.subtract(southLatitude).doubleValue();
+      return northLatitude - southLatitude;
     }
 
     public double getLongitudeWidth() {
-      return eastLongitude.subtract(westLongitude).doubleValue();
+      return eastLongitude - westLongitude;
     }
 
     public double getCenterLatitude() {
-      return southLatitude.add(northLatitude).doubleValue() / 2;
+      return (southLatitude + northLatitude) / 2;
     }
 
     public double getCenterLongitude() {
-      return westLongitude.add(eastLongitude).doubleValue() / 2;
+      return (westLongitude + eastLongitude) / 2;
     }
 
     public double getNorthLatitude() {
-      return northLatitude.doubleValue();
+      return northLatitude;
     }
 
     public double getEastLongitude() {
-      return eastLongitude.doubleValue();
+      return eastLongitude;
     }
 
     public int getLength() {
@@ -156,9 +164,10 @@ public final class OpenLocationCode {
 
   /**
    * Creates Open Location Code object for the provided code.
+   *
    * @param code A valid OLC code. Can be a full code or a shortened code.
    * @throws IllegalArgumentException when the passed code is not valid.
-  */
+   */
   public OpenLocationCode(String code) {
     if (!isValidCode(code.toUpperCase())) {
       throw new IllegalArgumentException(
@@ -169,6 +178,7 @@ public final class OpenLocationCode {
 
   /**
    * Creates Open Location Code.
+   *
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
    * @param codeLength The desired number of digits in the code.
@@ -178,7 +188,7 @@ public final class OpenLocationCode {
     // Limit the maximum number of digits in the code.
     codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
     // Check that the code length requested is valid.
-    if (codeLength < 4 || (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)) {
+    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < 4) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
     // Ensure that latitude and longitude are valid.
@@ -186,66 +196,66 @@ public final class OpenLocationCode {
     longitude = normalizeLongitude(longitude);
 
     // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
-    if (latitude == LATITUDE_MAX.doubleValue()) {
+    if (latitude == LATITUDE_MAX) {
       latitude = latitude - 0.9 * computeLatitudePrecision(codeLength);
     }
 
-    // Adjust latitude and longitude to be in positive number ranges.
-    // We add the max values when creating the BigDecimal (as opposed to creating a BigDecimal and
-    // then adding the value) to be consistent with the other implementations.
-    BigDecimal remainingLatitude = new BigDecimal(latitude + LATITUDE_MAX.doubleValue());
-    BigDecimal remainingLongitude = new BigDecimal(longitude + LONGITUDE_MAX.doubleValue());
+    // Store the code - we build it in reverse and reorder it afterwards.
+    StringBuilder revCodeBuilder = new StringBuilder();
 
-    // Count how many digits have been created.
-    int generatedDigits = 0;
-    // Store the code.
-    StringBuilder codeBuilder = new StringBuilder();
-    // The precisions are initially set to ENCODING_BASE^2 because they will be immediately
-    // divided.
-    BigDecimal latPrecision = ENCODING_BASE.multiply(ENCODING_BASE);
-    BigDecimal lngPrecision = ENCODING_BASE.multiply(ENCODING_BASE);
-    while (generatedDigits < codeLength) {
-      if (generatedDigits < PAIR_CODE_LENGTH) {
-        // Use the normal algorithm for the first set of digits.
-        latPrecision = latPrecision.divide(ENCODING_BASE);
-        lngPrecision = lngPrecision.divide(ENCODING_BASE);
-        BigDecimal latDigit = remainingLatitude.divide(latPrecision, 0, BigDecimal.ROUND_FLOOR);
-        BigDecimal lngDigit = remainingLongitude.divide(lngPrecision, 0, BigDecimal.ROUND_FLOOR);
-        remainingLatitude = remainingLatitude.subtract(latPrecision.multiply(latDigit));
-        remainingLongitude = remainingLongitude.subtract(lngPrecision.multiply(lngDigit));
-        codeBuilder.append(CODE_ALPHABET.charAt(latDigit.intValue()));
-        codeBuilder.append(CODE_ALPHABET.charAt(lngDigit.intValue()));
-        generatedDigits += 2;
-      } else {
-        // Use the 4x5 grid for remaining digits.
-        latPrecision = latPrecision.divide(GRID_ROWS);
-        lngPrecision = lngPrecision.divide(GRID_COLUMNS);
-        BigDecimal row = remainingLatitude.divide(latPrecision, 0, BigDecimal.ROUND_FLOOR);
-        BigDecimal col = remainingLongitude.divide(lngPrecision, 0, BigDecimal.ROUND_FLOOR);
-        remainingLatitude = remainingLatitude.subtract(latPrecision.multiply(row));
-        remainingLongitude = remainingLongitude.subtract(lngPrecision.multiply(col));
-        codeBuilder.append(
-            CODE_ALPHABET.charAt(row.intValue() * GRID_COLUMNS.intValue() + col.intValue()));
-        generatedDigits += 1;
+    // Compute the code.
+    // This approach converts each value to an integer after multiplying it by
+    // the final precision. This allows us to use only integer operations, so
+    // avoiding any accumulation of floating point representation errors.
+
+    // Multiply values by their precision and convert to positive. Rounding
+    // avoids/minimises errors due to floating point precision.
+    long latVal =
+        (long) (Math.round((latitude + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER * 1e6) / 1e6);
+    long lngVal =
+        (long) (Math.round((longitude + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER * 1e6) / 1e6);
+
+    // Compute the grid part of the code if necessary.
+    if (codeLength > PAIR_CODE_LENGTH) {
+      for (int i = 0; i < GRID_CODE_LENGTH; i++) {
+        long latDigit = latVal % GRID_ROWS;
+        long lngDigit = lngVal % GRID_COLUMNS;
+        int ndx = (int) (latDigit * GRID_COLUMNS + lngDigit);
+        revCodeBuilder.append(CODE_ALPHABET.charAt(ndx));
+        latVal /= GRID_ROWS;
+        lngVal /= GRID_COLUMNS;
       }
+    } else {
+      latVal = (long) (latVal / Math.pow(GRID_ROWS, GRID_CODE_LENGTH));
+      lngVal = (long) (lngVal / Math.pow(GRID_COLUMNS, GRID_CODE_LENGTH));
+    }
+    // Compute the pair section of the code.
+    for (int i = 0; i < PAIR_CODE_LENGTH / 2; i++) {
+      revCodeBuilder.append(CODE_ALPHABET.charAt((int) (lngVal % ENCODING_BASE)));
+      revCodeBuilder.append(CODE_ALPHABET.charAt((int) (latVal % ENCODING_BASE)));
+      latVal /= ENCODING_BASE;
+      lngVal /= ENCODING_BASE;
       // If we are at the separator position, add the separator.
-      if (generatedDigits == SEPARATOR_POSITION) {
-        codeBuilder.append(SEPARATOR);
+      if (i == 0) {
+        revCodeBuilder.append(SEPARATOR);
       }
     }
-    // If the generated code is shorter than the separator position, pad the code and add the
-    // separator.
-    if (generatedDigits < SEPARATOR_POSITION) {
-      for (; generatedDigits < SEPARATOR_POSITION; generatedDigits++) {
-        codeBuilder.append(PADDING_CHARACTER);
+    // Reverse the code.
+    StringBuilder codeBuilder = revCodeBuilder.reverse();
+
+    // If we need to pad the code, replace some of the digits.
+    if (codeLength < SEPARATOR_POSITION) {
+      for (int i = codeLength; i < SEPARATOR_POSITION; i++) {
+        codeBuilder.setCharAt(i, PADDING_CHARACTER);
       }
-      codeBuilder.append(SEPARATOR);
     }
-    this.code = codeBuilder.toString();
+    this.code =
+        codeBuilder.subSequence(0, Math.max(SEPARATOR_POSITION + 1, codeLength + 1)).toString();
   }
 
   /**
    * Creates Open Location Code with the default precision length.
+   *
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
    */
@@ -255,6 +265,8 @@ public final class OpenLocationCode {
 
   /**
    * Returns the string representation of the code.
+   *
+   * @return The code.
    */
   public String getCode() {
     return code;
@@ -263,8 +275,10 @@ public final class OpenLocationCode {
   /**
    * Encodes latitude/longitude into 10 digit Open Location Code. This method is equivalent to
    * creating the OpenLocationCode object and getting the code from it.
+   *
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
+   * @return The code.
    */
   public static String encode(double latitude, double longitude) {
     return new OpenLocationCode(latitude, longitude).getCode();
@@ -273,8 +287,11 @@ public final class OpenLocationCode {
   /**
    * Encodes latitude/longitude into Open Location Code of the provided length. This method is
    * equivalent to creating the OpenLocationCode object and getting the code from it.
+   *
    * @param latitude The latitude in decimal degrees.
    * @param longitude The longitude in decimal degrees.
+   * @param codeLength The number of digits in the returned code.
+   * @return The code.
    */
   public static String encode(double latitude, double longitude, int codeLength) {
     return new OpenLocationCode(latitude, longitude, codeLength).getCode();
@@ -283,6 +300,8 @@ public final class OpenLocationCode {
   /**
    * Decodes {@link OpenLocationCode} object into {@link CodeArea} object encapsulating
    * latitude/longitude bounding box.
+   *
+   * @return A CodeArea object.
    */
   public CodeArea decode() {
     if (!isFullCode(code)) {
@@ -290,47 +309,40 @@ public final class OpenLocationCode {
           "Method decode() could only be called on valid full codes, code was " + code + ".");
     }
     // Strip padding and separator characters out of the code.
-    String decoded = code.replace(String.valueOf(SEPARATOR), "")
-        .replace(String.valueOf(PADDING_CHARACTER), "");
+    String clean =
+        code.replace(String.valueOf(SEPARATOR), "").replace(String.valueOf(PADDING_CHARACTER), "");
 
-    int digit = 0;
-    // The precisions are initially set to ENCODING_BASE^2 because they will be immediately
-    // divided.
-    BigDecimal latPrecision = ENCODING_BASE.multiply(ENCODING_BASE);
-    BigDecimal lngPrecision = ENCODING_BASE.multiply(ENCODING_BASE);
-    // Save the coordinates.
-    BigDecimal southLatitude = BigDecimal.ZERO;
-    BigDecimal westLongitude = BigDecimal.ZERO;
-
-    // Decode the digits.
-    while (digit < Math.min(decoded.length(), MAX_DIGIT_COUNT)) {
-      if (digit < PAIR_CODE_LENGTH) {
-        // Decode a pair of digits, the first being latitude and the second being longitude.
-        latPrecision = latPrecision.divide(ENCODING_BASE);
-        lngPrecision = lngPrecision.divide(ENCODING_BASE);
-        int digitVal = CODE_ALPHABET.indexOf(decoded.charAt(digit));
-        southLatitude = southLatitude.add(latPrecision.multiply(new BigDecimal(digitVal)));
-        digitVal = CODE_ALPHABET.indexOf(decoded.charAt(digit + 1));
-        westLongitude = westLongitude.add(lngPrecision.multiply(new BigDecimal(digitVal)));
-        digit += 2;
-      } else {
-        // Use the 4x5 grid for digits after 10.
-        int digitVal = CODE_ALPHABET.indexOf(decoded.charAt(digit));
-        int row = (int) (digitVal / GRID_COLUMNS.intValue());
-        int col = digitVal % GRID_COLUMNS.intValue();
-        latPrecision = latPrecision.divide(GRID_ROWS);
-        lngPrecision = lngPrecision.divide(GRID_COLUMNS);
-        southLatitude = southLatitude.add(latPrecision.multiply(new BigDecimal(row)));
-        westLongitude = westLongitude.add(lngPrecision.multiply(new BigDecimal(col)));
-        digit += 1;
-      }
+    // Initialise the values. We work them out as integers and convert them to doubles at the end.
+    long latVal = -LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
+    long lngVal = -LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
+    // Define the place value for the digits. We'll divide this down as we work through the code.
+    long latPlaceVal = LAT_MSP_VALUE;
+    long lngPlaceVal = LNG_MSP_VALUE;
+    for (int i = 0; i < Math.min(clean.length(), PAIR_CODE_LENGTH); i += 2) {
+      latPlaceVal /= ENCODING_BASE;
+      lngPlaceVal /= ENCODING_BASE;
+      latVal += CODE_ALPHABET.indexOf(clean.charAt(i)) * latPlaceVal;
+      lngVal += CODE_ALPHABET.indexOf(clean.charAt(i + 1)) * lngPlaceVal;
     }
+    for (int i = PAIR_CODE_LENGTH; i < Math.min(clean.length(), MAX_DIGIT_COUNT); i++) {
+      latPlaceVal /= GRID_ROWS;
+      lngPlaceVal /= GRID_COLUMNS;
+      int digit = CODE_ALPHABET.indexOf(clean.charAt(i));
+      int row = digit / GRID_COLUMNS;
+      int col = digit % GRID_COLUMNS;
+      latVal += row * latPlaceVal;
+      lngVal += col * lngPlaceVal;
+    }
+    double latitudeLo = (double) latVal / LAT_INTEGER_MULTIPLIER;
+    double longitudeLo = (double) lngVal / LNG_INTEGER_MULTIPLIER;
+    double latitudeHi = (double) (latVal + latPlaceVal) / LAT_INTEGER_MULTIPLIER;
+    double longitudeHi = (double) (lngVal + lngPlaceVal) / LNG_INTEGER_MULTIPLIER;
     return new CodeArea(
-        southLatitude.subtract(LATITUDE_MAX),
-        westLongitude.subtract(LONGITUDE_MAX),
-        southLatitude.subtract(LATITUDE_MAX).add(latPrecision),
-        westLongitude.subtract(LONGITUDE_MAX).add(lngPrecision),
-        digit);
+        latitudeLo,
+        longitudeLo,
+        latitudeHi,
+        longitudeHi,
+        Math.min(clean.length(), MAX_DIGIT_COUNT));
   }
 
   /**
@@ -338,28 +350,47 @@ public final class OpenLocationCode {
    * latitude/longitude bounding box.
    *
    * @param code Open Location Code to be decoded.
+   * @return A CodeArea object.
    * @throws IllegalArgumentException if the provided code is not a valid Open Location Code.
    */
   public static CodeArea decode(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).decode();
   }
 
-  /** Returns whether this {@link OpenLocationCode} is a full Open Location Code. */
+  /**
+   * Returns whether this {@link OpenLocationCode} is a full Open Location Code.
+   *
+   * @return True if it is a full code.
+   */
   public boolean isFull() {
     return code.indexOf(SEPARATOR) == SEPARATOR_POSITION;
   }
 
-  /** Returns whether the provided Open Location Code is a full Open Location Code. */
+  /**
+   * Returns whether the provided Open Location Code is a full Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is a full code.
+   */
   public static boolean isFull(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isFull();
   }
 
-  /** Returns whether this {@link OpenLocationCode} is a short Open Location Code. */
+  /**
+   * Returns whether this {@link OpenLocationCode} is a short Open Location Code.
+   *
+   * @return True if it is short.
+   */
   public boolean isShort() {
     return code.indexOf(SEPARATOR) >= 0 && code.indexOf(SEPARATOR) < SEPARATOR_POSITION;
   }
 
-  /** Returns whether the provided Open Location Code is a short Open Location Code. */
+  /**
+   * Returns whether the provided Open Location Code is a short Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is short.
+   */
   public static boolean isShort(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isShort();
   }
@@ -367,6 +398,8 @@ public final class OpenLocationCode {
   /**
    * Returns whether this {@link OpenLocationCode} is a padded Open Location Code, meaning that it
    * contains less than 8 valid digits.
+   *
+   * @return True if this code is padded.
    */
   private boolean isPadded() {
     return code.indexOf(PADDING_CHARACTER) >= 0;
@@ -375,6 +408,9 @@ public final class OpenLocationCode {
   /**
    * Returns whether the provided Open Location Code is a padded Open Location Code, meaning that it
    * contains less than 8 valid digits.
+   *
+   * @param code The code to check.
+   * @return True if it is padded.
    */
   public static boolean isPadded(String code) throws IllegalArgumentException {
     return new OpenLocationCode(code).isPadded();
@@ -384,6 +420,10 @@ public final class OpenLocationCode {
    * Returns short {@link OpenLocationCode} from the full Open Location Code created by removing
    * four or six digits, depending on the provided reference point. It removes as many digits as
    * possible.
+   *
+   * @param referenceLatitude Degrees.
+   * @param referenceLongitude Degrees.
+   * @return A short code if possible.
    */
   public OpenLocationCode shorten(double referenceLatitude, double referenceLongitude) {
     if (!isFull()) {
@@ -394,9 +434,10 @@ public final class OpenLocationCode {
     }
 
     CodeArea codeArea = decode();
-    double range = Math.max(
-        Math.abs(referenceLatitude - codeArea.getCenterLatitude()),
-        Math.abs(referenceLongitude - codeArea.getCenterLongitude()));
+    double range =
+        Math.max(
+            Math.abs(referenceLatitude - codeArea.getCenterLatitude()),
+            Math.abs(referenceLongitude - codeArea.getCenterLongitude()));
     // We are going to check to see if we can remove three pairs, two pairs or just one pair of
     // digits from the code.
     for (int i = 4; i >= 1; i--) {
@@ -415,6 +456,10 @@ public final class OpenLocationCode {
   /**
    * Returns an {@link OpenLocationCode} object representing a full Open Location Code from this
    * (short) Open Location Code, given the reference location.
+   *
+   * @param referenceLatitude Degrees.
+   * @param referenceLongitude Degrees.
+   * @return The nearest matching full code.
    */
   public OpenLocationCode recover(double referenceLatitude, double referenceLongitude) {
     if (isFull()) {
@@ -426,7 +471,7 @@ public final class OpenLocationCode {
 
     int digitsToRecover = SEPARATOR_POSITION - code.indexOf(SEPARATOR);
     // The precision (height and width) of the missing prefix in degrees.
-    double prefixPrecision = Math.pow(ENCODING_BASE.intValue(), 2 - (digitsToRecover / 2));
+    double prefixPrecision = Math.pow(ENCODING_BASE, 2 - (digitsToRecover / 2));
 
     // Use the reference location to generate the prefix.
     String recoveredPrefix =
@@ -444,11 +489,10 @@ public final class OpenLocationCode {
     // Move the recovered latitude by one precision up or down if it is too far from the reference,
     // unless doing so would lead to an invalid latitude.
     double latitudeDiff = recoveredLatitude - referenceLatitude;
-    if (latitudeDiff > prefixPrecision / 2
-            && recoveredLatitude - prefixPrecision > -LATITUDE_MAX.intValue()) {
+    if (latitudeDiff > prefixPrecision / 2 && recoveredLatitude - prefixPrecision > -LATITUDE_MAX) {
       recoveredLatitude -= prefixPrecision;
     } else if (latitudeDiff < -prefixPrecision / 2
-            && recoveredLatitude + prefixPrecision < LATITUDE_MAX.intValue()) {
+        && recoveredLatitude + prefixPrecision < LATITUDE_MAX) {
       recoveredLatitude += prefixPrecision;
     }
 
@@ -467,6 +511,10 @@ public final class OpenLocationCode {
 
   /**
    * Returns whether the bounding box specified by the Open Location Code contains provided point.
+   *
+   * @param latitude Degrees.
+   * @param longitude Degrees.
+   * @return True if the coordinates are contained by the code.
    */
   public boolean contains(double latitude, double longitude) {
     CodeArea codeArea = decode();
@@ -500,7 +548,12 @@ public final class OpenLocationCode {
 
   // Exposed static helper methods.
 
-  /** Returns whether the provided string is a valid Open Location code. */
+  /**
+   * Returns whether the provided string is a valid Open Location code.
+   *
+   * @param code The code to check.
+   * @return True if it is a valid full or short code.
+   */
   public static boolean isValidCode(String code) {
     if (code == null || code.length() < 2) {
       return false;
@@ -536,17 +589,16 @@ public final class OpenLocationCode {
     // Check the characters before the separator.
     boolean paddingStarted = false;
     for (int i = 0; i < separatorPosition; i++) {
+      if (CODE_ALPHABET.indexOf(code.charAt(i)) == -1 && code.charAt(i) != PADDING_CHARACTER) {
+        // Invalid character.
+        return false;
+      }
       if (paddingStarted) {
         // Once padding starts, there must not be anything but padding.
         if (code.charAt(i) != PADDING_CHARACTER) {
           return false;
         }
-        continue;
-      }
-      if (CODE_ALPHABET.indexOf(code.charAt(i)) != -1) {
-        continue;
-      }
-      if (PADDING_CHARACTER == code.charAt(i)) {
+      } else if (code.charAt(i) == PADDING_CHARACTER) {
         paddingStarted = true;
         // Short codes cannot have padding
         if (separatorPosition < SEPARATOR_POSITION) {
@@ -556,9 +608,7 @@ public final class OpenLocationCode {
         if (i != 2 && i != 4 && i != 6) {
           return false;
         }
-        continue;
       }
-      return false; // Illegal character.
     }
 
     // Check the characters after the separator.
@@ -580,7 +630,12 @@ public final class OpenLocationCode {
     return true;
   }
 
-  /** Returns if the code is a valid full Open Location Code. */
+  /**
+   * Returns if the code is a valid full Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is a valid full code.
+   */
   public static boolean isFullCode(String code) {
     try {
       return new OpenLocationCode(code).isFull();
@@ -589,7 +644,12 @@ public final class OpenLocationCode {
     }
   }
 
-  /** Returns if the code is a valid short Open Location Code. */
+  /**
+   * Returns if the code is a valid short Open Location Code.
+   *
+   * @param code The code to check.
+   * @return True if it is a valid short code.
+   */
   public static boolean isShortCode(String code) {
     try {
       return new OpenLocationCode(code).isShort();
@@ -601,17 +661,20 @@ public final class OpenLocationCode {
   // Private static methods.
 
   private static double clipLatitude(double latitude) {
-    return Math.min(Math.max(latitude, -LATITUDE_MAX.intValue()), LATITUDE_MAX.intValue());
+    return Math.min(Math.max(latitude, -LATITUDE_MAX), LATITUDE_MAX);
   }
 
   private static double normalizeLongitude(double longitude) {
-    while (longitude < -LONGITUDE_MAX.intValue()) {
-      longitude = longitude + LONGITUDE_MAX.intValue() * 2;
+    if (longitude >= -LONGITUDE_MAX && longitude < LONGITUDE_MAX) {
+      // longitude is within proper range, no normalization necessary
+      return longitude;
     }
-    while (longitude >= LONGITUDE_MAX.intValue()) {
-      longitude = longitude - LONGITUDE_MAX.intValue() * 2;
-    }
-    return longitude;
+
+    // % in Java uses truncated division with the remainder having the same sign as
+    // the dividend. For any input longitude < -360, the result of longitude%CIRCLE_DEG
+    // will still be negative but > -360, so we need to add 360 and apply % a second time.
+    final long CIRCLE_DEG = 2 * LONGITUDE_MAX; // 360 degrees
+    return (longitude % CIRCLE_DEG + CIRCLE_DEG + LONGITUDE_MAX) % CIRCLE_DEG - LONGITUDE_MAX;
   }
 
   /**
@@ -621,9 +684,8 @@ public final class OpenLocationCode {
    */
   private static double computeLatitudePrecision(int codeLength) {
     if (codeLength <= CODE_PRECISION_NORMAL) {
-      return Math.pow(ENCODING_BASE.intValue(), Math.floor(codeLength / -2 + 2));
+      return Math.pow(ENCODING_BASE, (double) (codeLength / -2 + 2));
     }
-    return Math.pow(ENCODING_BASE.intValue(), -3)
-        / Math.pow(GRID_ROWS.intValue(), codeLength - PAIR_CODE_LENGTH);
+    return Math.pow(ENCODING_BASE, -3) / Math.pow(GRID_ROWS, codeLength - PAIR_CODE_LENGTH);
   }
 }

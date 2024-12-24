@@ -13,7 +13,10 @@ minified version, and both are also available using the following CDNs:
 
 ## Releasing
 
-Once changes have been made, update the `package.json` file.
+Once changes have been made and merged, start a new PR:
+
+* run `gulp minify` to update the minified Javascript in `src`.
+* update the `version` tag in the `package.json` file
 
 To update the CDNs, you will have to add a new release tag. Note that release
 tags are applied globally to the repository, so if you are making a change
@@ -22,11 +25,13 @@ adding the release tag.
 
 # Tests
 
-Unit tests require [gulp](https://www.npmjs.com/package/gulp) and
-[node-qunit-phantomjs](https://github.com/jonkemp/node-qunit-phantomjs). (These
-and other dependencies can be installed by running `npm install`.)
+Unit tests require [gulp](https://www.npmjs.com/package/gulp),
+[karma](https://karma-runner.github.io) and
+[jasmine](https://jasmine.github.io).
 
-Execute the tests with `gulp test`.
+Execute the tests with `sh test/run_tests.sh`. This will install the
+dependencies, run `eslint` and then run the tests as long as there were no
+eslint errors.
 
 Unit tests are automatically run on pull and push requests and visible at
 https://travis-ci.org/google/open-location-code.

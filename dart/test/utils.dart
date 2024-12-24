@@ -2,16 +2,16 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 
 List<String> getCsvLines(String fileName) {
-  return new File(fileName)
+  return File(fileName)
       .readAsLinesSync()
-      .where((x) => !x.isEmpty && !x.startsWith('#'))
+      .where((x) => x.isNotEmpty && !x.startsWith('#'))
       .map((x) => x.trim())
       .toList();
 }
 
 // Requires test csv files in a test_data directory under open location code project root.
 String testDataPath() {
-  Directory projectRoot = Directory.current.parent;
+  var projectRoot = Directory.current.parent;
 
   return path.absolute(projectRoot.path, 'test_data');
 }

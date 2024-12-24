@@ -2,15 +2,13 @@ package com.google.openlocationcode;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.google.openlocationcode.OpenLocationCode;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,11 +36,11 @@ public class DecodingTest {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
       this.code = parts[0];
-      this.length = Integer.valueOf(parts[1]);
-      this.decodedLatitudeLo = Double.valueOf(parts[2]);
-      this.decodedLongitudeLo = Double.valueOf(parts[3]);
-      this.decodedLatitudeHi = Double.valueOf(parts[4]);
-      this.decodedLongitudeHi = Double.valueOf(parts[5]);
+      this.length = Integer.parseInt(parts[1]);
+      this.decodedLatitudeLo = Double.parseDouble(parts[2]);
+      this.decodedLongitudeLo = Double.parseDouble(parts[3]);
+      this.decodedLatitudeHi = Double.parseDouble(parts[4]);
+      this.decodedLongitudeHi = Double.parseDouble(parts[5]);
     }
   }
 
@@ -50,7 +48,7 @@ public class DecodingTest {
 
   @Before
   public void setUp() throws Exception {
-    InputStream testDataStream = new FileInputStream(getTestFile());
+    InputStream testDataStream = new FileInputStream(TestUtils.getTestFile("decoding.csv"));
     BufferedReader reader = new BufferedReader(new InputStreamReader(testDataStream, UTF_8));
     String line;
     while ((line = reader.readLine()) != null) {
@@ -61,28 +59,18 @@ public class DecodingTest {
     }
   }
 
-  // Gets the test file, factoring in whether it's being built from Maven or Bazel.
-  private File getTestFile() {
-    String testPath;
-    String bazelRootPath = System.getenv("JAVA_RUNFILES");
-    if (bazelRootPath == null) {
-      File userDir = new File(System.getProperty("user.dir"));
-      testPath = userDir.getParent() + "/test_data";
-    } else {
-      testPath = bazelRootPath + "/openlocationcode/test_data";
-    }
-    return new File(testPath, "decoding.csv");
-  }
-
   @Test
   public void testDecode() {
     for (TestData testData : testDataList) {
       OpenLocationCode.CodeArea decoded = new OpenLocationCode(testData.code).decode();
 
       Assert.assertEquals(
-          "Wrong length for code " + testData.code,
-          testData.length,
-          decoded.getLength());
+          "Wrong length for code " + testData.code, testData.length, decoded.getLength());
+      Assert.assertEquals(
+          "Wrong low latitude for code " + testData.code,
+          testData.decodedLatitudeLo,
+          decoded.getSouthLatitude(),
+          PRECISION);
       Assert.assertEquals(
           "Wrong high latitude for code " + testData.code,
           testData.decodedLatitudeHi,

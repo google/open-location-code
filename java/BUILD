@@ -3,6 +3,20 @@ java_library(
     srcs = [
         "src/main/java/com/google/openlocationcode/OpenLocationCode.java",
     ],
+    visibility = ["//visibility:private"],
+)
+
+java_test(
+    name = "BenchmarkTest",
+    size = "small",
+    srcs = [
+        "src/test/java/com/google/openlocationcode/BenchmarkTest.java",
+    ],
+    test_class = "com.google.openlocationcode.BenchmarkTest",
+    deps = [
+        ":openlocationcode",
+    ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -10,6 +24,7 @@ java_test(
     size = "small",
     srcs = [
         "src/test/java/com/google/openlocationcode/DecodingTest.java",
+        "src/test/java/com/google/openlocationcode/TestUtils.java",
     ],
     data = [
         "//test_data:test_data"
@@ -18,6 +33,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -25,6 +41,7 @@ java_test(
     size = "small",
     srcs = [
         "src/test/java/com/google/openlocationcode/EncodingTest.java",
+        "src/test/java/com/google/openlocationcode/TestUtils.java",
     ],
     data = [
         "//test_data:test_data"
@@ -33,6 +50,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -40,6 +58,7 @@ java_test(
     size = "small",
     srcs = [
         "src/test/java/com/google/openlocationcode/ShorteningTest.java",
+        "src/test/java/com/google/openlocationcode/TestUtils.java",
     ],
     data = [
         "//test_data:test_data"
@@ -48,6 +67,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -55,6 +75,7 @@ java_test(
     size = "small",
     srcs = [
         "src/test/java/com/google/openlocationcode/ValidityTest.java",
+        "src/test/java/com/google/openlocationcode/TestUtils.java",
     ],
     data = [
         "//test_data:test_data"
@@ -63,6 +84,7 @@ java_test(
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -70,11 +92,13 @@ java_test(
     size = "small",
     srcs = [
         "src/test/java/com/google/openlocationcode/PrecisionTest.java",
+        "src/test/java/com/google/openlocationcode/TestUtils.java",
     ],
     test_class = "com.google.openlocationcode.PrecisionTest",
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -82,11 +106,13 @@ java_test(
     size = "small",
     srcs = [
         "src/test/java/com/google/openlocationcode/RecoverTest.java",
+        "src/test/java/com/google/openlocationcode/TestUtils.java",
     ],
     test_class = "com.google.openlocationcode.RecoverTest",
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )
 
 java_test(
@@ -94,9 +120,11 @@ java_test(
     size = "small",
     srcs = [
         "src/test/java/com/google/openlocationcode/UtilsTest.java",
+        "src/test/java/com/google/openlocationcode/TestUtils.java",
     ],
     test_class = "com.google.openlocationcode.UtilsTest",
     deps = [
         ":openlocationcode",
     ],
+    visibility = ["//visibility:private"],
 )

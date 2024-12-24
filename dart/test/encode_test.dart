@@ -19,17 +19,17 @@ import 'package:test/test.dart';
 import 'utils.dart';
 
 // code,lat,lng,latLo,lngLo,latHi,lngHi
-checkEncodeDecode(String csvLine) {
-  List<String> elements = csvLine.split(",");
+void checkEncodeDecode(String csvLine) {
+  var elements = csvLine.split(',');
   num lat = double.parse(elements[0]);
   num lng = double.parse(elements[1]);
-  num len = int.parse(elements[2]);
-  String code = elements[3];
-  String codeOlc = olc.encode(lat, lng, codeLength: len);
-  expect(code, equals(codeOlc));
+  int len = int.parse(elements[2]);
+  var want = elements[3];
+  var got = olc.encode(lat, lng, codeLength: len);
+  expect(got, equals(want));
 }
 
-main() {
+void main() {
   test('Check encode decode', () {
     csvLinesFromFile('encoding.csv').forEach(checkEncodeDecode);
   });
@@ -37,7 +37,9 @@ main() {
   test('MaxCodeLength', () {
     // Check that we do not return a code longer than is valid.
     var code = olc.encode(51.3701125, -10.202665625, codeLength: 1000000);
+    var area = olc.decode(code);
     expect(code.length, 16);
+    expect(area.codeLength, 15);
     expect(olc.isValid(code), true);
 
     // Extend the code with a valid character and make sure it is still valid.

@@ -1,7 +1,7 @@
-#include "openlocationcode.h"
-
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+
+#include "openlocationcode.h"
 
 int main() {
   // Encodes latitude and longitude into a Plus+Code.
@@ -16,13 +16,12 @@ int main() {
 
   // Decodes a Plus+Code back into coordinates.
   openlocationcode::CodeArea code_area = openlocationcode::Decode(code);
-  std::cout << "Code length: "
-            << std::fixed << std::setprecision(15)
-            << ' ' << code_area.GetLatitudeLo()    // 47.000062479999997
-            << ' ' << code_area.GetLongitudeLo()   // 8.000062500000013
-            << ' ' << code_area.GetLatitudeHi()    // 47.000062520000000
-            << ' ' << code_area.GetLongitudeHi()   // 8.000062622070317
-            << ' ' << code_area.GetCodeLength()    // 15
+  std::cout << "Code length: " << std::fixed << std::setprecision(15) << ' '
+            << code_area.GetLatitudeLo()          // 47.000062479999997
+            << ' ' << code_area.GetLongitudeLo()  // 8.000062500000013
+            << ' ' << code_area.GetLatitudeHi()   // 47.000062520000000
+            << ' ' << code_area.GetLongitudeHi()  // 8.000062622070317
+            << ' ' << code_area.GetCodeLength()   // 15
             << std::endl;
 
   // Checks if a Plus+Code is valid.

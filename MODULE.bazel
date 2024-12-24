@@ -1,0 +1,13 @@
+module(
+    name = "openlocationcode",
+    version = "1.0",
+)
+
+# bazel-skylib required by #@io_bazel_rules_closure.
+# https://github.com/bazelbuild/bazel-skylib
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+
+# googletest required by c/BUILD.
+# https://github.com/google/googletest
+bazel_dep(name = "googletest", version = "1.15.2")
+

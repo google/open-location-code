@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Lines};
 
 pub struct CSVReader {
-    iter: Lines<BufReader<File>>
+    iter: Lines<BufReader<File>>,
 }
 
 impl CSVReader {
@@ -32,4 +32,3 @@ impl Iterator for CSVReader {
         None
     }
 }
-

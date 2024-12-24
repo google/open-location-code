@@ -1,21 +1,22 @@
 use geo::Point;
+use std::cmp;
 
 use codearea::CodeArea;
 
 use consts::{
-    SEPARATOR, SEPARATOR_POSITION, PADDING_CHAR, PADDING_CHAR_STR, CODE_ALPHABET, ENCODING_BASE,
-    LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH, MAX_CODE_LENGTH, PAIR_RESOLUTIONS, GRID_COLUMNS, GRID_ROWS,
-    MIN_TRIMMABLE_CODE_LEN,
+    CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX,
+    LAT_INTEGER_MULTIPLIER, LNG_INTEGER_MULTIPLIER, LONGITUDE_MAX, MAX_CODE_LENGTH,
+    MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH, PAIR_RESOLUTIONS,
+    SEPARATOR, SEPARATOR_POSITION,
 };
 
 use private::{
-    code_value, normalize_longitude, clip_latitude, compute_latitude_precision, prefix_by_reference,
-    narrow_region,
+    clip_latitude, code_value, compute_latitude_precision, normalize_longitude, prefix_by_reference,
 };
 
 /// Determines if a code is a valid Open Location Code.
-pub fn is_valid(_code: &str) -> bool {
-    let mut code: String = _code.to_string();
+pub fn is_valid(code: &str) -> bool {
+    let mut code: String = code.to_string();
     if code.len() < 3 {
         // A code must have at-least a separator character + 1 lat/lng pair
         return false;
@@ -42,12 +43,11 @@ pub fn is_valid(_code: &str) -> bool {
 
     // Validate padding
     let padstart = code.find(PADDING_CHAR);
-    if padstart.is_some() {
+    if let Some(ppos) = padstart {
         if spos < SEPARATOR_POSITION {
             // Short codes cannot have padding
             return false;
         }
-        let ppos = padstart.unwrap();
         if ppos == 0 || ppos % 2 == 1 {
             // Padding must be "within" the string, starting at an even position
             return false;
@@ -62,7 +62,7 @@ pub fn is_valid(_code: &str) -> bool {
             return false;
         }
         // Extract the padding from the code (mutates code)
-        let padding: String = code.drain(ppos..eppos+1).collect();
+        let padding: String = code.drain(ppos..eppos + 1).collect();
         if padding.chars().any(|c| c != PADDING_CHAR) {
             // Padding must be one, contiguous block of padding chars
             return false;
@@ -79,9 +79,8 @@ pub fn is_valid(_code: &str) -> bool {
 ///
 /// A short Open Location Code is a sequence created by removing four or more
 /// digits from an Open Location Code. It must include a separator character.
-pub fn is_short(_code: &str) -> bool {
-    is_valid(_code) &&
-        _code.find(SEPARATOR).unwrap() < SEPARATOR_POSITION
+pub fn is_short(code: &str) -> bool {
+    is_valid(code) && code.find(SEPARATOR).unwrap() < SEPARATOR_POSITION
 }
 
 /// Determines if a code is a valid full Open Location Code.
@@ -91,8 +90,8 @@ pub fn is_short(_code: &str) -> bool {
 /// and also that the latitude and longitude values are legal. If the prefix
 /// character is present, it must be the first character. If the separator
 /// character is present, it must be after four characters.
-pub fn is_full(_code: &str) -> bool {
-    is_valid(_code) && !is_short(_code)
+pub fn is_full(code: &str) -> bool {
+    is_valid(code) && !is_short(code)
 }
 
 /// Encode a location into an Open Location Code.
@@ -105,12 +104,9 @@ pub fn is_full(_code: &str) -> bool {
 /// 11 or 12 are probably the limit of useful codes.
 pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     let mut lat = clip_latitude(pt.lat());
-    let mut lng = normalize_longitude(pt.lng());
+    let lng = normalize_longitude(pt.lng());
 
-    let mut trimmed_code_length = code_length;
-    if trimmed_code_length > MAX_CODE_LENGTH {
-        trimmed_code_length = MAX_CODE_LENGTH;
-    }
+    let trimmed_code_length = cmp::min(code_length, MAX_CODE_LENGTH);
 
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
@@ -118,36 +114,59 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
         lat -= compute_latitude_precision(trimmed_code_length);
     }
 
-    lat += LATITUDE_MAX;
-    lng += LONGITUDE_MAX;
+    // Convert to integers.
+    let mut lat_val =
+        (((lat + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
+    let mut lng_val =
+        (((lng + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
 
-    let mut code = String::with_capacity(trimmed_code_length + 1);
-    let mut digit = 0;
-    while digit < trimmed_code_length {
-        narrow_region(digit, &mut lat, &mut lng);
+    // Compute the code digits. This largely ignores the requested length - it
+    // generates either a 10 digit code, or a 15 digit code, and then truncates
+    // it to the requested length.
 
-        let lat_digit = lat as usize;
-        let lng_digit = lng as usize;
-        if digit < PAIR_CODE_LENGTH {
-            code.push(CODE_ALPHABET[lat_digit]);
-            code.push(CODE_ALPHABET[lng_digit]);
-            digit += 2;
-        } else {
-            code.push(CODE_ALPHABET[4 * lat_digit + lng_digit]);
-            digit += 1;
+    // Build up the code digits in reverse order.
+    let mut rev_code = String::with_capacity(trimmed_code_length + 1);
+
+    // First do the grid digits.
+    if code_length > PAIR_CODE_LENGTH {
+        for _i in 0..GRID_CODE_LENGTH {
+            let lat_digit = lat_val % GRID_ROWS as i64;
+            let lng_digit = lng_val % GRID_COLUMNS as i64;
+            let ndx = (lat_digit * GRID_COLUMNS as i64 + lng_digit) as usize;
+            rev_code.push(CODE_ALPHABET[ndx]);
+            lat_val /= GRID_ROWS as i64;
+            lng_val /= GRID_COLUMNS as i64;
         }
-        lat -= lat_digit as f64;
-        lng -= lng_digit as f64;
-        if digit == SEPARATOR_POSITION {
-            code.push(SEPARATOR);
+    } else {
+        // Adjust latitude and longitude values to skip the grid digits.
+        lat_val /= GRID_ROWS.pow(GRID_CODE_LENGTH as u32) as i64;
+        lng_val /= GRID_COLUMNS.pow(GRID_CODE_LENGTH as u32) as i64;
+    }
+    // Compute the pair section of the code.
+    for i in 0..PAIR_CODE_LENGTH / 2 {
+        rev_code.push(CODE_ALPHABET[(lng_val % ENCODING_BASE as i64) as usize]);
+        lng_val /= ENCODING_BASE as i64;
+        rev_code.push(CODE_ALPHABET[(lat_val % ENCODING_BASE as i64) as usize]);
+        lat_val /= ENCODING_BASE as i64;
+        // If we are at the separator position, add the separator.
+        if i == 0 {
+            rev_code.push(SEPARATOR);
         }
     }
-    if digit < SEPARATOR_POSITION {
+    let mut code: String;
+    // If we need to pad the code, replace some of the digits.
+    if code_length < SEPARATOR_POSITION {
+        code = rev_code.chars().rev().take(code_length).collect();
         code.push_str(
-            PADDING_CHAR_STR.repeat(SEPARATOR_POSITION - digit).as_str()
+            PADDING_CHAR_STR
+                .repeat(SEPARATOR_POSITION - code_length)
+                .as_str(),
         );
         code.push(SEPARATOR);
+    } else {
+        code = rev_code.chars().rev().take(code_length + 1).collect();
     }
+
     code
 }
 
@@ -155,38 +174,49 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
 ///
 /// Returns a CodeArea object that includes the coordinates of the bounding
 /// box - the lower left, center and upper right.
-pub fn decode(_code: &str) -> Result<CodeArea, String> {
-    if !is_full(_code) {
-        return Err(format!("Code must be a valid full code: {}", _code));
+pub fn decode(code: &str) -> Result<CodeArea, String> {
+    if !is_full(code) {
+        return Err(format!("Code must be a valid full code: {}", code));
     }
-    let code = _code.to_string()
+    let mut code = code
+        .to_string()
         .replace(SEPARATOR, "")
         .replace(PADDING_CHAR_STR, "")
         .to_uppercase();
+    if code.len() > MAX_CODE_LENGTH {
+        code = code.chars().take(MAX_CODE_LENGTH).collect();
+    }
 
-    let mut lat = -LATITUDE_MAX;
-    let mut lng = -LONGITUDE_MAX;
-    let mut lat_res = ENCODING_BASE * ENCODING_BASE;
-    let mut lng_res = ENCODING_BASE * ENCODING_BASE;
+    // Work out the values as integers and convert to floating point at the end.
+    let mut lat: i64 = -90 * LAT_INTEGER_MULTIPLIER;
+    let mut lng: i64 = -180 * LNG_INTEGER_MULTIPLIER;
+    let mut lat_place_val: i64 = LAT_INTEGER_MULTIPLIER * ENCODING_BASE.pow(2) as i64;
+    let mut lng_place_val: i64 = LNG_INTEGER_MULTIPLIER * ENCODING_BASE.pow(2) as i64;
 
     for (idx, chr) in code.chars().enumerate() {
         if idx < PAIR_CODE_LENGTH {
             if idx % 2 == 0 {
-                lat_res /= ENCODING_BASE;
-                lat += lat_res * code_value(chr) as f64;
+                lat_place_val /= ENCODING_BASE as i64;
+                lat += lat_place_val * code_value(chr) as i64;
             } else {
-                lng_res /= ENCODING_BASE;
-                lng += lng_res * code_value(chr) as f64;
+                lng_place_val /= ENCODING_BASE as i64;
+                lng += lng_place_val * code_value(chr) as i64;
             }
-        } else if idx < MAX_CODE_LENGTH {
-            lat_res /= GRID_ROWS;
-            lng_res /= GRID_COLUMNS;
-            lat += lat_res * (code_value(chr) as f64 / GRID_COLUMNS).trunc();
-
-            lng += lng_res * (code_value(chr) as f64 % GRID_COLUMNS);
+        } else {
+            lat_place_val /= GRID_ROWS as i64;
+            lng_place_val /= GRID_COLUMNS as i64;
+            lat += lat_place_val * (code_value(chr) / GRID_COLUMNS) as i64;
+            lng += lng_place_val * (code_value(chr) % GRID_COLUMNS) as i64;
         }
     }
-    Ok(CodeArea::new(lat, lng, lat + lat_res, lng + lng_res, code.len()))
+    // Convert to floating point values.
+    let lat_lo: f64 = lat as f64 / LAT_INTEGER_MULTIPLIER as f64;
+    let lng_lo: f64 = lng as f64 / LNG_INTEGER_MULTIPLIER as f64;
+    let lat_hi: f64 =
+        (lat + lat_place_val) as f64 / (ENCODING_BASE.pow(3) * GRID_ROWS.pow(5)) as f64;
+    let lng_hi: f64 =
+        (lng + lng_place_val) as f64 / (ENCODING_BASE.pow(3) * GRID_COLUMNS.pow(5)) as f64;
+    Ok(CodeArea::new(lat_lo, lng_lo, lat_hi, lng_hi, code.len()))
 }
 
 /// Remove characters from the start of an OLC code.
@@ -205,23 +235,26 @@ pub fn decode(_code: &str) -> Result<CodeArea, String> {
 ///
 /// It returns either the original code, if the reference location was not
 /// close enough, or the .
-pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
-    if !is_full(_code) {
-        return Ok(_code.to_string());
+pub fn shorten(code: &str, ref_pt: Point<f64>) -> Result<String, String> {
+    if !is_full(code) {
+        return Ok(code.to_string());
     }
-    if _code.find(PADDING_CHAR).is_some() {
+    if code.find(PADDING_CHAR).is_some() {
         return Err("Cannot shorten padded codes".to_owned());
     }
 
-    let codearea: CodeArea = decode(_code).unwrap();
+    let codearea: CodeArea = decode(code).unwrap();
     if codearea.code_length < MIN_TRIMMABLE_CODE_LEN {
-        return Err(format!("Code length must be at least {}", MIN_TRIMMABLE_CODE_LEN));
+        return Err(format!(
+            "Code length must be at least {}",
+            MIN_TRIMMABLE_CODE_LEN
+        ));
     }
 
     // How close are the latitude and longitude to the code center.
-    let range = (codearea.center.lat() - clip_latitude(ref_pt.lat())).abs().max(
-        (codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs()
-    );
+    let range = (codearea.center.lat() - clip_latitude(ref_pt.lat()))
+        .abs()
+        .max((codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs());
 
     for i in 0..PAIR_RESOLUTIONS.len() - 2 {
         // Check if we're close enough to shorten. The range must be less than 1/2
@@ -229,12 +262,12 @@ pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
         // use 0.3 instead of 0.5 as a multiplier.
         let idx = PAIR_RESOLUTIONS.len() - 2 - i;
         if range < (PAIR_RESOLUTIONS[idx] * 0.3f64) {
-            let mut code = _code.to_string();
+            let mut code = code.to_string();
             code.drain(..((idx + 1) * 2));
             return Ok(code);
         }
     }
-    Ok(_code.to_string())
+    Ok(code.to_string())
 }
 
 /// Recover the nearest matching code to a specified location.
@@ -263,18 +296,17 @@ pub fn shorten(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
 /// the nearest match, not necessarily the match within the same cell. If the
 /// passed code was not a valid short code, but was a valid full code, it is
 /// returned unchanged.
-pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String> {
-    if !is_short(_code) {
-        if is_full(_code) {
-            return Ok(_code.to_string().to_uppercase());
+pub fn recover_nearest(code: &str, ref_pt: Point<f64>) -> Result<String, String> {
+    if !is_short(code) {
+        if is_full(code) {
+            return Ok(code.to_string().to_uppercase());
         } else {
-            return Err(format!("Passed short code is not valid: {}", _code));
+            return Err(format!("Passed short code is not valid: {}", code));
         }
     }
 
-    let prefix_len = SEPARATOR_POSITION - _code.find(SEPARATOR).unwrap();
-    let mut code = prefix_by_reference(ref_pt, prefix_len);
-    code.push_str(_code);
+    let prefix_len = SEPARATOR_POSITION - code.find(SEPARATOR).unwrap();
+    let code = prefix_by_reference(ref_pt, prefix_len) + code;
 
     let code_area = decode(code.as_str()).unwrap();
 
@@ -296,6 +328,8 @@ pub fn recover_nearest(_code: &str, ref_pt: Point<f64>) -> Result<String, String
     } else if ref_lng - half_res > longitude {
         longitude += resolution;
     }
-    Ok(encode(Point::new(longitude, latitude), code_area.code_length))
+    Ok(encode(
+        Point::new(longitude, latitude),
+        code_area.code_length,
+    ))
 }
-

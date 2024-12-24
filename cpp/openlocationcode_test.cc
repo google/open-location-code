@@ -1,8 +1,11 @@
 #include "openlocationcode.h"
 
-#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <chrono>
+#include <cmath>
+#include <cstring>
 #include <fstream>
 #include <string>
 
@@ -117,14 +120,14 @@ TEST_P(DecodingChecks, Decode) {
               actual_rect.GetCenter().latitude, 1e-10);
   EXPECT_NEAR(expected_rect.GetCenter().longitude,
               actual_rect.GetCenter().longitude, 1e-10);
-  EXPECT_NEAR(expected_rect.GetLatitudeLo(),
-              actual_rect.GetLatitudeLo(), 1e-10);
-  EXPECT_NEAR(expected_rect.GetLongitudeLo(),
-              actual_rect.GetLongitudeLo(), 1e-10);
-  EXPECT_NEAR(expected_rect.GetLatitudeHi(),
-              actual_rect.GetLatitudeHi(), 1e-10);
-  EXPECT_NEAR(expected_rect.GetLongitudeHi(),
-              actual_rect.GetLongitudeHi(), 1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeLo(), actual_rect.GetLatitudeLo(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeLo(), actual_rect.GetLongitudeLo(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLatitudeHi(), actual_rect.GetLatitudeHi(),
+              1e-10);
+  EXPECT_NEAR(expected_rect.GetLongitudeHi(), actual_rect.GetLongitudeHi(),
+              1e-10);
 }
 
 INSTANTIATE_TEST_CASE_P(OLC_Tests, DecodingChecks,
@@ -242,7 +245,8 @@ TEST_P(ShortCodeChecks, ShortCode) {
   }
   // Now extend the code using the reference location and check.
   if (test_data.test_type == "B" || test_data.test_type == "R") {
-    std::string actual_full = RecoverNearest(test_data.short_code, reference_loc);
+    std::string actual_full =
+        RecoverNearest(test_data.short_code, reference_loc);
     EXPECT_EQ(test_data.full_code, actual_full);
   }
 }
@@ -264,6 +268,57 @@ TEST(MaxCodeLengthChecks, MaxCodeLength) {
   // Extend the code with an invalid character and make sure it is invalid.
   too_long_code = long_code + "U";
   EXPECT_FALSE(IsValid(too_long_code));
+}
+
+struct BenchmarkTestData {
+  LatLng lat_lng;
+  size_t len;
+  std::string code;
+};
+
+TEST(BenchmarkChecks, BenchmarkEncodeDecode) {
+  std::srand(std::time(0));
+  std::vector<BenchmarkTestData> tests;
+  const size_t loops = 1000000;
+  for (size_t i = 0; i < loops; i++) {
+    BenchmarkTestData test_data = {};
+    double lat = (double)rand() / RAND_MAX * 180 - 90;
+    double lng = (double)rand() / RAND_MAX * 360 - 180;
+    size_t rounding = pow(10, round((double)rand() / RAND_MAX * 10));
+    lat = round(lat * rounding) / rounding;
+    lng = round(lng * rounding) / rounding;
+    size_t len = round((double)rand() / RAND_MAX * 15);
+    if (len < 10 && len % 2 == 1) {
+      len += 1;
+    }
+    LatLng lat_lng = LatLng{lat, lng};
+    std::string code = Encode(lat_lng, len);
+    test_data.lat_lng = lat_lng;
+    test_data.len = len;
+    test_data.code = code;
+    tests.push_back(test_data);
+  }
+  auto start = std::chrono::high_resolution_clock::now();
+  for (auto td : tests) {
+    Encode(td.lat_lng, td.len);
+  }
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+                      std::chrono::high_resolution_clock::now() - start)
+                      .count();
+  std::cout << "Encoding " << loops << " locations took " << duration
+            << " usecs total, " << (float)duration / loops
+            << " usecs per call\n";
+
+  start = std::chrono::high_resolution_clock::now();
+  for (auto td : tests) {
+    Decode(td.code);
+  }
+  duration = std::chrono::duration_cast<std::chrono::microseconds>(
+                 std::chrono::high_resolution_clock::now() - start)
+                 .count();
+  std::cout << "Decoding " << loops << " locations took " << duration
+            << " usecs total, " << (float)duration / loops
+            << " usecs per call\n";
 }
 
 }  // namespace
