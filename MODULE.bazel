@@ -3,21 +3,11 @@ module(
     version = "1.0",
 )
 
+# bazel-skylib required by #@io_bazel_rules_closure.
+# https://github.com/bazelbuild/bazel-skylib
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+
+# googletest required by c/BUILD.
+# https://github.com/google/googletest
 bazel_dep(name = "googletest", version = "1.15.2")
-bazel_dep(name = "rules_proto", version = "6.0.2")  # Deprecated (moved), TODO find new URL
-bazel_dep(name = "rules_java", version = "7.8.0")
-bazel_dep(name = "bazel_skylib", version = "1.6.1")
-bazel_dep(name = "rules_python", version = "0.33.2")
 
-# External dependency archives
-http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "io_bazel_rules_closure",
-    sha256 = "9498e57368efb82b985db1ed426a767cbf1ba0398fd7aed632fc3908654e1b1e",
-    strip_prefix = "rules_closure-0.12.0",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_closure/archive/0.12.0.tar.gz",
-        "https://github.com/bazelbuild/rules_closure/archive/0.12.0.tar.gz",
-    ],
-)

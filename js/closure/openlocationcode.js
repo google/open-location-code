@@ -102,6 +102,11 @@ var LATITUDE_MAX = 90;
 var LONGITUDE_MAX = 180;
 
 /**
+ * Minimum length of a code.
+ */
+var MIN_CODE_LEN = 2;
+
+/**
  * Maximum length of a code.
  */
 var MAX_CODE_LEN = 15;
@@ -352,7 +357,7 @@ function encode(latitude, longitude, optLength) {
   if (typeof optLength == 'undefined') {
     optLength = PAIR_CODE_LENGTH;
   }
-  if (optLength < 2 ||
+  if (optLength < MIN_CODE_LEN ||
       (optLength < PAIR_CODE_LENGTH && optLength % 2 == 1)) {
     throw new Error(
         'IllegalArgumentException: Invalid Open Location Code length');
