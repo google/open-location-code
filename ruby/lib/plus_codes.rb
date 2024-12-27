@@ -16,6 +16,9 @@ module PlusCodes
   # The max number of characters can be placed before the separator.
   SEPARATOR_POSITION = 8
 
+  # Minimum number of digits to process in a plus code.
+  MIN_CODE_LENGTH = 2
+
   # Maximum number of digits to process in a plus code.
   MAX_CODE_LENGTH = 15
 
