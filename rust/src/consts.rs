@@ -10,25 +10,7 @@ pub const PADDING_CHAR_STR: &str = "0";
 
 // The character set used to encode the values.
 pub const CODE_ALPHABET: [char; 20] = [
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    'C',
-    'F',
-    'G',
-    'H',
-    'J',
-    'M',
-    'P',
-    'Q',
-    'R',
-    'V',
-    'W',
+    '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'F', 'G', 'H', 'J', 'M', 'P', 'Q', 'R', 'V', 'W',
     'X',
 ];
 
@@ -71,12 +53,22 @@ pub const MIN_TRIMMABLE_CODE_LEN: usize = 6;
 
 // What to multiply latitude degrees by to get an integer value. There are three pairs representing
 // decimal digits, and five digits in the grid.
-pub const LAT_INTEGER_MULTIPLIER: i64 =
-    (ENCODING_BASE * ENCODING_BASE * ENCODING_BASE * GRID_ROWS * GRID_ROWS * GRID_ROWS *
-         GRID_ROWS * GRID_ROWS) as i64;
+pub const LAT_INTEGER_MULTIPLIER: i64 = (ENCODING_BASE
+    * ENCODING_BASE
+    * ENCODING_BASE
+    * GRID_ROWS
+    * GRID_ROWS
+    * GRID_ROWS
+    * GRID_ROWS
+    * GRID_ROWS) as i64;
 
 // What to multiply longitude degrees by to get an integer value. There are three pairs representing
 // decimal digits, and five digits in the grid.
-pub const LNG_INTEGER_MULTIPLIER: i64 =
-    (ENCODING_BASE * ENCODING_BASE * ENCODING_BASE * GRID_COLUMNS * GRID_COLUMNS *
-         GRID_COLUMNS * GRID_COLUMNS * GRID_COLUMNS) as i64;
+pub const LNG_INTEGER_MULTIPLIER: i64 = (ENCODING_BASE
+    * ENCODING_BASE
+    * ENCODING_BASE
+    * GRID_COLUMNS
+    * GRID_COLUMNS
+    * GRID_COLUMNS
+    * GRID_COLUMNS
+    * GRID_COLUMNS) as i64;

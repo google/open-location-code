@@ -3,13 +3,16 @@ use std::cmp;
 
 use codearea::CodeArea;
 
-use consts::{CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS,
-             LATITUDE_MAX, LAT_INTEGER_MULTIPLIER, LNG_INTEGER_MULTIPLIER, LONGITUDE_MAX,
-             MIN_CODE_LENGTH, MAX_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR,
-             PADDING_CHAR_STR, PAIR_CODE_LENGTH, PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION};
+use consts::{
+    CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX,
+    LAT_INTEGER_MULTIPLIER, LNG_INTEGER_MULTIPLIER, LONGITUDE_MAX, MAX_CODE_LENGTH,
+    MIN_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH,
+    PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION,
+};
 
-use private::{clip_latitude, code_value, compute_latitude_precision, normalize_longitude,
-              prefix_by_reference};
+use private::{
+    clip_latitude, code_value, compute_latitude_precision, normalize_longitude, prefix_by_reference,
+};
 
 /// Determines if a code is a valid Open Location Code.
 pub fn is_valid(code: &str) -> bool {
@@ -67,9 +70,9 @@ pub fn is_valid(code: &str) -> bool {
     }
 
     // Validate all characters are permissible
-    code.chars().map(|c| c.to_ascii_uppercase()).all(|c| {
-        c == SEPARATOR || CODE_ALPHABET.contains(&c)
-    })
+    code.chars()
+        .map(|c| c.to_ascii_uppercase())
+        .all(|c| c == SEPARATOR || CODE_ALPHABET.contains(&c))
 }
 
 /// Determines if a code is a valid short code.
@@ -112,10 +115,10 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     }
 
     // Convert to integers.
-    let mut lat_val = (((lat + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER as f64 * 1e6).round() /
-                           1e6f64) as i64;
-    let mut lng_val = (((lng + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER as f64 * 1e6).round() /
-                           1e6f64) as i64;
+    let mut lat_val =
+        (((lat + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
+    let mut lng_val =
+        (((lng + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
 
     // Compute the code digits. This largely ignores the requested length - it
     // generates either a 10 digit code, or a 15 digit code, and then truncates
@@ -175,7 +178,8 @@ pub fn decode(code: &str) -> Result<CodeArea, String> {
     if !is_full(code) {
         return Err(format!("Code must be a valid full code: {}", code));
     }
-    let mut code = code.to_string()
+    let mut code = code
+        .to_string()
         .replace(SEPARATOR, "")
         .replace(PADDING_CHAR_STR, "")
         .to_uppercase();
@@ -208,10 +212,10 @@ pub fn decode(code: &str) -> Result<CodeArea, String> {
     // Convert to floating point values.
     let lat_lo: f64 = lat as f64 / LAT_INTEGER_MULTIPLIER as f64;
     let lng_lo: f64 = lng as f64 / LNG_INTEGER_MULTIPLIER as f64;
-    let lat_hi: f64 = (lat + lat_place_val) as f64 /
-        (ENCODING_BASE.pow(3) * GRID_ROWS.pow(5)) as f64;
-    let lng_hi: f64 = (lng + lng_place_val) as f64 /
-        (ENCODING_BASE.pow(3) * GRID_COLUMNS.pow(5)) as f64;
+    let lat_hi: f64 =
+        (lat + lat_place_val) as f64 / (ENCODING_BASE.pow(3) * GRID_ROWS.pow(5)) as f64;
+    let lng_hi: f64 =
+        (lng + lng_place_val) as f64 / (ENCODING_BASE.pow(3) * GRID_COLUMNS.pow(5)) as f64;
     Ok(CodeArea::new(lat_lo, lng_lo, lat_hi, lng_hi, code.len()))
 }
 
@@ -250,9 +254,7 @@ pub fn shorten(code: &str, ref_pt: Point<f64>) -> Result<String, String> {
     // How close are the latitude and longitude to the code center.
     let range = (codearea.center.lat() - clip_latitude(ref_pt.lat()))
         .abs()
-        .max(
-            (codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs(),
-        );
+        .max((codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs());
 
     for i in 0..PAIR_RESOLUTIONS.len() - 2 {
         // Check if we're close enough to shorten. The range must be less than 1/2
