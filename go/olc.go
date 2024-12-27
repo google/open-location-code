@@ -143,7 +143,7 @@ func Check(code string) error {
 		if firstSep < sepPos {
 			return errors.New("short codes cannot have padding")
 		}
-		if len(code)-firstPad-1%2 == 1 {
+		if firstPad%2 == 1 {
 			return errors.New("odd number of padding chars")
 		}
 	}

@@ -23,6 +23,9 @@ pub const LATITUDE_MAX: f64 = 90f64;
 // The maximum value for longitude in degrees.
 pub const LONGITUDE_MAX: f64 = 180f64;
 
+// Minimum number of digits to process for plus codes.
+pub const MIN_CODE_LENGTH: usize = 2;
+
 // Maximum number of digits to process for plus codes.
 pub const MAX_CODE_LENGTH: usize = 15;
 
