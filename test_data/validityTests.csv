@@ -14,7 +14,6 @@
 8fwc2345+,true,false,true
 8FWCX400+,true,false,true
 84000000+,true,false,true
-84900000+,true,false,true
 ################################################################################
 #
 # Valid short codes:
@@ -40,6 +39,7 @@ G+,false,false,false
 WC2300+G6g,false,false,false
 WC2345+G,false,false,false
 WC2300+,false,false,false
+84900000+,false,false,false
 ################################################################################
 #
 # Validate that codes at and exceeding 15 digits are still valid when all their
