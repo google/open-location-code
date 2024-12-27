@@ -270,7 +270,8 @@ module PlusCodes
     end
 
     def invalid_length?(code_length)
-      code_length < 2 || (code_length < PAIR_CODE_LENGTH && code_length.odd?)
+      code_length < MIN_CODE_LENGTH ||
+        (code_length < PAIR_CODE_LENGTH && code_length.odd?)
     end
 
     def padded(code)

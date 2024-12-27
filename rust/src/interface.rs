@@ -6,8 +6,8 @@ use codearea::CodeArea;
 use consts::{
     CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX,
     LAT_INTEGER_MULTIPLIER, LNG_INTEGER_MULTIPLIER, LONGITUDE_MAX, MAX_CODE_LENGTH,
-    MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH, PAIR_RESOLUTIONS,
-    SEPARATOR, SEPARATOR_POSITION,
+    MIN_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH,
+    PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION,
 };
 
 use private::{
@@ -106,7 +106,7 @@ pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     let mut lat = clip_latitude(pt.lat());
     let lng = normalize_longitude(pt.lng());
 
-    let trimmed_code_length = cmp::min(code_length, MAX_CODE_LENGTH);
+    let trimmed_code_length = cmp::min(cmp::max(code_length, MIN_CODE_LENGTH), MAX_CODE_LENGTH);
 
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.

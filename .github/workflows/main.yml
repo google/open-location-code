@@ -7,7 +7,7 @@ jobs:
     env:
       OLC_PATH: c
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all
@@ -20,7 +20,7 @@ jobs:
     env:
       OLC_PATH: cpp
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all
@@ -33,7 +33,7 @@ jobs:
     env:
       OLC_PATH: dart
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
       - name: test
         run: |
@@ -47,8 +47,8 @@ jobs:
     env:
       OLC_PATH: go
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-go@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
       with:
         go-version: 1.17
     - name: test
@@ -71,7 +71,7 @@ jobs:
         java: [ '17', '21' ]
     name: test-java-${{ matrix.java }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3
       - name: Setup java
         uses: actions/setup-java@v2
@@ -87,7 +87,7 @@ jobs:
     env:
       OLC_PATH: js/closure
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3
       - name: test
         run: |
@@ -100,7 +100,7 @@ jobs:
     env:
       OLC_PATH: js
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: test
         run: |
           cd ${OLC_PATH}
@@ -116,10 +116,10 @@ jobs:
         python: [ '3.11', '3.12', '3.13' ]
     name: test-python-${{ matrix.python }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3
       - name: Set up Python 
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: test
@@ -137,7 +137,7 @@ jobs:
     env:
       OLC_PATH: ruby
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3.6'
@@ -154,7 +154,7 @@ jobs:
     env:
       OLC_PATH: rust
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: test
         run: |
           cd ${OLC_PATH}

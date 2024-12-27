@@ -17,6 +17,7 @@ const char kAlphabet[] = "23456789CFGHJMPQRVWX";
 const size_t kEncodingBase = 20;
 // The max number of digits returned in a plus code. Roughly 1 x 0.5 cm.
 const size_t kMaximumDigitCount = 15;
+const size_t kMinimumDigitCount = 2;
 const size_t kPairCodeLength = 10;
 const size_t kGridCodeLength = kMaximumDigitCount - kPairCodeLength;
 const size_t kGridColumns = 4;
@@ -122,6 +123,11 @@ std::string clean_code_chars(const std::string &code) {
 std::string Encode(const LatLng &location, size_t code_length) {
   // Limit the maximum number of digits in the code.
   code_length = std::min(code_length, internal::kMaximumDigitCount);
+  // Ensure the length is valid.
+  code_length = std::max(code_length, internal::kMinimumDigitCount);
+  if (code_length < internal::kPairCodeLength && code_length % 2 == 1) {
+    code_length = code_length + 1;
+  }
   // Adjust latitude and longitude so that they are normalized/clipped.
   double latitude = adjust_latitude(location.latitude, code_length);
   double longitude = normalize_longitude(location.longitude);

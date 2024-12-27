@@ -39,6 +39,9 @@ const latitudeMax = 90;
 /// The maximum value for longitude in degrees.
 const longitudeMax = 180;
 
+// The min number of digits in a plus code.
+const minDigitCount = 2;
+
 // The max number of digits to process in a plus code.
 const maxDigitCount = 15;
 
@@ -251,7 +254,7 @@ bool isFull(String code) {
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
-  if (codeLength < 2 || (codeLength < pairCodeLength && codeLength.isOdd)) {
+  if (codeLength < minDigitCount || (codeLength < pairCodeLength && codeLength.isOdd)) {
     throw ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   codeLength = min(maxDigitCount, codeLength);

@@ -90,6 +90,12 @@ Private Const LATITUDE_MAX_ As Double = 90
 ' The maximum value for longitude in degrees.
 Private Const LONGITUDE_MAX_ As Double = 180
 
+' Minimum number of digits in a code.
+Private Const MIN_DIGIT_COUNT_ = 2;
+
+' Maximum number of digits in a code.
+Private Const MAX_DIGIT_COUNT_ = 15;
+
 ' Maximum code length using lat/lng pair encoding. The area of such a
 ' code is approximately 13x13 meters (at the equator), and should be suitable
 ' for identifying buildings. This excludes prefix and separator characters.
@@ -212,7 +218,13 @@ Public Function OLCEncode(ByVal latitude As Double, ByVal longitude As Double, O
   If codeLength = 0 Then
     codeLength = CODE_PRECISION_NORMAL
   End If
-  If codeLength < 2 Then
+  If codeLength < MIN_DIGIT_COUNT_ Then
+    Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
+  End If
+  If codeLength > MAX_DIGIT_COUNT_ Then
+    Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
+  End If
+  If codeLength < PAIR_CODE_LENGTH_ And codeLength \ 2 = 1 Then
     Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
   End If
   Dim lat, lng As Double
