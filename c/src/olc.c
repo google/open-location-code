@@ -88,6 +88,12 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   if (length > kMaximumDigitCount) {
     length = kMaximumDigitCount;
   }
+  if (length < kMinimumDigitCount) {
+    length = kMinimumDigitCount;
+  }
+  if (length < kPairCodeLength && length % 2 == 1) {
+    length = length + 1;
+  }
   // Adjust latitude and longitude so they fall into positive ranges.
   double latitude = adjust_latitude(location->lat, length);
   double longitude = normalize_longitude(location->lon);

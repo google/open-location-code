@@ -327,6 +327,7 @@ DECLARE
     ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
     LATITUDE_MAX_ int := 90;
     LONGITUDE_MAX_ int := 180;
+    MIN_DIGIT_COUNT_ int := 2;
     MAX_DIGIT_COUNT_ int := 15;
     PAIR_CODE_LENGTH_ int := 10;
     PAIR_PRECISION_ decimal := power(ENCODING_BASE_, 3);
@@ -343,7 +344,7 @@ DECLARE
     ndx smallint;
     i_ smallint;
 BEGIN
-    IF ((codeLength < 2) OR ((codeLength < PAIR_CODE_LENGTH_) AND (codeLength % 2 = 1))) THEN
+    IF ((codeLength < MIN_DIGIT_COUNT_) OR ((codeLength < PAIR_CODE_LENGTH_) AND (codeLength % 2 = 1))) THEN
         RAISE EXCEPTION 'Invalid Open Location Code length - %', codeLength
         USING HINT = 'The Open Location Code length must be 2, 4, 6, 8, 10, 11, 12, 13, 14, or 15.';
     END IF;

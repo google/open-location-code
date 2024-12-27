@@ -57,6 +57,9 @@ public final class OpenLocationCode {
   // The number of characters to place before the separator.
   private static final int SEPARATOR_POSITION = 8;
 
+  // The minimum number of digits in a plus code.
+  public static final int MIN_DIGIT_COUNT = 2;
+
   // The max number of digits to process in a plus code.
   public static final int MAX_DIGIT_COUNT = 15;
 
@@ -188,7 +191,7 @@ public final class OpenLocationCode {
     // Limit the maximum number of digits in the code.
     codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
     // Check that the code length requested is valid.
-    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < 4) {
+    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < MIN_DIGIT_COUNT) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
     // Ensure that latitude and longitude are valid.
