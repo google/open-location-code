@@ -14,12 +14,12 @@ int main(int argc, char* argv[]) {
   // Encodes latitude and longitude into a Plus+Code.
   location.lat = 47.0000625;
   location.lon = 8.0000625;
-  len = OLC_EncodeDefault(&location, code, 256);
+  len = OLC_EncodeDefault(&location, code);
   printf("%s (%d)\n", code, len);
   // => "8FVC2222+22"
 
   // Encodes latitude and longitude into a Plus+Code with a preferred length.
-  len = OLC_Encode(&location, 16, code, 256);
+  len = OLC_Encode(&location, 16, code);
   printf("%s (%d)\n", code, len);
   // => "8FVC2222+22GCCCC"
 
@@ -49,12 +49,12 @@ int main(int argc, char* argv[]) {
   printf("Original: %s\n", orig);
   location.lat = 51.3708675;
   location.lon = -1.217765625;
-  len = OLC_Shorten(orig, 0, &location, code, 256);
+  len = OLC_Shorten(orig, 0, &location, code);
   printf("Shortened: %s\n", code);
   // => "CJ+2VX"
 
   // Extends a Plus+Code by the given reference latitude and longitude.
-  OLC_RecoverNearest("CJ+2VX", 0, &location, code, 256);
+  OLC_RecoverNearest("CJ+2VX", 0, &location, code);
   printf("Recovered: %s\n", code);
   // => orig
 
