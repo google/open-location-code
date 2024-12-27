@@ -1,0 +1,5 @@
+# Set options for Bazelisk, a wrapper for Bazel.
+
+# Set the version of Bazel to use.
+# TODO: #642 -- Update once the JS bazelbuild/rules_closure supports bazel modules.
+USE_BAZEL_VERSION=7.4.1

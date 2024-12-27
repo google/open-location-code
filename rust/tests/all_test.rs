@@ -22,7 +22,6 @@ use csv_reader::CSVReader;
 ///
 /// We could probably take it a little further, and assert that tested was >= # tests in the file
 /// (allowing tests to be added, but assuming # tests will never be reduced).
-
 #[test]
 fn is_valid_test() {
     let mut tested = 0;

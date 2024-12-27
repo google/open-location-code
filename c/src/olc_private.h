@@ -21,6 +21,8 @@ static const char kPaddingCharacter = '0';
 static const char kAlphabet[] = "23456789CFGHJMPQRVWX";
 // Number of digits in the alphabet.
 static const size_t kEncodingBase = OLC_kEncodingBase;
+// The min number of digits returned in a plus code.
+static const size_t kMinimumDigitCount = 2;
 // The max number of digits returned in a plus code. Roughly 1 x 0.5 cm.
 static const size_t kMaximumDigitCount = 15;
 // The number of code characters that are lat/lng pairs.
