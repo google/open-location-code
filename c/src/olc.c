@@ -86,7 +86,6 @@ int OLC_IsFull(const char* code, size_t size) {
 
 int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
                int maxlen) {
-  // Normalize longitude.
   double latdeg = location->lat;
   double londeg = location->lon;
   // Add the maximum latitude and longitude to the values to move them into a
@@ -101,7 +100,7 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
 
 int OLC_EncodeFixed(long long int lat, long long int lon, size_t length,
                     char* code, int maxlen) {
-  // Limit the maximum number of digits in the code.
+  // Ensure length is valid.
   if (length > kMaximumDigitCount) {
     length = kMaximumDigitCount;
   } else if (length < kMinimumDigitCount) {
@@ -129,10 +128,6 @@ int OLC_EncodeFixed(long long int lat, long long int lon, size_t length,
   char fullcode[] = "12345678901234567";
 
   // Compute the code.
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
   size_t pos = kMaximumDigitCount;
   // Compute the grid part of the code if necessary.
   if (length > kPairCodeLength) {
