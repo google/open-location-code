@@ -1,14 +1,15 @@
 // Include the C library into this C++ test file.
 extern "C" {
-  #include "src/olc.h"
+#include "src/olc.h"
 }
 
-#include <chrono>
-#include <cstring>
-#include <cmath>
-#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <chrono>
+#include <cmath>
+#include <cstring>
+#include <fstream>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -134,11 +135,6 @@ TEST_P(EncodingChecks, Encode) {
   EncodingTestData test_data = GetParam();
   OLC_LatLon loc = OLC_LatLon{test_data.lat_deg, test_data.lng_deg};
   char got_code[18];
-  // Encode the test location and make sure we get the expected code.
-  // printf("%s,%s,", test_data.lat.c_str(), test_data.lng.c_str());
-  // OLC_Encode(&loc, test_data.length, got_code, 18);
-  // printf("%ld,%s\n", test_data.length, test_data.code.c_str());
-  // EXPECT_EQ(test_data.code, got_code);
   OLC_EncodeFixed(test_data.lat_fixed, test_data.lng_fixed, test_data.length,
                   got_code, 18);
   EXPECT_EQ(test_data.code, got_code);
@@ -191,7 +187,8 @@ INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
 //   std::string test_type;
 // };
 
-// class ShortCodeChecks : public ::testing::TestWithParam<ShortCodeTestData> {};
+// class ShortCodeChecks : public ::testing::TestWithParam<ShortCodeTestData>
+// {};
 
 // const std::string kShortCodeTestsFile = "test_data/shortCodeTests.csv";
 
@@ -224,8 +221,8 @@ INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
 //   // Now extend the code using the reference location and check.
 //   if (test_data.test_type == "B" || test_data.test_type == "R") {
 //     char got[18];
-//     OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got, 18);
-//     EXPECT_EQ(test_data.full_code, got);
+//     OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got,
+//     18); EXPECT_EQ(test_data.full_code, got);
 //   }
 // }
 
