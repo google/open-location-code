@@ -170,10 +170,10 @@ many buildings
 * Using a number base of 20 makes some calculations easier
 * We could identify a 20 character subset from 0-9A-Z that doesn't spell words.
 
-The characters that are used in Open Location Codes were chosen by computing
+The characters that are used in Open Location Code were chosen by computing
 all possible 20 character combinations from 0-9A-Z and scoring them on how
 well they spell 10,000 words from over 30 languages. This was to avoid, as
-far as possible, Open Location Codes being generated that included
+far as possible, Plus Codes being generated that included
 recognisable words. The selected 20 character set is made up of
 "23456789CFGHJMPQRVWX".
 
@@ -181,7 +181,7 @@ Note on terminology: The characters from 0-9A-Z that make up the significant
 part of an Open Location Code are referred to as "digits". Additional symbols
 used for formatting are referred to as "characters".
 
-Open Location Codes are encodings of WGS84 latitude and longitude
+Open Location Code uses encodings of WGS84 latitude and longitude
 coordinates in degrees. Decoding a code returns an area, not a point. The
 area of a code depends on the length (longer codes are more precise with
 smaller areas). A two-digit code has height and width <<height_width>> of 20
@@ -198,7 +198,7 @@ direction from one code to another to be determined visually, and for codes
 to be truncated, resulting in a larger area.
 
 [[fig_olc_area]]
-.Comparing areas of four and six digit Open Location Codes
+.Comparing areas of four and six digit Plus Codes
 image::../images/code_areas.png[width=400,height=350,align="center"]
 
 The large rectangle in <<fig_olc_area>> is the Open Location Code 8FVC (1
@@ -241,7 +241,7 @@ not be reliably compared visually.
 10 and 11 digit codes provide the necessary resolution to represent
 building locations. Other lengths are also valid.
 
-== Shortening Open Location Codes
+== Shortening Plus Codes
 
 We are accustomed to providing different levels of detail in a street
 address depending on who we give it to. People far away usually require the
@@ -283,7 +283,7 @@ digits to be recovered for this code.
 
 But this means that we have a problem if we want to represent the 1x1 degree
 area 6GCR. The solution here is to use zero, as a padding symbol, giving us
-6GCR0000+. Zeros in Open Location Codes must not be followed by any other
+6GCR0000+. Zeros in Plus Codes must not be followed by any other
 digits.
 
 == Imperfections
@@ -310,7 +310,7 @@ Similarly, locations at the poles, although physically close, can also have
 significantly different encodings. The fact that there are no significant
 population centers affected means that this is an imperfection we are
 willing to accept
-* Open Location Codes cannot exactly represent coordinates at latitude 90.
+* Plus Codes cannot exactly represent coordinates at latitude 90.
 The codes for latitude 90 would normally have an area whose lower latitude
 is at 90 degrees and an upper latitude of 90 + the height of the code area,
 but this would result in meaningless coordinates. Instead, when encoding

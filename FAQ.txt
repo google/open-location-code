@@ -12,7 +12,7 @@ codes should work offline, should not include words and should not require
 setting up. It should be possible to tell if two codes are close to each
 other by looking at them.
 
-Q: Where do we expect Open Location Codes to be useful?
+Q: Where do we expect Open Location Code to be useful?
 A: More than half the world's urban dwellers live on streets that don't have
 formal names. We expect these codes will be mostly used by people in areas
 lacking street addresses, but could also be used in areas that are mapped
@@ -28,7 +28,7 @@ approximately $5USD per addressed building. The advantage of Open Location
 Codes is that they are available now to anyone with access to a computer or
 smartphone.
 
-Q: Are there uses for Open Location Codes in well-mapped countries?
+Q: Are there uses for Open Location Code in well-mapped countries?
 A: Yes, for example Switzerland has villages where multiple streets have the
 same name. The UK has some homes that are identified by names, rather than
 by street numbers. Venice and Japan both have block-based addresses, rather
@@ -81,7 +81,7 @@ often suffice. This data might already exist for a specific application, or
 can potentially be extracted from open GIS or map data available online.
 The community mailing list can be used to ask for help with such data.
 
-Q: Why don't Open Location Codes include altitude?
+Q: Why doesn't Open Location Code include altitude?
 A: We didn't want to append it as a suffix or bury it in the code because we
 want to be able to truncate the codes reliably. We also didn't want to
 unnecessarily extend the length of codes for what we expect to be a minority
@@ -91,7 +91,7 @@ different ways of numbering building floors depending on local custom.
 In summary, we couldn't think of a way that was better than specifying the
 code and allowing people to just say "3rd floor".
 
-Q: Why do Open Location Codes use two algorithms?
+Q: Why does Open Location Code use two algorithms?
 A: The first algorithm provides codes that can be visually compared and
 sorted. This is used until the code is 10 characters long, with a resolution
 of 1/8000th of a degree, approximately 14 meters. This will often be
@@ -108,7 +108,7 @@ If we had based the entire code on the second algorithm, we would have codes
 that would not be reliably visually comparable or sortable by proximity.
 
 Q: Why is Open Location Code based on latin characters?
-A: We are aware that many of the countries where Open Location Codes will be
+A: We are aware that many of the countries where Open Location Code will be
 most useful use non-Latin character sets, such as Arabic, Chinese, Cyrillic,
 Thai, Vietnamese, etc. We selected Latin characters as the most common
 second-choice character set in these locations.
@@ -127,7 +127,7 @@ Hyderabad!") because users will realise that a code cannot possibly be
 correct. It's analogous to someone using the wrong suburb name today - it
 happens, people are able to deal with it.
 
-Q: Why do Open Location Codes look like something fell on my keyboard?
+Q: Why do Plus Codes look like something fell on my keyboard?
 A: We wanted something that wasn't linked to a single culture, so word-based
 codes were out. That meant that the codes would be essentially a number, but
 we used letters as well as digits to raise the number base and shorten the
@@ -138,14 +138,14 @@ noncontiguous, although it is difficult to see how we could change that
 without violating any of the aims.
 
 Q: What coordinate system does Open Location Code use?
-A: Open Location Codes should be based on WGS84, since this is the datum
+A: Open Location Code should be based on WGS84, since this is the datum
 used by GPS and is how coordinates on smartphone devices are made available.
 There is nothing to prevent coordinates using other datums being used, but
 when decoded by someone who expects them to be WGS84, it may result in a
 different location.
 
 Q: Why do Open Location Code areas distort at high latitudes?
-A: Open Location Codes are a function of latitude and longitude. As
+A: Plus Codes are a function of latitude and longitude. As
 longitude lines converge on the north and south poles the areas become
 narrower and narrower. At the equator codes are square, but at about 60
 degrees latitude, the codes are only half as wide.
@@ -156,12 +156,12 @@ different, even though they may be very close together. Apart from some
 islands in the Fiji group, there are almost no affected inhabited areas, and
 we feel this is acceptable. The other discontinuities are at the poles, but
 as these do not have large permanent populations we don't expect significant
-use of Open Location Codes here.
+use of Open Location Code here.
 
 Q: What about continental drift?
 A: Most tectonic plates are moving at rates of 1-5cm per year. With the 10
-character Open Location Codes representing 14x14 meter boxes, codes should
-be valid for many years. Even the more accurate 11 character codes should
-not require updating for 30-50 years. But even if they do, the worst result
-is that someone using a code will find themselves at the home or building
+character Plus Code representing 14x14 meter boxes, codes should be valid for
+many years. Even the more accurate 11 character codes should not require
+updating for 30-50 years. But even if they do, the worst result is that
+someone using a code will find themselves at the home or building
 next door.

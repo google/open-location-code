@@ -38,7 +38,8 @@
     <string name="search_empty">Enter a code to search</string>
 
     <string name="welcome_page_title">Discover your OLC</string>
-    <string name="welcome_page_text">Discover the Open Location Code of your home.\nOpen Location Codes are free and work with Google Maps.</string>
+    <string name="welcome_page_text">Discover the Plus Code of your home.\nPlus Codes are free and
+    work with Google Maps.</string>
 
     <string name="navigate_button_desc">Navigate from your location to the code</string>
     <string name="share_code_button_desc">Share the code or add to a contact</string>

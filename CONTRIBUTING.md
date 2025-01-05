@@ -35,7 +35,7 @@ To make a suggestion [file an issue](https://github.com/google/open-location-cod
 
 If you are intending to implement, please see the [Contributing code](#contributing-code) section below for next steps.
 
-If you are adding Open Location Codes to your project, please contact the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code) so we can suggest how you can make the most of the codes.
+If you are adding Open Location Code to your project, please contact the [Open Location Code Google Group](https://groups.google.com/forum/#!forum/open-location-code) so we can suggest how you can make the most of the codes.
 
 ## Contributing code
 

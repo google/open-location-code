@@ -1,17 +1,17 @@
-# Plus code datafield for Garmin Connect IQ devices.
+# Plus Code datafield for Garmin Connect IQ devices
 
 [<img src="https://developer.garmin.com/img/connect-iq/brand/available-badge.svg" alt="Drawing" width=200 style="width: 200px;"/>](https://apps.garmin.com/en-US/apps/74d90879-fbac-48e7-8405-28af2a0a55a7#0)
 
 
-Plus codes are short codes you can use to refer to a place, that are easier
+Plus Codes are short codes you can use to refer to a place, that are easier
 to use than latitude and longitude. They were designed to provide an
 address-like solution for the areas of the world where street addresses do not
-exist or are not widely known. Plus codes are free and the software is open
+exist or are not widely known. Plus Codes are free and the software is open
 source. See the [demo site](https://plus.codes) or the
 [Github project](https://github.com/google/open-location-code).
 
-This datafield displays the plus code for your current location. It doesn't
-use any network because plus codes can be computed offline.
+This datafield displays the Plus Code for your current location. It doesn't
+use any network because Plus Codes can be computed offline.
 
 Codes are displayed with the first four digits (the area code) small, and the
 remaining digits larger (this is the local code).

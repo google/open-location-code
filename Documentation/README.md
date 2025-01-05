@@ -19,8 +19,8 @@ The wiki is where you can find out information about using the software, the cod
 ### Technical
 
 * [An Evaluation of Location Encoding Systems](Reference/comparison.adoc)
-* [Supporting plus codes in GIS software](Reference/GIS_Software.md)
-* [Supporting plus codes in an app](Reference/App_Developers.md)
+* [Supporting Plus Codes in GIS software](Reference/GIS_Software.md)
+* [Supporting Plus Codes in an app](Reference/App_Developers.md)
 
 ### Tools
 

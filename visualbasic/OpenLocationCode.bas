@@ -16,12 +16,12 @@ Attribute VB_Name = "OpenLocationCode"
 '
 ' Convert locations to and from short codes.
 '
-' Open Location Codes are short, 10-11 character codes that can be used instead
+' Plus Codes are short, 10-11 character codes that can be used instead
 ' of street addresses. The codes can be generated and decoded offline, and use
 ' a reduced character set that minimises the chance of codes including words.
 '
 ' This file provides a VBA implementation (that may also run in OpenOffice or
-' LibreOffice). A full reference of Open Location Codes is provided at
+' LibreOffice). A full reference of Open Location Code is provided at
 ' https://github.com/google/open-location-code.
 '
 ' This library provides the following functions:

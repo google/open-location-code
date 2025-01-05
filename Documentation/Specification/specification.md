@@ -8,7 +8,7 @@ The latitude and longitude should be WGS84 values. If other datums are used it m
 
 ## Character Set
 
-The following defines the valid characters in an Open Location Code. Sequences that contain other characters are by definition not valid Open Location Codes.
+The following defines the valid characters in a Plus Code. Sequences that contain other characters are by definition not valid Open Location Code.
 
 ### Digits
 
@@ -158,7 +158,7 @@ The following public methods should be provided by any Open Location Code implem
 
 Note that any method that returns an Open Location Code should return upper case characters.
 
-Methods that accept Open Location Codes as parameters should be case insensitive.
+Methods that accept Plus Codes as parameters should be case insensitive.
 
 Capitalisation should follow the language convention, for example the method `isValid` in golang would be `IsValid`.
 
