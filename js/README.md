@@ -34,7 +34,7 @@ dependencies, run `eslint` and then run the tests as long as there were no
 eslint errors.
 
 Unit tests are automatically run on pull and push requests and visible at
-https://travis-ci.org/google/open-location-code.
+https://github.com/google/open-location-code/actions.
 
 # Examples
 
