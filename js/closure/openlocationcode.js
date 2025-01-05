@@ -569,7 +569,7 @@ function recoverNearest(
   }
 
   return encode(
-    codeArea.latitudeCenter, codeArea.longitudeCenter, codeArea.codeLength);
+      codeArea.latitudeCenter, codeArea.longitudeCenter, codeArea.codeLength);
 }
 exports.recoverNearest = recoverNearest;
 
