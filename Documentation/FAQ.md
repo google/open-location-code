@@ -50,7 +50,7 @@ You can tell if it's in a different city without having to know the street name.
 
 ### Why is Open Location Code based on latin characters?
 
-We are aware that many of the countries where Open Location Code will be most useful use non-Latin character sets, such as Arabic, Chinese, Cyrillic, Thai, Vietnamese, etc.
+We are aware that many of the countries where Plus Codes will be most useful use non-Latin character sets, such as Arabic, Chinese, Cyrillic, Thai, Vietnamese, etc.
 We selected Latin characters as the most common second-choice character set in these locations.
 We considered defining alternative Open Location Code alphabets in each character set, but this would result in codes that would be unusable to visitors to that region, or internationally.
 

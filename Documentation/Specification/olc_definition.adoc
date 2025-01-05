@@ -170,7 +170,7 @@ many buildings
 * Using a number base of 20 makes some calculations easier
 * We could identify a 20 character subset from 0-9A-Z that doesn't spell words.
 
-The characters that are used in Open Location Code were chosen by computing
+The characters that are used by Open Location Code were chosen by computing
 all possible 20 character combinations from 0-9A-Z and scoring them on how
 well they spell 10,000 words from over 30 languages. This was to avoid, as
 far as possible, Plus Codes being generated that included

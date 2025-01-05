@@ -108,7 +108,7 @@ If we had based the entire code on the second algorithm, we would have codes
 that would not be reliably visually comparable or sortable by proximity.
 
 Q: Why is Open Location Code based on latin characters?
-A: We are aware that many of the countries where Open Location Code will be
+A: We are aware that many of the countries where Plus Codes will be
 most useful use non-Latin character sets, such as Arabic, Chinese, Cyrillic,
 Thai, Vietnamese, etc. We selected Latin characters as the most common
 second-choice character set in these locations.

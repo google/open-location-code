@@ -215,7 +215,7 @@ This is because for large features, the returned code will be the **largest** co
 ## API Keys
 
 ### Obtaining A Google API Key
-To search for addresses, return addresses, and return short codes and localities, the Open Location Code uses the [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro).
+To search for addresses, return addresses, and return short codes and localities, the Plus Codes API uses the [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro).
 If you want to be able to:
 *  search by address,
 *  search by short codes with localities,
