@@ -21,8 +21,8 @@ class PlusCodesTest < Test::Unit::TestCase
       is_valid_olc = @olc.valid?(code)
       is_short_olc = @olc.short?(code)
       is_full_olc = @olc.full?(code)
-      result = (is_valid_olc == is_valid && is_short_olc == is_short &&
-        is_full_olc == is_full)
+      result = is_valid_olc == is_valid && is_short_olc == is_short &&
+               is_full_olc == is_full
       assert(result)
     end
   end
@@ -43,7 +43,7 @@ class PlusCodesTest < Test::Unit::TestCase
 
   def test_encode
     read_csv_lines('encoding.csv').each do |line|
-      next if line.length.zero?
+      next if line.empty?
 
       cols = line.split(',')
       code = @olc.encode(cols[0].to_f, cols[1].to_f, cols[2].to_i)

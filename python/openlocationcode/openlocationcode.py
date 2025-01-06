@@ -81,6 +81,9 @@ LATITUDE_MAX_ = 90
 # The maximum value for longitude in degrees.
 LONGITUDE_MAX_ = 180
 
+# The min number of digits to process in a plus code.
+MIN_DIGIT_COUNT_ = 2
+
 # The max number of digits to process in a plus code.
 MAX_DIGIT_COUNT_ = 15
 
@@ -241,8 +244,8 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
       codeLength: The number of significant digits in the output code, not
           including any separator characters.
     """
-    if codeLength < 2 or (codeLength < PAIR_CODE_LENGTH_ and
-                          codeLength % 2 == 1):
+    if codeLength < MIN_DIGIT_COUNT_ or (codeLength < PAIR_CODE_LENGTH_ and
+                                         codeLength % 2 == 1):
         raise ValueError('Invalid Open Location Code length - ' +
                          str(codeLength))
     codeLength = min(codeLength, MAX_DIGIT_COUNT_)
@@ -369,7 +372,6 @@ def decode(code):
                                           14), round(lat + latPrecision, 14),
                     round(lng + lngPrecision, 14),
                     min(len(code), MAX_DIGIT_COUNT_))
-
 
 
 def recoverNearest(code, referenceLatitude, referenceLongitude):
@@ -528,6 +530,7 @@ class CodeArea(object):
        code_length: The number of significant characters that were in the code.
            This excludes the separator.
     """
+
     def __init__(self, latitudeLo, longitudeLo, latitudeHi, longitudeHi,
                  codeLength):
         self.latitudeLo = latitudeLo

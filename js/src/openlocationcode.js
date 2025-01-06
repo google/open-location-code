@@ -108,6 +108,9 @@
   // The maximum value for longitude in degrees.
   var LONGITUDE_MAX_ = 180;
 
+  // The min number of digits in a plus code.
+  var MIN_DIGIT_COUNT_ = 2;
+
   // The max number of digits to process in a plus code.
   var MAX_DIGIT_COUNT_ = 15;
 
@@ -317,7 +320,7 @@
     if (isNaN(latitude) || isNaN(longitude) || isNaN(codeLength)) {
       throw new Error('ValueError: Parameters are not numbers');
     }
-    if (codeLength < 2 ||
+    if (codeLength < MIN_DIGIT_COUNT_ ||
         (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
       throw new Error('IllegalArgumentException: Invalid Open Location Code length');
     }
