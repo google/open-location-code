@@ -15,7 +15,7 @@
 /**
   @fileoverview Convert locations to and from short codes.
 
-  Open Location Codes are short, 10-11 character codes that can be used instead
+  Plus Codes are short, 10-11 character codes that can be used instead
   of street addresses. The codes can be generated and decoded offline, and use
   a reduced character set that minimises the chance of codes including words.
 
@@ -360,7 +360,7 @@ function encode(latitude, longitude, optLength) {
   if (optLength < MIN_CODE_LEN ||
       (optLength < PAIR_CODE_LENGTH && optLength % 2 == 1)) {
     throw new Error(
-        'IllegalArgumentException: Invalid Open Location Code length');
+        'IllegalArgumentException: Invalid Plus Code length');
   }
   optLength = Math.min(optLength, MAX_CODE_LEN);
   // Ensure that latitude and longitude are valid.
@@ -438,7 +438,7 @@ function decode(code) {
   if (!isFull(code)) {
     throw new Error(
         'IllegalArgumentException: ' +
-        'Passed Open Location Code is not a valid full code: ' + code);
+        'Passed Plus Code is not a valid full code: ' + code);
   }
   // Strip the '+' and '0' characters from the code and convert to upper case.
   code = code.replace('+', '').replace(/0/g, '').toUpperCase();

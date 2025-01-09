@@ -1,4 +1,4 @@
-// Package gridserver serves tiles with the plus codes grid.
+// Package gridserver serves tiles with the Plus Codes grid.
 // This parses the request, and generates either a GeoJSON or PNG image response.
 package gridserver
 

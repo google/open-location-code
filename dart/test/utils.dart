@@ -9,7 +9,7 @@ List<String> getCsvLines(String fileName) {
       .toList();
 }
 
-// Requires test csv files in a test_data directory under open location code project root.
+// Requires test csv files in a test_data directory under Open Location Code project root.
 String testDataPath() {
   var projectRoot = Directory.current.parent;
 

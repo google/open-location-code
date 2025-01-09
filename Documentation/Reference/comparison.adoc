@@ -111,8 +111,8 @@ cell marked g) is next to the cell 9X, but further from g7 (which is next to
 G2). Using real Geohash-36 codes, "bdg345476Q" is next to "bdbtTVTXWB" but
 several kilometers from "bdg3Hhg4Xd".
 
-Geohash-36 codes may be one character shorter than full Open Location Codes
-for similar accuracies.
+Geohash-36 codes may be one character shorter than full Plus Code for similar
+accuracies.
 
 The Geohash-36 definition includes an optional altitude specification, and
 an optional checksum, neither of which are provided by Open Location Code.
@@ -120,9 +120,9 @@ an optional checksum, neither of which are provided by Open Location Code.
 == MapCode
 
 MapCodes can be defined globally or within a containing territory
-<<mapcode>>. The global codes are a similar length to Open Location Codes,
-but codes defined within a territory are shorter than full Open Location
-Codes, and a similar length to short Open Location Codes.
+<<mapcode>>. The global codes are a similar length to Plus Codes, but codes
+defined within a territory are shorter than full Plus Codes, and a similar
+length to short Plus Codes.
 
 To decode the identifiers, a data file needs to be maintained and
 distributed. The identifiers are mostly ISO-3166 codes for the territory
@@ -149,9 +149,9 @@ character set.
 == Open Post Code
 
 Open Post Codes <<openpostcode-site>> can be defined globally or within a containing country
-<<openpostcode>>. The global codes are a similar length to Open Location
-Codes, but codes defined within a country are shorter than full Open
-Location Codes, and a similar length to short Open Location Codes.
+<<openpostcode>>. The global codes are a similar length to Plus Codes, but
+codes defined within a country are shorter than full Plus Code, and a similar
+length to short Plus Codes.
 
 Four countries are defined: Ireland, Hong Kong, Yemen and India.
 
@@ -208,7 +208,7 @@ Natural Area Codes have a discontinuity at longitude 180 and at the poles.
 == Maidenhead Locator System (MLS)
 
 Maidenhead Locator System codes explicitly represent areas, and can be
-truncated in a similar way to Open Location Codes. The accuracy and length of the codes is similar. MLS cannot generate words, but it can generate sequences that may appear to be words (e.g. when reading "1" as "l") <<mls>>.
+truncated in a similar way to Plus Codes. The accuracy and length of the codes is similar. MLS cannot generate words, but it can generate sequences that may appear to be words (e.g. when reading "1" as "l") <<mls>>.
 
 Maidenhead Locator System codes are based on an interleaving of latitude and
 longitude, and so are truncatable, and nearby locations have similar codes.
@@ -249,9 +249,9 @@ information such as contact details, photos etc in addition to the location.
 
 We felt that the attributes of the above systems didn't sufficiently meet
 our requirements. As a result, we defined a new coding system and termed it
-Open Location Code; codes created using this system are referred to as 'plus codes' (see the link:../Specification/Naming_Guidelines.md[Naming Guidelines]).
+Open Location Code; codes created using this system are referred to as 'Plus Codes' (see the link:../Specification/Naming_Guidelines.md[Naming Guidelines]).
 
-Plus codes are 10 to 11 characters long. They can also be used in a
+Plus Codes are 10 to 11 characters long. They can also be used in a
 short form of four to seven characters, similar to telephone numbers and
 postcodes, within approximately 50km of the original location. Within
 approximately 2.5km of the original location they can be shortened further,
@@ -260,12 +260,12 @@ to just four to five characters.
 To aid recognition and memorisation, we include a separator to break the code
 into two parts, and to distinguish codes from postal codes.
 
-In their short form, plus codes have from four to seven characters.
+In their short form, Plus Codes have from four to seven characters.
 These can be used on their own within 50km of the place, or globally by
-providing a city or locality within that distance. Full plus code
+providing a city or locality within that distance. Full Plus Code
 require no other information to locate them.
 
-There is only one plus code for a given location and area size.
+There is only one Plus Code for a given location and area size.
 Different codes can be generated with different areas, but they will share
 the leading characters.
 
@@ -279,14 +279,14 @@ billion possibilities, using a word list of 10,000 words from 30 languages.
 All possible sets were scored on whether they could spell the test words,
 and the most promising sets evaluated by hand.
 
-The character set used to form plus codes is not contiguous. This
+The character set used to form Plus Codes is not contiguous. This
 is a result of removing easily confused characters, vowels and some other
 characters. This does make manually comparing codes difficult, as one has to
 remember whether there are characters between 9 and C in order to tell if
 8FV9 is next to 8FVC. However, we think that this is justified by the
 improved usability.
 
-Nearby places have similar plus codes. There are three
+Nearby places have similar Plus Codes. There are three
 discontinuities, at longitude 180 and at the north and south poles, where
 nearby locations can have very different codes, but due to the low
 populations in these areas we feel this is an acceptable limitation.
@@ -297,19 +297,19 @@ latitudes are clipped to be greater than or equal to -90 and less than 90
 degrees, making representing the exact location of the North Pole impossible
 although it can be very closely approximated.
 
-Plus codes represent areas, and the size of the area depends on the
+Plus Codes represent areas, and the size of the area depends on the
 code length. The longer the code, the smaller and more accurate the area.
 
-Truncating a plus code increases the area and contains the
+Truncating a Plus Code increases the area and contains the
 original location.
 
 The codes are based on a simple encoding of latitude and longitude. The code
 for a place can be looked up by anyone and does not require any setup or
 configuration.
 
-Plus codes can be encoded and decoded offline.
+Plus Codes can be encoded and decoded offline.
 
-Plus codes do not depend on any infrastructure, and so are not
+Plus Codes do not depend on any infrastructure, and so are not
 dependent on any organisation or company for their continued existence or
 usage.
 

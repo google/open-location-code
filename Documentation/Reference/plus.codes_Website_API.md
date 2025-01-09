@@ -1,4 +1,4 @@
-# https://plus.codes API Developer's Guide
+# <https://plus.codes> API Developer's Guide
 
 ### Table of Contents
 - [https://plus.codes API Developer's Guide](#httpspluscodes-api-developers-guide)
@@ -37,13 +37,13 @@ A side effect of this update is that the API should be slightly faster, and if A
 
 The API provides the following functions:
 
-*  Conversion of a latitude and longitude to a plus code (including the bounding box and the center);
-*  Conversion of a plus code to the bounding box and center.
+*  Conversion of a latitude and longitude to a Plus Code (including the bounding box and the center);
+*  Conversion of a Plus Code to the bounding box and center.
 
 Additionally, it can use the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro) to:
 
-*  Include short codes and localities in the returned plus code (such as "WF8Q+WF Praia, Cape Verde" for "796RWF8Q+WF");
-*  Handle converting from a street address or business name to the plus code;
+*  Include short codes and localities in the returned Plus Code (such as "WF8Q+WF Praia, Cape Verde" for "796RWF8Q+WF");
+*  Handle converting from a street address or business name to the Plus Code;
 *  Handle converting a short code and locality to the global code and coordinates.
 
 The results are provided in JSON format.
@@ -51,7 +51,7 @@ The API is loosely modeled on the [Google Geocoding API](https://developers.goog
 
 ## API Request Format
 
-A Plus codes API request takes the following form:
+A Plus Codes API request takes the following form:
 
 `https://plus.codes/api?parameters`
 
@@ -157,7 +157,7 @@ The JSON response contains two root elements:
 
 *  `"status"` contains metadata on the request.
    Other status values are documented [here](https://developers.google.com/maps/documentation/geocoding/intro#StatusCodes).
-*  `"plus_code"` contains the plus code information for the location specified in `address`.
+*  `"plus_code"` contains the Plus Code information for the location specified in `address`.
 
 > There may be an additional `error_message` field within the response object.
 > This may contain additional background information for the status code.
@@ -236,12 +236,12 @@ Google API keys have a free daily quota allowance.
 If other people obtain your key, they can make requests to any API that is enabled for that key, consuming your free quota, and if you have billing enabled, can incur charges.
 
 The normal way of securing API keys is setting restrictions on the host that can use it to call Google APIs.
-These methods won't work here, because the calls to the Google API are being done from the plus codes server.
+These methods won't work here, because the calls to the Google API are being done from the Plus Codes server.
 
-Instead, you can encrypt your Google API key, and use the encrypted value in the requests to the plus codes API.
-The plus codes server will decrypt the key and use the decrypted value to make the calls to Google.
+Instead, you can encrypt your Google API key, and use the encrypted value in the requests to the Plus Codes API.
+The Plus Codes server will decrypt the key and use the decrypted value to make the calls to Google.
 
-If anyone obtains your encrypted API key, they cannot use it to make direct requests to any Google API. (They can still use it to make requests to the plus codes API, see the next section for a solution.)
+If anyone obtains your encrypted API key, they cannot use it to make direct requests to any Google API. (They can still use it to make requests to the Plus Codes API, see the next section for a solution.)
 
 For example, to protect the Google API key `my_google_api_key`, encrypt it like this:
 
@@ -249,7 +249,7 @@ For example, to protect the Google API key `my_google_api_key`, encrypt it like 
 https://plus.codes/api?encryptkey=my_google_api_key
 ```
 
-The plus codes API will respond with:
+The Plus Codes API will respond with:
 
 ```javascript
 {
@@ -262,7 +262,7 @@ The plus codes API will respond with:
 ### Securing Your API Key With An HTTP Referrer
 
 For extra security, you can encrypt a hostname with the key.
-When the plus codes server decrypts the key, it checks that the HTTP referrer matches the encrypted hostname.
+When the Plus Codes server decrypts the key, it checks that the HTTP referrer matches the encrypted hostname.
 This prevents the encrypted key from being used from another host.
 
 For example, to protect the Google API key `my_google_api_key`, and require the HTTP referrer host to be `openlocationcode.com`, encrypt it like this:
@@ -271,7 +271,7 @@ For example, to protect the Google API key `my_google_api_key`, and require the 
 https://plus.codes/api?referer=openlocationcode.com&encryptkey=my_google_api_key
 ```
 
-The plus codes API will respond with:
+The Plus Codes API will respond with:
 
 ```javascript
 {

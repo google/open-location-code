@@ -5,13 +5,13 @@ Open Location Code
 [![CDNJS](https://img.shields.io/cdnjs/v/openlocationcode.svg)](https://cdnjs.com/libraries/openlocationcode)
 
 Open Location Code is a technology that gives a way of encoding location into a form that is
-easier to use than latitude and longitude. The codes generated are called plus codes, as their
+easier to use than latitude and longitude. The codes generated are called Plus Codes, as their
 distinguishing attribute is that they include a "+" character.
 
 The technology is designed to produce codes that can be used as a replacement for street addresses, especially
 in places where buildings aren't numbered or streets aren't named.
 
-Plus codes represent an area, not a point. As digits are added
+Plus Codes represent an area, not a point. As digits are added
 to a code, the area shrinks, so a long code is more precise than a short
 code.
 

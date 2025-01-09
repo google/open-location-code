@@ -1,14 +1,15 @@
-# Supporting plus codes technology in apps and sites
+# Supporting Plus Codes technology in apps and sites
 
-This page gives guidelines for how to support plus codes in a website or mapping application.
+This page gives guidelines for how to support Plus Codes in a website or mapping application.
 These guidelines should make it clear that adding support for OLC is not onerous, but actually quite easy.
 
 > Note that with the availability of the [https://plus.codes website API](plus.codes_Website_API.md), these instructions really only apply to apps that require offline support.
 If your app or site can rely on a network connection, integrating with the API will give a better solution.
 
-# Supporting plus codes for search
+# Supporting Plus Codes for search
 
-To support plus codes for searching, there are three different cases:
+To support Plus Codes for searching, there are three different cases:
+
 * global codes, such as "796RWF8Q+WF"
 * local codes, such as "WF8Q+WF"
 * local codes with a locality, such as "WF8Q+WF Praia, Cabo Verde"
@@ -51,13 +52,13 @@ Use the location returned by your geocoding service as the reference location in
 
 ## Displaying the result
 
-If the user specified a plus code in their query, the result should match.
-That is, it is easier to understand if they enter a plus code to get a plus code displayed as the result.
-Searching for a plus code and displaying the result back to the user as "14°55'02.3"N 23°30'40.7"W" is confusing, unhelpful and should be avoided.
+If the user specified a Plus Code in their query, the result should match.
+That is, it is easier to understand if they enter a Plus Code to get a Plus Code displayed as the result.
+Searching for a Plus Code and displaying the result back to the user as "14°55'02.3"N 23°30'40.7"W" is confusing, unhelpful and should be avoided.
 
-# Computing plus codes for places
+# Computing Plus Codes for places
 
-Superficially computing plus codes for places is trivial.
+Superficially computing Plus Codes for places is trivial.
 All that is needed is to call the `encode()` method on the coordinates, and then to display the code.
 
 The problem is that this only displays the global code, not the more convenient and easy to remember local code.
@@ -77,17 +78,17 @@ Some geocoding backends are more suitable than others, so you might need to perf
 ## Ensuring the locality is near enough
 
 After reverse geocoding the location and extracting the locality name, you should make a call to a geocoding service to get the location of the locality.
-This is likely to be its center, not the position of the plus code, and could be some distance away.
+This is likely to be its center, not the position of the Plus Code, and could be some distance away.
 
 You want it to be as close as possible, because other geocoding services are likely to position it slightly differently.
-If it is very close to half a degree away, another geocoding service could result in the plus code being decoded to a different location.
+If it is very close to half a degree away, another geocoding service could result in the Plus Code being decoded to a different location.
 
 Typically you should aim for a locality within a quarter of a degree - this is approximately 25km away (at the equator) so still quite a large range.
 
 If the locality is near enough, you should display the local code and locality together.
 The `shorten()` method in the OLC library may remove 2, 4, 6 or even 8 characters, depending on how close the reference location is.
-Although all of these are valid, we recommend only removing the first 4 characters, so that plus codes have a consistent appearance.
+Although all of these are valid, we recommend only removing the first 4 characters, so that Plus Codes have a consistent appearance.
 
 # Summary
 
-Supporting plus codes in search use cases should not be a complex exercise.
+Supporting Plus Codes in search use cases should not be a complex exercise.

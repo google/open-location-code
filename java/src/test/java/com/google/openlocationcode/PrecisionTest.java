@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** Tests size of rectangles defined by open location codes of various size. */
+/** Tests size of rectangles defined by Plus Codes of various size. */
 @RunWith(JUnit4.class)
 public class PrecisionTest {
 

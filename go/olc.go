@@ -91,7 +91,7 @@ func Check(code string) error {
 	firstSep, firstPad := -1, -1
 	for i, r := range code {
 		if firstPad != -1 {
-			// Open Location Codes with less than eight digits can be suffixed with zeros with a "+" used as the final character. Zeros may not be followed by any other digit.
+			// Plus Code with less than eight digits can be suffixed with zeros with a "+" used as the final character. Zeros may not be followed by any other digit.
 			switch r {
 			case Padding:
 				continue
@@ -112,7 +112,7 @@ func Check(code string) error {
 		}
 		switch r {
 		case 'C', 'F', 'G', 'H', 'J', 'M', 'P', 'Q', 'R', 'V', 'W', 'X',
-			// Processing of Open Location Codes must be case insensitive.
+			// Processing of Plus Codes must be case insensitive.
 			'c', 'f', 'g', 'h', 'j', 'm', 'p', 'q', 'r', 'v', 'w', 'x':
 			continue
 		case Separator:

@@ -19,9 +19,9 @@ import java.util.Objects;
 /**
  * Convert locations to and from convenient short codes.
  *
- * <p>Open Location Codes are short, ~10 character codes that can be used instead of street
- * addresses. The codes can be generated and decoded offline, and use a reduced character set that
- * minimises the chance of codes including words.
+ * <p>Plus Codes are short, ~10 character codes that can be used instead of street addresses. The
+ * codes can be generated and decoded offline, and use a reduced character set that minimises the
+ * chance of codes including words.
  *
  * <p>This provides both object and static methods.
  *
@@ -57,10 +57,10 @@ public final class OpenLocationCode {
   // The number of characters to place before the separator.
   private static final int SEPARATOR_POSITION = 8;
 
-  // The minimum number of digits in a plus code.
+  // The minimum number of digits in a Plus Code.
   public static final int MIN_DIGIT_COUNT = 2;
 
-  // The max number of digits to process in a plus code.
+  // The max number of digits to process in a Plus Code.
   public static final int MAX_DIGIT_COUNT = 15;
 
   // Maximum code length using just lat/lng pair encoding.

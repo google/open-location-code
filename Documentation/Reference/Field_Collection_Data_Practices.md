@@ -3,20 +3,20 @@
 
 ## Summary
 
-Collecting locations of equipment, buildings, homes etc from the field, and obtaining the plus codes, is a common problem.
+Collecting locations of equipment, buildings, homes etc from the field, and obtaining the Plus Codes, is a common problem.
 
 [Open Data Kit](https://opendatakit.org) is a suite of free and open source software to support collecting, managing and using data. [Open Data Kit Collect](https://play.google.com/store/apps/details?id=org.odk.collect.android) (ODK Collect) is a free, open source app available in the Google Play Store for customizable data collection in an offline environment.
 
-This document explains how to get started with ODK to collect location data and convert it to plus codes.
+This document explains how to get started with ODK to collect location data and convert it to Plus Codes.
 
-**Note:** This process will collect latitude and longitude and convert them to global plus codes, e.g. 8FVC9G8F+6W.
-Converting these to plus code addresses (9G8F+6W Zurich, Switzerland) is out of scope of this data collection. (One way it could be done is using the [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro).)
+**Note:** This process will collect latitude and longitude and convert them to global Plus Codes, e.g. 8FVC9G8F+6W.
+Converting these to Plus Code addresses (9G8F+6W Zurich, Switzerland) is out of scope of this data collection. (One way it could be done is using the [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro).)
 
 ## Overview
 
 First we will define a [form](https://docs.opendatakit.org/form-design-intro/) that specifies what data we want, and then use [ODK Collect](https://docs.opendatakit.org/collect-intro/), an Android app, to collect filled in forms.
 
-ODK Collect saves location information as latitude and longitude, so the final step will be to convert those to plus codes using the [plus code add-on for Google Sheets](https://gsuite.google.com/marketplace).
+ODK Collect saves location information as latitude and longitude, so the final step will be to convert those to Plus Codes using the [Plus Code add-on for Google Sheets](https://gsuite.google.com/marketplace).
 
 ## Requirements
 
@@ -25,10 +25,10 @@ ODK Collect saves location information as latitude and longitude, so the final s
 
 ## Alternatives
 
-Other options for collecting this data might be to use Google Maps - manually long pressing on the map displays an address card, and expanding that shows the plus code.
+Other options for collecting this data might be to use Google Maps - manually long pressing on the map displays an address card, and expanding that shows the Plus Code.
 
 Alternatively, you could write an HTML5 web app or develop another mobile app.
-These could do the conversion from GPS coordinates to plus codes directly.
+These could do the conversion from GPS coordinates to Plus Codes directly.
 However, we think that using Open Data Kit provides the fastest route to general functionality.
 
 ## Using Open Data Kit
@@ -91,8 +91,8 @@ ODK uploads locations to the sheet using three fields:
 * altitude (set to zero for manual locations)
 * accuracy (set to zero for manual locations)
 
-To convert these to plus codes, install the Google Sheets plus code add-on from the [G Suite Marketplace](https://gsuite.google.com/marketplace).
-You can convert a column of locations into their corresponding plus codes using the formula:
+To convert these to Plus Codes, install the Google Sheets Plus Code add-on from the [G Suite Marketplace](https://gsuite.google.com/marketplace).
+You can convert a column of locations into their corresponding Plus Codes using the formula:
 ```
 =PLUSCODE(B:B)
 ```
