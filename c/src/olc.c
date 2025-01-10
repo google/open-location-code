@@ -82,7 +82,7 @@ int OLC_IsFull(const char* code, size_t size) {
   return is_full(&info);
 }
 
-int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length,
+int OLC_EncodeIntegers(long long int lat, long long int lng, size_t length,
                        char* code, int maxlen) {
   // Limit the maximum number of digits in the code.
   if (length > kMaximumDigitCount) {
@@ -103,12 +103,12 @@ int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length,
     lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse - 1;
   }
   // Convert longitude to positive range and normalise.
-  lon += OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
-  while (lon < 0) {
-    lon += 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
+  lng += OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
+  while (lng < 0) {
+    lng += 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
   }
-  while (lon >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
-    lon -= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
+  while (lng >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
+    lng -= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
   }
 
   // Build up the code here, then copy it to the passed pointer.
@@ -120,27 +120,27 @@ int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length,
   if (length > kPairCodeLength) {
     for (size_t i = 0; i < kGridCodeLength; i++) {
       int lat_digit = lat % kGridRows;
-      int lon_digit = lon % kGridCols;
+      int lon_digit = lng % kGridCols;
       int ndx = lat_digit * kGridCols + lon_digit;
       fullcode[pos--] = kAlphabet[ndx];
       // Note! Integer division.
       lat /= kGridRows;
-      lon /= kGridCols;
+      lng /= kGridCols;
     }
   } else {
     lat /= pow(kGridRows, kGridCodeLength);
-    lon /= pow(kGridCols, kGridCodeLength);
+    lng /= pow(kGridCols, kGridCodeLength);
   }
   pos = kPairCodeLength;
   // Compute the pair section of the code.
   for (size_t i = 0; i < kPairCodeLength / 2; i++) {
     int lat_ndx = lat % kEncodingBase;
-    int lon_ndx = lon % kEncodingBase;
+    int lon_ndx = lng % kEncodingBase;
     fullcode[pos--] = kAlphabet[lon_ndx];
     fullcode[pos--] = kAlphabet[lat_ndx];
     // Note! Integer division.
     lat /= kEncodingBase;
-    lon /= kEncodingBase;
+    lng /= kEncodingBase;
     if (i == 0) {
       fullcode[pos--] = kSeparator;
     }
@@ -173,8 +173,8 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   // truncate, which causes issues when using values like 0.1 that do not have
   // precise floating point representations.
   long long int lat = lround(location->lat * kGridLatPrecisionInverse);
-  long long int lon = lround(location->lon * kGridLonPrecisionInverse);
-  return OLC_EncodeIntegers(lat, lon, length, code, maxlen);
+  long long int lng = lround(location->lon * kGridLonPrecisionInverse);
+  return OLC_EncodeIntegers(lat, lng, length, code, maxlen);
 }
 
 int OLC_EncodeDefault(const OLC_LatLon* location, char* code, int maxlen) {
@@ -507,9 +507,9 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded) {
   // convert them to floats at the end. Using doubles all the way results in
   // multiplying small rounding errors until they become significant.
   int normal_lat = -kLatMaxDegrees * kPairPrecisionInverse;
-  int normal_lon = -kLonMaxDegrees * kPairPrecisionInverse;
+  int normal_lng = -kLonMaxDegrees * kPairPrecisionInverse;
   int extra_lat = 0;
-  int extra_lon = 0;
+  int extra_lng = 0;
 
   // How many digits do we have to process?
   size_t digits = strlen(clean_code) < kPairCodeLength ? strlen(clean_code)
@@ -519,7 +519,7 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded) {
   for (size_t i = 0; i < digits - 1; i += 2) {
     pv /= kEncodingBase;
     normal_lat += get_alphabet_position(clean_code[i]) * pv;
-    normal_lon += get_alphabet_position(clean_code[i + 1]) * pv;
+    normal_lng += get_alphabet_position(clean_code[i + 1]) * pv;
   }
   // Convert the place value to a float in degrees.
   double lat_precision = (double)pv / kPairPrecisionInverse;
@@ -539,7 +539,7 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded) {
       int row = dval / kGridCols;
       int col = dval % kGridCols;
       extra_lat += row * row_pv;
-      extra_lon += col * col_pv;
+      extra_lng += col * col_pv;
     }
     // Adjust the precisions from the integer values to degrees.
     lat_precision = (double)row_pv / kGridLatPrecisionInverse;
@@ -549,12 +549,12 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded) {
   // Everything is ints so they all need to be cast to floats.
   double lat = (double)normal_lat / kPairPrecisionInverse +
                (double)extra_lat / kGridLatPrecisionInverse;
-  double lon = (double)normal_lon / kPairPrecisionInverse +
-               (double)extra_lon / kGridLonPrecisionInverse;
+  double lng = (double)normal_lng / kPairPrecisionInverse +
+               (double)extra_lng / kGridLonPrecisionInverse;
   decoded->lo.lat = lat;
-  decoded->lo.lon = lon;
+  decoded->lo.lon = lng;
   decoded->hi.lat = lat + lat_precision;
-  decoded->hi.lon = lon + lon_precision;
+  decoded->hi.lon = lng + lon_precision;
   decoded->len = strlen(clean_code);
   return decoded->len;
 }
