@@ -1,7 +1,7 @@
 name: open_location_code
-description: Open Location Codes are short, generated codes that can be used like street addresses, for places where street addresses don't exist.
+description: Plus Codes are short, generated codes that can be used like street addresses, for places where street addresses don't exist.
 version: 0.0.1
-homepage: http://openlocationcode.com/
+homepage: https://maps.google.com/pluscodes/
 environment:
   sdk: '^2.19.6'
 dev_dependencies:

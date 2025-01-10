@@ -1,4 +1,4 @@
-# Library to handle open location codes
+# Library to handle Plus Codes
 cc_library(
     name = "openlocationcode",
     srcs = [
@@ -20,7 +20,7 @@ cc_library(
     ],
 )
 
-# Code area library, used by open location codes
+# Code area library, used by Open Location Code
 cc_library(
     name = "codearea",
     srcs = [
@@ -32,7 +32,7 @@ cc_library(
     visibility = ["//visibility:private"],  # Keep private unless needed elsewhere
 )
 
-# Unit test for open location codes
+# Unit test for Open Location Code implementations
 cc_test(
     name = "openlocationcode_test",
     size = "small",
@@ -53,7 +53,7 @@ cc_test(
     testonly = True,
 )
 
-# Example binary for open location codes
+# Example binary for Open Location Code
 cc_binary(
     name = "openlocationcode_example",
     srcs = [

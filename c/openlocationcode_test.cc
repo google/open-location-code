@@ -93,8 +93,8 @@ TEST_P(DecodingChecks, Decode) {
   EXPECT_NEAR(expected_center.lon, got_center.lon, 1e-10);
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, DecodingChecks,
-                        ::testing::ValuesIn(GetDecodingDataFromCsv()));
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, DecodingChecks,
+                         ::testing::ValuesIn(GetDecodingDataFromCsv()));
 
 struct EncodingTestData {
   double lat_deg;
@@ -131,8 +131,8 @@ TEST_P(EncodingChecks, Encode) {
   EXPECT_EQ(test_data.code, got_code);
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,
-                        ::testing::ValuesIn(GetEncodingDataFromCsv()));
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, EncodingChecks,
+                         ::testing::ValuesIn(GetEncodingDataFromCsv()));
 
 struct ValidityTestData {
   std::string code;
@@ -167,8 +167,8 @@ TEST_P(ValidityChecks, Validity) {
   EXPECT_EQ(test_data.is_short, OLC_IsShort(test_data.code.c_str(), 0));
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, ValidityChecks,
-                        ::testing::ValuesIn(GetValidityDataFromCsv()));
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, ValidityChecks,
+                         ::testing::ValuesIn(GetValidityDataFromCsv()));
 
 struct ShortCodeTestData {
   std::string full_code;
@@ -216,8 +216,8 @@ TEST_P(ShortCodeChecks, ShortCode) {
   }
 }
 
-INSTANTIATE_TEST_CASE_P(OLC_Tests, ShortCodeChecks,
-                        ::testing::ValuesIn(GetShortCodeDataFromCsv()));
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, ShortCodeChecks,
+                         ::testing::ValuesIn(GetShortCodeDataFromCsv()));
 
 TEST(MaxCodeLengthChecks, MaxCodeLength) {
   std::string long_code = "8FVC9G8F+6W23456";

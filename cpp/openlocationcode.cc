@@ -15,7 +15,7 @@ const char kPaddingCharacter = '0';
 const char kAlphabet[] = "23456789CFGHJMPQRVWX";
 // Number of digits in the alphabet.
 const size_t kEncodingBase = 20;
-// The max number of digits returned in a plus code. Roughly 1 x 0.5 cm.
+// The max number of digits returned in a Plus Code. Roughly 1 x 0.5 cm.
 const size_t kMaximumDigitCount = 15;
 const size_t kMinimumDigitCount = 2;
 const size_t kPairCodeLength = 10;

@@ -39,10 +39,10 @@ const latitudeMax = 90;
 /// The maximum value for longitude in degrees.
 const longitudeMax = 180;
 
-// The min number of digits in a plus code.
+// The min number of digits in a Plus Code.
 const minDigitCount = 2;
 
-// The max number of digits to process in a plus code.
+// The max number of digits to process in a Plus Code.
 const maxDigitCount = 15;
 
 /// Maximum code length using lat/lng pair encoding. The area of such a

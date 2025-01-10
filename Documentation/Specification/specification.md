@@ -8,7 +8,7 @@ The latitude and longitude should be WGS84 values. If other datums are used it m
 
 ## Character Set
 
-The following defines the valid characters in an Open Location Code. Sequences that contain other characters are by definition not valid Open Location Codes.
+The following defines the valid characters in a Plus Code. Sequences that contain other characters are by definition not valid Open Location Code.
 
 ### Digits
 
@@ -55,7 +55,7 @@ This differs from the above method in that each step produces a single character
 This encodes latitude into base five and longitude into base four, and then combines the digits for each position together.
 
 The following provides an algorithm to encode the values from least significant digit to most significant digit:
-1. Add 90 to the latiude, multiply the fractional part by 2.5e7 and take the integer part as latitude.
+1. Add 90 to the latitude, multiply the fractional part by 2.5e7 and take the integer part as latitude.
 1. Add 180 to the longitude, multiply the fractional part by 8.192e6 and take the integer part as longitude.
 1. Take the integer part of latitude modulus 5. Multiply that by 4, and add the integer part of the longitude modulus 4.
 1. Prefix the existing code with the symbol with the above value.
@@ -64,8 +64,8 @@ The following provides an algorithm to encode the values from least significant 
 
 ### Code length
 
-The minimum valid length of an Open Location Code is two digits.
-The maximum length of an Open Location Code is 15 digits.
+The minimum valid length of a Plus Code is two digits.
+The maximum length of a Plus Code is 15 digits.
 
 Below 10 digits, only even numbers are valid lengths.
 
@@ -98,7 +98,7 @@ NB: This table assumes one degree is 111321 meters, and that all distances are c
 ## Decoding
 
 The coordinates obtained when decoding are the south-west corner.
-(The north-east corner and center coordinates can be obtained by adding the precison values.)
+(The north-east corner and center coordinates can be obtained by adding the precision values.)
 
 This implies that the north-east coordinates are not included in the area of the code, with the exception of codes whose northern latitude is 90 degrees.
 
@@ -137,13 +137,13 @@ Given a global code, _796RWF8Q+WF_, you can eliminate the first **four** digits 
  * The center point of the feature is within **0.4** degrees latitude and **0.4** degrees longitude
  * The bounding box of the feature is less than **0.8** degrees high and wide.
 
-(These values are chosen because a four digit Open Location Code is 1x1 degrees.)
+(These values are chosen because a four digit Plus Code is 1x1 degrees.)
 
 If there is no suitable locality close enough or small enough, you can eliminate the first **two** digits of the code if:
  * The center point of the feature is within **8** degrees latitude and **8** degrees longitude
  * The bounding box of the feature is less than **16** degrees high and wide.
 
-(These values are chosen because a two digit Open Location Code is 20x20 degrees.)
+(These values are chosen because a two digit Plus Code is 20x20 degrees.)
 
 The values above are slightly smaller than the maximums to allow for different geocoder backends placing localities in slightly different positions.
 Although they could be increased there will be a risk that a shortened code will recover to a different location than the original, and people misdirected.
@@ -156,9 +156,9 @@ If a settlement (such as neighbourhood, town or city) is to be used, you should 
 
 The following public methods should be provided by any Open Location Code implementation, subject to minor changes caused by language conventions.
 
-Note that any method that returns an Open Location Code should return upper case characters.
+Note that any method that returns a Plus Code should return upper case characters.
 
-Methods that accept Open Location Codes as parameters should be case insensitive.
+Methods that accept Plus Codes as parameters should be case insensitive.
 
 Capitalisation should follow the language convention, for example the method `isValid` in golang would be `IsValid`.
 
@@ -166,17 +166,17 @@ Errors should be returned following the language convention. For example excepti
 
 ### `isValid`
 
-The `isValid` method takes a single parameter, a string, and returns a boolean indicating whether the string is a valid Open Location Code sequence.
+The `isValid` method takes a single parameter, a string, and returns a boolean indicating whether the string is a valid Plus Code.
 
 ### `isShort`
 
-The `isShort` method takes a single parameter, a string, and returns a boolean indicating whether the string is a valid short Open Location Code.
+The `isShort` method takes a single parameter, a string, and returns a boolean indicating whether the string is a valid short Plus Code.
 
  See [Short Codes](#short-codes) above.
 
 ### `isFull`
 
-Determines if a code is a valid full (i.e. not shortened) Open Location Code.
+Determines if a code is a valid full (i.e. not shortened) Plus Code.
 
 Not all possible combinations of Open Location Code characters decode to valid latitude and longitude values.
 This checks that a code is valid and that the resulting latitude and longitude values are legal.
@@ -184,15 +184,15 @@ Full codes must include the format separator character and it must be after eigh
 
 ### `encode`
 
-Encode a location into an Open Location Code.
+Encode a location into a Plus Code.
 This takes a latitude and longitude and an optional length.
 If the length is not specified, a code with 10 digits (and the format separator character) will be returned.
 
 ### `decode`
 
-Decodes an Open Location Code into the location coordinates.
+Decodes a Plus Code into the location coordinates.
 This method takes a string.
-If the string is a valid full Open Location Code, it returns:
+If the string is a valid full Plus Code, it returns:
 - the latitude and longitude of the SW corner of the bounding box;
 - the latitude and longitude of the NE corner of the bounding box;
 - the latitude and longitude of the center of the bounding box;
@@ -200,7 +200,7 @@ If the string is a valid full Open Location Code, it returns:
 
 ### `shorten`
 
-Passed a valid full Open Location Code and a latitude and longitude this removes as many digits as possible (up to a maximum of six) such that the resulting code is the closest matching code to the passed location.
+Passed a valid full Plus Code and a latitude and longitude this removes as many digits as possible (up to a maximum of six) such that the resulting code is the closest matching code to the passed location.
 A safety factor may be included.
 
 If the code cannot be shortened, the original full code should be returned.
@@ -209,4 +209,4 @@ Since the only really useful shortenings are removing the first four or six char
 
 ### `recoverNearest`
 
-This method is passed a valid short Open Location Code and a latitude and longitude, and returns the nearest matching full Open Location Code to the specified location.
+This method is passed a valid short Plus Code and a latitude and longitude, and returns the nearest matching full Plus Code to the specified location.

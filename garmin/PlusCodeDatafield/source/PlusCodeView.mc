@@ -163,7 +163,7 @@ class PlusCodeView extends Ui.DataField {
   const OLC_ALPHABET = "23456789CFGHJMPQRVWX";
 
   /**
-   * Encode the specified latitude and longitude into a 10 digit plus code using
+   * Encode the specified latitude and longitude into a 10 digit Plus Code using
    * the Open Location Code algorithm. See
    * https://github.com/google/open-location-code
    */
