@@ -72,16 +72,4 @@ int OLC_Shorten(const char* code, size_t size, const OLC_LatLon* reference,
 int OLC_RecoverNearest(const char* short_code, size_t size,
                        const OLC_LatLon* reference, char* code, int maxlen);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// Encode location using integer coordinates. This function is exposed for
-// testing purposes only.
-int OLC_EncodeIntegers(long long int lat, long long int lon, size_t code_length,
-                       char* code, int maxlen);
-#ifdef __cplusplus
-}
-#endif
-
 #endif // OLC_OPENLOCATIONCODE_H

@@ -83,16 +83,17 @@ int OLC_IsFull(const char* code, size_t size) {
 }
 
 int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
-               int maxlen) {
-  // Convert to integers. Clipping and normalisation will be done in the integer encoding function.
-  long long int lat = location->lat * kGridLatPrecisionInverse;
-  long long int lon = location->lon * kGridLonPrecisionInverse;
-  printf("encoding latitude %0.8f and longitude %0.8f\n", location->lat, location->lon);
-  printf("  initial integers: lat %lld  lon %lld\n", lat, lon);
+                int maxlen) {
+  // Multiply degrees by precision. Use lround to explicitly round rather than
+  // truncate, which causes issues when using values like 0.1 that do not have
+  // precise floating point representations.
+  long long int lat = lround(location->lat * kGridLatPrecisionInverse);
+  long long int lon = lround(location->lon * kGridLonPrecisionInverse);
   return OLC_EncodeIntegers(lat, lon, length, code, maxlen);
 }
 
-int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length, char* code, int maxlen) {
+int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length,
+                       char* code, int maxlen) {
   // Limit the maximum number of digits in the code.
   if (length > kMaximumDigitCount) {
     length = kMaximumDigitCount;
@@ -108,17 +109,17 @@ int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length, char
   if (lat < 0) {
     lat = 0;
   } else if (lat >= 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse) {
-    lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse;
+    // Subtract one to bring it just inside 90 degrees lat.
+    lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse - 1;
   }
   // Convert longitude to positive range and normalise.
-  lon += OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
+  lon += OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
   while (lon < 0) {
-    lon += 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
+    lon += 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
   }
-  while (lon >= 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse) {
-    lon -= 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
+  while (lon >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
+    lon -= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
   }
-  printf("  final integers: lat %lld  lon %lld\n", lat, lon);
 
   // Build up the code here, then copy it to the passed pointer.
   char fullcode[] = "12345678901234567";
