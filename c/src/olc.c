@@ -120,8 +120,8 @@ int OLC_EncodeIntegers(long long int lat, long long int lng, size_t length,
   if (length > kPairCodeLength) {
     for (size_t i = 0; i < kGridCodeLength; i++) {
       int lat_digit = lat % kGridRows;
-      int lon_digit = lng % kGridCols;
-      int ndx = lat_digit * kGridCols + lon_digit;
+      int lng_digit = lng % kGridCols;
+      int ndx = lat_digit * kGridCols + lng_digit;
       fullcode[pos--] = kAlphabet[ndx];
       // Note! Integer division.
       lat /= kGridRows;
@@ -135,8 +135,8 @@ int OLC_EncodeIntegers(long long int lat, long long int lng, size_t length,
   // Compute the pair section of the code.
   for (size_t i = 0; i < kPairCodeLength / 2; i++) {
     int lat_ndx = lat % kEncodingBase;
-    int lon_ndx = lng % kEncodingBase;
-    fullcode[pos--] = kAlphabet[lon_ndx];
+    int lng_ndx = lng % kEncodingBase;
+    fullcode[pos--] = kAlphabet[lng_ndx];
     fullcode[pos--] = kAlphabet[lat_ndx];
     // Note! Integer division.
     lat /= kEncodingBase;
@@ -523,7 +523,7 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded) {
   }
   // Convert the place value to a float in degrees.
   double lat_precision = (double)pv / kPairPrecisionInverse;
-  double lon_precision = (double)pv / kPairPrecisionInverse;
+  double lng_precision = (double)pv / kPairPrecisionInverse;
   // Process any extra precision digits.
   if (strlen(clean_code) > kPairCodeLength) {
     // How many digits do we have to process?
@@ -543,7 +543,7 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded) {
     }
     // Adjust the precisions from the integer values to degrees.
     lat_precision = (double)row_pv / kGridLatPrecisionInverse;
-    lon_precision = (double)col_pv / kGridLonPrecisionInverse;
+    lng_precision = (double)col_pv / kGridLonPrecisionInverse;
   }
   // Merge the values from the normal and extra precision parts of the code.
   // Everything is ints so they all need to be cast to floats.
@@ -554,7 +554,7 @@ static int decode(CodeInfo* info, OLC_CodeArea* decoded) {
   decoded->lo.lat = lat;
   decoded->lo.lon = lng;
   decoded->hi.lat = lat + lat_precision;
-  decoded->hi.lon = lng + lon_precision;
+  decoded->hi.lon = lng + lng_precision;
   decoded->len = strlen(clean_code);
   return decoded->len;
 }
