@@ -87,6 +87,8 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   // Convert to integers. Clipping and normalisation will be done in the integer encoding function.
   long long int lat = location->lat * kGridLatPrecisionInverse;
   long long int lon = location->lon * kGridLonPrecisionInverse;
+  printf("encoding latitude %0.8f and longitude %0.8f\n", location->lat, location->lon);
+  printf("  initial integers: lat %lld  lon %lld\n", lat, lon);
   return OLC_EncodeIntegers(lat, lon, length, code, maxlen);
 }
 
@@ -106,7 +108,7 @@ int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length, char
   if (lat < 0) {
     lat = 0;
   } else if (lat >= 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse) {
-    lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse - 1;
+    lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse;
   }
   // Convert longitude to positive range and normalise.
   lon += OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
@@ -116,6 +118,7 @@ int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length, char
   while (lon >= 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse) {
     lon -= 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
   }
+  printf("  final integers: lat %lld  lon %lld\n", lat, lon);
 
   // Build up the code here, then copy it to the passed pointer.
   char fullcode[] = "12345678901234567";
