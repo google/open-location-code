@@ -2,7 +2,7 @@
 *~
 .*.swp
 # Bazel module lock file.
-MODULE.Bazel.lock
+MODULE.bazel.lock
 # Ignore all bazel-* links.
 /bazel-*
 # Ignore outputs generated during Bazel bootstrapping.
