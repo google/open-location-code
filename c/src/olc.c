@@ -84,6 +84,13 @@ int OLC_IsFull(const char* code, size_t size) {
 
 int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
                int maxlen) {
+  // Convert to integers. Clipping and normalisation will be done in the integer encoding function.
+  long long int lat = location->lat * kGridLatPrecisionInverse;
+  long long int lon = location->lon * kGridLonPrecisionInverse;
+  return OLC_EncodeIntegers(lat, lon, length, code, maxlen);
+}
+
+int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length, char* code, int maxlen) {
   // Limit the maximum number of digits in the code.
   if (length > kMaximumDigitCount) {
     length = kMaximumDigitCount;
@@ -94,51 +101,52 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   if (length < kPairCodeLength && length % 2 == 1) {
     length = length + 1;
   }
-  // Adjust latitude and longitude so they fall into positive ranges.
-  double latitude = adjust_latitude(location->lat, length);
-  double longitude = normalize_longitude(location->lon);
+  // Convert latitude to positive range and clip.
+  lat += OLC_kLatMaxDegrees * kGridLatPrecisionInverse;
+  if (lat < 0) {
+    lat = 0;
+  } else if (lat >= 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse) {
+    lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse - 1;
+  }
+  // Convert longitude to positive range and normalise.
+  lon += OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
+  while (lon < 0) {
+    lon += 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
+  }
+  while (lon >= 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse) {
+    lon -= 2 * OLC_kLonMaxDegrees *kGridLonPrecisionInverse;
+  }
 
   // Build up the code here, then copy it to the passed pointer.
   char fullcode[] = "12345678901234567";
 
   // Compute the code.
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
-  // Multiply values by their precision and convert to positive without any
-  // floating point operations.
-  long long int lat_val = kLatMaxDegrees * 2.5e7;
-  long long int lng_val = kLonMaxDegrees * 8.192e6;
-  lat_val += latitude * 2.5e7;
-  lng_val += longitude * 8.192e6;
-
   size_t pos = kMaximumDigitCount;
   // Compute the grid part of the code if necessary.
   if (length > kPairCodeLength) {
     for (size_t i = 0; i < kGridCodeLength; i++) {
-      int lat_digit = lat_val % kGridRows;
-      int lng_digit = lng_val % kGridCols;
+      int lat_digit = lat % kGridRows;
+      int lng_digit = lon % kGridCols;
       int ndx = lat_digit * kGridCols + lng_digit;
       fullcode[pos--] = kAlphabet[ndx];
       // Note! Integer division.
-      lat_val /= kGridRows;
-      lng_val /= kGridCols;
+      lat /= kGridRows;
+      lon /= kGridCols;
     }
   } else {
-    lat_val /= pow(kGridRows, kGridCodeLength);
-    lng_val /= pow(kGridCols, kGridCodeLength);
+    lat /= pow(kGridRows, kGridCodeLength);
+    lon /= pow(kGridCols, kGridCodeLength);
   }
   pos = kPairCodeLength;
   // Compute the pair section of the code.
   for (size_t i = 0; i < kPairCodeLength / 2; i++) {
-    int lat_ndx = lat_val % kEncodingBase;
-    int lng_ndx = lng_val % kEncodingBase;
+    int lat_ndx = lat % kEncodingBase;
+    int lng_ndx = lon % kEncodingBase;
     fullcode[pos--] = kAlphabet[lng_ndx];
     fullcode[pos--] = kAlphabet[lat_ndx];
     // Note! Integer division.
-    lat_val /= kEncodingBase;
-    lng_val /= kEncodingBase;
+    lat /= kEncodingBase;
+    lon /= kEncodingBase;
     if (i == 0) {
       fullcode[pos--] = kSeparator;
     }
