@@ -82,16 +82,6 @@ int OLC_IsFull(const char* code, size_t size) {
   return is_full(&info);
 }
 
-int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
-                int maxlen) {
-  // Multiply degrees by precision. Use lround to explicitly round rather than
-  // truncate, which causes issues when using values like 0.1 that do not have
-  // precise floating point representations.
-  long long int lat = lround(location->lat * kGridLatPrecisionInverse);
-  long long int lon = lround(location->lon * kGridLonPrecisionInverse);
-  return OLC_EncodeIntegers(lat, lon, length, code, maxlen);
-}
-
 int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length,
                        char* code, int maxlen) {
   // Limit the maximum number of digits in the code.
@@ -175,6 +165,16 @@ int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length,
   code[char_count] = '\0';
 
   return char_count;
+}
+
+int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
+                int maxlen) {
+  // Multiply degrees by precision. Use lround to explicitly round rather than
+  // truncate, which causes issues when using values like 0.1 that do not have
+  // precise floating point representations.
+  long long int lat = lround(location->lat * kGridLatPrecisionInverse);
+  long long int lon = lround(location->lon * kGridLonPrecisionInverse);
+  return OLC_EncodeIntegers(lat, lon, length, code, maxlen);
 }
 
 int OLC_EncodeDefault(const OLC_LatLon* location, char* code, int maxlen) {
