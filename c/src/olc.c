@@ -168,7 +168,7 @@ int OLC_EncodeIntegers(long long int lat, long long int lon, size_t length,
 }
 
 int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
-                int maxlen) {
+               int maxlen) {
   // Multiply degrees by precision. Use lround to explicitly round rather than
   // truncate, which causes issues when using values like 0.1 that do not have
   // precise floating point representations.
