@@ -11,7 +11,7 @@ import (
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
 	log "github.com/golang/glog"
-	geojson "github.com/paulmach/go.geojson"
+	"github.com/paulmach/orb/geojson"
 	"golang.org/x/image/font/gofont/goregular"
 )
 
