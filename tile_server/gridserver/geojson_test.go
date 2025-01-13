@@ -2,12 +2,12 @@ package gridserver
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	log "github.com/golang/glog"
 	"github.com/google/go-cmp/cmp"
-	geojson "github.com/paulmach/go.geojson"
+	"github.com/paulmach/orb/geojson"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 )
 
 func readTestData(p string) []byte {
-	d, err := ioutil.ReadFile(p)
+	d, err := os.ReadFile(p)
 	if err != nil {
 		log.Fatal(err)
 	}
