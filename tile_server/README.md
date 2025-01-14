@@ -2,19 +2,20 @@
 
 This code provides a Go server to handle
 [Tile Map Service](https://en.wikipedia.org/wiki/Tile_Map_Service) requests. It
-is able to respond with [GeoJSON](https://geojson.org) or image tiles, either of
+is able to respond with [GeoJSON](https://geojson.org), image tiles or
+[Mapbox Vector Tile](https://github.com/mapbox/vector-tile-spec), any of
 which can be added as an overlay to a map.
 
 ## Limitations
 
-1.  This server does not implement any GetCapabilities methods.
-1.  A fixed image tile size of 256x256 pixels is used.
+1. This server does not implement any GetCapabilities methods.
+1. A fixed image tile size of 256x256 pixels is used.
 
 ## Tile Requests
 
 The server responds to tile requests. These send a zoom level, and x and y tile
-numbers. The request URL determines whether the response should be GeoJSON or an
-image.
+numbers. The request URL determines whether the response should be GeoJSON, an
+image, or a Mapbox Vector Tile.
 
 The format of the requests is:
 
@@ -22,22 +23,23 @@ The format of the requests is:
 //hostname:port/grid/[tilespec]/z/x/y.[format]?[options]
 ```
 
-*   `tilespec` must be either `wms` or `tms`. The only difference in these is
+* `tilespec` must be either `wms` or `tms`. The only difference in these is
     that the Y tiles are numbered from north to south (`wms`) or from south to
     north (`tms`).
-*   `format` must be either `json` for a GeoJSON FeatureCollection, or `png`
-    for a PNG image tile.
-*   The optional parameters are:
-    *   `linecol`: this defines the RGBA colour to use for lines in the PNG
+* `format` must be either `json` for a GeoJSON FeatureCollection, `png`
+    for a PNG image tile, or `mvt` for a Mapbox Vector Tile.
+* The optional parameters are:
+  * `linecol`: this defines the RGBA colour to use for lines in the PNG
         tiles.
-    *   `labelcol`: this defines the RGBA colour to use for the labels in the
+  * `labelcol`: this defines the RGBA colour to use for the labels in the
         PNG tiles.
-    *   `zoomadjust`: this is added to the map zoom value, to cause the returned
-        grid to be finer or coarser. This affects both GeoJSON and image tiles.
-    *   `projection`: this can be used to change the map projection from the
+  * `zoomadjust`: this is added to the map zoom value, to cause the returned
+        grid to be finer or coarser. This affects both GeoJSON, image tiles,
+        and Mapbox Vector Tile.
+  * `projection`: this can be used to change the map projection from the
         default, spherical mercator, to geodetic. Valid values are:
-        *   `mercator` or `epsg:3857`: selects spherical mercator (default)
-        *   `geodetic` or `epsg:4326`: selects geodetic projection
+    * `mercator` or `epsg:3857`: selects spherical mercator (default)
+    * `geodetic` or `epsg:4326`: selects geodetic projection
 
 An example request could be:
 
@@ -147,18 +149,18 @@ go test ./tile_server/gridserver -v --logtostderr
 
 The following other projects need to be installed:
 
-[GeoJSON](https://github.com/paulmach/go.geojson) provides the definition for
-the GeoJSON response objects. Install with:
+[orb](https://github.com/paulmach/orb) provides the definition for
+the GeoJSON and Mapbox Vector Tile response objects. Install with:
 
 ```
-go get github.com/paulmach/go.geojson
+go get github.com/paulmach/orb
 ```
 
 [Freetype](https://github.com/golang/freetype) is used for the labels in the PNG
 tiles. Install with:
 
 ```
-$ go get github.com/golang/freetype
+go get github.com/golang/freetype
 ```
 
 [Open Location Code](https://github.com/open-location-code/) generates the codes
