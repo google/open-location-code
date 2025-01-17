@@ -6,6 +6,12 @@ import (
 	"github.com/paulmach/orb/maptile"
 )
 
+const (
+	layerName    = "grid"
+	layerVersion = 2
+	layerExtent  = 4096
+)
+
 // MVT returns a Mapbox Vector Tile (MVT) marshalled as bytes.
 func (t *TileRef) MVT() ([]byte, error) {
 	log.Infof("Producing mvt for tile z/x/y %v/%v/%v (%s)", t.Z, t.X, t.Y, t.Path())
@@ -13,7 +19,13 @@ func (t *TileRef) MVT() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	layer := mvt.NewLayer("grid", gj)
+
+	layer := &mvt.Layer{
+		Name:     layerName,
+		Version:  layerVersion,
+		Extent:   layerExtent,
+		Features: gj.Features,
+	}
 
 	// Since GeoJSON stores geometries in latitude and longitude (WGS84),
 	// we only need to project the coordinates if the desired output projection is Mercator.

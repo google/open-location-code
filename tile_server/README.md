@@ -3,7 +3,7 @@
 This code provides a Go server to handle
 [Tile Map Service](https://en.wikipedia.org/wiki/Tile_Map_Service) requests. It
 is able to respond with [GeoJSON](https://geojson.org), image tiles or
-[Mapbox Vector Tile](https://github.com/mapbox/vector-tile-spec), any of
+[Mapbox Vector Tiles](https://github.com/mapbox/vector-tile-spec) (version 2.1), any of
 which can be added as an overlay to a map.
 
 ## Limitations
