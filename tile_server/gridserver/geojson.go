@@ -24,10 +24,10 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 			sw := LatLng{lo.Lat + latp*float64(lats), lo.Lng + lngp*float64(lngs)}
 			// Make the geometry of the cell. Longitude comes first!
 			g := orb.Polygon{orb.Ring{
-				{sw.Lng, sw.Lat},               // SW
-				{sw.Lng, sw.Lat + latp},        // NW
-				{sw.Lng + lngp, sw.Lat + latp}, // NE
-				{sw.Lng + lngp, sw.Lat},        // SE
+				orb.Point{sw.Lng, sw.Lat},               // SW
+				orb.Point{sw.Lng, sw.Lat + latp},        // NW
+				orb.Point{sw.Lng + lngp, sw.Lat + latp}, // NE
+				orb.Point{sw.Lng + lngp, sw.Lat},        // SE
 			}}
 			// Create the cell as a polygon.
 			cell := geojson.NewFeature(g)
@@ -51,10 +51,10 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 
 // bounds returns the lat/lng bounding box for the feature.
 func bounds(f *geojson.Feature) (latlo, lnglo, lathi, lnghi float64) {
-	latlo = f.Geometry.Bound().Bottom()
-	lnglo = f.Geometry.Bound().Left()
-	lathi = f.Geometry.Bound().Top()
-	lnghi = f.Geometry.Bound().Right()
+	latlo = f.Geometry.(orb.Polygon)[0][0][1]
+	lnglo = f.Geometry.(orb.Polygon)[0][0][0]
+	lathi = f.Geometry.(orb.Polygon)[0][2][1]
+	lnghi = f.Geometry.(orb.Polygon)[0][2][0]
 	return
 }
 
