@@ -13,6 +13,8 @@ const (
 	JSONTile TileFormat = 0
 	// ImageTile indicates the tile output should be a PNG image.
 	ImageTile TileFormat = 1
+	// VectorTile indicates the tile output should be Mapbox Vector Tile.
+	VectorTile TileFormat = 2
 )
 
 // TileRef represents a TMS tile reference, based on x/y/z values.
@@ -44,8 +46,8 @@ type TileOptions struct {
 
 // String returns a string representation of the options.
 func (o TileOptions) String() string {
-	if o.Format == JSONTile {
-		// Colour settings aren't used for JSON tiles - they just mess up the caching.
+	if o.Format == JSONTile || o.Format == VectorTile {
+		// Colour settings aren't used for JSON or Vector tiles - they just mess up the caching.
 		return fmt.Sprintf("%s_%d", o.Projection, o.ZoomAdjust)
 	}
 	r, g, b, a := o.LineColor.RGBA()
