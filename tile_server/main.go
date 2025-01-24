@@ -21,6 +21,7 @@ const (
 	contentTypeHeader  = "Content-Type"
 	contentTypeGeoJSON = "application/vnd.geo+json"
 	contentTypePNG     = "image/png"
+	contentTypeMVT     = "application/vnd.mapbox-vector-tile"
 )
 
 func init() {
@@ -71,6 +72,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		ctype = contentTypePNG
 		if blob, err = tile.Image(); err != nil {
 			log.Errorf("Error producing image tile: %v", err)
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	} else if tile.Options.Format == gridserver.VectorTile {
+		ctype = contentTypeMVT
+		if blob, err = tile.MVT(); err != nil {
+			log.Errorf("Error producing mapbox vector tile: %v", err)
 			http.Error(w, err.Error(), 500)
 			return
 		}
