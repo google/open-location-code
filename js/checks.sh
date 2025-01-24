@@ -1,6 +1,5 @@
 #!/bin/bash
 # Run lint checks on files in the Javascript directory.
-# When running within TravisCI, post comments back to the pull request.
 # Also converts the test CSV files to JSON ready for the tests to execute.
 # Note: must run within the JS directory.
 if [ `basename "$PWD"` != "js" ]; then
@@ -46,14 +45,6 @@ else
     echo -e "\e[1;31mFile has formatting errors:\e[0m"
     echo "$LINT"
     RETURN=1
-    if [ -v TRAVIS ]; then
-      # On TravisCI, send a comment with the diff to the pull request.
-      go run ../travis-utils/github_comments.go \
-          --comment '**File has `eslint` errors that must be fixed**:'"<br><pre>$LINT</pre>" \
-          --file "js/$FILE" \
-          --pr "$TRAVIS_PULL_REQUEST" \
-          --commit "$TRAVIS_PULL_REQUEST_SHA"
-    fi
   fi
 fi
 exit $RETURN
