@@ -20,9 +20,10 @@ package olc
 //go:generate go run corpus/gen.go -test-data=../test_data -dest=corpus
 
 // Fuzz usage:
-//   go get github.com/dvyukov/go-fuzz/...
 //
-//   go-fuzz-build github.com/google/open-location-code/go && go-fuzz -bin=./olc-fuzz.zip -workdir=/tmp/olc-fuzz
+//	go get github.com/dvyukov/go-fuzz/...
+//
+//	go-fuzz-build github.com/google/open-location-code/go && go-fuzz -bin=./olc-fuzz.zip -workdir=/tmp/olc-fuzz
 func Fuzz(data []byte) int {
 	code := string(data)
 	if err := Check(code); err != nil {
