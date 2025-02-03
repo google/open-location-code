@@ -24,8 +24,7 @@ npm install eslint
 eslint closure/*js
 ```
 
-If there are any syntax or style errors, it will output messages. Note that
-syntax or style errors will cause the TravisCI tests to **fail**.
+If there are any syntax or style errors, it will output messages.
 
 ## Building and Testing
 

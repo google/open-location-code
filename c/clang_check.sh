@@ -22,13 +22,8 @@ RETURN=0
 for FILE in `ls *.[ch] */*.[ch]`; do
   DIFF=`diff $FILE <($CLANG_FORMAT $FILE)`
   if [ $? -ne 0 ]; then
-    if [ -z "$TRAVIS" ]; then
-      echo "Formatting $FILE" >&2
-      $CLANG_FORMAT -i $FILE
-    else
-      echo -e "\e[31m$FILE has formatting errors:\e[30m" >&2
-      echo "$DIFF" >&2
-    fi
+    echo "Formatting $FILE" >&2
+    $CLANG_FORMAT -i $FILE
     RETURN=1
   fi
 done

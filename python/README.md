@@ -44,7 +44,7 @@ bash format_check.sh
 
 If you just want to see the changes, you can run `python -m yapf --diff *py`
 
-This script runs as part of the TravisCI tests - if files need formatting it
+This script runs as part of the CI tests - if files need formatting it
 will display the required changes **and fail the test**.
 
 
