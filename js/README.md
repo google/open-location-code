@@ -42,7 +42,7 @@ Example web pages illustrating converting map clicks with Open Location Code,
 and using Googles Maps API to extend place codes to full codes are in the
 `examples/` directory.
 
-More examples are on [jsfiddle](https://jsfiddle.net/user/openlocationcode/fiddles/).
+More examples are on [jsfiddle](https://jsfiddle.net/u/openlocationcode/fiddles/).
 
 # Public Methods
 
