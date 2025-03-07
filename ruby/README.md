@@ -20,7 +20,7 @@ gem install rubocop
 rubocop --config rubocop.yml
 ```
 
-If you can't run it yourself, it is run as part of the TravisCI tests.
+If you can't run it yourself, it is run as part of the CI tests.
 
 
 ### Testing

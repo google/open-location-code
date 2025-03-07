@@ -10,12 +10,10 @@ To format your files, just run `format_check.sh` or:
 dartfmt --fix --overwrite .
 ```
 
-The TravisCI test **will fail if any files need formatting**.
-
 ## Hints
 
-The TravisCI test uses `dartanalyzer` to check the library for improvements. IF
-any are found the TravisCI tests **will fail**.
+The CI test uses `dartanalyzer` to check the library for improvements. IF
+any are found the CI tests **will fail**.
 
 ## Testing
 
