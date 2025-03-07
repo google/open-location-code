@@ -83,7 +83,7 @@ int OLC_IsFull(const char* code, size_t size) {
 }
 
 int encodeIntegers(long long int lat, long long int lng, size_t length,
-                       char* code, int maxlen) {
+                   char* code, int maxlen) {
   // Limit the maximum number of digits in the code.
   if (length > kMaximumDigitCount) {
     length = kMaximumDigitCount;
@@ -108,7 +108,7 @@ int encodeIntegers(long long int lat, long long int lng, size_t length,
     // If after adding 180 it is still less than zero, do integer division
     // on a full longitude (360) and add the remainder.
     lng = lng % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) +
-        (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
+          (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
   } else if (lng >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
     // If it's greater than 360, just get the integer division remainder.
     lng = lng % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
@@ -223,8 +223,8 @@ int OLC_Shorten(const char* code, size_t size, const OLC_LatLon* reference,
   int start = 0;
   const double safety_factor = 0.3;
   const int removal_lengths[3] = {8, 6, 4};
-  for (unsigned long j = 0; j < sizeof(removal_lengths) / sizeof(removal_lengths[0]);
-       ++j) {
+  for (unsigned long j = 0;
+       j < sizeof(removal_lengths) / sizeof(removal_lengths[0]); ++j) {
     // Check if we're close enough to shorten. The range must be less than
     // 1/2 the resolution to shorten at all, and we want to allow some
     // safety, so use 0.3 instead of 0.5 as a multiplier.

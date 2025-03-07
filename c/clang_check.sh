@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# Check the C file and format them with clang-format, unless the script is
+# running in a GitHub workflow, in which case we just print an error message.
 
 CLANG_FORMAT="clang-format-5.0"
 if hash $CLANG_FORMAT 2>/dev/null; then
@@ -22,7 +23,7 @@ RETURN=0
 for FILE in `ls *.[ch] */*.[ch]`; do
   DIFF=`diff $FILE <($CLANG_FORMAT $FILE)`
   if [ $? -ne 0 ]; then
-    if [ -z "$TRAVIS" ]; then
+    if [ -z "$GITHUB_WORKFLOW" ]; then
       echo "Formatting $FILE" >&2
       $CLANG_FORMAT -i $FILE
     else
