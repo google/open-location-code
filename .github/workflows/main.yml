@@ -13,7 +13,7 @@ jobs:
         run: bazel test --test_output=all ${OLC_PATH}:all
       - name: check formatting
         run: cd ${OLC_PATH} && bash clang_check.sh
-        
+
   # C++ implementation. Lives in cpp/, tested with bazel.
   test-cpp:
     runs-on: ubuntu-latest
@@ -26,7 +26,7 @@ jobs:
         run: bazel test --test_output=all ${OLC_PATH}:all
       - name: check formatting
         run: cd ${OLC_PATH} && bash clang_check.sh
-        
+
   # Dart implementation. Lives in dart/.
   test-dart:
     runs-on: ubuntu-latest
@@ -60,8 +60,8 @@ jobs:
       run: |
         cd tile_server/gridserver
         go test ./ -v
-        
-  # Java implementation. Lives in java/, tested with bazel and maven.     
+
+  # Java implementation. Lives in java/, tested with bazel and maven.
   test-java:
     runs-on: ubuntu-latest
     env:
@@ -80,8 +80,8 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: test
         run: bazel test --test_output=all ${OLC_PATH}:all && cd ${OLC_PATH} && mvn package -Dsurefire.useFile=false -DdisableXmlReport=true
-        
-  # Javascript Closure library implementation. Lives in js/closure, tested with bazel.  
+
+  # Javascript Closure library implementation. Lives in js/closure, tested with bazel.
   test-js-closure:
     runs-on: ubuntu-latest
     env:
@@ -105,7 +105,7 @@ jobs:
         run: |
           cd ${OLC_PATH}
           bash checks.sh
-          
+
   # Python implementation. Lives in python/, tested with bazel.
   test-python:
     runs-on: ubuntu-latest
@@ -118,7 +118,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3
-      - name: Set up Python 
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -130,7 +130,7 @@ jobs:
           pip install yapf
           python3 -m yapf --diff *py
           exit 0
-          
+
   # Ruby implementation. Lives in ruby/.
   test-ruby:
     runs-on: ubuntu-latest
