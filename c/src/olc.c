@@ -104,11 +104,14 @@ int OLC_EncodeIntegers(long long int lat, long long int lng, size_t length,
   }
   // Convert longitude to positive range and normalise.
   lng += OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
-  while (lng < 0) {
-    lng += 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
-  }
-  while (lng >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
-    lng -= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
+  if (lng < 0) {
+    // If less than zero (e.g. -45 or -405), do integer division on the full
+    // range (360) and add the remainder(-45) to the full range value.
+    lng = lng % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) +
+        (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
+  } else if (lng >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
+    // If it's greater than the full range, just get the integer division remainder.
+    lng = lng % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
   }
 
   // Build up the code here, then copy it to the passed pointer.
