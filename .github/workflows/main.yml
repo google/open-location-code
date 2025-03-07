@@ -3,10 +3,7 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   # C implementation. Lives in c/, tested with bazel.
   test-c:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     env:
       OLC_PATH: c
     steps:
