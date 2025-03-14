@@ -16,7 +16,7 @@
 #
 # Convert locations to and from short codes.
 #
-# Open Location Codes are short, 10-11 character codes that can be used instead
+# Plus Codes are short, 10-11 character codes that can be used instead
 # of street addresses. The codes can be generated and decoded offline, and use
 # a reduced character set that minimises the chance of codes including words.
 #
@@ -81,10 +81,10 @@ LATITUDE_MAX_ = 90
 # The maximum value for longitude in degrees.
 LONGITUDE_MAX_ = 180
 
-# The min number of digits to process in a plus code.
+# The min number of digits to process in a Plus Code.
 MIN_DIGIT_COUNT_ = 2
 
-# The max number of digits to process in a plus code.
+# The max number of digits to process in a Plus Code.
 MAX_DIGIT_COUNT_ = 15
 
 # Maximum code length using lat/lng pair encoding. The area of such a

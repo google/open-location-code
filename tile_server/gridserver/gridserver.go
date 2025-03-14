@@ -1,4 +1,4 @@
-// Package gridserver serves tiles with the plus codes grid.
+// Package gridserver serves tiles with the Plus Codes grid.
 // This parses the request, and generates either a GeoJSON or PNG image response.
 package gridserver
 
@@ -16,6 +16,7 @@ import (
 const (
 	outputJSON       = "json"
 	outputPNG        = "png"
+	outputMVT        = "mvt"
 	tileNumberingWMS = "wms"
 	tileNumberingTMS = "tms"
 	lineColorOption  = "linecol"
@@ -25,7 +26,7 @@ const (
 )
 
 var (
-	pathSpec = regexp.MustCompile(fmt.Sprintf(`^/grid/(%s|%s)/(\d+)/(\d+)/(\d+)\.(%s|%s)`, tileNumberingWMS, tileNumberingTMS, outputJSON, outputPNG))
+	pathSpec = regexp.MustCompile(fmt.Sprintf(`^/grid/(%s|%s)/(\d+)/(\d+)/(\d+)\.(%s|%s|%s)`, tileNumberingWMS, tileNumberingTMS, outputJSON, outputPNG, outputMVT))
 )
 
 // LatLng represents a latitude and longitude in degrees.
@@ -71,6 +72,8 @@ func Parse(r *http.Request) (*TileRef, error) {
 		opts.Format = JSONTile
 	} else if g[5] == outputPNG {
 		opts.Format = ImageTile
+	} else if g[5] == outputMVT {
+		opts.Format = VectorTile
 	} else {
 		return nil, fmt.Errorf("Tile output type not specified: %v", g[5])
 	}

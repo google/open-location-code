@@ -5,7 +5,8 @@ import (
 
 	log "github.com/golang/glog"
 	olc "github.com/google/open-location-code/go"
-	geojson "github.com/paulmach/go.geojson"
+	"github.com/paulmach/orb"
+	"github.com/paulmach/orb/geojson"
 )
 
 // GeoJSON returns a GeoJSON object for the tile.
@@ -22,16 +23,14 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 			// Compute the SW corner of this cell.
 			sw := LatLng{lo.Lat + latp*float64(lats), lo.Lng + lngp*float64(lngs)}
 			// Make the geometry of the cell. Longitude comes first!
-			g := [][][]float64{
-				{
-					{sw.Lng, sw.Lat},               // SW
-					{sw.Lng, sw.Lat + latp},        // NW
-					{sw.Lng + lngp, sw.Lat + latp}, // NE
-					{sw.Lng + lngp, sw.Lat},        // SE
-				},
-			}
+			g := orb.Polygon{orb.Ring{
+				orb.Point{sw.Lng, sw.Lat},               // SW
+				orb.Point{sw.Lng, sw.Lat + latp},        // NW
+				orb.Point{sw.Lng + lngp, sw.Lat + latp}, // NE
+				orb.Point{sw.Lng + lngp, sw.Lat},        // SE
+			}}
 			// Create the cell as a polygon.
-			cell := geojson.NewPolygonFeature(g)
+			cell := geojson.NewFeature(g)
 			// Compute the code of the center.
 			code := olc.Encode(sw.Lat+latp/2, sw.Lng+lngp/2, cl)
 			cell.Properties["name"] = code
@@ -44,7 +43,7 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 				cell.Properties["local_code"] = code[4:]
 			}
 			// Add to the feature collection.
-			fc.AddFeature(cell)
+			fc.Append(cell)
 		}
 	}
 	return fc, nil
@@ -52,10 +51,10 @@ func (t *TileRef) GeoJSON() (*geojson.FeatureCollection, error) {
 
 // bounds returns the lat/lng bounding box for the feature.
 func bounds(f *geojson.Feature) (latlo, lnglo, lathi, lnghi float64) {
-	latlo = f.Geometry.Polygon[0][0][1]
-	lnglo = f.Geometry.Polygon[0][0][0]
-	lathi = f.Geometry.Polygon[0][2][1]
-	lnghi = f.Geometry.Polygon[0][2][0]
+	latlo = f.Geometry.(orb.Polygon)[0][0][1]
+	lnglo = f.Geometry.(orb.Polygon)[0][0][0]
+	lathi = f.Geometry.(orb.Polygon)[0][2][1]
+	lnghi = f.Geometry.(orb.Polygon)[0][2][0]
 	return
 }
 

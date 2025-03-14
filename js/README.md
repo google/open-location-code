@@ -34,15 +34,15 @@ dependencies, run `eslint` and then run the tests as long as there were no
 eslint errors.
 
 Unit tests are automatically run on pull and push requests and visible at
-https://travis-ci.org/google/open-location-code.
+https://github.com/google/open-location-code/actions.
 
 # Examples
 
-Example web pages illustrating converting map clicks to Open Location Codes,
+Example web pages illustrating converting map clicks with Open Location Code,
 and using Googles Maps API to extend place codes to full codes are in the
 `examples/` directory.
 
-More examples are on [jsfiddle](https://jsfiddle.net/user/openlocationcode/fiddles/).
+More examples are on [jsfiddle](https://jsfiddle.net/u/openlocationcode/fiddles/).
 
 # Public Methods
 
