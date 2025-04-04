@@ -32,16 +32,16 @@ const double kGridSizeDegrees =
 const size_t kPairPrecisionInverse = 8000;
 // Inverse (1/) of the precision of the final grid digits in degrees.
 // (Latitude and longitude are different.)
-const size_t kGridLatPrecisionInverse =
+const int64_t kGridLatPrecisionInverse =
     kPairPrecisionInverse * pow(kGridRows, kGridCodeLength);
-const size_t kGridLngPrecisionInverse =
+const int64_t kGridLngPrecisionInverse =
     kPairPrecisionInverse * pow(kGridColumns, kGridCodeLength);
 // Latitude bounds are -kLatitudeMaxDegrees degrees and +kLatitudeMaxDegrees
 // degrees which we transpose to 0 and 180 degrees.
-const double kLatitudeMaxDegrees = 90;
+const int64_t kLatitudeMaxDegrees = 90;
 // Longitude bounds are -kLongitudeMaxDegrees degrees and +kLongitudeMaxDegrees
 // degrees which we transpose to 0 and 360.
-const double kLongitudeMaxDegrees = 180;
+const int64_t kLongitudeMaxDegrees = 180;
 // Lookup table of the alphabet positions of characters 'C' through 'X',
 // inclusive. A value of -1 means the character isn't part of the alphabet.
 const int kPositionLUT['X' - 'C' + 1] = {8,  -1, -1, 9,  10, 11, -1, 12,
@@ -128,26 +128,37 @@ std::string Encode(const LatLng &location, size_t code_length) {
   if (code_length < internal::kPairCodeLength && code_length % 2 == 1) {
     code_length = code_length + 1;
   }
+  // Convert latitude and longitude into integer values.
+  int64_t lat_val =
+      round(location.latitude * internal::kGridLatPrecisionInverse);
+  int64_t lng_val =
+      round(location.longitude * internal::kGridLngPrecisionInverse);
+
   // Adjust latitude and longitude so that they are normalized/clipped.
-  double latitude = adjust_latitude(location.latitude, code_length);
-  double longitude = normalize_longitude(location.longitude);
+  lat_val += internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse;
+  if (lat_val < 0) {
+    lat_val = 0;
+  } else if (lat_val >= 2 * internal::kLatitudeMaxDegrees *
+                            internal::kGridLatPrecisionInverse) {
+    lat_val =
+        2 * internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse -
+        1;
+  }
+  lng_val +=
+      internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
+  if (lng_val <= 0) {
+    lng_val =
+        lng_val % (2 * internal::kLongitudeMaxDegrees *
+                   internal::kGridLngPrecisionInverse) +
+        2 * internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
+  } else if (lng_val >= 2 * internal::kLongitudeMaxDegrees *
+                            internal::kGridLngPrecisionInverse) {
+    lng_val = lng_val % (2 * internal::kLongitudeMaxDegrees *
+                         internal::kGridLngPrecisionInverse);
+  }
   // Reserve 15 characters for the code digits. The separator will be inserted
   // at the end.
   std::string code = "123456789abcdef";
-
-  // Compute the code.
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
-  // Multiply values by their precision and convert to positive without any
-  // floating point operations.
-  int64_t lat_val =
-      internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse;
-  int64_t lng_val =
-      internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
-  lat_val += latitude * internal::kGridLatPrecisionInverse;
-  lng_val += longitude * internal::kGridLngPrecisionInverse;
 
   size_t pos = internal::kMaximumDigitCount - 1;
   // Compute the grid part of the code if necessary.
