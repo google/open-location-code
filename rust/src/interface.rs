@@ -1,17 +1,19 @@
+use std::cmp::{max, min};
+
 use geo::Point;
-use std::cmp;
 
-use codearea::CodeArea;
-
-use consts::{
-    CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS, LATITUDE_MAX,
-    LAT_INTEGER_MULTIPLIER, LNG_INTEGER_MULTIPLIER, LONGITUDE_MAX, MAX_CODE_LENGTH,
-    MIN_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR, PAIR_CODE_LENGTH,
-    PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION,
-};
-
-use private::{
-    clip_latitude, code_value, compute_latitude_precision, normalize_longitude, prefix_by_reference,
+use crate::{
+    CodeArea,
+    consts::{
+        CODE_ALPHABET, ENCODING_BASE, GRID_CODE_LENGTH, GRID_COLUMNS, GRID_ROWS,
+        LAT_INTEGER_MULTIPLIER, LATITUDE_MAX, LNG_INTEGER_MULTIPLIER, LONGITUDE_MAX,
+        MAX_CODE_LENGTH, MIN_CODE_LENGTH, MIN_TRIMMABLE_CODE_LEN, PADDING_CHAR, PADDING_CHAR_STR,
+        PAIR_CODE_LENGTH, PAIR_RESOLUTIONS, SEPARATOR, SEPARATOR_POSITION,
+    },
+    private::{
+        clip_latitude, code_value, compute_latitude_precision, normalize_longitude,
+        prefix_by_reference,
+    },
 };
 
 /// Determines if a code is a valid Open Location Code.
@@ -103,10 +105,12 @@ pub fn is_full(code: &str) -> bool {
 /// codes represent smaller areas, but lengths > 14 are sub-centimetre and so
 /// 11 or 12 are probably the limit of useful codes.
 pub fn encode(pt: Point<f64>, code_length: usize) -> String {
-    let mut lat = clip_latitude(pt.lat());
-    let lng = normalize_longitude(pt.lng());
+    let (lng, lat) = pt.x_y();
 
-    let trimmed_code_length = cmp::min(cmp::max(code_length, MIN_CODE_LENGTH), MAX_CODE_LENGTH);
+    let mut lat = clip_latitude(lat);
+    let lng = normalize_longitude(lng);
+
+    let trimmed_code_length = min(max(code_length, MIN_CODE_LENGTH), MAX_CODE_LENGTH);
 
     // Latitude 90 needs to be adjusted to be just less, so the returned code
     // can also be decoded.
@@ -243,18 +247,21 @@ pub fn shorten(code: &str, ref_pt: Point<f64>) -> Result<String, String> {
         return Err("Cannot shorten padded codes".to_owned());
     }
 
-    let codearea: CodeArea = decode(code).unwrap();
-    if codearea.code_length < MIN_TRIMMABLE_CODE_LEN {
+    let code_area: CodeArea = decode(code).unwrap();
+    if code_area.code_length < MIN_TRIMMABLE_CODE_LEN {
         return Err(format!(
             "Code length must be at least {}",
             MIN_TRIMMABLE_CODE_LEN
         ));
     }
 
+    let (code_area_center_lng, code_area_center_lat) = code_area.center.x_y();
+    let (ref_pt_lng, ref_pt_lat) = ref_pt.x_y();
+
     // How close are the latitude and longitude to the code center.
-    let range = (codearea.center.lat() - clip_latitude(ref_pt.lat()))
+    let range = (code_area_center_lat - clip_latitude(ref_pt_lat))
         .abs()
-        .max((codearea.center.lng() - normalize_longitude(ref_pt.lng())).abs());
+        .max((code_area_center_lng - normalize_longitude(ref_pt_lng)).abs());
 
     for i in 0..PAIR_RESOLUTIONS.len() - 2 {
         // Check if we're close enough to shorten. The range must be less than 1/2
@@ -313,11 +320,14 @@ pub fn recover_nearest(code: &str, ref_pt: Point<f64>) -> Result<String, String>
     let resolution = compute_latitude_precision(prefix_len);
     let half_res = resolution / 2f64;
 
-    let mut latitude = code_area.center.lat();
-    let mut longitude = code_area.center.lng();
+    let (lng, lat) = code_area.center.x_y();
+    let mut latitude = lat;
+    let mut longitude = lng;
 
-    let ref_lat = clip_latitude(ref_pt.lat());
-    let ref_lng = normalize_longitude(ref_pt.lng());
+    let (lng, lat) = ref_pt.x_y();
+    let ref_lat = clip_latitude(lat);
+    let ref_lng = normalize_longitude(lng);
+
     if ref_lat + half_res < latitude && latitude - resolution >= -LATITUDE_MAX {
         latitude -= resolution;
     } else if ref_lat - half_res > latitude && latitude + resolution <= LATITUDE_MAX {
