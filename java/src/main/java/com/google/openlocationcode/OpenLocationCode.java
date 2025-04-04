@@ -194,14 +194,6 @@ public final class OpenLocationCode {
     if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < MIN_DIGIT_COUNT) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
-    // Ensure that latitude and longitude are valid.
-    latitude = clipLatitude(latitude);
-    longitude = normalizeLongitude(longitude);
-
-    // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
-    if (latitude == LATITUDE_MAX) {
-      latitude = latitude - 0.9 * computeLatitudePrecision(codeLength);
-    }
 
     // Store the code - we build it in reverse and reorder it afterwards.
     StringBuilder revCodeBuilder = new StringBuilder();
@@ -211,12 +203,24 @@ public final class OpenLocationCode {
     // the final precision. This allows us to use only integer operations, so
     // avoiding any accumulation of floating point representation errors.
 
-    // Multiply values by their precision and convert to positive. Rounding
-    // avoids/minimises errors due to floating point precision.
-    long latVal =
-        (long) (Math.round((latitude + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER * 1e6) / 1e6);
-    long lngVal =
-        (long) (Math.round((longitude + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER * 1e6) / 1e6);
+    long latVal = (long) Math.round(latitude * LAT_INTEGER_MULTIPLIER);
+    long lngVal = (long) Math.round(longitude * LNG_INTEGER_MULTIPLIER);
+
+    // Clip and normalise values.
+    latVal += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
+    if (latVal < 0) {
+      latVal = 0;
+    } else if (latVal >= 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER) {
+      latVal = 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER - 1;
+    }
+    lngVal += LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
+    if (lngVal < 0) {
+      lngVal =
+          lngVal % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER)
+              + 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
+    } else if (lngVal >= 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER) {
+      lngVal = lngVal % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER);
+    }
 
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH) {
