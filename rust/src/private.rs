@@ -1,10 +1,11 @@
-use consts::{
-    CODE_ALPHABET, ENCODING_BASE, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH,
-};
-
-use interface::encode;
-
 use geo::Point;
+
+use crate::{
+    consts::{
+        CODE_ALPHABET, ENCODING_BASE, GRID_ROWS, LATITUDE_MAX, LONGITUDE_MAX, PAIR_CODE_LENGTH,
+    },
+    encode,
+};
 
 pub fn code_value(chr: char) -> usize {
     // We assume this function is only called by other functions that have
@@ -38,10 +39,13 @@ pub fn compute_latitude_precision(code_length: usize) -> f64 {
 
 pub fn prefix_by_reference(pt: Point<f64>, code_length: usize) -> String {
     let precision = compute_latitude_precision(code_length);
+
+    let (lng, lat) = pt.x_y();
+
     let mut code = encode(
         Point::new(
-            (pt.lng() / precision).floor() * precision,
-            (pt.lat() / precision).floor() * precision,
+            (lng / precision).floor() * precision,
+            (lat / precision).floor() * precision,
         ),
         PAIR_CODE_LENGTH,
     );
