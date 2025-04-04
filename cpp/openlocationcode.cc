@@ -137,13 +137,13 @@ std::string Encode(const LatLng &location, size_t code_length) {
   if (lat_val < 0) {
     lat_val = 0;
   } else if (lat_val >= 2 * internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse) {
-    lat_val = internal::kGridLatPrecisionInverse - 1;
+    lat_val = 2 * internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse - 1;
   }
   lng_val += internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
   if (lng_val <= 0) {
-    lng_val = (lng_val % (2 * internal::kLongitudeMaxDegrees * internal::kGridLatPrecisionInverse)) + 2 * internal::kLongitudeMaxDegrees * internal::kGridLatPrecisionInverse;
-  } else if (lng_val > 2 * internal::kLongitudeMaxDegrees * internal::kGridLatPrecisionInverse) {
-    lng_val = lng_val % 2 * internal::kLongitudeMaxDegrees * internal::kGridLatPrecisionInverse;
+    lng_val = (lng_val % (2 * internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse)) + 2 * internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
+  } else if (lng_val > 2 * internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse) {
+    lng_val = lng_val % 2 * internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
   }
   // Reserve 15 characters for the code digits. The separator will be inserted
   // at the end.
