@@ -203,8 +203,6 @@ public final class OpenLocationCode {
     // the final precision. This allows us to use only integer operations, so
     // avoiding any accumulation of floating point representation errors.
 
-    // Multiply values by their precision and convert to positive. Rounding
-    // avoids/minimises errors due to floating point precision.
     long latVal = (long) Math.round(latitude * LAT_INTEGER_MULTIPLIER);
     long lngVal = (long) Math.round(longitude * LNG_INTEGER_MULTIPLIER);
 
