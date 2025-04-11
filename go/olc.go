@@ -231,10 +231,6 @@ func clipLatitude(lat float64) float64 {
 	return lat
 }
 
-func normalizeLat(value float64) float64 {
-	return normalize(value, latMax)
-}
-
 func normalizeLng(value float64) float64 {
 	return normalize(value, lngMax)
 }
