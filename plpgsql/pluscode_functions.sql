@@ -351,15 +351,24 @@ BEGIN
 
     codeLength := LEAST(codeLength, MAX_DIGIT_COUNT_);
 
-    latitude := pluscode_clipLatitude(latitude);
-    longitude := pluscode_normalizeLongitude(longitude);
-
-    IF (latitude = 90) THEN
-        latitude := latitude - pluscode_computeLatitudePrecision(codeLength);
-    END IF;
-
     latVal := floor(round((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_, 6));
     lngVal := floor(round((longitude + LONGITUDE_MAX_) * FINAL_LNG_PRECISION_, 6));
+
+    latVal := round(latitude * FINAL_LAT_PRECISION_);
+    latVal := latVal + LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
+    IF (latVal < 0) THEN
+        latVal := 0;
+    ELSIF (latVal > 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) THEN
+        latVal := 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
+    END IF;
+
+    lngVal := round(longitude * FINAL_LNG_PRECISION_);
+    lngVal := lngVal + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+    IF (lngVal < 0) THEN
+        lngVal := lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+    ELSIF (lngVal > 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) THEN
+        lngVal :=  lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
+    END IF;
 
     IF (codeLength > PAIR_CODE_LENGTH_) THEN
         i_ := 0;
