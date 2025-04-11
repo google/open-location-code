@@ -108,7 +108,7 @@ bool _matchesPattern(String string, Pattern pattern) =>
     string.contains(pattern);
 
 bool isValid(String code) {
-  if (code == null || code.length == 1) {
+  if (code.length == 1) {
     return false;
   }
 
@@ -254,33 +254,37 @@ bool isFull(String code) {
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
-  if (codeLength < minDigitCount || (codeLength < pairCodeLength && codeLength.isOdd)) {
+  if (codeLength < minDigitCount ||
+      (codeLength < pairCodeLength && codeLength.isOdd)) {
     throw ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   codeLength = min(maxDigitCount, codeLength);
-  // Ensure that latitude and longitude are valid.
-  latitude = clipLatitude(latitude);
-  longitude = normalizeLongitude(longitude);
-  // Latitude 90 needs to be adjusted to be just less, so the returned code
-  // can also be decoded.
-  if (latitude == 90) {
-    latitude -= computeLatitudePrecision(codeLength).toDouble();
+
+  // This approach converts each value to an integer after multiplying it by the final precision.
+  // This allows us to use only integer operations, so avoiding any accumulation of floating
+  // point representation errors.
+
+  // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+  // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+  var latVal = (latitude * finalLatPrecision).round();
+  latVal += latitudeMax * finalLatPrecision;
+  if (latVal < 0) {
+    latVal = 0;
+  } else if (latVal >= 2 * latitudeMax * finalLatPrecision) {
+    latVal = 2 * latitudeMax * finalLatPrecision - 1;
   }
+  // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+  var lngVal = (longitude * finalLngPrecision).round();
+  lngVal += longitudeMax * finalLngPrecision;
+  if (lngVal < 0) {
+    lngVal =
+        (lngVal % (2 * longitudeMax * finalLngPrecision)) +
+        2 * longitudeMax * finalLngPrecision;
+  } else if (lngVal >= 2 * longitudeMax * finalLngPrecision) {
+    lngVal = lngVal % (2 * longitudeMax * finalLngPrecision);
+  }
+
   var code = '';
-
-  // Compute the code.
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
-  // Multiply values by their precision and convert to positive.
-  // Force to integers so the division operations will have integer results.
-  // Note: Dart requires rounding before truncating to ensure precision!
-  var latVal =
-      ((latitude + latitudeMax) * finalLatPrecision * 1e6).round() ~/ 1e6;
-  var lngVal =
-      ((longitude + longitudeMax) * finalLngPrecision * 1e6).round() ~/ 1e6;
-
   // Compute the grid part of the code if necessary.
   if (codeLength > pairCodeLength) {
     for (var i = 0; i < maxDigitCount - pairCodeLength; i++) {
@@ -305,7 +309,8 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   }
 
   // Add the separator character.
-  code = code.substring(0, separatorPosition) +
+  code =
+      code.substring(0, separatorPosition) +
       separator +
       code.substring(separatorPosition);
 
@@ -326,7 +331,8 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
 CodeArea decode(String code) {
   if (!isFull(code)) {
     throw ArgumentError(
-        'Passed Open Location Code is not a valid full code: $code');
+      'Passed Open Location Code is not a valid full code: $code',
+    );
   }
   // Strip out separator character (we've already established the code is
   // valid so the maximum is one), padding characters and convert to upper
@@ -381,8 +387,13 @@ CodeArea decode(String code) {
   var lat = normalLat / pairPrecision + gridLat / finalLatPrecision;
   var lng = normalLng / pairPrecision + gridLng / finalLngPrecision;
   // Return the code area.
-  return CodeArea(lat, lng, lat + latPrecision, lng + lngPrecision,
-      min(code.length, maxDigitCount));
+  return CodeArea(
+    lat,
+    lng,
+    lat + latPrecision,
+    lng + lngPrecision,
+    min(code.length, maxDigitCount),
+  );
 }
 
 /// Recover the nearest matching code to a specified location.
@@ -420,7 +431,10 @@ CodeArea decode(String code) {
 /// passed code was not a valid short code, but was a valid full code, it is
 /// returned unchanged.
 String recoverNearest(
-    String shortCode, num referenceLatitude, num referenceLongitude) {
+  String shortCode,
+  num referenceLatitude,
+  num referenceLongitude,
+) {
   if (!isShort(shortCode)) {
     if (isFull(shortCode)) {
       return shortCode.toUpperCase();
@@ -442,9 +456,10 @@ String recoverNearest(
   var halfResolution = resolution / 2.0;
 
   // Use the reference location to pad the supplied short code and decode it.
-  var codeArea = decode(encode(referenceLatitude, referenceLongitude)
-          .substring(0, paddingLength) +
-      shortCode);
+  var codeArea = decode(
+    encode(referenceLatitude, referenceLongitude).substring(0, paddingLength) +
+        shortCode,
+  );
   var centerLatitude = codeArea.center.latitude;
   var centerLongitude = codeArea.center.longitude;
 
@@ -470,8 +485,11 @@ String recoverNearest(
     centerLongitude += resolution;
   }
 
-  return encode(centerLatitude, centerLongitude,
-      codeLength: codeArea.codeLength);
+  return encode(
+    centerLatitude,
+    centerLongitude,
+    codeLength: codeArea.codeLength,
+  );
 }
 
 /// Remove characters from the start of an OLC [code].
@@ -506,8 +524,10 @@ String shorten(String code, num latitude, num longitude) {
   latitude = clipLatitude(latitude);
   longitude = normalizeLongitude(longitude);
   // How close are the latitude and longitude to the code center.
-  var range = max((codeArea.center.latitude - latitude).abs(),
-      (codeArea.center.longitude - longitude).abs());
+  var range = max(
+    (codeArea.center.latitude - latitude).abs(),
+    (codeArea.center.longitude - longitude).abs(),
+  );
   for (var i = pairResolutions.length - 2; i >= 1; i--) {
     // Check if we're close enough to shorten. The range must be less than 1/2
     // the resolution to shorten at all, and we want to allow some safety, so
@@ -541,11 +561,11 @@ class CodeArea {
   /// *[code_length]: The number of significant characters that were in the code.
   /// This excludes the separator.
   CodeArea(num south, num west, num north, num east, this.codeLength)
-      : south = south,
-        west = west,
-        north = north,
-        east = east,
-        center = LatLng((south + north) / 2, (west + east) / 2);
+    : south = south,
+      west = west,
+      north = north,
+      east = east,
+      center = LatLng((south + north) / 2, (west + east) / 2);
 
   @override
   String toString() =>
