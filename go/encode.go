@@ -44,23 +44,35 @@ const (
 // codes represent smaller areas, but lengths > 14 are sub-centimetre and so
 // 11 or 12 are probably the limit of useful codes.
 func Encode(lat, lng float64, codeLen int) string {
-	codeLen = clipCodeLen(codeLen)
-	// Clip the latitude. Normalise the longitude.
-	lat, lng = clipLatitude(lat), normalizeLng(lng)
-	// Latitude 90 needs to be adjusted to be just less, so the returned code
-	// can also be decoded.
-	if lat == latMax {
-		lat = normalizeLat(lat - computeLatPrec(codeLen))
+	// This approach converts each value to an integer after multiplying it by the final precision.
+	// This allows us to use only integer operations, so avoiding any accumulation of floating point representation errors.
+
+	// Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+	// Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+	latVal := int64(math.Round(lat * finalLatPrecision))
+	latVal += latMax * finalLatPrecision
+	if latVal < 0 {
+		latVal = 0
+	} else if latVal >= 2*latMax*finalLatPrecision {
+		latVal = 2*latMax*finalLatPrecision - 1
 	}
+	// Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+	lngVal := int64(math.Round(lng * finalLngPrecision))
+	lngVal += lngMax * finalLngPrecision
+	if lngVal <= 0 {
+		lngVal = lngVal%(2*lngMax*finalLngPrecision) + 2*lngMax*finalLngPrecision
+	} else if lngVal >= 2*lngMax*finalLngPrecision {
+		lngVal = lngVal % (2 * lngMax * finalLngPrecision)
+	}
+
+	// Clip the code length to legal values.
+	codeLen = clipCodeLen(codeLen)
 	// Use a char array so we can build it up from the end digits, without having
 	// to keep reallocating strings.
 	var code [maxCodeLen + 1]byte
 
-	// Compute the code.
-	// This approach converts each value to an integer after multiplying it by
-	// the final precision. This allows us to use only integer operations, so
-	// avoiding any accumulation of floating point representation errors.
-	latVal, lngVal := roundLatLngToInts(lat, lng)
+	// // Compute the code.
+	// latVal, lngVal := roundLatLngToInts(lat, lng)
 
 	// Compute the grid part of the code if necessary.
 	if codeLen > pairCodeLen {
