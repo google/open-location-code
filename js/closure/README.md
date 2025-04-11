@@ -18,7 +18,7 @@ Code should be formatted according to the
 
 You can run checks on the code using `eslint`:
 
-```
+```shell
 cd js
 npm install eslint
 eslint closure/*js
@@ -37,7 +37,7 @@ The test cases have been copied from the [`test_data`](https://github.com/google
 
 Run the tests from the top-level github directory with:
 
-```
+```shell
 $ bazel test js/closure:openlocationcode_test
 INFO: Found 1 test target...
 Target //js/closure:openlocationcode_test up-to-date:

@@ -363,28 +363,32 @@ function encode(latitude, longitude, optLength) {
         'IllegalArgumentException: Invalid Plus Code length');
   }
   optLength = Math.min(optLength, MAX_CODE_LEN);
-  // Ensure that latitude and longitude are valid.
-  latitude = clipLatitude(latitude);
-  longitude = normalizeLongitude(longitude);
-  // Latitude 90 needs to be adjusted to be just less, so the returned code
-  // can also be decoded.
-  if (latitude == 90) {
-    latitude = latitude - computeLatitudePrecision(optLength);
+
+  // This approach converts each value to an integer after multiplying it by the final precision.
+  // This allows us to use only integer operations, so avoiding any accumulation of floating
+  // point representation errors.
+
+  // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+  // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+  var latVal = Math.round(latitude * FINAL_LAT_PRECISION);
+  latVal += LATITUDE_MAX * FINAL_LAT_PRECISION;
+  if (latVal < 0) {
+    latVal = 0;
+  } else if (latVal >= 2 * LATITUDE_MAX * FINAL_LAT_PRECISION) {
+    latVal = 2 * LATITUDE_MAX * FINAL_LAT_PRECISION - 1;
   }
+  // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+  var lngVal = Math.round(longitude * FINAL_LNG_PRECISION);
+  lngVal += LONGITUDE_MAX * FINAL_LNG_PRECISION;
+  if (lngVal < 0) {
+    lngVal =
+      (lngVal % (2 * LONGITUDE_MAX * FINAL_LNG_PRECISION)) +
+      2 * LONGITUDE_MAX * FINAL_LNG_PRECISION;
+  } else if (lngVal >= 2 * LONGITUDE_MAX * FINAL_LNG_PRECISION) {
+    lngVal = lngVal % (2 * LONGITUDE_MAX * FINAL_LNG_PRECISION);
+  }
+
   var code = '';
-
-  // Compute the code.
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
-  // Multiply values by their precision and convert to positive.
-  // Force to integers so the division operations will have integer results.
-  // Note: JavaScript requires rounding before truncating to ensure precision!
-  var latVal =
-      Math.floor(Math.round((latitude + LATITUDE_MAX) * FINAL_LAT_PRECISION * 1e6) / 1e6);
-  var lngVal =
-      Math.floor(Math.round((longitude + LONGITUDE_MAX) * FINAL_LNG_PRECISION * 1e6) / 1e6);
 
   // Compute the grid part of the code if necessary.
   if (optLength > PAIR_CODE_LENGTH) {
@@ -637,22 +641,6 @@ exports.shorten = shorten;
  */
 function clipLatitude(latitude) {
   return Math.min(90, Math.max(-90, latitude));
-}
-
-/**
-  Compute the latitude precision value for a given code length. Lengths <=
-  10 have the same precision for latitude and longitude, but lengths > 10
-  have different precisions due to the grid method having fewer columns than
-  rows.
-  @param {number} codeLength A number representing the length (digits) in a
-  code.
-  @return {number} The height of the code area in degrees latitude.
- */
-function computeLatitudePrecision(codeLength) {
-  if (codeLength <= 10) {
-    return Math.pow(20, Math.floor(codeLength / -2 + 2));
-  }
-  return Math.pow(20, -3) / Math.pow(GRID_ROWS, codeLength - 10);
 }
 
 /**
