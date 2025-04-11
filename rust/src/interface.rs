@@ -107,22 +107,31 @@ pub fn is_full(code: &str) -> bool {
 pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     let (lng, lat) = pt.x_y();
 
-    let mut lat = clip_latitude(lat);
-    let lng = normalize_longitude(lng);
-
     let trimmed_code_length = min(max(code_length, MIN_CODE_LENGTH), MAX_CODE_LENGTH);
 
-    // Latitude 90 needs to be adjusted to be just less, so the returned code
-    // can also be decoded.
-    if lat > LATITUDE_MAX || (LATITUDE_MAX - lat) < 1e-10f64 {
-        lat -= compute_latitude_precision(trimmed_code_length);
+    // This approach converts each value to an integer after multiplying it by the final precision.
+    // This allows us to use only integer operations, so avoiding any accumulation of floating
+    // point representation errors.
+
+    // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+    // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+    let mut lat_val = (lat * LAT_INTEGER_MULTIPLIER as f64).round() as i64;
+    lat_val += LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER;
+    if lat_val < 0 {
+        lat_val = 0
+    } else if lat_val >= 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER {
+        lat_val = 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER - 1;
     }
 
-    // Convert to integers.
-    let mut lat_val =
-        (((lat + LATITUDE_MAX) * LAT_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
-    let mut lng_val =
-        (((lng + LONGITUDE_MAX) * LNG_INTEGER_MULTIPLIER as f64 * 1e6).round() / 1e6f64) as i64;
+    // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+    let mut lng_val = (lng * LNG_INTEGER_MULTIPLIER as f64).round() as i64;
+    lng_val += LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER;
+    if lng_val < 0 {
+        lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
+            + (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
+    } else if lng_val >= 2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER {
+        lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
+    }
 
     // Compute the code digits. This largely ignores the requested length - it
     // generates either a 10 digit code, or a 15 digit code, and then truncates
