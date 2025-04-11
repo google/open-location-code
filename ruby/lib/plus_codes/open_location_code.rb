@@ -48,23 +48,31 @@ module PlusCodes
       end
 
       code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
-      latitude = clip_latitude(latitude)
-      longitude = normalize_longitude(longitude)
-      latitude -= precision_by_length(code_length) if latitude == 90
-
-      code = ''
 
       # Compute the code.
       # This approach converts each value to an integer after multiplying it by
       # the final precision. This allows us to use only integer operations, so
       # avoiding any accumulation of floating point representation errors.
-      lat_val = 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
-      lat_val += latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
-      lng_val = 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
-      lng_val += longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
-      lat_val = lat_val.to_i
-      lng_val = lng_val.to_i
+      lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).round
+      lat_val += 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
+      if lat_val.negative?
+        lat_val = 0
+      elsif lat_val >= 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
+        lat_val = 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION - 1
+      end
+      lng_val = (longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION).round
+      lng_val += 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
+      if lng_val.negative?
+        # Ruby's % operator differs from other languages in that it returns
+        # the same sign as the divisor. This means we don't need to add the
+        # range to the result.
+        lng_val %= (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
+      elsif lng_val >= 360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
+        lng_val %= (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
+      end
 
+      # Initialise the code string.
+      code = ''
       # Compute the grid part of the code if necessary.
       if code_length > PAIR_CODE_LENGTH
         (0..MAX_CODE_LENGTH - PAIR_CODE_LENGTH - 1).each do
