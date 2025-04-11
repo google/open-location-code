@@ -46,6 +46,7 @@ module PlusCodes
       if invalid_length?(code_length)
         raise ArgumentError, 'Invalid Open Location Code(Plus+Codes) length'
       end
+
       code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
 
       # Compute the code.
@@ -54,20 +55,20 @@ module PlusCodes
       # avoiding any accumulation of floating point representation errors.
       lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).round
       lat_val += 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
-      if lat_val < 0
+      if lat_val.negative?
         lat_val = 0
       elsif lat_val >= 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
         lat_val = 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION - 1
       end
       lng_val = (longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION).round
       lng_val += 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
-      if lng_val < 0
+      if lng_val.negative?
         # Ruby's % operator differs from other languages in that it returns
         # the same sign as the divisor. This means we don't need to add the
         # range to the result.
-        lng_val = lng_val % (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
+        lng_val %= (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
       elsif lng_val >= 360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
-        lng_val = lng_val % (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
+        lng_val %= (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
       end
 
       # Initialise the code string.
