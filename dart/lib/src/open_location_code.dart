@@ -260,26 +260,29 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   }
   codeLength = min(maxDigitCount, codeLength);
 
-  // This approach converts each value to an integer after multiplying it by the final precision.
-  // This allows us to use only integer operations, so avoiding any accumulation of floating
-  // point representation errors.
+  // This approach converts each value to an integer after multiplying it by
+  // the final precision. This allows us to use only integer operations, so
+  // avoiding any accumulation of floating point representation errors.
 
-  // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
-  // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
-  var latVal = (latitude * finalLatPrecision).round();
+  // Convert latitude into a positive integer clipped into the range 0-(just
+  // under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
+  // returned code can also be decoded.
+  var latVal = (latitude * finalLatPrecision).round().toInt();
   latVal += latitudeMax * finalLatPrecision;
   if (latVal < 0) {
     latVal = 0;
   } else if (latVal >= 2 * latitudeMax * finalLatPrecision) {
     latVal = 2 * latitudeMax * finalLatPrecision - 1;
   }
-  // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-  var lngVal = (longitude * finalLngPrecision).round();
+  // Convert longitude into a positive integer and normalise it into the range
+  // 0-360*8.192e6.
+  var lngVal = (longitude * finalLngPrecision).round().toInt();
   lngVal += longitudeMax * finalLngPrecision;
   if (lngVal < 0) {
-    lngVal =
-        (lngVal % (2 * longitudeMax * finalLngPrecision)) +
-        2 * longitudeMax * finalLngPrecision;
+    // Dart's % operator differs from other languages in that it returns the
+    // same sign as the divisor. This means we don't need to add the range to
+    // the result.
+    lngVal = (lngVal % (2 * longitudeMax * finalLngPrecision));
   } else if (lngVal >= 2 * longitudeMax * finalLngPrecision) {
     lngVal = lngVal % (2 * longitudeMax * finalLngPrecision);
   }
@@ -309,8 +312,7 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   }
 
   // Add the separator character.
-  code =
-      code.substring(0, separatorPosition) +
+  code = code.substring(0, separatorPosition) +
       separator +
       code.substring(separatorPosition);
 
@@ -561,11 +563,11 @@ class CodeArea {
   /// *[code_length]: The number of significant characters that were in the code.
   /// This excludes the separator.
   CodeArea(num south, num west, num north, num east, this.codeLength)
-    : south = south,
-      west = west,
-      north = north,
-      east = east,
-      center = LatLng((south + north) / 2, (west + east) / 2);
+      : south = south,
+        west = west,
+        north = north,
+        east = east,
+        center = LatLng((south + north) / 2, (west + east) / 2);
 
   @override
   String toString() =>
