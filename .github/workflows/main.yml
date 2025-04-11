@@ -38,7 +38,7 @@ jobs:
       - name: test
         run: |
           cd ${OLC_PATH}
-          pub get && pub run test
+          dart pub get && dart test
           bash checks.sh
 
   # Go implementation. Lives in go/. Tests fail if files have not been formatted with gofmt.
