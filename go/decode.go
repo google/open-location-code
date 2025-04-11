@@ -90,7 +90,7 @@ func Decode(code string) (CodeArea, error) {
 	// Everything is ints so they all need to be cast to floats.
 	lat := float64(normalLat)/pairPrecision + float64(extraLat)/finalLatPrecision
 	lng := float64(normalLng)/pairPrecision + float64(extraLng)/finalLngPrecision
-	// Round everthing off to 14 places.
+	// Round everything off to 14 places.
 	return CodeArea{
 		LatLo: math.Round(lat*1e14) / 1e14,
 		LngLo: math.Round(lng*1e14) / 1e14,

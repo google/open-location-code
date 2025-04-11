@@ -47,9 +47,9 @@ type (
 	}
 
 	decodingTest struct {
-		code                                 string
-		length                               int
-		lat, lng, latLo, lngLo, latHi, lngHi float64
+		code                       string
+		length                     int
+		latLo, lngLo, latHi, lngHi float64
 	}
 
 	shortenTest struct {
@@ -78,9 +78,7 @@ func init() {
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range append(
-			mustReadLines("encoding.csv"),
-		) {
+		for _, cols := range mustReadLines("encoding.csv") {
 			encoding = append(encoding, encodingTest{
 				lat:    mustFloat(cols[0]),
 				lng:    mustFloat(cols[1]),
@@ -92,9 +90,7 @@ func init() {
 
 	go func() {
 		defer wg.Done()
-		for _, cols := range append(
-			mustReadLines("decoding.csv"),
-		) {
+		for _, cols := range mustReadLines("decoding.csv") {
 			decoding = append(decoding, decodingTest{
 				code:   cols[0],
 				length: mustInt(cols[1]),
