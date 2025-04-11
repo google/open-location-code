@@ -348,14 +348,6 @@
       lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
     }
 
-    // // Multiply values by their precision and convert to positive.
-    // // Force to integers so the division operations will have integer results.
-    // // Note: JavaScript requires rounding before truncating to ensure precision!
-    // var latVal =
-    //     Math.floor(Math.round((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_ * 1e6) / 1e6);
-    // var lngVal =
-    //     Math.floor(Math.round((longitude + LONGITUDE_MAX_) * FINAL_LNG_PRECISION_ * 1e6) / 1e6);
-
     var code = '';
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH_) {
