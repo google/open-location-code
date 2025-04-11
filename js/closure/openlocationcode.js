@@ -363,28 +363,32 @@ function encode(latitude, longitude, optLength) {
         'IllegalArgumentException: Invalid Plus Code length');
   }
   optLength = Math.min(optLength, MAX_CODE_LEN);
-  // Ensure that latitude and longitude are valid.
-  latitude = clipLatitude(latitude);
-  longitude = normalizeLongitude(longitude);
-  // Latitude 90 needs to be adjusted to be just less, so the returned code
-  // can also be decoded.
-  if (latitude == 90) {
-    latitude = latitude - computeLatitudePrecision(optLength);
+
+  // This approach converts each value to an integer after multiplying it by the final precision.
+  // This allows us to use only integer operations, so avoiding any accumulation of floating
+  // point representation errors.
+
+  // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+  // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+  var latVal = Math.round(latitude * FINAL_LAT_PRECISION_);
+  latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
+  if (latVal < 0) {
+    latVal = 0;
+  } else if (latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) {
+    latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
   }
+  // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+  var lngVal = Math.round(longitude * FINAL_LNG_PRECISION_);
+  lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+  if (lngVal < 0) {
+    lngVal =
+      (lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)) +
+      2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+  } else if (lngVal >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) {
+    lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
+  }
+
   var code = '';
-
-  // Compute the code.
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
-  // Multiply values by their precision and convert to positive.
-  // Force to integers so the division operations will have integer results.
-  // Note: JavaScript requires rounding before truncating to ensure precision!
-  var latVal =
-      Math.floor(Math.round((latitude + LATITUDE_MAX) * FINAL_LAT_PRECISION * 1e6) / 1e6);
-  var lngVal =
-      Math.floor(Math.round((longitude + LONGITUDE_MAX) * FINAL_LNG_PRECISION * 1e6) / 1e6);
 
   // Compute the grid part of the code if necessary.
   if (optLength > PAIR_CODE_LENGTH) {
