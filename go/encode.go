@@ -27,10 +27,6 @@ var (
 	ErrNotShort = errors.New("not short code")
 )
 
-const (
-	minTrimmableCodeLen = 6
-)
-
 // Encode a location into an Open Location Code.
 //
 // Produces a code of the specified codeLen, or the default length if
@@ -44,23 +40,35 @@ const (
 // codes represent smaller areas, but lengths > 14 are sub-centimetre and so
 // 11 or 12 are probably the limit of useful codes.
 func Encode(lat, lng float64, codeLen int) string {
-	codeLen = clipCodeLen(codeLen)
-	// Clip the latitude. Normalise the longitude.
-	lat, lng = clipLatitude(lat), normalizeLng(lng)
-	// Latitude 90 needs to be adjusted to be just less, so the returned code
-	// can also be decoded.
-	if lat == latMax {
-		lat = normalizeLat(lat - computeLatPrec(codeLen))
+	// This approach converts each value to an integer after multiplying it by the final precision.
+	// This allows us to use only integer operations, so avoiding any accumulation of floating point representation errors.
+
+	// Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+	// Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+	latVal := int64(math.Round(lat * finalLatPrecision))
+	latVal += latMax * finalLatPrecision
+	if latVal < 0 {
+		latVal = 0
+	} else if latVal >= 2*latMax*finalLatPrecision {
+		latVal = 2*latMax*finalLatPrecision - 1
 	}
+	// Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+	lngVal := int64(math.Round(lng * finalLngPrecision))
+	lngVal += lngMax * finalLngPrecision
+	if lngVal <= 0 {
+		lngVal = lngVal%(2*lngMax*finalLngPrecision) + 2*lngMax*finalLngPrecision
+	} else if lngVal >= 2*lngMax*finalLngPrecision {
+		lngVal = lngVal % (2 * lngMax * finalLngPrecision)
+	}
+
+	// Clip the code length to legal values.
+	codeLen = clipCodeLen(codeLen)
 	// Use a char array so we can build it up from the end digits, without having
 	// to keep reallocating strings.
 	var code [maxCodeLen + 1]byte
 
-	// Compute the code.
-	// This approach converts each value to an integer after multiplying it by
-	// the final precision. This allows us to use only integer operations, so
-	// avoiding any accumulation of floating point representation errors.
-	latVal, lngVal := roundLatLngToInts(lat, lng)
+	// // Compute the code.
+	// latVal, lngVal := roundLatLngToInts(lat, lng)
 
 	// Compute the grid part of the code if necessary.
 	if codeLen > pairCodeLen {
@@ -94,8 +102,8 @@ func Encode(lat, lng float64, codeLen int) string {
 	code[3], lngVal = pairIndexStep(lngVal)
 	code[2], latVal = pairIndexStep(latVal)
 
-	code[1], lngVal = pairIndexStep(lngVal)
-	code[0], latVal = pairIndexStep(latVal)
+	code[1], _ = pairIndexStep(lngVal)
+	code[0], _ = pairIndexStep(latVal)
 
 	// If we don't need to pad the code, return the requested section.
 	if codeLen >= sepPos {
@@ -103,23 +111,6 @@ func Encode(lat, lng float64, codeLen int) string {
 	}
 	// Pad and return the code.
 	return string(code[:codeLen]) + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
-}
-
-// roundLatLngToInts rounds the passed latitude and longitude to integral values
-// representing a location within 1 centimetre of the passed coordinates.
-func roundLatLngToInts(lat, lng float64) (int64, int64) {
-	// To round, we:
-	// 1) Offset latitude and longitude so that all values are positive.
-	// 2) Multiply by the final precision before conversion to integer to preserve precision.
-	// 3) Multiply by desired rounding precision and add 1.
-	// 4) Bit shift to undo the multiply used for rounding.
-
-	// Precision of rounding is equal to 2^roundPrecision.
-	// A value of 20 corresponds to sub-centimetre precision.
-	const roundPrecision = 20
-	latVal := int64((lat+latMax)*finalLatPrecision*(1<<roundPrecision)+1) >> roundPrecision
-	lngVal := int64((lng+lngMax)*finalLngPrecision*(1<<roundPrecision)+1) >> roundPrecision
-	return latVal, lngVal
 }
 
 // clipCodeLen returns the smallest valid code length greater than or equal to
@@ -154,15 +145,4 @@ func pairIndexStep(coordinate int64) (byte, int64) {
 	coordinate /= int64(encBase)
 	latNdx := coordinate % int64(encBase)
 	return Alphabet[latNdx], coordinate
-}
-
-// computeLatPrec computes the precision value for a given code length.
-// Lengths <= 10 have the same precision for latitude and longitude,
-// but lengths > 10 have different precisions due to the grid method
-// having fewer columns than rows.
-func computeLatPrec(codeLen int) float64 {
-	if codeLen <= pairCodeLen {
-		return math.Pow(float64(encBase), math.Floor(float64(codeLen/-2+2)))
-	}
-	return math.Pow(float64(encBase), -3) / math.Pow(float64(gridRows), float64(codeLen-pairCodeLen))
 }
