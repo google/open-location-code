@@ -9,8 +9,8 @@ minified version, and both are also available using the following CDNs:
   * <https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.js>
   * <https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.min.js>
 * [cdnjs](https://cdnjs.com/)
-  * <https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.js>
-  * <https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.min.js>
+  * <https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.5/openlocationcode.js>
+  * <https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.5/openlocationcode.min.js>
 
 ## Releasing
 
