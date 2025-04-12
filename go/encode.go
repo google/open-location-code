@@ -67,9 +67,6 @@ func Encode(lat, lng float64, codeLen int) string {
 	// to keep reallocating strings.
 	var code [maxCodeLen + 1]byte
 
-	// // Compute the code.
-	// latVal, lngVal := roundLatLngToInts(lat, lng)
-
 	// Compute the grid part of the code if necessary.
 	if codeLen > pairCodeLen {
 		code[sepPos+7], latVal, lngVal = latLngGridStep(latVal, lngVal)
