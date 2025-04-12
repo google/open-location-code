@@ -16,7 +16,6 @@ package olc
 
 import (
 	"errors"
-	"math"
 	"strings"
 )
 
@@ -24,78 +23,64 @@ import (
 // Returns a CodeArea object that includes the coordinates of the bounding
 // box - the lower left, center and upper right.
 //
-// To avoid underflow errors, the precision is limited to 15 digits.
 // Longer codes are allowed, but only the first 15 is decoded.
 func Decode(code string) (CodeArea, error) {
 	var area CodeArea
 	if err := CheckFull(code); err != nil {
 		return area, err
 	}
-	// Strip out separator character (we've already established the code is
-	// valid so the maximum is one), padding characters and convert to upper
+	// Strip out separator character, padding characters and convert to upper
 	// case.
 	code = StripCode(code)
-	if len(code) < 2 {
+	codeLen := len(code)
+	if codeLen < 2 {
 		return area, errors.New("code too short")
 	}
-	// Initialise the values for each section. We work them out as integers and
-	// convert them to floats at the end.
-	normalLat := -latMax * pairPrecision
-	normalLng := -lngMax * pairPrecision
-	extraLat := 0
-	extraLng := 0
-	// How many digits do we have to process?
-	digits := pairCodeLen
-	if len(code) < digits {
-		digits = len(code)
-	}
-	// Define the place value for the most significant pair.
-	pv := pairFPV
-	for i := 0; i < digits-1; i += 2 {
-		normalLat += strings.IndexByte(Alphabet, code[i]) * pv
-		normalLng += strings.IndexByte(Alphabet, code[i+1]) * pv
-		if i < digits-2 {
-			pv /= encBase
+	// lat and lng build up the integer values.
+	var lat int64
+	var lng int64
+	// height and width build up integer values for the height and width of the
+	// code area. They get set to 1 for the last digit and then multiplied by
+	// each remaining place.
+	var height int64 = 1
+	var width int64 = 1
+	// Decode the paired digits.
+	for i := 0; i < pairCodeLen; i += 2 {
+		lat *= encBase
+		lng *= encBase
+		height *= encBase
+		if i < codeLen {
+			lat += int64(strings.IndexByte(Alphabet, code[i]))
+			lng += int64(strings.IndexByte(Alphabet, code[i+1]))
+			height = 1
 		}
 	}
-	// Convert the place value to a float in degrees.
-	latPrecision := float64(pv) / pairPrecision
-	lngPrecision := float64(pv) / pairPrecision
-	// Process any extra precision digits.
-	if len(code) > pairCodeLen {
-		// Initialise the place values for the grid.
-		rowpv := gridLatFPV
-		colpv := gridLngFPV
-		// How many digits do we have to process?
-		digits = maxCodeLen
-		if len(code) < maxCodeLen {
-			digits = len(code)
+	// The paired section has the same resolution for height and width.
+	width = height
+	// Decode the grid section.
+	for i := pairCodeLen; i < maxCodeLen; i++ {
+		lat *= gridRows
+		height *= gridRows
+		lng *= gridCols
+		width *= gridCols
+		if i < codeLen {
+			dval := int64(strings.IndexByte(Alphabet, code[i]))
+			lat += dval / gridCols
+			lng += dval % gridCols
+			height = 1
+			width = 1
 		}
-		for i := pairCodeLen; i < digits; i++ {
-			dval := strings.IndexByte(Alphabet, code[i])
-			row := dval / gridCols
-			col := dval % gridCols
-			extraLat += row * rowpv
-			extraLng += col * colpv
-			if i < digits-1 {
-				rowpv /= gridRows
-				colpv /= gridCols
-			}
-		}
-		// Adjust the precisions from the integer values to degrees.
-		latPrecision = float64(rowpv) / finalLatPrecision
-		lngPrecision = float64(colpv) / finalLngPrecision
 	}
-	// Merge the values from the normal and extra precision parts of the code.
-	// Everything is ints so they all need to be cast to floats.
-	lat := float64(normalLat)/pairPrecision + float64(extraLat)/finalLatPrecision
-	lng := float64(normalLng)/pairPrecision + float64(extraLng)/finalLngPrecision
-	// Round everything off to 14 places.
+	// Convert everything into degrees and return the code area.
+	var latDegrees float64 = float64(lat-latMax*finalLatPrecision) / float64(finalLatPrecision)
+	var lngDegrees float64 = float64(lng-lngMax*finalLngPrecision) / float64(finalLngPrecision)
+	var heightDegrees float64 = float64(height) / float64(finalLatPrecision)
+	var widthDegrees float64 = float64(width) / float64(finalLngPrecision)
 	return CodeArea{
-		LatLo: math.Round(lat*1e14) / 1e14,
-		LngLo: math.Round(lng*1e14) / 1e14,
-		LatHi: math.Round((lat+latPrecision)*1e14) / 1e14,
-		LngHi: math.Round((lng+lngPrecision)*1e14) / 1e14,
-		Len:   len(code),
+		LatLo: latDegrees,
+		LngLo: lngDegrees,
+		LatHi: latDegrees + heightDegrees,
+		LngHi: lngDegrees + widthDegrees,
+		Len:   codeLen,
 	}, nil
 }

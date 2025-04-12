@@ -16,7 +16,6 @@ package olc
 
 import (
 	"errors"
-	"math"
 	"strings"
 )
 
@@ -42,24 +41,8 @@ var (
 func Encode(lat, lng float64, codeLen int) string {
 	// This approach converts each value to an integer after multiplying it by the final precision.
 	// This allows us to use only integer operations, so avoiding any accumulation of floating point representation errors.
-
-	// Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
-	// Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
-	latVal := int64(math.Round(lat * finalLatPrecision))
-	latVal += latMax * finalLatPrecision
-	if latVal < 0 {
-		latVal = 0
-	} else if latVal >= 2*latMax*finalLatPrecision {
-		latVal = 2*latMax*finalLatPrecision - 1
-	}
-	// Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-	lngVal := int64(math.Round(lng * finalLngPrecision))
-	lngVal += lngMax * finalLngPrecision
-	if lngVal <= 0 {
-		lngVal = lngVal%(2*lngMax*finalLngPrecision) + 2*lngMax*finalLngPrecision
-	} else if lngVal >= 2*lngMax*finalLngPrecision {
-		lngVal = lngVal % (2 * lngMax * finalLngPrecision)
-	}
+	latVal := latitudeAsInteger(lat)
+	lngVal := longitudeAsInteger(lng)
 
 	// Clip the code length to legal values.
 	codeLen = clipCodeLen(codeLen)
@@ -69,39 +52,27 @@ func Encode(lat, lng float64, codeLen int) string {
 
 	// Compute the grid part of the code if necessary.
 	if codeLen > pairCodeLen {
-		code[sepPos+7], latVal, lngVal = latLngGridStep(latVal, lngVal)
-		code[sepPos+6], latVal, lngVal = latLngGridStep(latVal, lngVal)
-		code[sepPos+5], latVal, lngVal = latLngGridStep(latVal, lngVal)
-		code[sepPos+4], latVal, lngVal = latLngGridStep(latVal, lngVal)
-		code[sepPos+3], latVal, lngVal = latLngGridStep(latVal, lngVal)
+		for i := maxCodeLen - pairCodeLen; i >= 1; i-- {
+			code[sepPos+2+i], latVal, lngVal = latLngGridStep(latVal, lngVal)
+		}
 	} else {
 		latVal /= gridLatFullValue
 		lngVal /= gridLngFullValue
 	}
 
 	// Add the pair after the separator.
-	latNdx := latVal % int64(encBase)
-	lngNdx := lngVal % int64(encBase)
-	code[sepPos+2] = Alphabet[lngNdx]
-	code[sepPos+1] = Alphabet[latNdx]
+	code[sepPos+2], lngVal = pairIndexStep(lngVal)
+	code[sepPos+1], latVal = pairIndexStep(latVal)
 
 	// Avoid the need for string concatenation by filling in the Separator manually.
 	code[sepPos] = Separator
 
 	// Compute the pair section of the code.
 	// Even indices contain latitude and odd contain longitude.
-	code[7], lngVal = pairIndexStep(lngVal)
-	code[6], latVal = pairIndexStep(latVal)
-
-	code[5], lngVal = pairIndexStep(lngVal)
-	code[4], latVal = pairIndexStep(latVal)
-
-	code[3], lngVal = pairIndexStep(lngVal)
-	code[2], latVal = pairIndexStep(latVal)
-
-	code[1], _ = pairIndexStep(lngVal)
-	code[0], _ = pairIndexStep(latVal)
-
+	for pairStart := (pairCodeLen/2 + 1); pairStart >= 0; pairStart = pairStart - 2 {
+		code[pairStart+1], lngVal = pairIndexStep(lngVal)
+		code[pairStart], latVal = pairIndexStep(latVal)
+	}
 	// If we don't need to pad the code, return the requested section.
 	if codeLen >= sepPos {
 		return string(code[:codeLen+1])
@@ -139,7 +110,7 @@ func latLngGridStep(latVal, lngVal int64) (byte, int64, int64) {
 // pairIndexStep computes the next smallest pair code in sequence,
 // followed by the remaining integer not yet converted to a pair code.
 func pairIndexStep(coordinate int64) (byte, int64) {
-	coordinate /= int64(encBase)
 	latNdx := coordinate % int64(encBase)
+	coordinate /= int64(encBase)
 	return Alphabet[latNdx], coordinate
 }
