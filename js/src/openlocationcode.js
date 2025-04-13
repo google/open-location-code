@@ -350,12 +350,12 @@
 
     // Javascript strings are immutable and it doesn't have a native
     // StringBuilder, so we'll use an array.
-    let code = new Array(MAX_DIGIT_COUNT_ + 1);
+    const code = new Array(MAX_DIGIT_COUNT_ + 1);
     code[SEPARATOR_POSITION_] = SEPARATOR_;
 
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH_) {
-      for (var i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i >= 1; i++) {
+      for (var i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i >= 1; i--) {
         var latDigit = latVal % GRID_ROWS_;
         var lngDigit = lngVal % GRID_COLUMNS_;
         var ndx = latDigit * GRID_COLUMNS_ + lngDigit;
