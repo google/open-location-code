@@ -388,43 +388,48 @@ function encode(latitude, longitude, optLength) {
     lngVal = lngVal % (2 * LONGITUDE_MAX * FINAL_LNG_PRECISION);
   }
 
-  var code = '';
+  // Javascript strings are immutable and it doesn't have a native
+  // StringBuilder, so we'll use an array.
+  const code = new Array(MAX_CODE_LEN + 1);
+  code[SEPARATOR_POSITION] = SEPARATOR;
 
   // Compute the grid part of the code if necessary.
-  if (optLength > PAIR_CODE_LENGTH) {
-    for (var i = 0; i < MAX_CODE_LEN - PAIR_CODE_LENGTH; i++) {
+  if (codeLength > PAIR_CODE_LENGTH) {
+    for (var i = MAX_CODE_LEN - PAIR_CODE_LENGTH; i >= 1; i--) {
       var latDigit = latVal % GRID_ROWS;
       var lngDigit = lngVal % GRID_COLUMNS;
       var ndx = latDigit * GRID_COLUMNS + lngDigit;
-      code = CODE_ALPHABET.charAt(ndx) + code;
+      code[SEPARATOR_POSITION + 2 + i] = CODE_ALPHABET.charAt(ndx);
       // Note! Integer division.
       latVal = Math.floor(latVal / GRID_ROWS);
       lngVal = Math.floor(lngVal / GRID_COLUMNS);
     }
   } else {
-    latVal = Math.floor(latVal / GRID_ROWS**GRID_CODE_LENGTH);
-    lngVal = Math.floor(lngVal / GRID_COLUMNS**GRID_CODE_LENGTH);
+    latVal = Math.floor(latVal / Math.pow(GRID_ROWS, GRID_CODE_LENGTH));
+    lngVal = Math.floor(lngVal / Math.pow(GRID_COLUMNS, GRID_CODE_LENGTH));
   }
+
+  // Add the pair after the separator.
+  code[SEPARATOR_POSITION + 1] = CODE_ALPHABET.charAt(latVal % ENCODING_BASE);
+  code[SEPARATOR_POSITION + 2] = CODE_ALPHABET.charAt(lngVal % ENCODING_BASE);
+  latVal = Math.floor(latVal / ENCODING_BASE);
+  lngVal = Math.floor(lngVal / ENCODING_BASE);
+
   // Compute the pair section of the code.
-  for (var i = 0; i < PAIR_CODE_LENGTH / 2; i++) {
-    code = CODE_ALPHABET.charAt(lngVal % ENCODING_BASE) + code;
-    code = CODE_ALPHABET.charAt(latVal % ENCODING_BASE) + code;
+  for (var i = PAIR_CODE_LENGTH / 2 + 1; i >= 0; i -= 2) {
+    code[i] = CODE_ALPHABET.charAt(latVal % ENCODING_BASE);
+    code[i + 1] = CODE_ALPHABET.charAt(lngVal % ENCODING_BASE);
     latVal = Math.floor(latVal / ENCODING_BASE);
     lngVal = Math.floor(lngVal / ENCODING_BASE);
   }
 
-  // Add the separator character.
-  code = code.substring(0, SEPARATOR_POSITION) +
-      SEPARATOR +
-      code.substring(SEPARATOR_POSITION);
-
   // If we don't need to pad the code, return the requested section.
-  if (optLength >= SEPARATOR_POSITION) {
-    return code.substring(0, optLength + 1);
+  if (codeLength >= SEPARATOR_POSITION) {
+    return code.slice(0, codeLength + 1).join('');
   }
   // Pad and return the code.
-  return code.substring(0, optLength) +
-      Array(SEPARATOR_POSITION - optLength + 1).join('0') + SEPARATOR;
+  return code.slice(0, codeLength).join('') +
+      Array(SEPARATOR_POSITION - codeLength + 1).join(PADDING_CHARACTER) + SEPARATOR;
 }
 exports.encode = encode;
 
