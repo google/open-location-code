@@ -114,8 +114,9 @@ int encodeIntegers(long long int lat, long long int lng, size_t length,
     lng = lng % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
   }
 
-  // Build up the code here, then copy it to the passed pointer.
-  char fullcode[] = "12345678901234567";
+  // Reserve characters for the code digits, the separator and the null
+  // terminator.
+  char fullcode[] = "1234567890abcdefg";
   // Insert the separator in position.
   fullcode[kSeparatorPosition] = kSeparator;
 

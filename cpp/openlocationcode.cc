@@ -156,8 +156,8 @@ std::string Encode(const LatLng &location, size_t code_length) {
     lng_val = lng_val % (2 * internal::kLongitudeMaxDegrees *
                          internal::kGridLngPrecisionInverse);
   }
-  // Reserve 17 characters for the code digits.
-  std::string code = "123456789abcdefgh";
+  // Reserve characters for the code digits and the separator.
+  std::string code = "1234567890abcdef";
   // Add the separator character.
   code[internal::kSeparatorPosition] = internal::kSeparator;
 
