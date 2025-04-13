@@ -166,7 +166,8 @@ std::string Encode(const LatLng &location, size_t code_length) {
     for (size_t i = internal::kGridCodeLength; i >= 1; i--) {
       int lat_digit = lat_val % internal::kGridRows;
       int lng_digit = lng_val % internal::kGridColumns;
-      code[internal::kSeparatorPosition+2+i] = internal::kAlphabet[lat_digit * internal::kGridColumns + lng_digit];
+      code[internal::kSeparatorPosition + 2 + i] =
+          internal::kAlphabet[lat_digit * internal::kGridColumns + lng_digit];
       lat_val /= internal::kGridRows;
       lng_val /= internal::kGridColumns;
     }
@@ -175,17 +176,19 @@ std::string Encode(const LatLng &location, size_t code_length) {
     lng_val /= pow(internal::kGridColumns, internal::kGridCodeLength);
   }
 
-	// Add the pair after the separator.
-	code[internal::kSeparatorPosition+1] = internal::kAlphabet[lat_val % internal::kEncodingBase];
-  code[internal::kSeparatorPosition+2] = internal::kAlphabet[lng_val % internal::kEncodingBase];
+  // Add the pair after the separator.
+  code[internal::kSeparatorPosition + 1] =
+      internal::kAlphabet[lat_val % internal::kEncodingBase];
+  code[internal::kSeparatorPosition + 2] =
+      internal::kAlphabet[lng_val % internal::kEncodingBase];
   lat_val /= internal::kEncodingBase;
   lng_val /= internal::kEncodingBase;
 
-	// Compute the pair section before the separator in reverse order.
-	// Even indices contain latitude and odd contain longitude.
-  for (int i = (internal::kPairCodeLength/2 + 1); i >= 0; i -= 2) {
-    code[i]= internal::kAlphabet[lat_val % internal::kEncodingBase];
-    code[i+1]= internal::kAlphabet[lng_val % internal::kEncodingBase];
+  // Compute the pair section before the separator in reverse order.
+  // Even indices contain latitude and odd contain longitude.
+  for (int i = (internal::kPairCodeLength / 2 + 1); i >= 0; i -= 2) {
+    code[i] = internal::kAlphabet[lat_val % internal::kEncodingBase];
+    code[i + 1] = internal::kAlphabet[lng_val % internal::kEncodingBase];
     lat_val /= internal::kEncodingBase;
     lng_val /= internal::kEncodingBase;
   }
@@ -197,7 +200,7 @@ std::string Encode(const LatLng &location, size_t code_length) {
     code_length = internal::kSeparatorPosition;
   }
   // Return the code up to and including the separator.
-  return code.substr(0, code_length+1);
+  return code.substr(0, code_length + 1);
 }
 
 std::string Encode(const LatLng &location) {

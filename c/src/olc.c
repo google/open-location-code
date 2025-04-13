@@ -121,10 +121,11 @@ int encodeIntegers(long long int lat, long long int lng, size_t length,
 
   // Compute the grid part of the code if necessary.
   if (length > kPairCodeLength) {
-		for (size_t i = kMaximumDigitCount - kPairCodeLength; i >= 1; i--) {
+    for (size_t i = kMaximumDigitCount - kPairCodeLength; i >= 1; i--) {
       int lat_digit = lat % kGridRows;
       int lng_digit = lng % kGridCols;
-      fullcode[kSeparatorPosition+2+i] = kAlphabet[lat_digit * kGridCols + lng_digit];
+      fullcode[kSeparatorPosition + 2 + i] =
+          kAlphabet[lat_digit * kGridCols + lng_digit];
       lat /= kGridRows;
       lng /= kGridCols;
     }
@@ -133,15 +134,15 @@ int encodeIntegers(long long int lat, long long int lng, size_t length,
     lng /= pow(kGridCols, kGridCodeLength);
   }
 
-	// Add the pair after the separator.
-	fullcode[kSeparatorPosition+1] = kAlphabet[lat % kEncodingBase];
-	fullcode[kSeparatorPosition+2] = kAlphabet[lng % kEncodingBase];
+  // Add the pair after the separator.
+  fullcode[kSeparatorPosition + 1] = kAlphabet[lat % kEncodingBase];
+  fullcode[kSeparatorPosition + 2] = kAlphabet[lng % kEncodingBase];
   lat /= kEncodingBase;
   lng /= kEncodingBase;
 
-	// Compute the pair section before the separator in reverse order.
-	// Even indices contain latitude and odd contain longitude.
-  for (int i = (kPairCodeLength/2 + 1); i >= 0; i -= 2) {
+  // Compute the pair section before the separator in reverse order.
+  // Even indices contain latitude and odd contain longitude.
+  for (int i = (kPairCodeLength / 2 + 1); i >= 0; i -= 2) {
     fullcode[i] = kAlphabet[lat % kEncodingBase];
     fullcode[i + 1] = kAlphabet[lng % kEncodingBase];
     lat /= kEncodingBase;
