@@ -73,7 +73,7 @@ module PlusCodes
 
       # Initialise the code using an Array. Array.join is more efficient that
       # string addition.
-      code = Array.new(MAX_CODE_LENGTH + 1, "")
+      code = Array.new(MAX_CODE_LENGTH + 1, '')
       code[SEPARATOR_POSITION] = SEPARATOR
 
       # Compute the grid part of the code if necessary.
@@ -96,7 +96,7 @@ module PlusCodes
       lng_val = lng_val.div 20
 
       # Compute the pair section of the code before the separator.
-      for i in (PAIR_CODE_LENGTH / 2 + 1..0).step(-2) do
+      (PAIR_CODE_LENGTH / 2 + 1..0).step(-2).each do |i|
         code[i] = CODE_ALPHABET[lat_val % 20]
         code[i + 1] = CODE_ALPHABET[lng_val % 20]
         lat_val = lat_val.div 20
@@ -104,8 +104,12 @@ module PlusCodes
       end
       # If we don't need to pad the code, return the requested section.
       return code[0, code_length + 1].join if code_length >= SEPARATOR_POSITION
+
       # Pad and return the code.
-      return "#{code[0, code_length].join}#{PADDING * (SEPARATOR_POSITION - code_length)}#{SEPARATOR}"
+      (code_length..SEPARATOR_POSITION-1).each do |i|
+        code[i] = PADDING
+      end
+      code[0, SEPARATOR_POSITION+1].join
     end
 
     # Decodes an Open Location Code(Plus+Codes) into a [CodeArea].
