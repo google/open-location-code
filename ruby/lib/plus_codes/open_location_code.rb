@@ -106,10 +106,10 @@ module PlusCodes
       return code[0, code_length + 1].join if code_length >= SEPARATOR_POSITION
 
       # Pad and return the code.
-      (code_length..SEPARATOR_POSITION-1).each do |i|
+      (code_length..SEPARATOR_POSITION - 1).each do |i|
         code[i] = PADDING
       end
-      code[0, SEPARATOR_POSITION+1].join
+      code[0, SEPARATOR_POSITION + 1].join
     end
 
     # Decodes an Open Location Code(Plus+Codes) into a [CodeArea].
