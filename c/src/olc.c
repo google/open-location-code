@@ -116,17 +116,15 @@ int encodeIntegers(long long int lat, long long int lng, size_t length,
 
   // Build up the code here, then copy it to the passed pointer.
   char fullcode[] = "12345678901234567";
+  // Insert the separator in position.
+  fullcode[kSeparatorPosition] = kSeparator;
 
-  // Compute the code.
-  size_t pos = kMaximumDigitCount;
   // Compute the grid part of the code if necessary.
   if (length > kPairCodeLength) {
-    for (size_t i = 0; i < kGridCodeLength; i++) {
+		for (size_t i = kMaximumDigitCount - kPairCodeLength; i >= 1; i--) {
       int lat_digit = lat % kGridRows;
       int lng_digit = lng % kGridCols;
-      int ndx = lat_digit * kGridCols + lng_digit;
-      fullcode[pos--] = kAlphabet[ndx];
-      // Note! Integer division.
+      fullcode[kSeparatorPosition+2+i] = kAlphabet[lat_digit * kGridCols + lng_digit];
       lat /= kGridRows;
       lng /= kGridCols;
     }
@@ -134,40 +132,35 @@ int encodeIntegers(long long int lat, long long int lng, size_t length,
     lat /= pow(kGridRows, kGridCodeLength);
     lng /= pow(kGridCols, kGridCodeLength);
   }
-  pos = kPairCodeLength;
-  // Compute the pair section of the code.
-  for (size_t i = 0; i < kPairCodeLength / 2; i++) {
-    int lat_ndx = lat % kEncodingBase;
-    int lng_ndx = lng % kEncodingBase;
-    fullcode[pos--] = kAlphabet[lng_ndx];
-    fullcode[pos--] = kAlphabet[lat_ndx];
-    // Note! Integer division.
+
+	// Add the pair after the separator.
+	fullcode[kSeparatorPosition+1] = kAlphabet[lat % kEncodingBase];
+	fullcode[kSeparatorPosition+2] = kAlphabet[lng % kEncodingBase];
+  lat /= kEncodingBase;
+  lng /= kEncodingBase;
+
+	// Compute the pair section before the separator in reverse order.
+	// Even indices contain latitude and odd contain longitude.
+  for (int i = (kPairCodeLength/2 + 1); i >= 0; i -= 2) {
+    fullcode[i] = kAlphabet[lat % kEncodingBase];
+    fullcode[i + 1] = kAlphabet[lng % kEncodingBase];
     lat /= kEncodingBase;
     lng /= kEncodingBase;
-    if (i == 0) {
-      fullcode[pos--] = kSeparator;
-    }
   }
   // Replace digits with padding if necessary.
   if (length < kSeparatorPosition) {
     for (size_t i = length; i < kSeparatorPosition; i++) {
       fullcode[i] = kPaddingCharacter;
     }
-    fullcode[kSeparatorPosition] = kSeparator;
+    length = kSeparatorPosition;
   }
-  // Now copy the full code digits into the buffer.
-  size_t char_count = length + 1;
-  if (kSeparatorPosition + 1 > char_count) {
-    char_count = kSeparatorPosition + 1;
-  }
-  for (size_t i = 0; i < char_count; i++) {
+  // Copy code digits back into the buffer.
+  for (size_t i = 0; i <= length; i++) {
     code[i] = fullcode[i];
   }
-
   // Terminate the buffer.
-  code[char_count] = '\0';
-
-  return char_count;
+  code[length + 1] = '\0';
+  return length;
 }
 
 int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
