@@ -287,15 +287,16 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
     lngVal = lngVal % (2 * longitudeMax * finalLngPrecision);
   }
 
-  var code = '';
+  List<String> code = List<String>.filled(maxDigitCount + 1, '');
+  code[separatorPosition] = separator;
+
   // Compute the grid part of the code if necessary.
   if (codeLength > pairCodeLength) {
-    for (var i = 0; i < maxDigitCount - pairCodeLength; i++) {
+    for (int i = maxDigitCount - pairCodeLength; i >= 1; i--) {
       var lat_digit = latVal % gridRows;
       var lng_digit = lngVal % gridColumns;
-      var ndx = lat_digit * gridColumns + lng_digit;
-      code = codeAlphabet[ndx] + code;
-      // Note! Integer division.
+      code[separatorPosition + 2 + i] =
+          codeAlphabet[lat_digit * gridColumns + lng_digit];
       latVal ~/= gridRows;
       lngVal ~/= gridColumns;
     }
@@ -303,25 +304,28 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
     latVal ~/= pow(gridRows, gridCodeLength);
     lngVal ~/= pow(gridColumns, gridCodeLength);
   }
+
+  // Add the pair after the separator.
+  code[separatorPosition + 1] = codeAlphabet[latVal % encodingBase];
+  code[separatorPosition + 2] = codeAlphabet[lngVal % encodingBase];
+  latVal ~/= encodingBase;
+  lngVal ~/= encodingBase;
+
   // Compute the pair section of the code.
-  for (var i = 0; i < pairCodeLength / 2; i++) {
-    code = codeAlphabet[lngVal % encodingBase] + code;
-    code = codeAlphabet[latVal % encodingBase] + code;
+  for (int i = pairCodeLength ~/ 2 + 1; i >= 0; i -= 2) {
+    code[i] = codeAlphabet[latVal % encodingBase];
+    code[i + 1] = codeAlphabet[lngVal % encodingBase];
     latVal ~/= encodingBase;
     lngVal ~/= encodingBase;
   }
 
-  // Add the separator character.
-  code = code.substring(0, separatorPosition) +
-      separator +
-      code.substring(separatorPosition);
-
   // If we don't need to pad the code, return the requested section.
   if (codeLength >= separatorPosition) {
-    return code.substring(0, codeLength + 1);
+    return code.getRange(0, codeLength + 1).join('');
   }
+
   // Pad and return the code.
-  return code.substring(0, codeLength) +
+  return code.getRange(0, codeLength).join('') +
       (padding * (separatorPosition - codeLength)) +
       separator;
 }

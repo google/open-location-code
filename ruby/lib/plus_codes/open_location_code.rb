@@ -71,13 +71,16 @@ module PlusCodes
         lng_val %= (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
       end
 
-      # Initialise the code string.
-      code = ''
+      # Initialise the code using an Array. Array.join is more efficient that
+      # string addition.
+      code = Array.new(MAX_CODE_LENGTH + 1, '')
+      code[SEPARATOR_POSITION] = SEPARATOR
+
       # Compute the grid part of the code if necessary.
       if code_length > PAIR_CODE_LENGTH
-        (0..MAX_CODE_LENGTH - PAIR_CODE_LENGTH - 1).each do
+        (MAX_CODE_LENGTH - PAIR_CODE_LENGTH..1).step(-1).each do |i|
           index = (lat_val % 5) * 4 + (lng_val % 4)
-          code = CODE_ALPHABET[index] + code
+          code[SEPARATOR_POSITION + 2 + i] = CODE_ALPHABET[index]
           lat_val = lat_val.div 5
           lng_val = lng_val.div 4
         end
@@ -85,18 +88,28 @@ module PlusCodes
         lat_val = lat_val.div LAT_GRID_PRECISION
         lng_val = lng_val.div LNG_GRID_PRECISION
       end
-      (0..PAIR_CODE_LENGTH / 2 - 1).each do |i|
-        code = CODE_ALPHABET[lng_val % 20] + code
-        code = CODE_ALPHABET[lat_val % 20] + code
+
+      # Add the pair digits after the separator.
+      code[SEPARATOR_POSITION + 1] = CODE_ALPHABET[lat_val % 20]
+      code[SEPARATOR_POSITION + 2] = CODE_ALPHABET[lng_val % 20]
+      lat_val = lat_val.div 20
+      lng_val = lng_val.div 20
+
+      # Compute the pair section of the code before the separator.
+      (PAIR_CODE_LENGTH / 2 + 1..0).step(-2).each do |i|
+        code[i] = CODE_ALPHABET[lat_val % 20]
+        code[i + 1] = CODE_ALPHABET[lng_val % 20]
         lat_val = lat_val.div 20
         lng_val = lng_val.div 20
-        code = "+#{code}" if i.zero?
       end
       # If we don't need to pad the code, return the requested section.
-      return code[0, code_length + 1] if code_length >= SEPARATOR_POSITION
+      return code[0, code_length + 1].join if code_length >= SEPARATOR_POSITION
 
       # Pad and return the code.
-      "#{code[0, code_length]}#{PADDING * (SEPARATOR_POSITION - code_length)}+"
+      (code_length..SEPARATOR_POSITION - 1).each do |i|
+        code[i] = PADDING
+      end
+      code[0, SEPARATOR_POSITION + 1].join
     end
 
     # Decodes an Open Location Code(Plus+Codes) into a [CodeArea].

@@ -156,19 +156,18 @@ std::string Encode(const LatLng &location, size_t code_length) {
     lng_val = lng_val % (2 * internal::kLongitudeMaxDegrees *
                          internal::kGridLngPrecisionInverse);
   }
-  // Reserve 15 characters for the code digits. The separator will be inserted
-  // at the end.
-  std::string code = "123456789abcdef";
+  // Reserve characters for the code digits and the separator.
+  std::string code = "1234567890abcdef";
+  // Add the separator character.
+  code[internal::kSeparatorPosition] = internal::kSeparator;
 
-  size_t pos = internal::kMaximumDigitCount - 1;
   // Compute the grid part of the code if necessary.
   if (code_length > internal::kPairCodeLength) {
-    for (size_t i = 0; i < internal::kGridCodeLength; i++) {
+    for (size_t i = internal::kGridCodeLength; i >= 1; i--) {
       int lat_digit = lat_val % internal::kGridRows;
       int lng_digit = lng_val % internal::kGridColumns;
-      int ndx = lat_digit * internal::kGridColumns + lng_digit;
-      code.replace(pos--, 1, 1, internal::kAlphabet[ndx]);
-      // Note! Integer division.
+      code[internal::kSeparatorPosition + 2 + i] =
+          internal::kAlphabet[lat_digit * internal::kGridColumns + lng_digit];
       lat_val /= internal::kGridRows;
       lng_val /= internal::kGridColumns;
     }
@@ -176,31 +175,32 @@ std::string Encode(const LatLng &location, size_t code_length) {
     lat_val /= pow(internal::kGridRows, internal::kGridCodeLength);
     lng_val /= pow(internal::kGridColumns, internal::kGridCodeLength);
   }
-  pos = internal::kPairCodeLength - 1;
-  // Compute the pair section of the code.
-  for (size_t i = 0; i < internal::kPairCodeLength / 2; i++) {
-    int lat_ndx = lat_val % internal::kEncodingBase;
-    int lng_ndx = lng_val % internal::kEncodingBase;
-    code.replace(pos--, 1, 1, internal::kAlphabet[lng_ndx]);
-    code.replace(pos--, 1, 1, internal::kAlphabet[lat_ndx]);
-    // Note! Integer division.
+
+  // Add the pair after the separator.
+  code[internal::kSeparatorPosition + 1] =
+      internal::kAlphabet[lat_val % internal::kEncodingBase];
+  code[internal::kSeparatorPosition + 2] =
+      internal::kAlphabet[lng_val % internal::kEncodingBase];
+  lat_val /= internal::kEncodingBase;
+  lng_val /= internal::kEncodingBase;
+
+  // Compute the pair section before the separator in reverse order.
+  // Even indices contain latitude and odd contain longitude.
+  for (int i = (internal::kPairCodeLength / 2 + 1); i >= 0; i -= 2) {
+    code[i] = internal::kAlphabet[lat_val % internal::kEncodingBase];
+    code[i + 1] = internal::kAlphabet[lng_val % internal::kEncodingBase];
     lat_val /= internal::kEncodingBase;
     lng_val /= internal::kEncodingBase;
   }
-
-  // Add the separator character.
-  code.insert(internal::kSeparatorPosition, &(internal::kSeparator), 1);
-
-  // If we don't need to pad the code, return the requested section.
-  if (code_length >= internal::kSeparatorPosition) {
-    return code.substr(0, code_length + 1);
-  }
-  // Add the required padding characters.
-  for (size_t i = code_length; i < internal::kSeparatorPosition; i++) {
-    code[i] = internal::kPaddingCharacter;
+  // Replace digits with padding if necessary.
+  if (code_length < internal::kSeparatorPosition) {
+    for (size_t i = code_length; i < internal::kSeparatorPosition; i++) {
+      code[i] = internal::kPaddingCharacter;
+    }
+    code_length = internal::kSeparatorPosition;
   }
   // Return the code up to and including the separator.
-  return code.substr(0, internal::kSeparatorPosition + 1);
+  return code.substr(0, code_length + 1);
 }
 
 std::string Encode(const LatLng &location) {

@@ -348,14 +348,18 @@
       lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
     }
 
-    var code = '';
+    // Javascript strings are immutable and it doesn't have a native
+    // StringBuilder, so we'll use an array.
+    const code = new Array(MAX_DIGIT_COUNT_ + 1);
+    code[SEPARATOR_POSITION_] = SEPARATOR_;
+
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH_) {
-      for (var i = 0; i < MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i++) {
+      for (var i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i >= 1; i--) {
         var latDigit = latVal % GRID_ROWS_;
         var lngDigit = lngVal % GRID_COLUMNS_;
         var ndx = latDigit * GRID_COLUMNS_ + lngDigit;
-        code = CODE_ALPHABET_.charAt(ndx) + code;
+        code[SEPARATOR_POSITION_ + 2 + i] = CODE_ALPHABET_.charAt(ndx);
         // Note! Integer division.
         latVal = Math.floor(latVal / GRID_ROWS_);
         lngVal = Math.floor(lngVal / GRID_COLUMNS_);
@@ -364,26 +368,27 @@
       latVal = Math.floor(latVal / Math.pow(GRID_ROWS_, GRID_CODE_LENGTH_));
       lngVal = Math.floor(lngVal / Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_));
     }
+
+    // Add the pair after the separator.
+    code[SEPARATOR_POSITION_ + 1] = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_);
+    code[SEPARATOR_POSITION_ + 2] = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_);
+    latVal = Math.floor(latVal / ENCODING_BASE_);
+    lngVal = Math.floor(lngVal / ENCODING_BASE_);
+
     // Compute the pair section of the code.
-    for (var i = 0; i < PAIR_CODE_LENGTH_ / 2; i++) {
-      code = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_) + code;
-      code = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_) + code;
+    for (var i = PAIR_CODE_LENGTH_ / 2 + 1; i >= 0; i -= 2) {
+      code[i] = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_);
+      code[i + 1] = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_);
       latVal = Math.floor(latVal / ENCODING_BASE_);
       lngVal = Math.floor(lngVal / ENCODING_BASE_);
     }
 
-    // Add the separator character.
-    code = code.substring(0, SEPARATOR_POSITION_) +
-        SEPARATOR_ +
-        code.substring(SEPARATOR_POSITION_);
-
-
     // If we don't need to pad the code, return the requested section.
     if (codeLength >= SEPARATOR_POSITION_) {
-      return code.substring(0, codeLength + 1);
+      return code.slice(0, codeLength + 1).join('');
     }
     // Pad and return the code.
-    return code.substring(0, codeLength) +
+    return code.slice(0, codeLength).join('') +
         Array(SEPARATOR_POSITION_ - codeLength + 1).join(PADDING_CHARACTER_) + SEPARATOR_;
   };
 
