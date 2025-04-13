@@ -348,21 +348,21 @@ exports.isFull = isFull;
       clipped to the range -90 to 90.
   @param {number} longitude A longitude in signed decimal degrees. Will be
       normalised to the range -180 to 180.
-  @param {number=} optLength The number of significant digits in the output
+  @param {number=} codeLength The number of significant digits in the output
       code, not including any separator characters.
   @return {string} A code of the specified length or the default length if not
       specified.
  */
-function encode(latitude, longitude, optLength) {
-  if (typeof optLength == 'undefined') {
-    optLength = PAIR_CODE_LENGTH;
+function encode(latitude, longitude, codeLength) {
+  if (typeof codeLength == 'undefined') {
+    codeLength = PAIR_CODE_LENGTH;
   }
-  if (optLength < MIN_CODE_LEN ||
-      (optLength < PAIR_CODE_LENGTH && optLength % 2 == 1)) {
+  if (codeLength < MIN_CODE_LEN ||
+      (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)) {
     throw new Error(
         'IllegalArgumentException: Invalid Plus Code length');
   }
-  optLength = Math.min(optLength, MAX_CODE_LEN);
+  codeLength = Math.min(codeLength, MAX_CODE_LEN);
 
   // This approach converts each value to an integer after multiplying it by the final precision.
   // This allows us to use only integer operations, so avoiding any accumulation of floating
