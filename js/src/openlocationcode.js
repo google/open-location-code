@@ -330,7 +330,7 @@
 
     // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
     // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
-    var latVal = Math.round(latitude * FINAL_LAT_PRECISION_);
+    var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION_);
     latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
     if (latVal < 0) {
       latVal = 0;
@@ -338,7 +338,7 @@
       latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
     }
     // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-    var lngVal = Math.round(longitude * FINAL_LNG_PRECISION_);
+    var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION_);
     lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
     if (lngVal < 0) {
       lngVal =
@@ -595,6 +595,20 @@
       }
     }
     return code;
+  };
+
+  /**
+   * Round numbers like C does. This implements rounding away from zero (see
+   * https://en.wikipedia.org/wiki/Rounding).
+   *
+   * @param {number} num A number to round.
+   * @return {number} The rounded value.
+   */
+  var roundAwayFromZero = function(num) {
+    if (num >= 0) {
+      return Math.round(num);
+    }
+    return -1 * Math.round(Math.abs(num));
   };
 
   /**

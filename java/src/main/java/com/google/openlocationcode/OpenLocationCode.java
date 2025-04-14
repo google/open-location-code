@@ -203,8 +203,8 @@ public final class OpenLocationCode {
     // the final precision. This allows us to use only integer operations, so
     // avoiding any accumulation of floating point representation errors.
 
-    long latVal = (long) Math.round(latitude * LAT_INTEGER_MULTIPLIER);
-    long lngVal = (long) Math.round(longitude * LNG_INTEGER_MULTIPLIER);
+    long latVal = (long) roundAwayFromZero(latitude * LAT_INTEGER_MULTIPLIER);
+    long lngVal = (long) roundAwayFromZero(longitude * LNG_INTEGER_MULTIPLIER);
 
     // Clip and normalise values.
     latVal += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
@@ -667,6 +667,20 @@ public final class OpenLocationCode {
   }
 
   // Private static methods.
+
+  /**
+   * Round numbers like C does. This implements rounding away from zero (see
+   * https://en.wikipedia.org/wiki/Rounding).
+   *
+   * @param num A number to round.
+   * @return The rounded value.
+   */
+  private static Long roundAwayFromZero(double num) {
+    if (num >= 0) {
+      return Math.round(num);
+    }
+    return -1 * Math.round(Math.abs(num));
+  }
 
   private static double clipLatitude(double latitude) {
     return Math.min(Math.max(latitude, -LATITUDE_MAX), LATITUDE_MAX);
