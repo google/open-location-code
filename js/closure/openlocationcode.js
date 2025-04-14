@@ -642,7 +642,7 @@ exports.shorten = shorten;
 /**
  * Round numbers like C does. This implements rounding away from zero (see
  * https://en.wikipedia.org/wiki/Rounding).
- * 
+ *
  * @param {number} num A number to round.
  * @return {number} The rounded value usn
  */
