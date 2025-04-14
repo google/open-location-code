@@ -598,14 +598,11 @@
   };
 
   /**
-   * Round numbers like C does.
-   * This implements rounding away from zero (see
+   * Round numbers like C does. This implements rounding away from zero (see
    * https://en.wikipedia.org/wiki/Rounding).
-   * 
-   * Java's Math.round(-3.5) rounds to -3, whereas C rounds to -4.
-   * 
+   *
    * @param {number} num A number to round.
-   * @return {number} The rounded value usn
+   * @return {number} The rounded value.
    */
   var roundAwayFromZero = function(num) {
     if (num >= 0) {

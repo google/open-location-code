@@ -370,7 +370,7 @@ function encode(latitude, longitude, codeLength) {
 
   // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
   // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
-  var latVal = Math.round(latitude * FINAL_LAT_PRECISION);
+  var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION);
   latVal += LATITUDE_MAX * FINAL_LAT_PRECISION;
   if (latVal < 0) {
     latVal = 0;
@@ -378,7 +378,7 @@ function encode(latitude, longitude, codeLength) {
     latVal = 2 * LATITUDE_MAX * FINAL_LAT_PRECISION - 1;
   }
   // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-  var lngVal = Math.round(longitude * FINAL_LNG_PRECISION);
+  var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION);
   lngVal += LONGITUDE_MAX * FINAL_LNG_PRECISION;
   if (lngVal < 0) {
     lngVal =
@@ -638,6 +638,20 @@ function shorten(code, latitude, longitude) {
   return code;
 }
 exports.shorten = shorten;
+
+/**
+ * Round numbers like C does. This implements rounding away from zero (see
+ * https://en.wikipedia.org/wiki/Rounding).
+ * 
+ * @param {number} num A number to round.
+ * @return {number} The rounded value usn
+ */
+function roundAwayFromZero(num) {
+  if (num >= 0) {
+    return Math.round(num);
+  }
+  return -1 * Math.round(Math.abs(num));
+}
 
 /**
   Clip a latitude into the range -90 to 90.

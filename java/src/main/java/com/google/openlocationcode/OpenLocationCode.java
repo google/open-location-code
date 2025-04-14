@@ -668,14 +668,11 @@ public final class OpenLocationCode {
   // Private static methods.
 
   /**
-   * Round numbers like C does.
-   * This implements rounding away from zero (see
+   * Round numbers like C does. This implements rounding away from zero (see
    * https://en.wikipedia.org/wiki/Rounding).
    * 
-   * Java's Math.round(-3.5) rounds to -3, whereas C rounds to -4.
-   * 
    * @param num A number to round.
-   * @return The rounded value usn
+   * @return The rounded value.
    */
   private static Long roundAwayFromZero(double num) {
     if (num >= 0) {
