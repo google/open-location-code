@@ -609,7 +609,7 @@
       return Math.round(num);
     }
     return -1 * Math.round(Math.abs(num));
-  }
+  };
 
   /**
    * Clip a latitude into the range -90 to 90.

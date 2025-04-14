@@ -670,7 +670,7 @@ public final class OpenLocationCode {
   /**
    * Round numbers like C does. This implements rounding away from zero (see
    * https://en.wikipedia.org/wiki/Rounding).
-   * 
+   *
    * @param num A number to round.
    * @return The rounded value.
    */
