@@ -91,10 +91,10 @@ Private Const LATITUDE_MAX_ As Double = 90
 Private Const LONGITUDE_MAX_ As Double = 180
 
 ' Minimum number of digits in a code.
-Private Const MIN_DIGIT_COUNT_ = 2;
+Private Const MIN_DIGIT_COUNT_ As Integer = 2
 
 ' Maximum number of digits in a code.
-Private Const MAX_DIGIT_COUNT_ = 15;
+Private Const MAX_DIGIT_COUNT_ As Integer = 15
 
 ' Maximum code length using lat/lng pair encoding. The area of such a
 ' code is approximately 13x13 meters (at the equator), and should be suitable
@@ -107,8 +107,17 @@ Private Const GRID_COLUMNS_ As Integer = 4
 ' Number of rows in the grid refinement method.
 Private Const GRID_ROWS_ As Integer = 5
 
+' Number of grid digits.
+Private Const GRID_CODE_LENGTH_ As Integer = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_
+
 ' Size of the initial grid in degrees.
 Private Const GRID_SIZE_DEGREES_ As Double = 1 / 8000
+
+' Degree resolution for latitude.
+Private Const FINAL_LAT_PRECISION_ As Long = 8000 * (GRID_ROWS_ ^ GRID_CODE_LENGTH_)
+
+' Degree resolution for longitude.
+Private Const FINAL_LNG_PRECISION_ As Long = 8000 * (GRID_COLUMNS_ ^ GRID_CODE_LENGTH_)
 
 ' Minimum length of a code that can be shortened.
 Private Const MIN_TRIMMABLE_CODE_LEN_ As Integer = 6
@@ -227,23 +236,80 @@ Public Function OLCEncode(ByVal latitude As Double, ByVal longitude As Double, O
   If codeLength < PAIR_CODE_LENGTH_ And codeLength \ 2 = 1 Then
     Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
   End If
-  Dim lat, lng As Double
-  Dim latCode, lngCode, gridCode As String
-  Dim code As String
-  ' Ensure that the latitude and longitude are valid.
-  lat = clipLatitude(latitude)
-  lng = normalizeLongitude(longitude)
-  ' Latitude 90 needs to be adjusted to be just under, so the returned code can also be decoded.
-  If lat = 90 Then
-    lat = lat - computeLatitudePrecision(codeLength)
+  ' We use Doubles for the latitude and longitude, even though we will use them as integers.
+  ' The reason is that we want to use this code in Excel and LibreOffice, but the LibreOffice
+  ' Long type is only 32 bits, –2147483648 and 2147483647, which is too small.
+  Dim lat As Double, lng As Double
+  ' i is used in loops.
+  Dim i As Integer
+
+  ' Convert latitude into a positive integer clipped into the range 0-(just
+  ' under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
+  ' returned code can also be decoded.
+  lat = Round(latitude * FINAL_LAT_PRECISION_)
+  lat = lat + LATITUDE_MAX_ * FINAL_LAT_PRECISION_
+  If lat < 0 Then
+    lat = 0
+  ElseIf lat >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ Then
+    lat = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1
   End If
-  latCode = encodeCoordinate(lat + LATITUDE_MAX_, doubleMin(codeLength, PAIR_CODE_LENGTH_) / 2)
-  lngCode = encodeCoordinate(lng + LONGITUDE_MAX_, doubleMin(codeLength, PAIR_CODE_LENGTH_) / 2)
+  ' Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+  lng = Round(longitude * FINAL_LNG_PRECISION_)
+  lng = lng + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
+  If lng < 0 Then
+    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
+  ElseIf lng >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_ Then
+    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_))
+  EndIf
+
+  ' Build up the code in an array.
+  Dim code(MAX_DIGIT_COUNT_) As String
+  code(SEPARATOR_POSITION_) = SEPARATOR_
+
+  ' Compute the grid part of the code if necessary.
+  Dim latDigit As Integer
+  Dim lngDigit As Integer
   If codeLength > PAIR_CODE_LENGTH_ Then
-    gridCode = encodeGrid(lat, lng, codeLength - PAIR_CODE_LENGTH_)
+      For i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_ To 1 Step -1
+        latDigit = CInt(doubleMod(lat, GRID_ROWS_))
+        lngDigit = CInt(doubleMod(lng, GRID_COLUMNS_))
+        code(SEPARATOR_POSITION_ + 2 + i) = Mid(CODE_ALPHABET_, 1 + latDigit * GRID_COLUMNS_ + lngDigit, 1)
+        lat = Int(lat / GRID_ROWS_)
+        lng = Int(lng / GRID_COLUMNS_)
+      Next
+  Else
+    lat = Int(lat / (GRID_ROWS_ ^ GRID_CODE_LENGTH_))
+    lng = Int(lng / (GRID_COLUMNS_ ^ GRID_CODE_LENGTH_))
   End If
-  code = mergeCode(latCode, lngCode, gridCode)
-  OLCEncode = code
+
+  ' Add the pair after the separator.
+  code(SEPARATOR_POSITION_ + 1) = Mid(CODE_ALPHABET_, 1 + doubleMod(lat, ENCODING_BASE_), 1)
+  code(SEPARATOR_POSITION_ + 2) = Mid(CODE_ALPHABET_, 1 + doubleMod(lng, ENCODING_BASE_), 1)
+  lat = Int(lat / ENCODING_BASE_)
+  lng = Int(lng / ENCODING_BASE_)
+
+  ' Compute the pair section of the code.
+  For i = Int(PAIR_CODE_LENGTH_ / 2) + 1 To 0 Step -2
+    code(i) = Mid(CODE_ALPHABET_, 1 + doubleMod(lat, ENCODING_BASE_), 1)
+    code(i + 1) = Mid(CODE_ALPHABET_, 1 + doubleMod(lng, ENCODING_BASE_), 1)
+    lat = Int(lat / ENCODING_BASE_)
+    lng = Int(lng / ENCODING_BASE_)
+  Next
+  Dim finalCodeLen As Integer
+  finalCodeLen = codeLength
+  ' Add padding characters if necessary.
+  If codeLength < SEPARATOR_POSITION_ Then
+  	For i = codeLength To SEPARATOR_POSITION_ - 1
+  	  code(i) = PADDING_CHARACTER_
+  	Next
+  	finalCodeLen = SEPARATOR_POSITION_
+  EndIf
+  ' Build the final code and return it.
+  Dim finalCode As String
+  For i = 0 To finalCodeLen
+    finalCode = finalCode & code(i)
+  Next
+  OLCEncode = finalCode
 End Function
 
 ' Decodes an Open Location Code into an array of latlo, lnglo, latcenter, lngcenter, lathi, lnghi, codelength.
@@ -427,25 +493,6 @@ Private Function mergeCode(ByVal latCode As String, ByVal lngCode As String, ByV
   mergeCode = code
 End Function
 
-' Encode a coordinate into an OLC sequence.
-Private Function encodeCoordinate(ByVal degrees As Double, ByVal digits As Integer) As String
-  Dim code As String
-  Dim remaining, precision As Double
-  Dim i As Integer
-  code = ""
-  remaining = degrees
-  precision = CDbl(ENCODING_BASE_)
-  For i = 1 To digits
-    Dim digitValue As Double
-    ' Get the latitude digit.
-    digitValue = Int(remaining / precision)
-    remaining = remaining - digitValue * precision
-    code = code + Mid(CODE_ALPHABET_, digitValue + 1, 1)
-    precision = precision / ENCODING_BASE_
-  Next
-  encodeCoordinate = code
-End Function
-
 ' Decode an OLC code made up of lat/lng pairs.
 Private Function decodePairs(code) As OLCArea
   Dim lat, lng, precision As Double
@@ -476,34 +523,6 @@ Private Function decodePairs(code) As OLCArea
   codeArea.LngHi = codeArea.LngLo + precision
   codeArea.CodeLength = Len(code)
   decodePairs = codeArea
-End Function
-
-' Encode a location using the grid refinement method into an OLC string.
-' The grid refinement method divides the area into a grid of 4x5, and uses a
-' single character to refine the area. This allows default accuracy OLC codes
-' to be refined with just a single character.
-' This algorithm is used for codes longer than 10 digits.
-Private Function encodeGrid(ByVal latitude As Double, ByVal longitude As Double, ByVal codeLength As Integer) As String
-  Dim code As String
-  Dim latPlaceValue, lngPlaceValue, lat, lng As Double
-  Dim i, row, col As Integer
-  code = ""
-  latPlaceValue = CDbl(GRID_SIZE_DEGREES_)
-  lngPlaceValue = CDbl(GRID_SIZE_DEGREES_)
-  ' Adjust latitude and longitude so they fall into positive ranges and get the offset for the required places.
-  lat = doubleMod(latitude + LATITUDE_MAX_, latPlaceValue)
-  lng = doubleMod(longitude + LONGITUDE_MAX_, lngPlaceValue)
-  For i = 1 To codeLength
-    ' Work out the row and column.
-    row = Int(lat / (latPlaceValue / GRID_ROWS_))
-    col = Int(lng / (lngPlaceValue / GRID_COLUMNS_))
-    latPlaceValue = latPlaceValue / GRID_ROWS_
-    lngPlaceValue = lngPlaceValue / GRID_COLUMNS_
-    lat = lat - row * latPlaceValue
-    lng = lng - col * lngPlaceValue
-    code = code + Mid(CODE_ALPHABET_, row * GRID_COLUMNS_ + col + 1, 1)
-  Next
-  encodeGrid = code
 End Function
 
 ' Decode the grid refinement portion of an OLC code.
@@ -539,15 +558,6 @@ Private Function doubleMax(ByVal number1 As Double, ByVal number2 As Double) As 
     doubleMax = number1
   Else
     doubleMax = number2
-  End If
-End Function
-
-' Provide a min function.
-Private Function doubleMin(ByVal number1 As Double, ByVal number2 As Double) As Double
-  If number1 < number2 Then
-    doubleMin = number1
-  Else
-    doubleMin = number2
   End If
 End Function
 
@@ -719,7 +729,6 @@ Sub TestOLCLibrary()
     MsgBox ("South pole recovery test, expected: 2CXXXXXX+XX, actual: " + c)
     Exit Sub
   End If
-
 
   MsgBox ("All tests pass")
 End Sub
