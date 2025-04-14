@@ -221,7 +221,6 @@ public final class OpenLocationCode {
     } else if (lngVal >= 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER) {
       lngVal = lngVal % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER);
     }
-    System.out.printf("debugging %.10f,%.10f,%d: %d,%d\n", latitude, longitude, codeLength, latVal, lngVal);
 
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH) {
