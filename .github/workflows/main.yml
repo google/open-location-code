@@ -14,6 +14,19 @@ jobs:
       - name: check formatting
         run: cd ${OLC_PATH} && bash clang_check.sh
 
+  # C implementation. Lives in c/, tested with bazel.
+  # Use Mac with Apple Silicon for this test because of different floating point math
+  # which can affect test results https://github.com/google/open-location-code/issues/652
+  test-c-macos-latest:
+    runs-on: macos-latest
+    env:
+      OLC_PATH: c
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bazelbuild/setup-bazelisk@v3
+      - name: test
+        run: bazel test --test_output=all ${OLC_PATH}:all
+
   # C++ implementation. Lives in cpp/, tested with bazel.
   test-cpp:
     runs-on: ubuntu-latest
