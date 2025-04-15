@@ -82,7 +82,6 @@ int OLC_IsFull(const char* code, size_t size) {
   return is_full(&info);
 }
 
-
 int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
                int maxlen) {
   // Multiply degrees by precision. Use lround to explicitly round rather than
