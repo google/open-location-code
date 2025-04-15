@@ -129,6 +129,35 @@ TEST_P(EncodingChecks, Encode) {
   // Encode the test location and make sure we get the expected code.
   OLC_Encode(&loc, test_data.length, got_code, 18);
   EXPECT_EQ(test_data.code, got_code);
+  // Make the test circular. Decode the code and make sure it contains the
+  // original coordinates. First, we need to clip the latitude and normalise
+  // the longitude.
+  double lat = test_data.lat_deg;
+  double lng = test_data.lng_deg;
+  if (lat < -90) {
+    lat = -90;
+  } else if (lat >= 90) {
+    lat = 90 - 1e-10;
+  }
+  // Shift longitude by 180 before modding it (shift it back below).
+  lng = std::fmod(lng + 180.0, 360.0);
+  if (lng < 0) {
+    lng += 360;
+  }
+  lng -= 180.0;
+  if (lng == 180.0) {
+    lng -= 1e-10;
+  }
+  // Decode the code we generated above and verify that it contains the
+  // original coordinates.
+  OLC_CodeArea got_area;
+  OLC_Decode(got_code, 0, &got_area);
+  EXPECT_TRUE((lat >= got_area.lo.lat) && (lat < got_area.hi.lat))
+      << "Latitude " << lat << " not in " << got_code
+      << " bounding box range: " << got_area.lo.lat << "," << got_area.hi.lat;
+  EXPECT_TRUE((lng >= got_area.lo.lon) && (lng < got_area.hi.lon))
+      << "Longitude " << lng << " not in " << got_code
+      << " bounding box range: " << got_area.lo.lon << "," << got_area.hi.lon;
 }
 
 INSTANTIATE_TEST_SUITE_P(OLC_Tests, EncodingChecks,

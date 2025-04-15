@@ -132,7 +132,60 @@ func TestEncode(t *testing.T) {
 		got := Encode(elt.lat, elt.lng, elt.length)
 		if got != elt.code {
 			t.Errorf("%d. got %q for (%v,%v,%d), wanted %q.", i, got, elt.lat, elt.lng, elt.length, elt.code)
-			t.FailNow()
+		}
+		// Make the test circular. Decode the code and make sure it contains the original coordinates.
+		// First, we need to clip the latitude and normalise the longitude.
+		lat := elt.lat
+		if lat < -90 {
+			lat = -90
+		} else if lat >= 90 {
+			// Use a value very slightly less than 90.
+			lat = 90 - 1e-10
+		}
+		lng := math.Mod(elt.lng, 360)
+		if lng > 180 {
+			lng = lng - 360
+		} else if lng < -180 {
+			lng = lng + 360
+		}
+		if lng == 180 {
+			lng = -180
+		}
+		// Decode the code we generated above and verify that it contains the original coordinates.
+		ca, err := Decode(got)
+		if err != nil {
+			t.Errorf("Decode(%q) returned an unexpected error: %v", got, err)
+			continue
+		}
+		if !(lat >= ca.LatLo && lat < ca.LatHi) {
+			t.Errorf(
+				"%d. Encode(%s, %s, %d) -> Decode(%q) does not include latitude %s in the bounding box %s,%s -> %s,%s",
+				i,
+				strconv.FormatFloat(elt.lat, 'f', -1, 64),
+				strconv.FormatFloat(elt.lng, 'f', -1, 64),
+				elt.length,
+				got,
+				strconv.FormatFloat(lat, 'f', -1, 64),
+				strconv.FormatFloat(ca.LatLo, 'f', -1, 64),
+				strconv.FormatFloat(ca.LngLo, 'f', -1, 64),
+				strconv.FormatFloat(ca.LatHi, 'f', -1, 64),
+				strconv.FormatFloat(ca.LngHi, 'f', -1, 64),
+			)
+		}
+		if !(lng >= ca.LngLo && lng < ca.LngHi) {
+			t.Errorf(
+				"%d. Encode(%s, %s, %d) -> Decode(%q) does not include longitude %s in the bounding box %s,%s -> %s,%s",
+				i,
+				strconv.FormatFloat(elt.lat, 'f', -1, 64),
+				strconv.FormatFloat(elt.lng, 'f', -1, 64),
+				elt.length,
+				got,
+				strconv.FormatFloat(lng, 'f', -1, 64),
+				strconv.FormatFloat(ca.LatLo, 'f', -1, 64),
+				strconv.FormatFloat(ca.LngLo, 'f', -1, 64),
+				strconv.FormatFloat(ca.LatHi, 'f', -1, 64),
+				strconv.FormatFloat(ca.LngHi, 'f', -1, 64),
+			)
 		}
 	}
 }
