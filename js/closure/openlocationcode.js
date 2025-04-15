@@ -497,12 +497,11 @@ function decode(code) {
   // Merge the values from the normal and extra precision parts of the code.
   var lat = normalLat / PAIR_PRECISION + gridLat / FINAL_LAT_PRECISION;
   var lng = normalLng / PAIR_PRECISION + gridLng / FINAL_LNG_PRECISION;
-  // Multiple values by 1e14, round and then divide. This reduces errors due
-  // to floating point precision.
   return new CodeArea(
-      Math.round(lat * 1e14) / 1e14, Math.round(lng * 1e14) / 1e14,
-      Math.round((lat + latPrecision) * 1e14) / 1e14,
-      Math.round((lng + lngPrecision) * 1e14) / 1e14,
+      lat,
+      lng,
+      lat + latPrecision,
+      lng + lngPrecision,
       Math.min(code.length, MAX_CODE_LEN));
 }
 exports.decode = decode;
