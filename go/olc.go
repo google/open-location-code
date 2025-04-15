@@ -38,26 +38,20 @@ const (
 	Padding = '0'
 
 	// Alphabet is the set of valid encoding characters.
-	Alphabet = "23456789CFGHJMPQRVWX"
-	encBase  = len(Alphabet)
+	Alphabet       = "23456789CFGHJMPQRVWX"
+	encBase  int64 = int64(len(Alphabet))
 
 	maxCodeLen  = 15
 	pairCodeLen = 10
 	gridCodeLen = maxCodeLen - pairCodeLen
 	gridCols    = 4
 	gridRows    = 5
-	// First place value of the pairs (if the last pair value is 1). encBase^(pairs-1)
-	pairFPV = 160000
 	// Precision of the pair part of the code, in 1/degrees.
 	pairPrecision = 8000
 	// Full value of the latitude grid - gridRows**gridCodeLen.
 	gridLatFullValue = 3125
 	// Full value of the longitude grid - gridCols**gridCodeLen.
 	gridLngFullValue = 1024
-	// First place value of the latitude grid (if the last place is 1). gridRows^(gridCodeLen - 1)
-	gridLatFPV = gridLatFullValue / gridRows
-	// First place value of the longitude grid (if the last place is 1). gridCols^(gridCodeLen - 1)
-	gridLngFPV = gridLngFullValue / gridCols
 	// Latitude precision of a full length code. pairPrecision * gridRows**gridCodeLen
 	finalLatPrecision = pairPrecision * gridLatFullValue
 	// Longitude precision of a full length code. pairPrecision * gridCols**gridCodeLen
@@ -170,13 +164,13 @@ func CheckFull(code string) error {
 	} else if err != ErrNotShort {
 		return err
 	}
-	if firstLat := strings.IndexByte(Alphabet, upper(code[0])) * encBase; firstLat >= latMax*2 {
+	if firstLat := strings.IndexByte(Alphabet, upper(code[0])) * int(encBase); firstLat >= latMax*2 {
 		return errors.New("latitude outside range")
 	}
 	if len(code) == 1 {
 		return nil
 	}
-	if firstLong := strings.IndexByte(Alphabet, upper(code[1])) * encBase; firstLong >= lngMax*2 {
+	if firstLong := strings.IndexByte(Alphabet, upper(code[1])) * int(encBase); firstLong >= lngMax*2 {
 		return errors.New("longitude outside range")
 	}
 	return nil
@@ -231,10 +225,32 @@ func clipLatitude(lat float64) float64 {
 	return lat
 }
 
-func normalizeLat(value float64) float64 {
-	return normalize(value, latMax)
-}
-
 func normalizeLng(value float64) float64 {
 	return normalize(value, lngMax)
+}
+
+// latitudeAsInteger converts a latitude in degrees into the integer representation.
+// It will be clipped into the degree range -90<=x<90 (actually 0-180*2.5e7-1).
+func latitudeAsInteger(latDegrees float64) int64 {
+	latVal := int64(math.Round(latDegrees * finalLatPrecision))
+	latVal += latMax * finalLatPrecision
+	if latVal < 0 {
+		latVal = 0
+	} else if latVal >= 2*latMax*finalLatPrecision {
+		latVal = 2*latMax*finalLatPrecision - 1
+	}
+	return latVal
+}
+
+// longitudeAsInteger converts a longitude in degrees into the integer representation.
+// It will be normalised into the degree range -180<=x<180 (actually 0-360*8.192e6).
+func longitudeAsInteger(lngDegrees float64) int64 {
+	lngVal := int64(math.Round(lngDegrees * finalLngPrecision))
+	lngVal += lngMax * finalLngPrecision
+	if lngVal <= 0 {
+		lngVal = lngVal%(2*lngMax*finalLngPrecision) + 2*lngMax*finalLngPrecision
+	} else if lngVal >= 2*lngMax*finalLngPrecision {
+		lngVal = lngVal % (2 * lngMax * finalLngPrecision)
+	}
+	return lngVal
 }

@@ -2,12 +2,12 @@
 
 ## Formatting
 
-Code **must** be formatted using `dartfmt`.
+Code **must** be formatted using `dart format`.
 
-To format your files, just run `format_check.sh` or:
+To format your files, just run `checks.sh` or:
 
-```
-dartfmt --fix --overwrite .
+```shell
+dart format .
 ```
 
 The TravisCI test **will fail if any files need formatting**.
@@ -24,5 +24,5 @@ To test the dart version first download the dart sdk from
 directory:
 
 ```
-~/open-location-code$ cd dart && pub run test
+~/open-location-code$ cd dart && dart test
 ```

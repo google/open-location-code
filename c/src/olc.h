@@ -72,4 +72,4 @@ int OLC_Shorten(const char* code, size_t size, const OLC_LatLon* reference,
 int OLC_RecoverNearest(const char* short_code, size_t size,
                        const OLC_LatLon* reference, char* code, int maxlen);
 
-#endif
+#endif  // OLC_OPENLOCATIONCODE_H_

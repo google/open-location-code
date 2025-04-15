@@ -1,15 +1,16 @@
 # Open Location Code JavaScript API
+
 This is the JavaScript implementation of the Open Location Code API.
 
 The library file is in `src/openlocationcode.js`. There is also a
 minified version, and both are also available using the following CDNs:
 
 * [jsDelivr](https://www.jsdelivr.com)
-  * https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.js
-  * https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.min.js
+  * <https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.js>
+  * <https://cdn.jsdelivr.net/openlocationcode/latest/openlocationcode.min.js>
 * [cdnjs](https://cdnjs.com/)
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.js
-  * https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.3/openlocationcode.min.js
+  * <https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.5/openlocationcode.js>
+  * <https://cdnjs.cloudflare.com/ajax/libs/openlocationcode/1.0.5/openlocationcode.min.js>
 
 ## Releasing
 
@@ -23,20 +24,20 @@ tags are applied globally to the repository, so if you are making a change
 across multiple implementations, consider waiting until all are updated before
 adding the release tag.
 
-# Tests
+## Tests
 
 Unit tests require [gulp](https://www.npmjs.com/package/gulp),
 [karma](https://karma-runner.github.io) and
 [jasmine](https://jasmine.github.io).
 
-Execute the tests with `sh test/run_tests.sh`. This will install the
+Execute the tests with `npm test`. This will install the
 dependencies, run `eslint` and then run the tests as long as there were no
 eslint errors.
 
 Unit tests are automatically run on pull and push requests and visible at
-https://github.com/google/open-location-code/actions.
+<https://github.com/google/open-location-code/actions>.
 
-# Examples
+## Examples
 
 Example web pages illustrating converting map clicks with Open Location Code,
 and using Googles Maps API to extend place codes to full codes are in the
@@ -44,12 +45,12 @@ and using Googles Maps API to extend place codes to full codes are in the
 
 More examples are on [jsfiddle](https://jsfiddle.net/u/openlocationcode/fiddles/).
 
-# Public Methods
+## Public Methods
 
 The following are the four public methods and one object you should use. All the
 other methods in the code should be regarded as private and not called.
 
-## encode()
+### encode()
 
 ```javascript
 OpenLocationCode.encode(latitude, longitude, codeLength) → {string}
@@ -73,7 +74,7 @@ The code for the location.
 
 If any of the passed values are not numbers, an exception will be thrown.
 
-## decode()
+### decode()
 
 ```javascript
 OpenLocationCode.decode(code) → {OpenLocationCode.CodeArea}
@@ -95,7 +96,7 @@ The `OpenLocationCode.CodeArea` object.
 
 If the passed code is not a valid full code, an exception will be thrown.
 
-## shorten()
+### shorten()
 
 ```javascript
 OpenLocationCode.shorten(code, latitude, longitude) → {string}
@@ -126,7 +127,7 @@ code to the reference location.
 If the code is not a valid full code, or the latitude or longitude are not
 numbers, an exception will be thrown.
 
-## recoverNearest()
+### recoverNearest()
 
 ```javascript
 OpenLocationCode.recoverNearest(shortCode, referenceLatitude, referenceLongitude) → {string}
@@ -154,7 +155,7 @@ The nearest matching full code to the reference location.
 If the short code is not valid, or the reference position values are not
 numbers, an exception will be thrown.
 
-## CodeArea
+### CodeArea
 
 ```javascript
 OpenLocationCode.CodeArea(latitudeLo, longitudeLo, latitudeHi, longitudeHi, codeLength) → {OpenLocationCode.CodeAre}

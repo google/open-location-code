@@ -1,10 +1,9 @@
 extern crate geo;
 
+mod codearea;
 mod consts;
+mod interface;
 mod private;
 
-mod codearea;
 pub use codearea::CodeArea;
-
-mod interface;
 pub use interface::{decode, encode, is_full, is_short, is_valid, recover_nearest, shorten};

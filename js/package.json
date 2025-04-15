@@ -1,7 +1,7 @@
 {
   "name": "open-location-code",
   "description": "Library to convert between lat/lng and OLC codes",
-  "version": "20190515.0.0",
+  "version": "20250411.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/google/open-location-code.git"

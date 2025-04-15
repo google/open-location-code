@@ -348,79 +348,88 @@ exports.isFull = isFull;
       clipped to the range -90 to 90.
   @param {number} longitude A longitude in signed decimal degrees. Will be
       normalised to the range -180 to 180.
-  @param {number=} optLength The number of significant digits in the output
+  @param {number=} codeLength The number of significant digits in the output
       code, not including any separator characters.
   @return {string} A code of the specified length or the default length if not
       specified.
  */
-function encode(latitude, longitude, optLength) {
-  if (typeof optLength == 'undefined') {
-    optLength = PAIR_CODE_LENGTH;
+function encode(latitude, longitude, codeLength) {
+  if (typeof codeLength == 'undefined') {
+    codeLength = PAIR_CODE_LENGTH;
   }
-  if (optLength < MIN_CODE_LEN ||
-      (optLength < PAIR_CODE_LENGTH && optLength % 2 == 1)) {
+  if (codeLength < MIN_CODE_LEN ||
+      (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)) {
     throw new Error(
         'IllegalArgumentException: Invalid Plus Code length');
   }
-  optLength = Math.min(optLength, MAX_CODE_LEN);
-  // Ensure that latitude and longitude are valid.
-  latitude = clipLatitude(latitude);
-  longitude = normalizeLongitude(longitude);
-  // Latitude 90 needs to be adjusted to be just less, so the returned code
-  // can also be decoded.
-  if (latitude == 90) {
-    latitude = latitude - computeLatitudePrecision(optLength);
+  codeLength = Math.min(codeLength, MAX_CODE_LEN);
+
+  // This approach converts each value to an integer after multiplying it by the final precision.
+  // This allows us to use only integer operations, so avoiding any accumulation of floating
+  // point representation errors.
+
+  // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+  // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+  var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION);
+  latVal += LATITUDE_MAX * FINAL_LAT_PRECISION;
+  if (latVal < 0) {
+    latVal = 0;
+  } else if (latVal >= 2 * LATITUDE_MAX * FINAL_LAT_PRECISION) {
+    latVal = 2 * LATITUDE_MAX * FINAL_LAT_PRECISION - 1;
   }
-  var code = '';
+  // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+  var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION);
+  lngVal += LONGITUDE_MAX * FINAL_LNG_PRECISION;
+  if (lngVal < 0) {
+    lngVal =
+      (lngVal % (2 * LONGITUDE_MAX * FINAL_LNG_PRECISION)) +
+      2 * LONGITUDE_MAX * FINAL_LNG_PRECISION;
+  } else if (lngVal >= 2 * LONGITUDE_MAX * FINAL_LNG_PRECISION) {
+    lngVal = lngVal % (2 * LONGITUDE_MAX * FINAL_LNG_PRECISION);
+  }
 
-  // Compute the code.
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
-  // Multiply values by their precision and convert to positive.
-  // Force to integers so the division operations will have integer results.
-  // Note: JavaScript requires rounding before truncating to ensure precision!
-  var latVal =
-      Math.floor(Math.round((latitude + LATITUDE_MAX) * FINAL_LAT_PRECISION * 1e6) / 1e6);
-  var lngVal =
-      Math.floor(Math.round((longitude + LONGITUDE_MAX) * FINAL_LNG_PRECISION * 1e6) / 1e6);
+  // Javascript strings are immutable and it doesn't have a native
+  // StringBuilder, so we'll use an array.
+  const code = new Array(MAX_CODE_LEN + 1);
+  code[SEPARATOR_POSITION] = SEPARATOR;
 
   // Compute the grid part of the code if necessary.
-  if (optLength > PAIR_CODE_LENGTH) {
-    for (var i = 0; i < MAX_CODE_LEN - PAIR_CODE_LENGTH; i++) {
+  if (codeLength > PAIR_CODE_LENGTH) {
+    for (var i = MAX_CODE_LEN - PAIR_CODE_LENGTH; i >= 1; i--) {
       var latDigit = latVal % GRID_ROWS;
       var lngDigit = lngVal % GRID_COLUMNS;
       var ndx = latDigit * GRID_COLUMNS + lngDigit;
-      code = CODE_ALPHABET.charAt(ndx) + code;
+      code[SEPARATOR_POSITION + 2 + i] = CODE_ALPHABET.charAt(ndx);
       // Note! Integer division.
       latVal = Math.floor(latVal / GRID_ROWS);
       lngVal = Math.floor(lngVal / GRID_COLUMNS);
     }
   } else {
-    latVal = Math.floor(latVal / GRID_ROWS**GRID_CODE_LENGTH);
-    lngVal = Math.floor(lngVal / GRID_COLUMNS**GRID_CODE_LENGTH);
+    latVal = Math.floor(latVal / Math.pow(GRID_ROWS, GRID_CODE_LENGTH));
+    lngVal = Math.floor(lngVal / Math.pow(GRID_COLUMNS, GRID_CODE_LENGTH));
   }
+
+  // Add the pair after the separator.
+  code[SEPARATOR_POSITION + 1] = CODE_ALPHABET.charAt(latVal % ENCODING_BASE);
+  code[SEPARATOR_POSITION + 2] = CODE_ALPHABET.charAt(lngVal % ENCODING_BASE);
+  latVal = Math.floor(latVal / ENCODING_BASE);
+  lngVal = Math.floor(lngVal / ENCODING_BASE);
+
   // Compute the pair section of the code.
-  for (var i = 0; i < PAIR_CODE_LENGTH / 2; i++) {
-    code = CODE_ALPHABET.charAt(lngVal % ENCODING_BASE) + code;
-    code = CODE_ALPHABET.charAt(latVal % ENCODING_BASE) + code;
+  for (var i = PAIR_CODE_LENGTH / 2 + 1; i >= 0; i -= 2) {
+    code[i] = CODE_ALPHABET.charAt(latVal % ENCODING_BASE);
+    code[i + 1] = CODE_ALPHABET.charAt(lngVal % ENCODING_BASE);
     latVal = Math.floor(latVal / ENCODING_BASE);
     lngVal = Math.floor(lngVal / ENCODING_BASE);
   }
 
-  // Add the separator character.
-  code = code.substring(0, SEPARATOR_POSITION) +
-      SEPARATOR +
-      code.substring(SEPARATOR_POSITION);
-
   // If we don't need to pad the code, return the requested section.
-  if (optLength >= SEPARATOR_POSITION) {
-    return code.substring(0, optLength + 1);
+  if (codeLength >= SEPARATOR_POSITION) {
+    return code.slice(0, codeLength + 1).join('');
   }
   // Pad and return the code.
-  return code.substring(0, optLength) +
-      Array(SEPARATOR_POSITION - optLength + 1).join('0') + SEPARATOR;
+  return code.slice(0, codeLength).join('') +
+      Array(SEPARATOR_POSITION - codeLength + 1).join(PADDING_CHARACTER) + SEPARATOR;
 }
 exports.encode = encode;
 
@@ -488,12 +497,11 @@ function decode(code) {
   // Merge the values from the normal and extra precision parts of the code.
   var lat = normalLat / PAIR_PRECISION + gridLat / FINAL_LAT_PRECISION;
   var lng = normalLng / PAIR_PRECISION + gridLng / FINAL_LNG_PRECISION;
-  // Multiple values by 1e14, round and then divide. This reduces errors due
-  // to floating point precision.
   return new CodeArea(
-      Math.round(lat * 1e14) / 1e14, Math.round(lng * 1e14) / 1e14,
-      Math.round((lat + latPrecision) * 1e14) / 1e14,
-      Math.round((lng + lngPrecision) * 1e14) / 1e14,
+      lat,
+      lng,
+      lat + latPrecision,
+      lng + lngPrecision,
       Math.min(code.length, MAX_CODE_LEN));
 }
 exports.decode = decode;
@@ -631,28 +639,26 @@ function shorten(code, latitude, longitude) {
 exports.shorten = shorten;
 
 /**
+ * Round numbers like C does. This implements rounding away from zero (see
+ * https://en.wikipedia.org/wiki/Rounding).
+ *
+ * @param {number} num A number to round.
+ * @return {number} The rounded value usn
+ */
+function roundAwayFromZero(num) {
+  if (num >= 0) {
+    return Math.round(num);
+  }
+  return -1 * Math.round(Math.abs(num));
+}
+
+/**
   Clip a latitude into the range -90 to 90.
   @param {number} latitude A latitude in signed decimal degrees.
   @return {number} the clipped latitude in the range -90 to 90.
  */
 function clipLatitude(latitude) {
   return Math.min(90, Math.max(-90, latitude));
-}
-
-/**
-  Compute the latitude precision value for a given code length. Lengths <=
-  10 have the same precision for latitude and longitude, but lengths > 10
-  have different precisions due to the grid method having fewer columns than
-  rows.
-  @param {number} codeLength A number representing the length (digits) in a
-  code.
-  @return {number} The height of the code area in degrees latitude.
- */
-function computeLatitudePrecision(codeLength) {
-  if (codeLength <= 10) {
-    return Math.pow(20, Math.floor(codeLength / -2 + 2));
-  }
-  return Math.pow(20, -3) / Math.pow(GRID_ROWS, codeLength - 10);
 }
 
 /**

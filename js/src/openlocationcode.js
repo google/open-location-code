@@ -324,36 +324,42 @@
         (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
       throw new Error('IllegalArgumentException: Invalid Open Location Code length');
     }
-    // Ensure that latitude and longitude are valid.
-    latitude = clipLatitude(latitude);
-    longitude = normalizeLongitude(longitude);
-    // Latitude 90 needs to be adjusted to be just less, so the returned code
-    // can also be decoded.
-    if (latitude == 90) {
-      latitude = latitude - computeLatitudePrecision(codeLength);
+    // This approach converts each value to an integer after multiplying it by the final precision.
+    // This allows us to use only integer operations, so avoiding any accumulation of floating
+    // point representation errors.
+
+    // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
+    // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+    var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION_);
+    latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
+    if (latVal < 0) {
+      latVal = 0;
+    } else if (latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) {
+      latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
     }
-    var code = '';
+    // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+    var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION_);
+    lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+    if (lngVal < 0) {
+      lngVal =
+        (lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)) +
+        2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+    } else if (lngVal >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) {
+      lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
+    }
 
-    // Compute the code.
-    // This approach converts each value to an integer after multiplying it by
-    // the final precision. This allows us to use only integer operations, so
-    // avoiding any accumulation of floating point representation errors.
-
-    // Multiply values by their precision and convert to positive.
-    // Force to integers so the division operations will have integer results.
-    // Note: JavaScript requires rounding before truncating to ensure precision!
-    var latVal =
-        Math.floor(Math.round((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_ * 1e6) / 1e6);
-    var lngVal =
-        Math.floor(Math.round((longitude + LONGITUDE_MAX_) * FINAL_LNG_PRECISION_ * 1e6) / 1e6);
+    // Javascript strings are immutable and it doesn't have a native
+    // StringBuilder, so we'll use an array.
+    const code = new Array(MAX_DIGIT_COUNT_ + 1);
+    code[SEPARATOR_POSITION_] = SEPARATOR_;
 
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH_) {
-      for (var i = 0; i < MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i++) {
+      for (var i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i >= 1; i--) {
         var latDigit = latVal % GRID_ROWS_;
         var lngDigit = lngVal % GRID_COLUMNS_;
         var ndx = latDigit * GRID_COLUMNS_ + lngDigit;
-        code = CODE_ALPHABET_.charAt(ndx) + code;
+        code[SEPARATOR_POSITION_ + 2 + i] = CODE_ALPHABET_.charAt(ndx);
         // Note! Integer division.
         latVal = Math.floor(latVal / GRID_ROWS_);
         lngVal = Math.floor(lngVal / GRID_COLUMNS_);
@@ -362,26 +368,27 @@
       latVal = Math.floor(latVal / Math.pow(GRID_ROWS_, GRID_CODE_LENGTH_));
       lngVal = Math.floor(lngVal / Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_));
     }
+
+    // Add the pair after the separator.
+    code[SEPARATOR_POSITION_ + 1] = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_);
+    code[SEPARATOR_POSITION_ + 2] = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_);
+    latVal = Math.floor(latVal / ENCODING_BASE_);
+    lngVal = Math.floor(lngVal / ENCODING_BASE_);
+
     // Compute the pair section of the code.
-    for (var i = 0; i < PAIR_CODE_LENGTH_ / 2; i++) {
-      code = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_) + code;
-      code = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_) + code;
+    for (var i = PAIR_CODE_LENGTH_ / 2 + 1; i >= 0; i -= 2) {
+      code[i] = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_);
+      code[i + 1] = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_);
       latVal = Math.floor(latVal / ENCODING_BASE_);
       lngVal = Math.floor(lngVal / ENCODING_BASE_);
     }
 
-    // Add the separator character.
-    code = code.substring(0, SEPARATOR_POSITION_) +
-        SEPARATOR_ +
-        code.substring(SEPARATOR_POSITION_);
-
-
     // If we don't need to pad the code, return the requested section.
     if (codeLength >= SEPARATOR_POSITION_) {
-      return code.substring(0, codeLength + 1);
+      return code.slice(0, codeLength + 1).join('');
     }
     // Pad and return the code.
-    return code.substring(0, codeLength) +
+    return code.slice(0, codeLength).join('') +
         Array(SEPARATOR_POSITION_ - codeLength + 1).join(PADDING_CHARACTER_) + SEPARATOR_;
   };
 
@@ -453,12 +460,11 @@
     // Merge the values from the normal and extra precision parts of the code.
     var lat = normalLat / PAIR_PRECISION_ + gridLat / FINAL_LAT_PRECISION_;
     var lng = normalLng / PAIR_PRECISION_ + gridLng / FINAL_LNG_PRECISION_;
-    // Multiple values by 1e14, round and then divide. This reduces errors due
-    // to floating point precision.
     return new CodeArea(
-        Math.round(lat * 1e14) / 1e14, Math.round(lng * 1e14) / 1e14,
-        Math.round((lat + latPrecision) * 1e14) / 1e14,
-        Math.round((lng + lngPrecision) * 1e14) / 1e14,
+        lat,
+        lng,
+        lat + latPrecision,
+        lng + lngPrecision,
         Math.min(code.length, MAX_DIGIT_COUNT_));
   };
 
@@ -591,6 +597,20 @@
   };
 
   /**
+   * Round numbers like C does. This implements rounding away from zero (see
+   * https://en.wikipedia.org/wiki/Rounding).
+   *
+   * @param {number} num A number to round.
+   * @return {number} The rounded value.
+   */
+  var roundAwayFromZero = function(num) {
+    if (num >= 0) {
+      return Math.round(num);
+    }
+    return -1 * Math.round(Math.abs(num));
+  };
+
+  /**
    * Clip a latitude into the range -90 to 90.
    *
    * @param {number} latitude
@@ -598,21 +618,6 @@
    */
   var clipLatitude = function(latitude) {
     return Math.min(90, Math.max(-90, latitude));
-  };
-
-  /**
-   * Compute the latitude precision value for a given code length.
-   * Lengths <= 10 have the same precision for latitude and longitude, but
-   * lengths > 10 have different precisions due to the grid method having
-   * fewer columns than rows.
-   * @param {number} codeLength
-   * @return {number} The latitude precision in degrees.
-   */
-  var computeLatitudePrecision = function(codeLength) {
-    if (codeLength <= 10) {
-      return Math.pow(ENCODING_BASE_, Math.floor(codeLength / -2 + 2));
-    }
-    return Math.pow(ENCODING_BASE_, -3) / Math.pow(GRID_ROWS_, codeLength - 10);
   };
 
   /**

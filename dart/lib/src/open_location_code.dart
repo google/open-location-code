@@ -108,7 +108,7 @@ bool _matchesPattern(String string, Pattern pattern) =>
     string.contains(pattern);
 
 bool isValid(String code) {
-  if (code == null || code.length == 1) {
+  if (code.length == 1) {
     return false;
   }
 
@@ -254,41 +254,49 @@ bool isFull(String code) {
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
-  if (codeLength < minDigitCount || (codeLength < pairCodeLength && codeLength.isOdd)) {
+  if (codeLength < minDigitCount ||
+      (codeLength < pairCodeLength && codeLength.isOdd)) {
     throw ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   codeLength = min(maxDigitCount, codeLength);
-  // Ensure that latitude and longitude are valid.
-  latitude = clipLatitude(latitude);
-  longitude = normalizeLongitude(longitude);
-  // Latitude 90 needs to be adjusted to be just less, so the returned code
-  // can also be decoded.
-  if (latitude == 90) {
-    latitude -= computeLatitudePrecision(codeLength).toDouble();
-  }
-  var code = '';
 
-  // Compute the code.
   // This approach converts each value to an integer after multiplying it by
   // the final precision. This allows us to use only integer operations, so
   // avoiding any accumulation of floating point representation errors.
 
-  // Multiply values by their precision and convert to positive.
-  // Force to integers so the division operations will have integer results.
-  // Note: Dart requires rounding before truncating to ensure precision!
-  var latVal =
-      ((latitude + latitudeMax) * finalLatPrecision * 1e6).round() ~/ 1e6;
-  var lngVal =
-      ((longitude + longitudeMax) * finalLngPrecision * 1e6).round() ~/ 1e6;
+  // Convert latitude into a positive integer clipped into the range 0-(just
+  // under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
+  // returned code can also be decoded.
+  var latVal = (latitude * finalLatPrecision).round().toInt();
+  latVal += latitudeMax * finalLatPrecision;
+  if (latVal < 0) {
+    latVal = 0;
+  } else if (latVal >= 2 * latitudeMax * finalLatPrecision) {
+    latVal = 2 * latitudeMax * finalLatPrecision - 1;
+  }
+  // Convert longitude into a positive integer and normalise it into the range
+  // 0-360*8.192e6.
+  var lngVal = (longitude * finalLngPrecision).round().toInt();
+  lngVal += longitudeMax * finalLngPrecision;
+  if (lngVal < 0) {
+    // Dart's % operator differs from other languages in that it returns the
+    // same sign as the divisor. This means we don't need to add the range to
+    // the result.
+    lngVal = (lngVal % (2 * longitudeMax * finalLngPrecision));
+  } else if (lngVal >= 2 * longitudeMax * finalLngPrecision) {
+    lngVal = lngVal % (2 * longitudeMax * finalLngPrecision);
+  }
+
+  List<String> code = List<String>.filled(maxDigitCount + 1, '');
+  code[separatorPosition] = separator;
 
   // Compute the grid part of the code if necessary.
   if (codeLength > pairCodeLength) {
-    for (var i = 0; i < maxDigitCount - pairCodeLength; i++) {
+    for (int i = maxDigitCount - pairCodeLength; i >= 1; i--) {
       var lat_digit = latVal % gridRows;
       var lng_digit = lngVal % gridColumns;
-      var ndx = lat_digit * gridColumns + lng_digit;
-      code = codeAlphabet[ndx] + code;
-      // Note! Integer division.
+      code[separatorPosition + 2 + i] =
+          codeAlphabet[lat_digit * gridColumns + lng_digit];
       latVal ~/= gridRows;
       lngVal ~/= gridColumns;
     }
@@ -296,25 +304,28 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
     latVal ~/= pow(gridRows, gridCodeLength);
     lngVal ~/= pow(gridColumns, gridCodeLength);
   }
+
+  // Add the pair after the separator.
+  code[separatorPosition + 1] = codeAlphabet[latVal % encodingBase];
+  code[separatorPosition + 2] = codeAlphabet[lngVal % encodingBase];
+  latVal ~/= encodingBase;
+  lngVal ~/= encodingBase;
+
   // Compute the pair section of the code.
-  for (var i = 0; i < pairCodeLength / 2; i++) {
-    code = codeAlphabet[lngVal % encodingBase] + code;
-    code = codeAlphabet[latVal % encodingBase] + code;
+  for (int i = pairCodeLength ~/ 2 + 1; i >= 0; i -= 2) {
+    code[i] = codeAlphabet[latVal % encodingBase];
+    code[i + 1] = codeAlphabet[lngVal % encodingBase];
     latVal ~/= encodingBase;
     lngVal ~/= encodingBase;
   }
 
-  // Add the separator character.
-  code = code.substring(0, separatorPosition) +
-      separator +
-      code.substring(separatorPosition);
-
   // If we don't need to pad the code, return the requested section.
   if (codeLength >= separatorPosition) {
-    return code.substring(0, codeLength + 1);
+    return code.getRange(0, codeLength + 1).join('');
   }
+
   // Pad and return the code.
-  return code.substring(0, codeLength) +
+  return code.getRange(0, codeLength).join('') +
       (padding * (separatorPosition - codeLength)) +
       separator;
 }
@@ -326,7 +337,8 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
 CodeArea decode(String code) {
   if (!isFull(code)) {
     throw ArgumentError(
-        'Passed Open Location Code is not a valid full code: $code');
+      'Passed Open Location Code is not a valid full code: $code',
+    );
   }
   // Strip out separator character (we've already established the code is
   // valid so the maximum is one), padding characters and convert to upper
@@ -381,8 +393,13 @@ CodeArea decode(String code) {
   var lat = normalLat / pairPrecision + gridLat / finalLatPrecision;
   var lng = normalLng / pairPrecision + gridLng / finalLngPrecision;
   // Return the code area.
-  return CodeArea(lat, lng, lat + latPrecision, lng + lngPrecision,
-      min(code.length, maxDigitCount));
+  return CodeArea(
+    lat,
+    lng,
+    lat + latPrecision,
+    lng + lngPrecision,
+    min(code.length, maxDigitCount),
+  );
 }
 
 /// Recover the nearest matching code to a specified location.
@@ -420,7 +437,10 @@ CodeArea decode(String code) {
 /// passed code was not a valid short code, but was a valid full code, it is
 /// returned unchanged.
 String recoverNearest(
-    String shortCode, num referenceLatitude, num referenceLongitude) {
+  String shortCode,
+  num referenceLatitude,
+  num referenceLongitude,
+) {
   if (!isShort(shortCode)) {
     if (isFull(shortCode)) {
       return shortCode.toUpperCase();
@@ -442,9 +462,10 @@ String recoverNearest(
   var halfResolution = resolution / 2.0;
 
   // Use the reference location to pad the supplied short code and decode it.
-  var codeArea = decode(encode(referenceLatitude, referenceLongitude)
-          .substring(0, paddingLength) +
-      shortCode);
+  var codeArea = decode(
+    encode(referenceLatitude, referenceLongitude).substring(0, paddingLength) +
+        shortCode,
+  );
   var centerLatitude = codeArea.center.latitude;
   var centerLongitude = codeArea.center.longitude;
 
@@ -470,8 +491,11 @@ String recoverNearest(
     centerLongitude += resolution;
   }
 
-  return encode(centerLatitude, centerLongitude,
-      codeLength: codeArea.codeLength);
+  return encode(
+    centerLatitude,
+    centerLongitude,
+    codeLength: codeArea.codeLength,
+  );
 }
 
 /// Remove characters from the start of an OLC [code].
@@ -506,8 +530,10 @@ String shorten(String code, num latitude, num longitude) {
   latitude = clipLatitude(latitude);
   longitude = normalizeLongitude(longitude);
   // How close are the latitude and longitude to the code center.
-  var range = max((codeArea.center.latitude - latitude).abs(),
-      (codeArea.center.longitude - longitude).abs());
+  var range = max(
+    (codeArea.center.latitude - latitude).abs(),
+    (codeArea.center.longitude - longitude).abs(),
+  );
   for (var i = pairResolutions.length - 2; i >= 1; i--) {
     // Check if we're close enough to shorten. The range must be less than 1/2
     // the resolution to shorten at all, and we want to allow some safety, so

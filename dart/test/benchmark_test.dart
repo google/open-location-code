@@ -26,15 +26,19 @@ void main() {
       olc.encode(testData[i][0], testData[i][1], codeLength: testData[i][2]);
     }
     var duration = stopwatch.elapsedMicroseconds;
-    print('Encoding benchmark ${testData.length}, duration ${duration} usec, '
-        'average ${duration / testData.length} usec');
+    print(
+      'Encoding benchmark ${testData.length}, duration ${duration} usec, '
+      'average ${duration / testData.length} usec',
+    );
 
     stopwatch = Stopwatch()..start();
     for (var i = 0; i < testData.length; i++) {
       olc.decode(testData[i][3]);
     }
     duration = stopwatch.elapsedMicroseconds;
-    print('Decoding benchmark ${testData.length}, duration ${duration} usec, '
-        'average ${duration / testData.length} usec');
+    print(
+      'Decoding benchmark ${testData.length}, duration ${duration} usec, '
+      'average ${duration / testData.length} usec',
+    );
   });
 }

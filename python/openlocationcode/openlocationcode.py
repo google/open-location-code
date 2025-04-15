@@ -249,25 +249,34 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
         raise ValueError('Invalid Open Location Code length - ' +
                          str(codeLength))
     codeLength = min(codeLength, MAX_DIGIT_COUNT_)
-    # Ensure that latitude and longitude are valid.
-    latitude = clipLatitude(latitude)
-    longitude = normalizeLongitude(longitude)
-    # Latitude 90 needs to be adjusted to be just less, so the returned code
-    # can also be decoded.
-    if latitude == 90:
-        latitude = latitude - computeLatitudePrecision(codeLength)
-    code = ''
 
     # Compute the code.
-    # This approach converts each value to an integer after multiplying it by
-    # the final precision. This allows us to use only integer operations, so
-    # avoiding any accumulation of floating point representation errors.
+    # This approach converts latitude and longitude to integers. This allows us
+    # to use only integer operations, so avoiding any accumulation of floating
+    # point representation errors.
 
     # Multiply values by their precision and convert to positive.
     # Force to integers so the division operations will have integer results.
     # Note: Python requires rounding before truncating to ensure precision!
-    latVal = int(round((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_, 6))
-    lngVal = int(round((longitude + LONGITUDE_MAX_) * FINAL_LNG_PRECISION_, 6))
+    latVal = int(round(latitude * FINAL_LAT_PRECISION_))
+    latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_
+    if latVal < 0:
+        latVal = 0
+    elif latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_:
+        latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1
+
+    lngVal = int(round(longitude * FINAL_LNG_PRECISION_))
+    lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
+    if lngVal < 0:
+        # Python's % operator differs from other languages in that it returns
+        # the same sign as the divisor. This means we don't need to add the
+        # range to the result.
+        lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)
+    elif lngVal >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_:
+        lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)
+
+    # Initialise the code string.
+    code = ''
 
     # Compute the grid part of the code if necessary.
     if codeLength > PAIR_CODE_LENGTH_:
