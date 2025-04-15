@@ -142,14 +142,10 @@ class TestDecoding(unittest.TestCase):
         precision = 10
         for td in self.testdata:
             decoded = olc.decode(td['code'])
-            self.assertEqual(round(decoded.latitudeLo, precision),
-                             round(td['latLo'], precision), td)
-            self.assertEqual(round(decoded.longitudeLo, precision),
-                             round(td['lngLo'], precision), td)
-            self.assertEqual(round(decoded.latitudeHi, precision),
-                             round(td['latHi'], precision), td)
-            self.assertEqual(round(decoded.longitudeHi, precision),
-                             round(td['longHi'], precision), td)
+            self.assertAlmostEqual(decoded.latitudeLo, td['latLo'], precision, td)
+            self.assertAlmostEqual(decoded.longitudeLo, td['lngLo'], precision, td)
+            self.assertAlmostEqual(decoded.latitudeHi, td['latHi'], precision, td)
+            self.assertAlmostEqual(decoded.longitudeHi, td['longHi'], precision, td)
 
 
 class Benchmark(unittest.TestCase):
