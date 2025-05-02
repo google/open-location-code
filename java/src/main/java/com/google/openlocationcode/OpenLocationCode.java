@@ -195,33 +195,14 @@ public final class OpenLocationCode {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
 
+    // Compute the code.
+    long[] integers = degreesToIntegers(latitude, longitude);
+    this.code = encodeIntegers(integers[0], integers[1], codeLength);
+  }
+
+  private static String encodeIntegers(long latVal, long lngVal, int codeLength) {
     // Store the code - we build it in reverse and reorder it afterwards.
     StringBuilder revCodeBuilder = new StringBuilder();
-
-    // Compute the code.
-    // This approach converts each value to an integer after multiplying it by
-    // the final precision. This allows us to use only integer operations, so
-    // avoiding any accumulation of floating point representation errors.
-
-    long latVal = (long) roundAwayFromZero(latitude * LAT_INTEGER_MULTIPLIER);
-    long lngVal = (long) roundAwayFromZero(longitude * LNG_INTEGER_MULTIPLIER);
-
-    // Clip and normalise values.
-    latVal += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
-    if (latVal < 0) {
-      latVal = 0;
-    } else if (latVal >= 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER) {
-      latVal = 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER - 1;
-    }
-    lngVal += LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
-    if (lngVal < 0) {
-      lngVal =
-          lngVal % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER)
-              + 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
-    } else if (lngVal >= 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER) {
-      lngVal = lngVal % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER);
-    }
-
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH) {
       for (int i = 0; i < GRID_CODE_LENGTH; i++) {
@@ -256,8 +237,7 @@ public final class OpenLocationCode {
         codeBuilder.setCharAt(i, PADDING_CHARACTER);
       }
     }
-    this.code =
-        codeBuilder.subSequence(0, Math.max(SEPARATOR_POSITION + 1, codeLength + 1)).toString();
+    return codeBuilder.subSequence(0, Math.max(SEPARATOR_POSITION + 1, codeLength + 1)).toString();
   }
 
   /**
@@ -666,6 +646,28 @@ public final class OpenLocationCode {
   }
 
   // Private static methods.
+
+  private static long[] degreesToIntegers(double latitude, double longitude) {
+    long lat = (long) roundAwayFromZero(latitude * LAT_INTEGER_MULTIPLIER);
+    long lng = (long) roundAwayFromZero(longitude * LNG_INTEGER_MULTIPLIER);
+
+    // Clip and normalise values.
+    lat += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
+    if (lat < 0) {
+      lat = 0;
+    } else if (lat >= 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER) {
+      lat = 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER - 1;
+    }
+    lng += LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
+    if (lng < 0) {
+      lng =
+          lng % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER)
+              + 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
+    } else if (lng >= 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER) {
+      lng = lng % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER);
+    }
+    return new long[]{lat, lng};
+  }
 
   /**
    * Round numbers like C does. This implements rounding away from zero (see
