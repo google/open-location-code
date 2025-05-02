@@ -16,7 +16,6 @@ package olc
 
 import (
 	"errors"
-	"strings"
 )
 
 var (
@@ -43,17 +42,25 @@ func Encode(lat, lng float64, codeLen int) string {
 	// This allows us to use only integer operations, so avoiding any accumulation of floating point representation errors.
 	latVal := latitudeAsInteger(lat)
 	lngVal := longitudeAsInteger(lng)
-
 	// Clip the code length to legal values.
 	codeLen = clipCodeLen(codeLen)
-	// Use a char array so we can build it up from the end digits, without having
-	// to keep reallocating strings.
-	var code [maxCodeLen + 1]byte
+	// Call the integer based encoding method.
+	return integerEncode(latVal, lngVal, codeLen)
+}
+
+func integerEncode(latVal, lngVal int64, codeLen int) string {
+	// Use a char array so we can build it up from the end digits, without having to keep reallocating strings.
+	// Prime it with padding and separator.
+	var code []byte = []byte("00000000+0012345")
 
 	// Compute the grid part of the code if necessary.
 	if codeLen > pairCodeLen {
 		for i := maxCodeLen - pairCodeLen; i >= 1; i-- {
-			code[sepPos+2+i], latVal, lngVal = latLngGridStep(latVal, lngVal)
+			latDigit := latVal % int64(gridRows)
+			lngDigit := lngVal % int64(gridCols)
+			code[sepPos+2+i] = Alphabet[latDigit*gridCols+lngDigit]
+			latVal /= int64(gridRows)
+			lngVal /= int64(gridCols)
 		}
 	} else {
 		latVal /= gridLatFullValue
@@ -63,9 +70,6 @@ func Encode(lat, lng float64, codeLen int) string {
 	// Add the pair after the separator.
 	code[sepPos+2], lngVal = pairIndexStep(lngVal)
 	code[sepPos+1], latVal = pairIndexStep(latVal)
-
-	// Avoid the need for string concatenation by filling in the Separator manually.
-	code[sepPos] = Separator
 
 	// Compute the pair section of the code.
 	// Even indices contain latitude and odd contain longitude.
@@ -77,8 +81,11 @@ func Encode(lat, lng float64, codeLen int) string {
 	if codeLen >= sepPos {
 		return string(code[:codeLen+1])
 	}
-	// Pad and return the code.
-	return string(code[:codeLen]) + strings.Repeat(string(Padding), sepPos-codeLen) + string(Separator)
+	// If the code needs padding, add it and return to the separator.
+	for i := codeLen; i < sepPos; i++ {
+		code[i] = Padding
+	}
+	return string(code[:sepPos+1])
 }
 
 // clipCodeLen returns the smallest valid code length greater than or equal to
@@ -95,16 +102,6 @@ func clipCodeLen(codeLen int) int {
 		return maxCodeLen
 	}
 	return codeLen
-}
-
-// latLngGridStep computes the next smallest grid code in sequence,
-// followed by the remaining latitude and longitude values not yet converted
-// to a grid code.
-func latLngGridStep(latVal, lngVal int64) (byte, int64, int64) {
-	latDigit := latVal % int64(gridRows)
-	lngDigit := lngVal % int64(gridCols)
-	ndx := latDigit*gridCols + lngDigit
-	return Alphabet[ndx], latVal / int64(gridRows), lngVal / int64(gridCols)
 }
 
 // pairIndexStep computes the next smallest pair code in sequence,
