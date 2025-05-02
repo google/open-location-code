@@ -129,11 +129,12 @@ Both the encoding algorithms below operate on integer values, requiring the lati
 Take care when implementing this conversion - merging the operations below can result in unexpected rounding operations and will result in test failures.
 
 1. Convert latitude to a clipped, positive integer:
-   1. Multiply it by the maximum latitude resolution, 2.5e7, and truncate (_not round_) it.
+   1. Multiply it by the maximum latitude resolution, 2.5e7, and floor (_not round_) it.
+      1. Truncating (just casting to an integer) may not perform correctly with negative numbers depending on the language, as casting -1.3 to an integer could return -1, when we need -2.
    2. Add `90 x 2.5e7` to put it in a positive range.
    3. Clip it so that it is in the range `0 <= latitude < 180`. (If it is greater than or equal to 180, set it to `180 - 1/8.192e6`.)
 2. Convert longitude to a normalised, positive integer:
-   1. Multiply it by the maximum longitude resolution, 8.192e6, and truncate (_not round_) it.
+   1. Multiply it by the maximum longitude resolution, 8.192e6, and floor (_not round_) it.
    2. Add `180 x 8.192e6` to put it in a positive range.
    3. Normalise the longitude so that it is in the range `0 <= longitude < 360`.
 
