@@ -69,7 +69,9 @@ Each of the 400 divisions in a cell are identified by the latitude (vertical) di
 The initial grid size is 20° x 20° so that we can represent the full longitude range (-180 to 180, or 0 to 360).
 
 Digits 11 to 15 differ from the above method in that each step adds a single digit, representing the position in a 4 x 5 grid.
-(Latitude is divided by five, longitude divided by four.)
+Latitude has five (vertical) divisions, longitude has four (horizontal) divisions.
+(This was chosen because a latitude degree value represents a roughly constant distance, but the distance of a longitude degree reduces as you approach the poles.)
+
 The code symbols are positioned in these grid cells as follows:
 
     R V W X
@@ -78,7 +80,7 @@ The code symbols are positioned in these grid cells as follows:
     6 7 8 9
     2 3 4 5
 
-The following table gives the precision of the valid code lengths in degrees and in meters. Where the precisions differ between latitude and longitude both are shown (as latitude x longitude):
+The following table gives the precision of the valid code lengths in degrees and the approximate size in metric units. Where the precisions differ between latitude and longitude both are shown (as latitude x longitude):
 
 | Code length | Precision in degrees |    Precision     |
 | :---------: | :------------------: | :--------------: |
