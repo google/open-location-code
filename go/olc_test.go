@@ -260,15 +260,18 @@ func BenchmarkEncode(b *testing.B) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	lat := make([]float64, b.N)
 	lng := make([]float64, b.N)
+	len := make([]int, b.N)
 	for i := 0; i < b.N; i++ {
 		lat[i] = r.Float64()*180 - 90
 		lng[i] = r.Float64()*360 - 180
+		// Lengths in the range 2-15.
+		len[i] = 2 + i%(maxCodeLen-1)
 	}
 	// Reset the timer and run the benchmark.
 	b.ResetTimer()
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		Encode(lat[i], lng[i], maxCodeLen)
+		Encode(lat[i], lng[i], len[i])
 	}
 }
 
