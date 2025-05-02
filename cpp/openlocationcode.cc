@@ -47,6 +47,78 @@ const int64_t kLongitudeMaxDegrees = 180;
 const int kPositionLUT['X' - 'C' + 1] = {8,  -1, -1, 9,  10, 11, -1, 12,
                                          -1, -1, 13, -1, -1, 14, 15, 16,
                                          -1, -1, -1, 17, 18, 19};
+
+int64_t latitudeToInteger(double latitude) {
+  int64_t lat = round(latitude * kGridLatPrecisionInverse);
+  lat += kLatitudeMaxDegrees * kGridLatPrecisionInverse;
+  if (lat < 0) {
+    lat = 0;
+  } else if (lat >= 2 * kLatitudeMaxDegrees * kGridLatPrecisionInverse) {
+    lat = 2 * kLatitudeMaxDegrees * kGridLatPrecisionInverse - 1;
+  }
+  return lat;
+}
+
+int64_t longitudeToInteger(double longitude) {
+  int64_t lng = round(longitude * kGridLngPrecisionInverse);
+  lng += kLongitudeMaxDegrees * kGridLngPrecisionInverse;
+  if (lng <= 0) {
+    lng = lng % (2 * kLongitudeMaxDegrees * kGridLngPrecisionInverse) +
+          2 * kLongitudeMaxDegrees * kGridLngPrecisionInverse;
+  } else if (lng >= 2 * kLongitudeMaxDegrees * kGridLngPrecisionInverse) {
+    lng = lng % (2 * kLongitudeMaxDegrees * kGridLngPrecisionInverse);
+  }
+  return lng;
+}
+
+std::string encodeIntegers(int64_t lat_val, int64_t lng_val,
+                           size_t code_length) {
+  // Reserve characters for the code digits and the separator.
+  std::string code = "1234567890abcdef";
+  // Add the separator character.
+  code[internal::kSeparatorPosition] = internal::kSeparator;
+
+  // Compute the grid part of the code if necessary.
+  if (code_length > internal::kPairCodeLength) {
+    for (size_t i = internal::kGridCodeLength; i >= 1; i--) {
+      int lat_digit = lat_val % internal::kGridRows;
+      int lng_digit = lng_val % internal::kGridColumns;
+      code[internal::kSeparatorPosition + 2 + i] =
+          internal::kAlphabet[lat_digit * internal::kGridColumns + lng_digit];
+      lat_val /= internal::kGridRows;
+      lng_val /= internal::kGridColumns;
+    }
+  } else {
+    lat_val /= pow(internal::kGridRows, internal::kGridCodeLength);
+    lng_val /= pow(internal::kGridColumns, internal::kGridCodeLength);
+  }
+
+  // Add the pair after the separator.
+  code[internal::kSeparatorPosition + 1] =
+      internal::kAlphabet[lat_val % internal::kEncodingBase];
+  code[internal::kSeparatorPosition + 2] =
+      internal::kAlphabet[lng_val % internal::kEncodingBase];
+  lat_val /= internal::kEncodingBase;
+  lng_val /= internal::kEncodingBase;
+
+  // Compute the pair section before the separator in reverse order.
+  // Even indices contain latitude and odd contain longitude.
+  for (int i = (internal::kPairCodeLength / 2 + 1); i >= 0; i -= 2) {
+    code[i] = internal::kAlphabet[lat_val % internal::kEncodingBase];
+    code[i + 1] = internal::kAlphabet[lng_val % internal::kEncodingBase];
+    lat_val /= internal::kEncodingBase;
+    lng_val /= internal::kEncodingBase;
+  }
+  // Replace digits with padding if necessary.
+  if (code_length < internal::kSeparatorPosition) {
+    for (size_t i = code_length; i < internal::kSeparatorPosition; i++) {
+      code[i] = internal::kPaddingCharacter;
+    }
+    code_length = internal::kSeparatorPosition;
+  }
+  // Return the code up to and including the separator.
+  return code.substr(0, code_length + 1);
+}
 }  // namespace internal
 
 namespace {
@@ -129,78 +201,9 @@ std::string Encode(const LatLng &location, size_t code_length) {
     code_length = code_length + 1;
   }
   // Convert latitude and longitude into integer values.
-  int64_t lat_val =
-      round(location.latitude * internal::kGridLatPrecisionInverse);
-  int64_t lng_val =
-      round(location.longitude * internal::kGridLngPrecisionInverse);
-
-  // Adjust latitude and longitude so that they are normalized/clipped.
-  lat_val += internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse;
-  if (lat_val < 0) {
-    lat_val = 0;
-  } else if (lat_val >= 2 * internal::kLatitudeMaxDegrees *
-                            internal::kGridLatPrecisionInverse) {
-    lat_val =
-        2 * internal::kLatitudeMaxDegrees * internal::kGridLatPrecisionInverse -
-        1;
-  }
-  lng_val +=
-      internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
-  if (lng_val <= 0) {
-    lng_val =
-        lng_val % (2 * internal::kLongitudeMaxDegrees *
-                   internal::kGridLngPrecisionInverse) +
-        2 * internal::kLongitudeMaxDegrees * internal::kGridLngPrecisionInverse;
-  } else if (lng_val >= 2 * internal::kLongitudeMaxDegrees *
-                            internal::kGridLngPrecisionInverse) {
-    lng_val = lng_val % (2 * internal::kLongitudeMaxDegrees *
-                         internal::kGridLngPrecisionInverse);
-  }
-  // Reserve characters for the code digits and the separator.
-  std::string code = "1234567890abcdef";
-  // Add the separator character.
-  code[internal::kSeparatorPosition] = internal::kSeparator;
-
-  // Compute the grid part of the code if necessary.
-  if (code_length > internal::kPairCodeLength) {
-    for (size_t i = internal::kGridCodeLength; i >= 1; i--) {
-      int lat_digit = lat_val % internal::kGridRows;
-      int lng_digit = lng_val % internal::kGridColumns;
-      code[internal::kSeparatorPosition + 2 + i] =
-          internal::kAlphabet[lat_digit * internal::kGridColumns + lng_digit];
-      lat_val /= internal::kGridRows;
-      lng_val /= internal::kGridColumns;
-    }
-  } else {
-    lat_val /= pow(internal::kGridRows, internal::kGridCodeLength);
-    lng_val /= pow(internal::kGridColumns, internal::kGridCodeLength);
-  }
-
-  // Add the pair after the separator.
-  code[internal::kSeparatorPosition + 1] =
-      internal::kAlphabet[lat_val % internal::kEncodingBase];
-  code[internal::kSeparatorPosition + 2] =
-      internal::kAlphabet[lng_val % internal::kEncodingBase];
-  lat_val /= internal::kEncodingBase;
-  lng_val /= internal::kEncodingBase;
-
-  // Compute the pair section before the separator in reverse order.
-  // Even indices contain latitude and odd contain longitude.
-  for (int i = (internal::kPairCodeLength / 2 + 1); i >= 0; i -= 2) {
-    code[i] = internal::kAlphabet[lat_val % internal::kEncodingBase];
-    code[i + 1] = internal::kAlphabet[lng_val % internal::kEncodingBase];
-    lat_val /= internal::kEncodingBase;
-    lng_val /= internal::kEncodingBase;
-  }
-  // Replace digits with padding if necessary.
-  if (code_length < internal::kSeparatorPosition) {
-    for (size_t i = code_length; i < internal::kSeparatorPosition; i++) {
-      code[i] = internal::kPaddingCharacter;
-    }
-    code_length = internal::kSeparatorPosition;
-  }
-  // Return the code up to and including the separator.
-  return code.substr(0, code_length + 1);
+  int64_t lat_val = internal::latitudeToInteger(location.latitude);
+  int64_t lng_val = internal::longitudeToInteger(location.longitude);
+  return internal::encodeIntegers(lat_val, lng_val, code_length);
 }
 
 std::string Encode(const LatLng &location) {

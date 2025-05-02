@@ -195,53 +195,42 @@ public final class OpenLocationCode {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
 
+    // Compute the code.
+    long[] integers = degreesToIntegers(latitude, longitude);
+    this.code = encodeIntegers(integers[0], integers[1], codeLength);
+  }
+
+  /**
+   * Encode a location specified with integer values and return the code.
+   *
+   * @param lat The latitude as a positive integer.
+   * @param lng The longitude as a positive integer.
+   * @param codeLength The requested number of digits.
+   * @return The OLC for the location.
+   */
+  private static String encodeIntegers(long lat, long lng, int codeLength) {
     // Store the code - we build it in reverse and reorder it afterwards.
     StringBuilder revCodeBuilder = new StringBuilder();
-
-    // Compute the code.
-    // This approach converts each value to an integer after multiplying it by
-    // the final precision. This allows us to use only integer operations, so
-    // avoiding any accumulation of floating point representation errors.
-
-    long latVal = (long) roundAwayFromZero(latitude * LAT_INTEGER_MULTIPLIER);
-    long lngVal = (long) roundAwayFromZero(longitude * LNG_INTEGER_MULTIPLIER);
-
-    // Clip and normalise values.
-    latVal += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
-    if (latVal < 0) {
-      latVal = 0;
-    } else if (latVal >= 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER) {
-      latVal = 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER - 1;
-    }
-    lngVal += LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
-    if (lngVal < 0) {
-      lngVal =
-          lngVal % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER)
-              + 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
-    } else if (lngVal >= 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER) {
-      lngVal = lngVal % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER);
-    }
-
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH) {
       for (int i = 0; i < GRID_CODE_LENGTH; i++) {
-        long latDigit = latVal % GRID_ROWS;
-        long lngDigit = lngVal % GRID_COLUMNS;
+        long latDigit = lat % GRID_ROWS;
+        long lngDigit = lng % GRID_COLUMNS;
         int ndx = (int) (latDigit * GRID_COLUMNS + lngDigit);
         revCodeBuilder.append(CODE_ALPHABET.charAt(ndx));
-        latVal /= GRID_ROWS;
-        lngVal /= GRID_COLUMNS;
+        lat /= GRID_ROWS;
+        lng /= GRID_COLUMNS;
       }
     } else {
-      latVal = (long) (latVal / Math.pow(GRID_ROWS, GRID_CODE_LENGTH));
-      lngVal = (long) (lngVal / Math.pow(GRID_COLUMNS, GRID_CODE_LENGTH));
+      lat = (long) (lat / Math.pow(GRID_ROWS, GRID_CODE_LENGTH));
+      lng = (long) (lng / Math.pow(GRID_COLUMNS, GRID_CODE_LENGTH));
     }
     // Compute the pair section of the code.
     for (int i = 0; i < PAIR_CODE_LENGTH / 2; i++) {
-      revCodeBuilder.append(CODE_ALPHABET.charAt((int) (lngVal % ENCODING_BASE)));
-      revCodeBuilder.append(CODE_ALPHABET.charAt((int) (latVal % ENCODING_BASE)));
-      latVal /= ENCODING_BASE;
-      lngVal /= ENCODING_BASE;
+      revCodeBuilder.append(CODE_ALPHABET.charAt((int) (lng % ENCODING_BASE)));
+      revCodeBuilder.append(CODE_ALPHABET.charAt((int) (lat % ENCODING_BASE)));
+      lat /= ENCODING_BASE;
+      lng /= ENCODING_BASE;
       // If we are at the separator position, add the separator.
       if (i == 0) {
         revCodeBuilder.append(SEPARATOR);
@@ -256,8 +245,7 @@ public final class OpenLocationCode {
         codeBuilder.setCharAt(i, PADDING_CHARACTER);
       }
     }
-    this.code =
-        codeBuilder.subSequence(0, Math.max(SEPARATOR_POSITION + 1, codeLength + 1)).toString();
+    return codeBuilder.subSequence(0, Math.max(SEPARATOR_POSITION + 1, codeLength + 1)).toString();
   }
 
   /**
@@ -666,6 +654,36 @@ public final class OpenLocationCode {
   }
 
   // Private static methods.
+
+  /**
+   * Convert latitude and longitude in degrees into the integer values needed for reliable encoding.
+   * (To avoid floating point precision errors.)
+   *
+   * @param latitude The latitude in decimal degrees.
+   * @param longitude The longitude in decimal degrees.
+   * @return A list of [latitude, longitude] in clipped, normalised integer values.
+   */
+  private static long[] degreesToIntegers(double latitude, double longitude) {
+    long lat = (long) roundAwayFromZero(latitude * LAT_INTEGER_MULTIPLIER);
+    long lng = (long) roundAwayFromZero(longitude * LNG_INTEGER_MULTIPLIER);
+
+    // Clip and normalise values.
+    lat += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
+    if (lat < 0) {
+      lat = 0;
+    } else if (lat >= 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER) {
+      lat = 2 * LATITUDE_MAX * LAT_INTEGER_MULTIPLIER - 1;
+    }
+    lng += LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
+    if (lng < 0) {
+      lng =
+          lng % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER)
+              + 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER;
+    } else if (lng >= 2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER) {
+      lng = lng % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER);
+    }
+    return new long[] {lat, lng};
+  }
 
   /**
    * Round numbers like C does. This implements rounding away from zero (see

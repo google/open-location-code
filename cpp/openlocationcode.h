@@ -106,6 +106,16 @@ extern const size_t kInitialExponent;
 // Size of the initial grid in degrees. This is the size of the area represented
 // by a 10 character code, and is kEncodingBase ^ (2 - kPairCodeLength / 2).
 extern const double kGridSizeDegrees;
+// Internal method to convert latitude in degrees to the integer value for
+// encoding.
+int64_t latitudeToInteger(double latitude);
+// Internal method to convert longitude in degrees to the integer value for
+// encoding.
+int64_t longitudeToInteger(double longitude);
+// Internal method to encode using the integer values to avoid floating-point
+// precision errors.
+std::string encodeIntegers(int64_t latitude, int64_t longitude,
+                           size_t code_length);
 }  // namespace internal
 
 }  // namespace openlocationcode

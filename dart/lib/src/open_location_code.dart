@@ -259,11 +259,13 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
     throw ArgumentError('Invalid Open Location Code length: $codeLength');
   }
   codeLength = min(maxDigitCount, codeLength);
+  var integers = locationToIntegers(latitude, longitude);
+  return encodeIntegers(integers[0], integers[1], codeLength);
+}
 
-  // This approach converts each value to an integer after multiplying it by
-  // the final precision. This allows us to use only integer operations, so
-  // avoiding any accumulation of floating point representation errors.
-
+// Convert latitude and longitude in degrees to the integer values needed for
+// reliable conversions.
+List<int> locationToIntegers(num latitude, num longitude) {
   // Convert latitude into a positive integer clipped into the range 0-(just
   // under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
   // returned code can also be decoded.
@@ -286,7 +288,11 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   } else if (lngVal >= 2 * longitudeMax * finalLngPrecision) {
     lngVal = lngVal % (2 * longitudeMax * finalLngPrecision);
   }
+  return [latVal, lngVal];
+}
 
+/// Encode a location into an Open Location Code.
+String encodeIntegers(int latVal, int lngVal, int codeLength) {
   List<String> code = List<String>.filled(maxDigitCount + 1, '');
   code[separatorPosition] = separator;
 
