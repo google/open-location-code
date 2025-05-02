@@ -41,12 +41,42 @@ Algorithms based on floating-point numbers should be avoided, as the precision l
 ### Code precision
 
 The first 10 digits of the code is made up of five pairs.
-Each pair represents a cell in a 20x20 grid, with the first digit of each pair being latitude, and the second being longitude.
+Each pair represents a cell in a 20x20 grid.
+
+Each of the 400 divisions in a cell are identified by the latitude (vertical) digit followed by the longitude (horizontal) digit:
+
+    X2 X3 X4 X5 X6 X7 X8 X9 XC XF XG XH XJ XM XP XQ XR XV XW XX
+    W2 W3 W4 W5 W6 W7 W8 W9 WC WF WG WH WJ WM WP WQ WR WV WW WX
+    V2 V3 V4 V5 V6 V7 V8 V9 VC VF VG VH VJ VM VP VQ VR VV VW VX
+    R2 R3 R4 R5 R6 R7 R8 R9 RC RF RG RH RJ RM RP RQ RR RV RW RX
+    Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 QC QF QG QH QJ QM QP QQ QR QV QW QX
+    P2 P3 P4 P5 P6 P7 P8 P9 PC PF PG PH PJ PM PP PQ PR PV PW PX
+    M2 M3 M4 M5 M6 M7 M8 M9 MC MF MG MH MJ MM MP MQ MR MV MW MX
+    J2 J3 J4 J5 J6 J7 J8 J9 JC JF JG JH JJ JM JP JQ JR JV JW JX
+    H2 H3 H4 H5 H6 H7 H8 H9 HC HF HG HH HJ HM HP HQ HR HV HW HX
+    G2 G3 G4 G5 G6 G7 G8 G9 GC GF GG GH GJ GM GP GQ GR GV GW GX
+    F2 F3 F4 F5 F6 F7 F8 F9 FC FF FG FH FJ FM FP FQ FR FV FW FX
+    C2 C3 C4 C5 C6 C7 C8 C9 CC CF CG CH CJ CM CP CQ CR CV CW CX
+    92 93 94 95 96 97 98 99 9C 9F 9G 9H 9J 9M 9P 9Q 9R 9V 9W 9X
+    82 83 84 85 86 87 88 89 8C 8F 8G 8H 8J 8M 8P 8Q 8R 8V 8W 8X
+    72 73 74 75 76 77 78 79 7C 7F 7G 7H 7J 7M 7P 7Q 7R 7V 7W 7X
+    62 63 64 65 66 67 68 69 6C 6F 6G 6H 6J 6M 6P 6Q 6R 6V 6W 6X
+    52 53 54 55 56 57 58 59 5C 5F 5G 5H 5J 5M 5P 5Q 5R 5V 5W 5X
+    42 43 44 45 46 47 48 49 4C 4F 4G 4H 4J 4M 4P 4Q 4R 4V 4W 4X
+    32 33 34 35 36 37 38 39 3C 3F 3G 3H 3J 3M 3P 3Q 3R 3V 3W 3X
+    22 23 24 25 26 27 28 29 2C 2F 2G 2H 2J 2M 2P 2Q 2R 2V 2W 2X
 
 The initial grid size is 20° x 20° so that we can represent the full longitude range (-180 to 180, or 0 to 360).
 
 Digits 11 to 15 differ from the above method in that each step adds a single digit, representing the position in a 4 x 5 grid.
 (Latitude is divided by five, longitude divided by four.)
+The code symbols are positioned in these grid cells as follows:
+
+    R V W X
+    J M P Q
+    C F G H
+    6 7 8 9
+    2 3 4 5
 
 The following table gives the precision of the valid code lengths in degrees and in meters. Where the precisions differ between latitude and longitude both are shown (as latitude x longitude):
 
@@ -89,45 +119,25 @@ Implementations using high precision floating-point libraries should be well tes
 The algorithms below should be considered as reference implementations.
 Other implementations should be well tested to make sure they do not differ.
 
+Whether you build the code from the first digit or the last digit may depend on personal preference, or the available string-building libraries.
+
 ### Prerequisites
 
-The encoding algorithms below operate on integer values, requiring the latitude and longitude values to be converted to be positive integers.
-Take care when implementing - merging the operations below can result in unexpected rounding operations and will result in test failures.
+Both the encoding algorithms below operate on integer values, requiring the latitude and longitude values to be converted to be positive integers.
+Take care when implementing this conversion - merging the operations below can result in unexpected rounding operations and will result in test failures.
 
 1. Convert latitude to a clipped, positive integer:
-   1. Multiply it by the maximum latitude resolution, 2.5e7, and truncate (*not round*) it.
+   1. Multiply it by the maximum latitude resolution, 2.5e7, and truncate (_not round_) it.
    2. Add `90 x 2.5e7` to put it in a positive range.
    3. Clip it so that it is in the range `0 <= latitude < 180`. (If it is greater than or equal to 180, set it to `180 - 1/8.192e6`.)
 2. Convert longitude to a normalised, positive integer:
-   1. Multiply it by the maximum longitude resolution, 8.192e6, and truncate (*not round*) it.
+   1. Multiply it by the maximum longitude resolution, 8.192e6, and truncate (_not round_) it.
    2. Add `180 x 8.192e6` to put it in a positive range.
    3. Normalise the longitude so that it is in the range `0 <= longitude < 360`.
 
-### Reverse Encoding
-
-This algorithm computes the code digits starting at the least significant digit, digit 15.
-
-For each digit 15 to 11:
-
-1. The code digits position in the symbol set is defined by `(latitude % 5) * 4 + (longitude % 4)`.
-   1. (`%` is the modulo or remainder operation, and this produces values in the range 0-19.)
-   2. For example, if the calculation returns the value `8`, the code digit is `C`.
-2. Divide latitude by 5 and truncate it.
-   1. For example, `latitude = math.Floor(latitude / 5)`
-3. Similarly, divide longitude by 4 and truncate it.
-
-Digits 10 to 1 are computed in pairs as follows:
-
-1. Digit _n_ (latitude) position in the symbol set is defined by `latitude % 20`
-   1. For example, if the calculation returns the value `8`, the code digit is `C`.
-2. Similarly, digit _n + 1_ (longitude) position in the symbol set is defined by `longitude %20`
-3. Divide each value by `20` (and truncate).
-
-The separator character "+" will need to be inserted into the code, and codes with fewer digits than the separator position will need to be padded with "0".
-
 ### Forward Encoding
 
-The code can also be computed starting from the first character.
+This algorithm computes the code starting from the first character and working towards the end of the code.
 
 1. Define a latitude divisor of `400 * 2.5e7`.
 2. Define a longitude divisor of `400 * 8.192e6`
@@ -135,19 +145,43 @@ The code can also be computed starting from the first character.
 Digits 1 to 10 are computed in pairs as follows:
 
 1. Divide the `latitude divisor` by `20`
-2. Digit _n_ (latitude) position in the symbol set is defined by the quotient of `latitude / latitude divisor`
+2. Digit _n_ (latitude) position in the symbol set is defined by the integer result ("quotient") of `latitude / latitude divisor`
 3. Subtract `latitude divisor * quotient` from `latitude`
 4. Divide the `longitude divisor` by `20`
-5. Digit _n + 1_ (longitude) position in the symbol set is defined by the quotient of `longitude / longitude divisor`
+5. Digit _n + 1_ (longitude) position in the symbol set is defined by the integer result ("quotient") of `longitude / longitude divisor`
 6. Subtract `longitude divisor * quotient` from `longitude`
 
 Digits 11 to 15 are computed as follows:
 
 1. Divide `latitude divisor` by `5`
 2. Divide `longitude divisor` by `4`
-3. Latitude quotient is defined by the quotient of `latitude / latitude divisor`
-4. Longitude quotient is defined by the quotient of `longitude / longitude divisor`
+3. Latitude quotient is defined by the integer result of `latitude / latitude divisor`
+4. Longitude quotient is defined by the integer result of `longitude / longitude divisor`
 5. Digit _n_ position in the symbol set is defined by `latitude quotient * 4 + longitude quotient`
+
+The separator character "+" will need to be inserted into the code, and codes with fewer digits than the separator position will need to be padded with "0".
+
+### Reverse Encoding
+
+This alternative algorithm computes the code digits starting at the least significant digit, digit 15.
+It is also based on the integer converted values for latitude and longitude.
+This may be more convenient to implement, depending on the string building capabilities in a specific language.
+
+For each digit 15 to 11:
+
+1. The code digits position in the symbol set is defined by `(latitude % 5) * 4 + (longitude % 4)`.
+   1. (`%` is the modulo or remainder operation, and this produces values in the range 0-19.)
+   2. For example, if the calculation returns the value `8`, the code digit is `C`.
+2. Set latitude to the integer result of `latitude / 5`.
+   1. For example, `latitude = math.Floor(latitude / 5)` or `latitude = int64(latitude / 5)`
+3. Similarly, set longitude to the integer result of `longitude / 4`.
+
+Digits 10 to 1 are computed in pairs as follows:
+
+1. Digit _n_ (latitude) position in the symbol set is defined by `latitude % 20`
+   1. For example, if the calculation returns the value `8`, the code digit is `C`.
+2. Similarly, digit _n + 1_ (longitude) position in the symbol set is defined by `longitude % 20`
+3. Divide each value by `20` (and truncate).
 
 The separator character "+" will need to be inserted into the code, and codes with fewer digits than the separator position will need to be padded with "0".
 
