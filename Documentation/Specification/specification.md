@@ -171,6 +171,7 @@ The separator character "+" will need to be inserted into the code, and codes wi
 This alternative algorithm computes the code digits starting at the least significant digit, digit 15.
 It is also based on the integer converted values for latitude and longitude.
 This may be more convenient to implement, depending on the string building capabilities in a specific language.
+This algorithm is also slightly faster than the forward encoding, except for code lengths less than 10.
 
 For each digit 15 to 11:
 
