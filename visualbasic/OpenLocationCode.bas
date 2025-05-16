@@ -240,76 +240,11 @@ Public Function OLCEncode(ByVal latitude As Double, ByVal longitude As Double, O
   ' The reason is that we want to use this code in Excel and LibreOffice, but the LibreOffice
   ' Long type is only 32 bits, –2147483648 and 2147483647, which is too small.
   Dim lat As Double, lng As Double
-  ' i is used in loops.
-  Dim i As Integer
 
-  ' Convert latitude into a positive integer clipped into the range 0-(just
-  ' under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
-  ' returned code can also be decoded.
-  lat = Round(latitude * FINAL_LAT_PRECISION_)
-  lat = lat + LATITUDE_MAX_ * FINAL_LAT_PRECISION_
-  If lat < 0 Then
-    lat = 0
-  ElseIf lat >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ Then
-    lat = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1
-  End If
-  ' Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-  lng = Round(longitude * FINAL_LNG_PRECISION_)
-  lng = lng + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
-  If lng < 0 Then
-    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
-  ElseIf lng >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_ Then
-    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_))
-  EndIf
+  lat = latitudeToInteger(latitude)
+  lng = longitudeToInteger(longitude)
 
-  ' Build up the code in an array.
-  Dim code(MAX_DIGIT_COUNT_) As String
-  code(SEPARATOR_POSITION_) = SEPARATOR_
-
-  ' Compute the grid part of the code if necessary.
-  Dim latDigit As Integer
-  Dim lngDigit As Integer
-  If codeLength > PAIR_CODE_LENGTH_ Then
-      For i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_ To 1 Step -1
-        latDigit = CInt(doubleMod(lat, GRID_ROWS_))
-        lngDigit = CInt(doubleMod(lng, GRID_COLUMNS_))
-        code(SEPARATOR_POSITION_ + 2 + i) = Mid(CODE_ALPHABET_, 1 + latDigit * GRID_COLUMNS_ + lngDigit, 1)
-        lat = Int(lat / GRID_ROWS_)
-        lng = Int(lng / GRID_COLUMNS_)
-      Next
-  Else
-    lat = Int(lat / (GRID_ROWS_ ^ GRID_CODE_LENGTH_))
-    lng = Int(lng / (GRID_COLUMNS_ ^ GRID_CODE_LENGTH_))
-  End If
-
-  ' Add the pair after the separator.
-  code(SEPARATOR_POSITION_ + 1) = Mid(CODE_ALPHABET_, 1 + doubleMod(lat, ENCODING_BASE_), 1)
-  code(SEPARATOR_POSITION_ + 2) = Mid(CODE_ALPHABET_, 1 + doubleMod(lng, ENCODING_BASE_), 1)
-  lat = Int(lat / ENCODING_BASE_)
-  lng = Int(lng / ENCODING_BASE_)
-
-  ' Compute the pair section of the code.
-  For i = Int(PAIR_CODE_LENGTH_ / 2) + 1 To 0 Step -2
-    code(i) = Mid(CODE_ALPHABET_, 1 + doubleMod(lat, ENCODING_BASE_), 1)
-    code(i + 1) = Mid(CODE_ALPHABET_, 1 + doubleMod(lng, ENCODING_BASE_), 1)
-    lat = Int(lat / ENCODING_BASE_)
-    lng = Int(lng / ENCODING_BASE_)
-  Next
-  Dim finalCodeLen As Integer
-  finalCodeLen = codeLength
-  ' Add padding characters if necessary.
-  If codeLength < SEPARATOR_POSITION_ Then
-  	For i = codeLength To SEPARATOR_POSITION_ - 1
-  	  code(i) = PADDING_CHARACTER_
-  	Next
-  	finalCodeLen = SEPARATOR_POSITION_
-  EndIf
-  ' Build the final code and return it.
-  Dim finalCode As String
-  For i = 0 To finalCodeLen
-    finalCode = finalCode & code(i)
-  Next
-  OLCEncode = finalCode
+  OLCEncode = encodeIntegers(lat, lng, codeLength)
 End Function
 
 ' Decodes an Open Location Code into an array of latlo, lnglo, latcenter, lngcenter, lathi, lnghi, codelength.
@@ -455,6 +390,93 @@ Private Function normalizeLongitude(ByVal longitude As Double) As Double
     lng = lng - 360
   Loop
   normalizeLongitude = lng
+End Function
+
+' Convert a latitude in degrees to the integer representation.
+' (We return a Double, because VB as used in LibreOffice only uses 32-bit Longs.)
+Private Function latitudeToInteger(ByVal latitude As Double) AS Double
+  Dim lat As Double
+
+  ' Convert latitude into a positive integer clipped into the range 0-(just
+  ' under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
+  ' returned code can also be decoded.
+  lat = Round(latitude * FINAL_LAT_PRECISION_)
+  lat = lat + LATITUDE_MAX_ * FINAL_LAT_PRECISION_
+  If lat < 0 Then
+    lat = 0
+  ElseIf lat >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ Then
+    lat = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1
+  End If
+  latitudeToInteger = lat
+End Function
+
+' Convert a longitude in degrees to the integer representation.
+' (We return a Double, because VB as used in LibreOffice only uses 32-bit Longs.)
+Private Function longitudeToInteger(ByVal longitude As Double) AS Double
+  Dim lng As Double
+  ' Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
+  lng = Round(longitude * FINAL_LNG_PRECISION_)
+  lng = lng + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
+  If lng < 0 Then
+    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
+  ElseIf lng >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_ Then
+    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_))
+  EndIf
+  longitudeToInteger = lng
+End Function
+
+' Encode latitude and longitude integers to an Open Location Code.
+Private Function encodeIntegers(ByVal lat As Double, ByVal lng As Double, codeLength As Integer) AS String
+  ' i is used in loops.
+  Dim i As integer
+  ' Build up the code in an array.
+  Dim code(MAX_DIGIT_COUNT_) As String
+  code(SEPARATOR_POSITION_) = SEPARATOR_
+
+  ' Compute the grid part of the code if necessary.
+  Dim latDigit As Integer
+  Dim lngDigit As Integer
+  If codeLength > PAIR_CODE_LENGTH_ Then
+      For i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_ To 1 Step -1
+        latDigit = CInt(doubleMod(lat, GRID_ROWS_))
+        lngDigit = CInt(doubleMod(lng, GRID_COLUMNS_))
+        code(SEPARATOR_POSITION_ + 2 + i) = Mid(CODE_ALPHABET_, 1 + latDigit * GRID_COLUMNS_ + lngDigit, 1)
+        lat = Int(lat / GRID_ROWS_)
+        lng = Int(lng / GRID_COLUMNS_)
+      Next
+  Else
+    lat = Int(lat / (GRID_ROWS_ ^ GRID_CODE_LENGTH_))
+    lng = Int(lng / (GRID_COLUMNS_ ^ GRID_CODE_LENGTH_))
+  End If
+
+  ' Add the pair after the separator.
+  code(SEPARATOR_POSITION_ + 1) = Mid(CODE_ALPHABET_, 1 + doubleMod(lat, ENCODING_BASE_), 1)
+  code(SEPARATOR_POSITION_ + 2) = Mid(CODE_ALPHABET_, 1 + doubleMod(lng, ENCODING_BASE_), 1)
+  lat = Int(lat / ENCODING_BASE_)
+  lng = Int(lng / ENCODING_BASE_)
+
+  ' Compute the pair section of the code.
+  For i = Int(PAIR_CODE_LENGTH_ / 2) + 1 To 0 Step -2
+    code(i) = Mid(CODE_ALPHABET_, 1 + doubleMod(lat, ENCODING_BASE_), 1)
+    code(i + 1) = Mid(CODE_ALPHABET_, 1 + doubleMod(lng, ENCODING_BASE_), 1)
+    lat = Int(lat / ENCODING_BASE_)
+    lng = Int(lng / ENCODING_BASE_)
+  Next
+  Dim finalCodeLen As Integer
+  finalCodeLen = codeLength
+  ' Add padding characters if necessary.
+  If codeLength < SEPARATOR_POSITION_ Then
+  	For i = codeLength To SEPARATOR_POSITION_ - 1
+  	  code(i) = PADDING_CHARACTER_
+  	Next
+  	finalCodeLen = SEPARATOR_POSITION_
+  EndIf
+  ' Build the final code and return it.
+  Dim finalCode As String
+  For i = 0 To finalCodeLen
+    finalCode = finalCode & code(i)
+  Next
+  encodeIntegers = finalCode
 End Function
 
 ' Compute the latitude precision value for a given code length.
