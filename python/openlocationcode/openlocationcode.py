@@ -226,6 +226,36 @@ def isFull(code):
         return False
     return True
 
+def locationToIntegers(latitude, longitude):
+    """
+    Convert location in degrees into the integer representations.
+
+    This function is exposed for testing purposes and should not be called
+    directly.
+
+    Args:
+      latitude: Latitude in degrees.
+      longitude: Longitude in degrees.
+    Return:
+      A tuple of the [latitude, longitude] values as integers.
+    """
+    latVal = int(round(latitude * FINAL_LAT_PRECISION_))
+    latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_
+    if latVal < 0:
+        latVal = 0
+    elif latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_:
+        latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1
+
+    lngVal = int(round(longitude * FINAL_LNG_PRECISION_))
+    lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
+    if lngVal < 0:
+        # Python's % operator differs from other languages in that it returns
+        # the same sign as the divisor. This means we don't need to add the
+        # range to the result.
+        lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)
+    elif lngVal >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_:
+        lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)
+    return (latVal, lngVal)
 
 def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
     """
@@ -249,32 +279,16 @@ def encode(latitude, longitude, codeLength=PAIR_CODE_LENGTH_):
         raise ValueError('Invalid Open Location Code length - ' +
                          str(codeLength))
     codeLength = min(codeLength, MAX_DIGIT_COUNT_)
+    (latInt, lngInt) = locationToIntegers(latitude, longitude)
+    return encodeIntegers(latInt, lngInt, codeLength)
 
-    # Compute the code.
-    # This approach converts latitude and longitude to integers. This allows us
-    # to use only integer operations, so avoiding any accumulation of floating
-    # point representation errors.
+def encodeIntegers(latVal, lngVal, codeLength):
+    """
+    Encode a location, as two integer values, into a code.
 
-    # Multiply values by their precision and convert to positive.
-    # Force to integers so the division operations will have integer results.
-    # Note: Python requires rounding before truncating to ensure precision!
-    latVal = int(round(latitude * FINAL_LAT_PRECISION_))
-    latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_
-    if latVal < 0:
-        latVal = 0
-    elif latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_:
-        latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1
-
-    lngVal = int(round(longitude * FINAL_LNG_PRECISION_))
-    lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
-    if lngVal < 0:
-        # Python's % operator differs from other languages in that it returns
-        # the same sign as the divisor. This means we don't need to add the
-        # range to the result.
-        lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)
-    elif lngVal >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_:
-        lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)
-
+    This function is exposed for testing purposes and should not be called
+    directly.
+    """
     # Initialise the code string.
     code = ''
 
