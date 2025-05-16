@@ -345,7 +345,7 @@
    * @param {number} longitude
    * @return {Array<number>} A tuple of the latitude integer and longitude integer.
    */
-  var locationToIntegers = function(latitude, longitude) {
+  var locationToIntegers = OpenLocationCode.locationToIntegers = function(latitude, longitude) {
     var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION_);
     latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
     if (latVal < 0) {
@@ -377,7 +377,7 @@
    * @return {string} A code of the specified length or the default length if not
    *     specified.
    */
-  var encodeIntegers = function(latInt, lngInt, codeLength) {
+  var encodeIntegers = OpenLocationCode.encodeIntegers = function(latInt, lngInt, codeLength) {
     // Javascript strings are immutable and it doesn't have a native
     // StringBuilder, so we'll use an array.
     const code = new Array(MAX_DIGIT_COUNT_ + 1);

@@ -7,9 +7,33 @@ describe("Open Location Code", function() {
     expect(encTests.length).toBeGreaterThan(1);
     for (var i = 0; i < encTests.length; i++) {
       var test = encTests[i];
-      var code = OpenLocationCode.encode(test[0], test[1], test[2]);
+      var code = OpenLocationCode.encode(test[0], test[1], test[4]);
       // Did we get the same code?
-      expect(code).toBe(test[3]);
+      expect(code).toBe(test[5]);
+    }
+  });
+
+  it("Location to Integers Tests", function() {
+    jasmine.getFixtures().fixturesPath = 'base/';
+    var encTests = JSON.parse(jasmine.getFixtures().read("encoding.json"));
+    expect(encTests.length).toBeGreaterThan(1);
+    for (var i = 0; i < encTests.length; i++) {
+      var test = encTests[i];
+      var got = OpenLocationCode.locationToIntegers(test[0], test[1]);
+      expect(got[0]).toBe(test[2]);
+      expect(got[1]).toBe(test[3]);
+    }
+  });
+
+  it("Integer Encoding Tests", function() {
+    jasmine.getFixtures().fixturesPath = 'base/';
+    var encTests = JSON.parse(jasmine.getFixtures().read("encoding.json"));
+    expect(encTests.length).toBeGreaterThan(1);
+    for (var i = 0; i < encTests.length; i++) {
+      var test = encTests[i];
+      var code = OpenLocationCode.encodeIntegers(test[2], test[3], test[4]);
+      // Did we get the same code?
+      expect(code).toBe(test[5]);
     }
   });
 
