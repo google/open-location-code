@@ -188,14 +188,6 @@ public final class OpenLocationCode {
    * @throws IllegalArgumentException if the code length is not valid.
    */
   public OpenLocationCode(double latitude, double longitude, int codeLength) {
-    // Limit the maximum number of digits in the code.
-    codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
-    // Check that the code length requested is valid.
-    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < MIN_DIGIT_COUNT) {
-      throw new IllegalArgumentException("Illegal code length " + codeLength);
-    }
-
-    // Compute the code.
     long[] integers = degreesToIntegers(latitude, longitude);
     this.code = encodeIntegers(integers[0], integers[1], codeLength);
   }
@@ -208,7 +200,13 @@ public final class OpenLocationCode {
    * @param codeLength The requested number of digits.
    * @return The OLC for the location.
    */
-  private static String encodeIntegers(long lat, long lng, int codeLength) {
+  static String encodeIntegers(long lat, long lng, int codeLength) {
+    // Limit the maximum number of digits in the code.
+    codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
+    // Check that the code length requested is valid.
+    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < MIN_DIGIT_COUNT) {
+      throw new IllegalArgumentException("Illegal code length " + codeLength);
+    }
     // Store the code - we build it in reverse and reorder it afterwards.
     StringBuilder revCodeBuilder = new StringBuilder();
     // Compute the grid part of the code if necessary.
