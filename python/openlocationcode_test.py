@@ -86,7 +86,7 @@ class TestEncoding(unittest.TestCase):
 
     def setUp(self):
         self.testdata = []
-        headermap = {0: 'lat', 1: 'lng', 2: 'length', 3: 'code'}
+        headermap = {0: 'lat', 1: 'lng', 2: 'latInt', 3: 'lngInt', 4: 'length', 5: 'code'}
         tests_fn = _TEST_DATA + '/encoding.csv'
         with open(tests_fn, mode='r', encoding='utf-8') as fin:
             for line in fin:
@@ -95,9 +95,12 @@ class TestEncoding(unittest.TestCase):
                 td = line.strip().split(',')
                 assert len(td) == len(
                     headermap), 'Wrong format of testing data: {0}'.format(line)
-                # first 3 keys should be numbers
-                for i in range(0, 3):
+                # first 2 keys should be floats
+                for i in range(0, 2):
                     td[i] = float(td[i])
+                # next three are integers
+                for i in range(2, 5):
+                    td[i] = int(td[i])
                 self.testdata.append({
                     headermap[i]: v for i, v in enumerate(td)
                 })
@@ -109,6 +112,18 @@ class TestEncoding(unittest.TestCase):
                 codelength = td['code'].index('0')
             self.assertEqual(td['code'],
                              olc.encode(td['lat'], td['lng'], codelength))
+
+    # Uncomment when tests updated.
+    # def test_locationToIntegers(self):
+    #     for td in self.testdata:
+    #         intvals = olc.locationToIntegers(td['lat'], td['lng'])
+    #         self.assertEqual(td['latInt'], intvals[0])
+    #         self.assertEqual(td['lngInt'], intvals[1])
+
+    def test_encodeIntegers(self):
+        for td in self.testdata:
+            got = olc.encodeIntegers(td['latInt'], td['lngInt'], td['length'])
+            self.assertEqual(td['code'], got)
 
 
 class TestDecoding(unittest.TestCase):
