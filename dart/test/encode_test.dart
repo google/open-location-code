@@ -18,20 +18,48 @@ import 'package:open_location_code/open_location_code.dart' as olc;
 import 'package:test/test.dart';
 import 'utils.dart';
 
-// code,lat,lng,latLo,lngLo,latHi,lngHi
-void checkEncodeDecode(String csvLine) {
+void checkEncode(String csvLine) {
   var elements = csvLine.split(',');
   num lat = double.parse(elements[0]);
   num lng = double.parse(elements[1]);
-  int len = int.parse(elements[2]);
-  var want = elements[3];
+  int lat_int = int.parse(elements[2]);
+  int lng_int = int.parse(elements[3]);
+  int len = int.parse(elements[4]);
+  var want = elements[5];
   var got = olc.encode(lat, lng, codeLength: len);
   expect(got, equals(want));
 }
 
+void checkLocationToIntegers(String csvLine) {
+  var elements = csvLine.split(',');
+  num lat = double.parse(elements[0]);
+  num lng = double.parse(elements[1]);
+  int lat_int = int.parse(elements[2]);
+  int lng_int = int.parse(elements[3]);
+  var got = olc.locationToIntegers(lat, lng);
+  expect(got[0], equals(lat_int));
+  expect(got[1], equals(lng_int));
+}
+
+void checkEncodeIntegers(String csvLine) {
+  var elements = csvLine.split(',');
+  int lat_int = int.parse(elements[2]);
+  int lng_int = int.parse(elements[3]);
+  int len = int.parse(elements[4]);
+  var want = elements[5];
+  var got = olc.encodeIntegers(lat_int, lng_int, len);
+  expect(got, equals(want));
+}
+
 void main() {
-  test('Check encode decode', () {
-    csvLinesFromFile('encoding.csv').forEach(checkEncodeDecode);
+  test('Check encode', () {
+    csvLinesFromFile('encoding.csv').forEach(checkEncode);
+  });
+  test('Check locationToIntegers', () {
+    csvLinesFromFile('encoding.csv').forEach(checkLocationToIntegers);
+  });
+  test('Check encodeIntegers', () {
+    csvLinesFromFile('encoding.csv').forEach(checkEncodeIntegers);
   });
 
   test('MaxCodeLength', () {

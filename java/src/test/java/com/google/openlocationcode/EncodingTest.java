@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,20 +24,24 @@ public class EncodingTest {
 
   private static class TestData {
 
-    private final double latitude;
-    private final double longitude;
+    private final double latitudeDegrees;
+    private final double longitudeDegrees;
+    private final long latitudeInteger;
+    private final long longitudeInteger;
     private final int length;
     private final String code;
 
     public TestData(String line) {
       String[] parts = line.split(",");
-      if (parts.length != 4) {
+      if (parts.length != 6) {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
-      this.latitude = Double.parseDouble(parts[0]);
-      this.longitude = Double.parseDouble(parts[1]);
-      this.length = Integer.parseInt(parts[2]);
-      this.code = parts[3];
+      this.latitudeDegrees = Double.parseDouble(parts[0]);
+      this.longitudeDegrees = Double.parseDouble(parts[1]);
+      this.latitudeInteger = Long.parseLong(parts[2]);
+      this.longitudeInteger = Long.parseLong(parts[3]);
+      this.length = Integer.parseInt(parts[4]);
+      this.code = parts[5];
     }
   }
 
@@ -61,9 +66,56 @@ public class EncodingTest {
       Assert.assertEquals(
           String.format(
               "Latitude %f, longitude %f and length %d were wrongly encoded.",
-              testData.latitude, testData.longitude, testData.length),
+              testData.latitudeDegrees, testData.longitudeDegrees, testData.length),
           testData.code,
-          OpenLocationCode.encode(testData.latitude, testData.longitude, testData.length));
+          OpenLocationCode.encode(
+              testData.latitudeDegrees, testData.longitudeDegrees, testData.length));
+    }
+  }
+
+  @Test
+  public void testDegreesToIntegers() throws Exception {
+    // The method to test is private, we use reflection to get it to avoid changing the visibility.
+    OpenLocationCode olcClass = new OpenLocationCode("8FWC2345+G6");
+    Method privateMethod =
+        OpenLocationCode.class.getDeclaredMethod("degreesToIntegers", double.class, double.class);
+    privateMethod.setAccessible(true);
+
+    for (TestData testData : testDataList) {
+      long[] got =
+          (long[])
+              privateMethod.invoke(olcClass, testData.latitudeDegrees, testData.longitudeDegrees);
+      Assert.assertEquals(
+          String.format("Latitude %f integer conversion is incorrect", testData.latitudeDegrees),
+          testData.latitudeInteger,
+          got[0]);
+      Assert.assertEquals(
+          String.format("Longitude %f integer conversion is incorrect", testData.longitudeDegrees),
+          testData.longitudeInteger,
+          got[1]);
+    }
+  }
+
+  @Test
+  public void testEncodeIntegers() throws Exception {
+    // The method to test is private, we use reflection to get it to avoid changing the visibility.
+    OpenLocationCode olcClass = new OpenLocationCode("8FWC2345+G6");
+    Method privateMethod =
+        OpenLocationCode.class.getDeclaredMethod(
+            "encodeIntegers", long.class, long.class, int.class);
+    privateMethod.setAccessible(true);
+
+    for (TestData testData : testDataList) {
+      String got =
+          (String)
+              privateMethod.invoke(
+                  olcClass, testData.latitudeInteger, testData.longitudeInteger, testData.length);
+      Assert.assertEquals(
+          String.format(
+              "Latitude %d, longitude %d and length %d were wrongly encoded.",
+              testData.latitudeInteger, testData.longitudeInteger, testData.length),
+          testData.code,
+          got);
     }
   }
 }

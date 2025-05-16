@@ -30,7 +30,10 @@ Unit tests require [gulp](https://www.npmjs.com/package/gulp),
 [karma](https://karma-runner.github.io) and
 [jasmine](https://jasmine.github.io).
 
-Execute the tests with `npm test`. This will install the
+To run the tests the first time use `bash checks.sh` - this will convert the
+CSV test files to JSON.
+
+Then you can execute the tests with `npm test`. This will install the
 dependencies, run `eslint` and then run the tests as long as there were no
 eslint errors.
 

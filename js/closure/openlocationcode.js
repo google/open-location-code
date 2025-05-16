@@ -362,17 +362,6 @@ exports.isFull = isFull;
       specified.
  */
 function encode(latitude, longitude, codeLength) {
-  if (typeof codeLength == 'undefined') {
-    codeLength = PAIR_CODE_LENGTH;
-  }
-  if (
-    codeLength < MIN_CODE_LEN ||
-    (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)
-  ) {
-    throw new Error('IllegalArgumentException: Invalid Plus Code length');
-  }
-  codeLength = Math.min(codeLength, MAX_CODE_LEN);
-
   const locationIntegers = _locationToIntegers(latitude, longitude);
 
   return _encodeIntegers(locationIntegers[0], locationIntegers[1], codeLength);
@@ -428,6 +417,16 @@ exports._locationToIntegers = _locationToIntegers;
       specified.
  */
 function _encodeIntegers(latInt, lngInt, codeLength) {
+  if (typeof codeLength == 'undefined') {
+    codeLength = PAIR_CODE_LENGTH;
+  }
+  if (
+    codeLength < MIN_CODE_LEN ||
+    (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)
+  ) {
+    throw new Error('IllegalArgumentException: Invalid Plus Code length');
+  }
+  codeLength = Math.min(codeLength, MAX_CODE_LEN);
   // Javascript strings are immutable and it doesn't have a native
   // StringBuilder, so we'll use an array.
   const code = new Array(MAX_CODE_LEN + 1);

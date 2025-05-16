@@ -254,11 +254,6 @@ bool isFull(String code) {
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
-  if (codeLength < minDigitCount ||
-      (codeLength < pairCodeLength && codeLength.isOdd)) {
-    throw ArgumentError('Invalid Open Location Code length: $codeLength');
-  }
-  codeLength = min(maxDigitCount, codeLength);
   var integers = locationToIntegers(latitude, longitude);
   return encodeIntegers(integers[0], integers[1], codeLength);
 }
@@ -293,6 +288,11 @@ List<int> locationToIntegers(num latitude, num longitude) {
 
 /// Encode a location into an Open Location Code.
 String encodeIntegers(int latVal, int lngVal, int codeLength) {
+  if (codeLength < minDigitCount ||
+      (codeLength < pairCodeLength && codeLength.isOdd)) {
+    throw ArgumentError('Invalid Open Location Code length: $codeLength');
+  }
+  codeLength = min(maxDigitCount, codeLength);
   List<String> code = List<String>.filled(maxDigitCount + 1, '');
   code[separatorPosition] = separator;
 

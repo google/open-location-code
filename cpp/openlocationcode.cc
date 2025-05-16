@@ -73,6 +73,13 @@ int64_t longitudeToInteger(double longitude) {
 
 std::string encodeIntegers(int64_t lat_val, int64_t lng_val,
                            size_t code_length) {
+  // Limit the maximum number of digits in the code.
+  code_length = std::min(code_length, internal::kMaximumDigitCount);
+  // Ensure the length is valid.
+  code_length = std::max(code_length, internal::kMinimumDigitCount);
+  if (code_length < internal::kPairCodeLength && code_length % 2 == 1) {
+    code_length = code_length + 1;
+  }
   // Reserve characters for the code digits and the separator.
   std::string code = "1234567890abcdef";
   // Add the separator character.
@@ -193,13 +200,6 @@ std::string clean_code_chars(const std::string &code) {
 }  // anonymous namespace
 
 std::string Encode(const LatLng &location, size_t code_length) {
-  // Limit the maximum number of digits in the code.
-  code_length = std::min(code_length, internal::kMaximumDigitCount);
-  // Ensure the length is valid.
-  code_length = std::max(code_length, internal::kMinimumDigitCount);
-  if (code_length < internal::kPairCodeLength && code_length % 2 == 1) {
-    code_length = code_length + 1;
-  }
   // Convert latitude and longitude into integer values.
   int64_t lat_val = internal::latitudeToInteger(location.latitude);
   int64_t lng_val = internal::longitudeToInteger(location.longitude);

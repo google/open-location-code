@@ -41,9 +41,10 @@ type (
 	}
 
 	encodingTest struct {
-		lat, lng float64
-		length   int
-		code     string
+		lat, lng               float64
+		integerLat, integerLng int64
+		length                 int
+		code                   string
 	}
 
 	decodingTest struct {
@@ -80,10 +81,12 @@ func init() {
 		defer wg.Done()
 		for _, cols := range mustReadLines("encoding.csv") {
 			encoding = append(encoding, encodingTest{
-				lat:    mustFloat(cols[0]),
-				lng:    mustFloat(cols[1]),
-				length: mustInt(cols[2]),
-				code:   cols[3],
+				lat:        mustFloat(cols[0]),
+				lng:        mustFloat(cols[1]),
+				integerLat: mustInt64(cols[2]),
+				integerLng: mustInt64(cols[3]),
+				length:     mustInt(cols[4]),
+				code:       cols[5],
 			})
 		}
 	}()
@@ -129,6 +132,15 @@ func TestCheck(t *testing.T) {
 
 func TestEncode(t *testing.T) {
 	for i, elt := range encoding {
+		if got := latitudeAsInteger(elt.lat); got != elt.integerLat {
+			t.Errorf("%d: latitudeAsInteger(%f) got %d, want %d", i, elt.lat, got, elt.integerLat)
+		}
+		if got := longitudeAsInteger(elt.lng); got != elt.integerLng {
+			t.Errorf("%d: longitudeAsInteger(%f) got %d, want %d", i, elt.lng, got, elt.integerLng)
+		}
+		if got := integerEncode(elt.integerLat, elt.integerLng, elt.length); got != elt.code {
+			t.Errorf("%d. integerEncode(%d, %d, %d) got %s, want %s", i, elt.integerLat, elt.integerLng, elt.length, got, elt.code)
+		}
 		got := Encode(elt.lat, elt.lng, elt.length)
 		if got != elt.code {
 			t.Errorf("%d. got %q for (%v,%v,%d), wanted %q.", i, got, elt.lat, elt.lng, elt.length, elt.code)
@@ -210,6 +222,14 @@ func mustInt(a string) int {
 		panic(err)
 	}
 	return f
+}
+
+func mustInt64(a string) int64 {
+	i, err := strconv.ParseInt(a, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }
 
 func TestFuzzCrashers(t *testing.T) {
