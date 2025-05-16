@@ -75,7 +75,7 @@ public class EncodingTest {
   @Test
   public void testDegreesToIntegers() throws Exception {
     // The method to test is private, we use reflection to get it to avoid changing the visibility.
-    OpenLocationCode olcClass = new OpenLocationCode(null);
+    OpenLocationCode olcClass = new OpenLocationCode("8FWC2345+G6");
     Method privateMethod = OpenLocationCode.class.getDeclaredMethod("degreesToIntegers", int.class, int.class);
     privateMethod.setAccessible(true);
 
@@ -95,7 +95,7 @@ public class EncodingTest {
   @Test
   public void testEncodeIntegers() throws Exception {
     // The method to test is private, we use reflection to get it to avoid changing the visibility.
-    OpenLocationCode olcClass = new OpenLocationCode(null);
+    OpenLocationCode olcClass = new OpenLocationCode("8FWC2345+G6");
     Method privateMethod = OpenLocationCode.class.getDeclaredMethod("encodeIntegers", int.class, int.class);
     privateMethod.setAccessible(true);
 
