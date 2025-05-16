@@ -136,6 +136,8 @@ INSTANTIATE_TEST_CASE_P(OLC_Tests, DecodingChecks,
 struct EncodingTestData {
   double lat_deg;
   double lng_deg;
+  long long int lat_int;
+  long long int lng_int;
   size_t length;
   std::string code;
 };
@@ -152,8 +154,10 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
     EncodingTestData test_data = {};
     test_data.lat_deg = strtod(csv_records[i][0].c_str(), nullptr);
     test_data.lng_deg = strtod(csv_records[i][1].c_str(), nullptr);
-    test_data.length = atoi(csv_records[i][2].c_str());
-    test_data.code = csv_records[i][3];
+    test_data.lat_int = strtoll(csv_records[i][2].c_str(), nullptr, 10);
+    test_data.lng_int = strtoll(csv_records[i][3].c_str(), nullptr, 10);
+    test_data.length = atoi(csv_records[i][4].c_str());
+    test_data.code = csv_records[i][5];
     data_results.push_back(test_data);
   }
   return data_results;
@@ -164,6 +168,21 @@ TEST_P(EncodingChecks, Encode) {
   LatLng lat_lng = LatLng{test_data.lat_deg, test_data.lng_deg};
   // Encode the test location and make sure we get the expected code.
   std::string actual_code = Encode(lat_lng, test_data.length);
+  EXPECT_EQ(test_data.code, actual_code);
+}
+
+TEST_P(EncodingChecks, degreesToIntegers) {
+  EncodingTestData test_data = GetParam();
+  int64_t got_lat = internal::latitudeToInteger(test_data.lat_deg);
+  EXPECT_EQ(test_data.lat_int, got_lat);
+  int64_t got_lng = internal::longitudeToInteger(test_data.lng_deg);
+  EXPECT_EQ(test_data.lng_int, got_lng);
+}
+
+TEST_P(EncodingChecks, encodeIntegers) {
+  EncodingTestData test_data = GetParam();
+  // Encode the test location and make sure we get the expected code.
+  std::string actual_code = internal::encodeIntegers(test_data.lat_int, test_data.lng_int, test_data.length);
   EXPECT_EQ(test_data.code, actual_code);
 }
 
