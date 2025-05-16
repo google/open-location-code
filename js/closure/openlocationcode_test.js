@@ -75,8 +75,8 @@ testSuite({
         const fields = lines[i].split(',');
         const lat = parseFloat(fields[0]);
         const lng = parseFloat(fields[1]);
-        const latInt = parseInt(fields[2], 10);
-        const lngInt = parseInt(fields[3], 10);
+        // const latInt = parseInt(fields[2], 10);
+        // const lngInt = parseInt(fields[3], 10);
         const length = parseInt(fields[4], 10);
         const code = fields[5];
 
@@ -96,8 +96,8 @@ testSuite({
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
       for (var i = 0; i < lines.length; i++) {
         const fields = lines[i].split(',');
-        const lat = parseFloat(fields[0]);
-        const lng = parseFloat(fields[1]);
+        // const lat = parseFloat(fields[0]);
+        // const lng = parseFloat(fields[1]);
         const latInt = parseInt(fields[2], 10);
         const lngInt = parseInt(fields[3], 10);
         const length = parseInt(fields[4], 10);
@@ -123,6 +123,8 @@ testSuite({
         const lng = parseFloat(fields[1]);
         const latInt = parseInt(fields[2], 10);
         const lngInt = parseInt(fields[3], 10);
+        // const length = parseInt(fields[4], 10);
+        // const code = fields[5];
 
         const got = OpenLocationCode._locationToIntegers(lat, lng);
         assertEquals('testLocationToIntegers: latitude ' + 1, latInt, got[0]);
