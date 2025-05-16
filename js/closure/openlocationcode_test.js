@@ -75,12 +75,58 @@ testSuite({
         const fields = lines[i].split(',');
         const lat = parseFloat(fields[0]);
         const lng = parseFloat(fields[1]);
-        const length = parseInt(fields[2], 10);
-        const code = fields[3];
+        const latInt = parseInt(fields[2]);
+        const lngInt = parseInt(fields[3]);
+        const length = parseInt(fields[4], 10);
+        const code = fields[5];
 
         const gotCode = OpenLocationCode.encode(lat, lng, length);
         // Did we get the same code?
         assertEquals('testEncode ' + 1, code, gotCode);
+
+        asyncTestCase.continueTesting();
+      }
+    });
+    asyncTestCase.waitForAsync('Waiting for xhr to respond');
+    xhrIo_.send(ENCODING_TEST_FILE, 'GET');
+  },
+  testEncodeIntegers: function() {
+    const xhrIo_ = new XhrIo();
+    xhrIo_.listenOnce(EventType.COMPLETE, () => {
+      const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
+      for (var i = 0; i < lines.length; i++) {
+        const fields = lines[i].split(',');
+        const lat = parseFloat(fields[0]);
+        const lng = parseFloat(fields[1]);
+        const latInt = parseInt(fields[2]);
+        const lngInt = parseInt(fields[3]);
+        const length = parseInt(fields[4], 10);
+        const code = fields[5];
+
+        const gotCode = OpenLocationCode._encodeIntegers(latInt, lngInt, length);
+        // Did we get the same code?
+        assertEquals('testEncodeIntegers ' + 1, code, gotCode);
+
+        asyncTestCase.continueTesting();
+      }
+    });
+    asyncTestCase.waitForAsync('Waiting for xhr to respond');
+    xhrIo_.send(ENCODING_TEST_FILE, 'GET');
+  },
+  testLocationToIntegers: function() {
+    const xhrIo_ = new XhrIo();
+    xhrIo_.listenOnce(EventType.COMPLETE, () => {
+      const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
+      for (var i = 0; i < lines.length; i++) {
+        const fields = lines[i].split(',');
+        const lat = parseFloat(fields[0]);
+        const lng = parseFloat(fields[1]);
+        const latInt = parseInt(fields[2]);
+        const lngInt = parseInt(fields[3]);
+
+        const got = OpenLocationCode._locationToIntegers(lat, lng);
+        assertEquals('testLocationToIntegers: latitude ' + 1, latInt, got[0]);
+        assertEquals('testLocationToIntegers: longitude ' + 1, lngInt, got[1]);
 
         asyncTestCase.continueTesting();
       }
