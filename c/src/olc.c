@@ -82,13 +82,38 @@ int OLC_IsFull(const char* code, size_t size) {
   return is_full(&info);
 }
 
-int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
-               int maxlen) {
+void OLC_LocationToIntegers(const OLC_LatLon* degrees,
+                            OLC_LatLonIntegers* integers) {
   // Multiply degrees by precision. Use lround to explicitly round rather than
   // truncate, which causes issues when using values like 0.1 that do not have
   // precise floating point representations.
-  long long int lat = lround(location->lat * kGridLatPrecisionInverse);
-  long long int lng = lround(location->lon * kGridLonPrecisionInverse);
+  long long int lat = lround(degrees->lat * kGridLatPrecisionInverse);
+  long long int lon = lround(degrees->lon * kGridLonPrecisionInverse);
+  // Convert latitude to positive range (0..2*degrees*precision) and clip.
+  lat += OLC_kLatMaxDegrees * kGridLatPrecisionInverse;
+  if (lat < 0) {
+    lat = 0;
+  } else if (lat >= 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse) {
+    // Subtract one to bring it just inside 90 degrees lat.
+    lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse - 1;
+  }
+  // Convert longitude to the positive range and normalise.
+  lon += OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
+  if (lon < 0) {
+    // If after adding 180 it is still less than zero, do integer division
+    // on a full longitude (360) and add the remainder.
+    lon = lon % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) +
+          (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
+  } else if (lon >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
+    // If it's greater than 360, just get the integer division remainder.
+    lon = lon % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
+  }
+  integers->lat = lat;
+  integers->lon = lon;
+}
+
+int OLC_EncodeIntegers(const OLC_LatLonIntegers* location, size_t length,
+                       char* code, int maxlen) {
   // Limit the maximum number of digits in the code.
   if (length > kMaximumDigitCount) {
     length = kMaximumDigitCount;
@@ -99,25 +124,9 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   if (length < kPairCodeLength && length % 2 == 1) {
     length = length + 1;
   }
-  // Convert latitude to positive range (0..2*degrees*precision) and clip.
-  lat += OLC_kLatMaxDegrees * kGridLatPrecisionInverse;
-  if (lat < 0) {
-    lat = 0;
-  } else if (lat >= 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse) {
-    // Subtract one to bring it just inside 90 degrees lat.
-    lat = 2 * OLC_kLatMaxDegrees * kGridLatPrecisionInverse - 1;
-  }
-  // Convert longitude to the positive range and normalise.
-  lng += OLC_kLonMaxDegrees * kGridLonPrecisionInverse;
-  if (lng < 0) {
-    // If after adding 180 it is still less than zero, do integer division
-    // on a full longitude (360) and add the remainder.
-    lng = lng % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) +
-          (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
-  } else if (lng >= 2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse) {
-    // If it's greater than 360, just get the integer division remainder.
-    lng = lng % (2 * OLC_kLonMaxDegrees * kGridLonPrecisionInverse);
-  }
+
+  long long int lat = location->lat;
+  long long int lon = location->lon;
 
   // Reserve characters for the code digits, the separator and the null
   // terminator.
@@ -129,30 +138,30 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   if (length > kPairCodeLength) {
     for (size_t i = kMaximumDigitCount - kPairCodeLength; i >= 1; i--) {
       int lat_digit = lat % kGridRows;
-      int lng_digit = lng % kGridCols;
+      int lng_digit = lon % kGridCols;
       fullcode[kSeparatorPosition + 2 + i] =
           kAlphabet[lat_digit * kGridCols + lng_digit];
       lat /= kGridRows;
-      lng /= kGridCols;
+      lon /= kGridCols;
     }
   } else {
     lat /= pow(kGridRows, kGridCodeLength);
-    lng /= pow(kGridCols, kGridCodeLength);
+    lon /= pow(kGridCols, kGridCodeLength);
   }
 
   // Add the pair after the separator.
   fullcode[kSeparatorPosition + 1] = kAlphabet[lat % kEncodingBase];
-  fullcode[kSeparatorPosition + 2] = kAlphabet[lng % kEncodingBase];
+  fullcode[kSeparatorPosition + 2] = kAlphabet[lon % kEncodingBase];
   lat /= kEncodingBase;
-  lng /= kEncodingBase;
+  lon /= kEncodingBase;
 
   // Compute the pair section before the separator in reverse order.
   // Even indices contain latitude and odd contain longitude.
   for (int i = (kPairCodeLength / 2 + 1); i >= 0; i -= 2) {
     fullcode[i] = kAlphabet[lat % kEncodingBase];
-    fullcode[i + 1] = kAlphabet[lng % kEncodingBase];
+    fullcode[i + 1] = kAlphabet[lon % kEncodingBase];
     lat /= kEncodingBase;
-    lng /= kEncodingBase;
+    lon /= kEncodingBase;
   }
   // Replace digits with padding if necessary.
   if (length < kSeparatorPosition) {
@@ -168,6 +177,13 @@ int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
   // Terminate the buffer.
   code[length + 1] = '\0';
   return length;
+}
+
+int OLC_Encode(const OLC_LatLon* location, size_t length, char* code,
+               int maxlen) {
+  OLC_LatLonIntegers integers;
+  OLC_LocationToIntegers(location, &integers);
+  return OLC_EncodeIntegers(&integers, length, code, maxlen);
 }
 
 int OLC_EncodeDefault(const OLC_LatLon* location, char* code, int maxlen) {

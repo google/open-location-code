@@ -35,24 +35,15 @@ module PlusCodes
       valid?(code) && !short?(code)
     end
 
-    # Converts a latitude and longitude into a Open Location Code(Plus+Codes).
+    # Convert a latitude and longitude in degrees to integer values.
+    #
+    # This function is exposed for testing and should not be called directly.
     #
     # @param latitude [Numeric] a latitude in degrees
     # @param longitude [Numeric] a longitude in degrees
-    # @param code_length [Integer] the number of characters in the code, this
-    # excludes the separator
-    # @return [String] a plus+codes
-    def encode(latitude, longitude, code_length = PAIR_CODE_LENGTH)
-      if invalid_length?(code_length)
-        raise ArgumentError, 'Invalid Open Location Code(Plus+Codes) length'
-      end
-
-      code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
-
-      # Compute the code.
-      # This approach converts each value to an integer after multiplying it by
-      # the final precision. This allows us to use only integer operations, so
-      # avoiding any accumulation of floating point representation errors.
+    # @return [Array<Integer, Integer>] with the latitude and longitude integer
+    # values.
+    def location_to_integers(latitude, longitude)
       lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).round
       lat_val += 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
       if lat_val.negative?
@@ -70,7 +61,36 @@ module PlusCodes
       elsif lng_val >= 360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
         lng_val %= (360 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
       end
+      [lat_val, lng_val]
+    end
 
+    # Converts a latitude and longitude into a Open Location Code(Plus+Codes).
+    #
+    # @param latitude [Numeric] a latitude in degrees
+    # @param longitude [Numeric] a longitude in degrees
+    # @param code_length [Integer] the number of characters in the code, this
+    # excludes the separator
+    # @return [String] a plus+codes
+    def encode(latitude, longitude, code_length = PAIR_CODE_LENGTH)
+      if invalid_length?(code_length)
+        raise ArgumentError, 'Invalid Open Location Code(Plus+Codes) length'
+      end
+
+      code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
+      lat_val, lng_val = location_to_integers(latitude, longitude)
+      encode_integers(lat_val, lng_val, code_length)
+    end
+
+    # Converts integer latitude and longitude into a Open Location Code.
+    #
+    # This function is exposed for testing and should not be called directly.
+    #
+    # @param lat_val [Integer] a latitude integer value
+    # @param lng_val [Integer] a longitude integer value
+    # @param code_length [Integer] the number of characters in the code, this
+    # excludes the separator
+    # @return [String] a plus+codes
+    def encode_integers(lat_val, lng_val, code_length = PAIR_CODE_LENGTH)
       # Initialise the code using an Array. Array.join is more efficient that
       # string addition.
       code = Array.new(MAX_CODE_LENGTH + 1, '')

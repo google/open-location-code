@@ -324,12 +324,28 @@
         (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
       throw new Error('IllegalArgumentException: Invalid Open Location Code length');
     }
-    // This approach converts each value to an integer after multiplying it by the final precision.
-    // This allows us to use only integer operations, so avoiding any accumulation of floating
-    // point representation errors.
 
-    // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
-    // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
+    const locationIntegers = locationToIntegers(latitude, longitude);
+
+    return encodeIntegers(locationIntegers[0], locationIntegers[1], codeLength);
+  };
+
+  /**
+   * Convert a latitude, longitude location into integer values.
+   *
+   * This function is only exposed for testing.
+   *
+   * Latitude is converted into a positive integer clipped into the range
+   * 0 <= X < 180*2.5e7. (Latitude 90 needs to be adjusted to be slightly lower,
+   * so that the returned code can also be decoded.
+   * Longitude is converted into a positive integer and normalised into the range
+   * 0 <= X < 360*8.192e6.
+
+   * @param {number} latitude
+   * @param {number} longitude
+   * @return {Array<number>} A tuple of the latitude integer and longitude integer.
+   */
+  var locationToIntegers = function(latitude, longitude) {
     var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION_);
     latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
     if (latVal < 0) {
@@ -337,7 +353,6 @@
     } else if (latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) {
       latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
     }
-    // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
     var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION_);
     lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
     if (lngVal < 0) {
@@ -347,7 +362,22 @@
     } else if (lngVal >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) {
       lngVal = lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
     }
+    return [latVal, lngVal];
+  };
 
+  /**
+   * Encode a location that uses integer values into an Open Location Code.
+   *
+   * This is a testing function, and should not be called directly.
+   *
+   * @param {number} latInt An integer latitude.
+   * @param {number} lngInt An integer longitude.
+   * @param {number=} codeLength The number of significant digits in the output
+   *     code, not including any separator characters.
+   * @return {string} A code of the specified length or the default length if not
+   *     specified.
+   */
+  var encodeIntegers = function(latInt, lngInt, codeLength) {
     // Javascript strings are immutable and it doesn't have a native
     // StringBuilder, so we'll use an array.
     const code = new Array(MAX_DIGIT_COUNT_ + 1);
@@ -356,31 +386,31 @@
     // Compute the grid part of the code if necessary.
     if (codeLength > PAIR_CODE_LENGTH_) {
       for (var i = MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_; i >= 1; i--) {
-        var latDigit = latVal % GRID_ROWS_;
-        var lngDigit = lngVal % GRID_COLUMNS_;
+        var latDigit = latInt % GRID_ROWS_;
+        var lngDigit = lngInt % GRID_COLUMNS_;
         var ndx = latDigit * GRID_COLUMNS_ + lngDigit;
         code[SEPARATOR_POSITION_ + 2 + i] = CODE_ALPHABET_.charAt(ndx);
         // Note! Integer division.
-        latVal = Math.floor(latVal / GRID_ROWS_);
-        lngVal = Math.floor(lngVal / GRID_COLUMNS_);
+        latInt = Math.floor(latInt / GRID_ROWS_);
+        lngInt = Math.floor(lngInt / GRID_COLUMNS_);
       }
     } else {
-      latVal = Math.floor(latVal / Math.pow(GRID_ROWS_, GRID_CODE_LENGTH_));
-      lngVal = Math.floor(lngVal / Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_));
+      latInt = Math.floor(latInt / Math.pow(GRID_ROWS_, GRID_CODE_LENGTH_));
+      lngInt = Math.floor(lngInt / Math.pow(GRID_COLUMNS_, GRID_CODE_LENGTH_));
     }
 
     // Add the pair after the separator.
-    code[SEPARATOR_POSITION_ + 1] = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_);
-    code[SEPARATOR_POSITION_ + 2] = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_);
-    latVal = Math.floor(latVal / ENCODING_BASE_);
-    lngVal = Math.floor(lngVal / ENCODING_BASE_);
+    code[SEPARATOR_POSITION_ + 1] = CODE_ALPHABET_.charAt(latInt % ENCODING_BASE_);
+    code[SEPARATOR_POSITION_ + 2] = CODE_ALPHABET_.charAt(lngInt % ENCODING_BASE_);
+    latInt = Math.floor(latInt / ENCODING_BASE_);
+    lngInt = Math.floor(lngInt / ENCODING_BASE_);
 
     // Compute the pair section of the code.
     for (var i = PAIR_CODE_LENGTH_ / 2 + 1; i >= 0; i -= 2) {
-      code[i] = CODE_ALPHABET_.charAt(latVal % ENCODING_BASE_);
-      code[i + 1] = CODE_ALPHABET_.charAt(lngVal % ENCODING_BASE_);
-      latVal = Math.floor(latVal / ENCODING_BASE_);
-      lngVal = Math.floor(lngVal / ENCODING_BASE_);
+      code[i] = CODE_ALPHABET_.charAt(latInt % ENCODING_BASE_);
+      code[i + 1] = CODE_ALPHABET_.charAt(lngInt % ENCODING_BASE_);
+      latInt = Math.floor(latInt / ENCODING_BASE_);
+      lngInt = Math.floor(lngInt / ENCODING_BASE_);
     }
 
     // If we don't need to pad the code, return the requested section.
