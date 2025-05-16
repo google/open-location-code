@@ -86,7 +86,14 @@ class TestEncoding(unittest.TestCase):
 
     def setUp(self):
         self.testdata = []
-        headermap = {0: 'lat', 1: 'lng', 2: 'latInt', 3: 'lngInt', 4: 'length', 5: 'code'}
+        headermap = {
+            0: 'lat',
+            1: 'lng',
+            2: 'latInt',
+            3: 'lngInt',
+            4: 'length',
+            5: 'code'
+        }
         tests_fn = _TEST_DATA + '/encoding.csv'
         with open(tests_fn, mode='r', encoding='utf-8') as fin:
             for line in fin:
