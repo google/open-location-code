@@ -90,7 +90,79 @@ BEGIN
     WHILE (lng >= 180) LOOP
       lng := lng - 360;
     END LOOP;
-    return lng;
+    RETURN lng;
+END;
+$BODY$;
+
+
+-- pluscode_latitudeToInteger ####
+-- Convert latitude to an integer representation.
+-- PARAMETERS
+-- latitude numeric // latitude in degrees
+-- EXAMPLE
+-- select pluscode_latitudeToInteger(149.18);
+CREATE OR REPLACE FUNCTION public.pluscode_latitudeToInteger(
+    latitude numeric)
+RETURNS numeric
+    LANGUAGE 'plpgsql'
+    COST 100
+    IMMUTABLE
+AS $BODY$
+DECLARE
+    CODE_ALPHABET_ text := '23456789CFGHJMPQRVWX';
+    ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
+    LATITUDE_MAX_ int := 90;
+    MAX_DIGIT_COUNT_ int := 15;
+    PAIR_CODE_LENGTH_ int := 10;
+    PAIR_PRECISION_ decimal := power(ENCODING_BASE_, 3);
+    GRID_ROWS_ int := 5;
+    FINAL_LAT_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+    latVal decimal := 0;
+BEGIN
+    latVal := round(latitude * FINAL_LAT_PRECISION_);
+    latVal := latVal + LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
+    IF (latVal < 0) THEN
+        latVal := 0;
+    ELSIF (latVal > 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) THEN
+        latVal := 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
+    END IF;
+    RETURN latVal;
+END;
+$BODY$;
+
+
+-- pluscode_longitudeToInteger ####
+-- Convert longitude to an integer representation.
+-- PARAMETERS
+-- longitude numeric // longitude in degrees
+-- EXAMPLE
+-- select pluscode_longitudeToInteger(149.18);
+CREATE OR REPLACE FUNCTION public.pluscode_longitudeToInteger(
+    longitude numeric)
+RETURNS numeric
+    LANGUAGE 'plpgsql'
+    COST 100
+    IMMUTABLE
+AS $BODY$
+DECLARE
+    CODE_ALPHABET_ text := '23456789CFGHJMPQRVWX';
+    ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
+    LONGITUDE_MAX_ int := 180;
+    MAX_DIGIT_COUNT_ int := 15;
+    PAIR_CODE_LENGTH_ int := 10;
+    PAIR_PRECISION_ decimal := power(ENCODING_BASE_, 3);
+    GRID_COLUMNS_ int := 4;
+    FINAL_LNG_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
+    lngVal decimal := 0;
+BEGIN
+    lngVal := round(longitude * FINAL_LNG_PRECISION_);
+    lngVal := lngVal + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+    IF (lngVal < 0) THEN
+        lngVal := lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
+    ELSIF (lngVal > 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) THEN
+        lngVal :=  lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
+    END IF;
+    RETURN lngVal;
 END;
 $BODY$;
 
@@ -302,6 +374,75 @@ END;
 $BODY$;
 
 
+-- pluscode_encodeIntegers ####
+-- Encode lat lng in their integer representation to get an Open Location Code.
+-- This function is for testing purposes only.
+-- PARAMETERS
+-- latitude numeric // latitude ref
+-- longitude numeric // longitude ref
+-- codeLength int// How long must be the pluscode
+CREATE OR REPLACE FUNCTION public.pluscode_encodeIntegers(
+    latVal numeric,
+    lngVal numeric,
+    codeLength int DEFAULT 10)
+RETURNS text
+    LANGUAGE 'plpgsql'
+    COST 100
+    IMMUTABLE
+AS $BODY$
+DECLARE
+    SEPARATOR_ text := '+';
+    SEPARATOR_POSITION_ int := 8;
+    PADDING_CHARACTER_ text := '0';
+    CODE_ALPHABET_ text := '23456789CFGHJMPQRVWX';
+    ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
+    MAX_DIGIT_COUNT_ int := 15;
+    PAIR_CODE_LENGTH_ int := 10;
+    GRID_CODE_LENGTH_ int := MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_;
+    GRID_COLUMNS_ int := 4;
+    GRID_ROWS_ int := 5;
+    code text := '';
+    latDigit smallint;
+    lngDigit smallint;
+    ndx smallint;
+    i_ smallint;
+BEGIN
+    IF (codeLength > PAIR_CODE_LENGTH_) THEN
+        i_ := 0;
+        WHILE (i_ < (MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_)) LOOP
+            latDigit := latVal % GRID_ROWS_;
+            lngDigit := lngVal % GRID_COLUMNS_;
+            ndx := (latDigit * GRID_COLUMNS_) + lngDigit;
+            code := substr(CODE_ALPHABET_, ndx + 1, 1) || code;
+            latVal := div(latVal, GRID_ROWS_);
+            lngVal := div(lngVal, GRID_COLUMNS_);
+            i_ := i_ + 1;
+        END LOOP;
+    ELSE
+        latVal := div(latVal, power(GRID_ROWS_, GRID_CODE_LENGTH_)::integer);
+        lngVal := div(lngVal, power(GRID_COLUMNS_, GRID_CODE_LENGTH_)::integer);
+    END IF;
+
+    i_ := 0;
+    WHILE (i_ < (PAIR_CODE_LENGTH_ / 2)) LOOP
+        code := substr(CODE_ALPHABET_, (lngVal % ENCODING_BASE_)::integer + 1, 1) || code;
+        code := substr(CODE_ALPHABET_, (latVal % ENCODING_BASE_)::integer + 1, 1) || code;
+        latVal := div(latVal, ENCODING_BASE_);
+        lngVal := div(lngVal, ENCODING_BASE_);
+        i_ := i_ + 1;
+    END LOOP;
+
+    code := substr(code, 1, SEPARATOR_POSITION_) || SEPARATOR_ || substr(code, SEPARATOR_POSITION_ + 1);
+
+    IF (codeLength >= SEPARATOR_POSITION_) THEN
+        RETURN substr(code, 1, codeLength + 1);
+    ELSE
+        RETURN rpad(substr(code, 1, codeLength), SEPARATOR_POSITION_, PADDING_CHARACTER_) || SEPARATOR_;
+    END IF;
+END;
+$BODY$;
+
+
 -- pluscode_encode ####
 -- Encode lat lng to get pluscode
 -- PARAMETERS
@@ -351,57 +492,10 @@ BEGIN
 
     codeLength := LEAST(codeLength, MAX_DIGIT_COUNT_);
 
-    latVal := floor(round((latitude + LATITUDE_MAX_) * FINAL_LAT_PRECISION_, 6));
-    lngVal := floor(round((longitude + LONGITUDE_MAX_) * FINAL_LNG_PRECISION_, 6));
+    latVal := pluscode_latitudeToInteger(latitude);
+    lngVal := pluscode_longitudeToInteger(longitude);
 
-    latVal := round(latitude * FINAL_LAT_PRECISION_);
-    latVal := latVal + LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
-    IF (latVal < 0) THEN
-        latVal := 0;
-    ELSIF (latVal > 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) THEN
-        latVal := 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
-    END IF;
-
-    lngVal := round(longitude * FINAL_LNG_PRECISION_);
-    lngVal := lngVal + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
-    IF (lngVal < 0) THEN
-        lngVal := lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
-    ELSIF (lngVal > 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) THEN
-        lngVal :=  lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
-    END IF;
-
-    IF (codeLength > PAIR_CODE_LENGTH_) THEN
-        i_ := 0;
-        WHILE (i_ < (MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_)) LOOP
-            latDigit := latVal % GRID_ROWS_;
-            lngDigit := lngVal % GRID_COLUMNS_;
-            ndx := (latDigit * GRID_COLUMNS_) + lngDigit;
-            code := substr(CODE_ALPHABET_, ndx + 1, 1) || code;
-            latVal := div(latVal, GRID_ROWS_);
-            lngVal := div(lngVal, GRID_COLUMNS_);
-            i_ := i_ + 1;
-        END LOOP;
-    ELSE
-        latVal := div(latVal, power(GRID_ROWS_, GRID_CODE_LENGTH_)::integer);
-        lngVal := div(lngVal, power(GRID_COLUMNS_, GRID_CODE_LENGTH_)::integer);
-    END IF;
-
-    i_ := 0;
-    WHILE (i_ < (PAIR_CODE_LENGTH_ / 2)) LOOP
-        code := substr(CODE_ALPHABET_, (lngVal % ENCODING_BASE_)::integer + 1, 1) || code;
-        code := substr(CODE_ALPHABET_, (latVal % ENCODING_BASE_)::integer + 1, 1) || code;
-        latVal := div(latVal, ENCODING_BASE_);
-        lngVal := div(lngVal, ENCODING_BASE_);
-        i_ := i_ + 1;
-    END LOOP;
-
-    code := substr(code, 1, SEPARATOR_POSITION_) || SEPARATOR_ || substr(code, SEPARATOR_POSITION_ + 1);
-
-    IF (codeLength >= SEPARATOR_POSITION_) THEN
-        RETURN substr(code, 1, codeLength + 1);
-    ELSE
-        RETURN rpad(substr(code, 1, codeLength), SEPARATOR_POSITION_, PADDING_CHARACTER_) || SEPARATOR_;
-    END IF;
+    RETURN pluscode_encodeIntegers(latVal, lngVal, codeLength);
 END;
 $BODY$;
 

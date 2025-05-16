@@ -1,5 +1,14 @@
 --Test script for openlocationcode functions
 
+
+--###############################################################
+--pluscode_latitudeToInteger
+select pluscode_latitudeToInteger(149.18);
+ -- pluscode_latitudeToInteger
+-----------------
+                    -- 4499999999
+-- (1 row)
+
 --###############################################################
 --pluscode_cliplatitude
 select pluscode_cliplatitude(149.18);
