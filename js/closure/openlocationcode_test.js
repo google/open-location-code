@@ -75,8 +75,8 @@ testSuite({
         const fields = lines[i].split(',');
         const lat = parseFloat(fields[0]);
         const lng = parseFloat(fields[1]);
-        const latInt = parseInt(fields[2]);
-        const lngInt = parseInt(fields[3]);
+        const latInt = parseInt(fields[2], 10);
+        const lngInt = parseInt(fields[3], 10);
         const length = parseInt(fields[4], 10);
         const code = fields[5];
 
@@ -98,8 +98,8 @@ testSuite({
         const fields = lines[i].split(',');
         const lat = parseFloat(fields[0]);
         const lng = parseFloat(fields[1]);
-        const latInt = parseInt(fields[2]);
-        const lngInt = parseInt(fields[3]);
+        const latInt = parseInt(fields[2], 10);
+        const lngInt = parseInt(fields[3], 10);
         const length = parseInt(fields[4], 10);
         const code = fields[5];
 
@@ -121,8 +121,8 @@ testSuite({
         const fields = lines[i].split(',');
         const lat = parseFloat(fields[0]);
         const lng = parseFloat(fields[1]);
-        const latInt = parseInt(fields[2]);
-        const lngInt = parseInt(fields[3]);
+        const latInt = parseInt(fields[2], 10);
+        const lngInt = parseInt(fields[3], 10);
 
         const got = OpenLocationCode._locationToIntegers(lat, lng);
         assertEquals('testLocationToIntegers: latitude ' + 1, latInt, got[0]);
