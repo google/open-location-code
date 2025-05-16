@@ -96,6 +96,31 @@ pub fn is_full(code: &str) -> bool {
     is_valid(code) && !is_short(code)
 }
 
+/// Convert a latitude and longitude in degrees to integer values.
+///
+/// This function is only exposed for testing and should not be called directly.
+pub fn point_to_integers(pt: Point<f64>) -> (i64, i64) {
+    let (lng, lat) = pt.x_y();
+
+    let mut lat_val = (lat * LAT_INTEGER_MULTIPLIER as f64).round() as i64;
+    lat_val += LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER;
+    if lat_val < 0 {
+        lat_val = 0
+    } else if lat_val >= 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER {
+        lat_val = 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER - 1;
+    }
+
+    let mut lng_val = (lng * LNG_INTEGER_MULTIPLIER as f64).round() as i64;
+    lng_val += LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER;
+    if lng_val < 0 {
+        lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
+            + (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
+    } else if lng_val >= 2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER {
+        lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
+    }
+    (lat_val, lng_val)
+}
+
 /// Encode a location into an Open Location Code.
 ///
 /// Produces a code of the specified length, or the default length if no
@@ -105,40 +130,22 @@ pub fn is_full(code: &str) -> bool {
 /// codes represent smaller areas, but lengths > 14 are sub-centimetre and so
 /// 11 or 12 are probably the limit of useful codes.
 pub fn encode(pt: Point<f64>, code_length: usize) -> String {
-    let (lng, lat) = pt.x_y();
-
+    let (lat_val, lng_val) = point_to_integers(pt);
     let trimmed_code_length = min(max(code_length, MIN_CODE_LENGTH), MAX_CODE_LENGTH);
 
-    // This approach converts each value to an integer after multiplying it by the final precision.
-    // This allows us to use only integer operations, so avoiding any accumulation of floating
-    // point representation errors.
+    encode_integers(lat_val, lng_val, trimmed_code_length)
+}
 
-    // Convert latitude into a positive integer clipped into the range 0-(just under 180*2.5e7).
-    // Latitude 90 needs to be adjusted to be just less, so the returned code can also be decoded.
-    let mut lat_val = (lat * LAT_INTEGER_MULTIPLIER as f64).round() as i64;
-    lat_val += LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER;
-    if lat_val < 0 {
-        lat_val = 0
-    } else if lat_val >= 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER {
-        lat_val = 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER - 1;
-    }
-
-    // Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-    let mut lng_val = (lng * LNG_INTEGER_MULTIPLIER as f64).round() as i64;
-    lng_val += LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER;
-    if lng_val < 0 {
-        lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
-            + (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
-    } else if lng_val >= 2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER {
-        lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
-    }
-
+/// Encode an integer location into an Open Location Code.
+///
+/// This function is only exposed for testing and should not be called directly.
+pub fn encode_integers(mut lat_val: i64, mut lng_val: i64, code_length: usize) -> String {
     // Compute the code digits. This largely ignores the requested length - it
     // generates either a 10 digit code, or a 15 digit code, and then truncates
     // it to the requested length.
 
     // Build up the code digits in reverse order.
-    let mut rev_code = String::with_capacity(trimmed_code_length + 1);
+    let mut rev_code = String::with_capacity(code_length + 1);
 
     // First do the grid digits.
     if code_length > PAIR_CODE_LENGTH {
