@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +67,8 @@ public class EncodingTest {
               "Latitude %f, longitude %f and length %d were wrongly encoded.",
               testData.latitudeDegrees, testData.longitudeDegrees, testData.length),
           testData.code,
-          OpenLocationCode.encode(testData.latitudeDegrees, testData.longitudeDegrees, testData.length));
+          OpenLocationCode.encode(
+              testData.latitudeDegrees, testData.longitudeDegrees, testData.length));
     }
   }
 
@@ -76,11 +76,14 @@ public class EncodingTest {
   public void testDegreesToIntegers() throws Exception {
     // The method to test is private, we use reflection to get it to avoid changing the visibility.
     OpenLocationCode olcClass = new OpenLocationCode("8FWC2345+G6");
-    Method privateMethod = OpenLocationCode.class.getDeclaredMethod("degreesToIntegers", double.class, double.class);
+    Method privateMethod =
+        OpenLocationCode.class.getDeclaredMethod("degreesToIntegers", double.class, double.class);
     privateMethod.setAccessible(true);
 
     for (TestData testData : testDataList) {
-      long[] got = (long[]) privateMethod.invoke(olcClass, testData.latitudeDegrees, testData.longitudeDegrees);
+      long[] got =
+          (long[])
+              privateMethod.invoke(olcClass, testData.latitudeDegrees, testData.longitudeDegrees);
       Assert.assertEquals(
           String.format("Latitude %f integer conversion is incorrect", testData.latitudeDegrees),
           testData.latitudeInteger,
@@ -96,11 +99,16 @@ public class EncodingTest {
   public void testEncodeIntegers() throws Exception {
     // The method to test is private, we use reflection to get it to avoid changing the visibility.
     OpenLocationCode olcClass = new OpenLocationCode("8FWC2345+G6");
-    Method privateMethod = OpenLocationCode.class.getDeclaredMethod("encodeIntegers", long.class, long.class, int.class);
+    Method privateMethod =
+        OpenLocationCode.class.getDeclaredMethod(
+            "encodeIntegers", long.class, long.class, int.class);
     privateMethod.setAccessible(true);
 
     for (TestData testData : testDataList) {
-      String got = (String) privateMethod.invoke(olcClass, testData.latitudeInteger, testData.longitudeInteger, testData.length);
+      String got =
+          (String)
+              privateMethod.invoke(
+                  olcClass, testData.latitudeInteger, testData.longitudeInteger, testData.length);
       Assert.assertEquals(
           String.format(
               "Latitude %d, longitude %d and length %d were wrongly encoded.",
