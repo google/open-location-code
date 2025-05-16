@@ -182,7 +182,8 @@ TEST_P(EncodingChecks, degreesToIntegers) {
 TEST_P(EncodingChecks, encodeIntegers) {
   EncodingTestData test_data = GetParam();
   // Encode the test location and make sure we get the expected code.
-  std::string actual_code = internal::encodeIntegers(test_data.lat_int, test_data.lng_int, test_data.length);
+  std::string actual_code = internal::encodeIntegers(
+      test_data.lat_int, test_data.lng_int, test_data.length);
   EXPECT_EQ(test_data.code, actual_code);
 }
 
