@@ -1,4 +1,5 @@
 // Include the C library into this C++ test file.
+#include <cstdlib>
 extern "C" {
   #include "src/olc.h"
 }
@@ -99,6 +100,8 @@ INSTANTIATE_TEST_SUITE_P(OLC_Tests, DecodingChecks,
 struct EncodingTestData {
   double lat_deg;
   double lng_deg;
+  long long int lat_int;
+  long long int lng_int;
   size_t length;
   std::string code;
 };
@@ -115,8 +118,10 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
     EncodingTestData test_data = {};
     test_data.lat_deg = strtod(csv_records[i][0].c_str(), nullptr);
     test_data.lng_deg = strtod(csv_records[i][1].c_str(), nullptr);
-    test_data.length = atoi(csv_records[i][2].c_str());
-    test_data.code = csv_records[i][3];
+    test_data.lat_int = strtoll(csv_records[i][2].c_str(), nullptr, 10);
+    test_data.lng_int = strtoll(csv_records[i][3].c_str(), nullptr, 10);
+    test_data.length = atoi(csv_records[i][4].c_str());
+    test_data.code = csv_records[i][5];
     data_results.push_back(test_data);
   }
   return data_results;
@@ -129,6 +134,24 @@ TEST_P(EncodingChecks, Encode) {
   // Encode the test location and make sure we get the expected code.
   OLC_Encode(&loc, test_data.length, got_code, 18);
   EXPECT_EQ(test_data.code, got_code);
+}
+
+TEST_P(EncodingChecks, OLC_EncodeIntegers) {
+  EncodingTestData test_data = GetParam();
+  OLC_LatLonIntegers loc = OLC_LatLonIntegers{test_data.lat_int, test_data.lng_int};
+  char got_code[18];
+  // Encode the test location and make sure we get the expected code.
+  OLC_EncodeIntegers(&loc, test_data.length, got_code, 18);
+  EXPECT_EQ(test_data.code, got_code);
+}
+
+TEST_P(EncodingChecks, OLC_LocationToIntegers) {
+  EncodingTestData test_data = GetParam();
+  OLC_LatLon loc = OLC_LatLon{test_data.lat_deg, test_data.lng_deg};
+  OLC_LatLonIntegers got;
+  OLC_LocationToIntegers(&loc, &got);
+  EXPECT_EQ(test_data.lat_int, got.lat);
+  EXPECT_EQ(test_data.lng_int, got.lon);
 }
 
 INSTANTIATE_TEST_SUITE_P(OLC_Tests, EncodingChecks,
