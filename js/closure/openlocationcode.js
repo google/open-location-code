@@ -413,7 +413,7 @@ function _locationToIntegers(latitude, longitude) {
   }
   return [latVal, lngVal];
 }
-exports._latitudeToInteger = _latitudeToInteger;
+exports._locationToIntegers = _locationToIntegers;
 
 /**
   Encode a location that uses integer values into an Open Location Code.
