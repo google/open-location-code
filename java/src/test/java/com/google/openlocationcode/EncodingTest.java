@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,9 +73,14 @@ public class EncodingTest {
   }
 
   @Test
-  public void testDegreesToIntegers() {
+  public void testDegreesToIntegers() throws Exception {
+    // The method to test is private, we use reflection to get it to avoid changing the visibility.
+    OpenLocationCode olcClass = new OpenLocationCode(null);
+    Method privateMethod = OpenLocationCode.class.getDeclaredMethod("degreesToIntegers", int.class, int.class);
+    privateMethod.setAccessible(true);
+
     for (TestData testData : testDataList) {
-      long[] got = OpenLocationCode.degreesToIntegers(testData.latitudeDegrees, testData.longitudeDegrees);
+      long[] got = (long[]) privateMethod.invoke(olcClass, testData.latitudeDegrees, testData.longitudeDegrees);
       Assert.assertEquals(
           String.format("Latitude %f integer conversion is incorrect", testData.latitudeDegrees),
           testData.latitudeInteger,
@@ -87,14 +93,20 @@ public class EncodingTest {
   }
 
   @Test
-  public void testEncodeIntegers() {
+  public void testEncodeIntegers() throws Exception {
+    // The method to test is private, we use reflection to get it to avoid changing the visibility.
+    OpenLocationCode olcClass = new OpenLocationCode(null);
+    Method privateMethod = OpenLocationCode.class.getDeclaredMethod("encodeIntegers", int.class, int.class);
+    privateMethod.setAccessible(true);
+
     for (TestData testData : testDataList) {
+      String got = (String) privateMethod.invoke(olcClass, testData.latitudeInteger, testData.longitudeInteger, testData.length);
       Assert.assertEquals(
           String.format(
               "Latitude %d, longitude %d and length %d were wrongly encoded.",
               testData.latitudeInteger, testData.longitudeInteger, testData.length),
           testData.code,
-          OpenLocationCode.encodeIntegers(testData.latitudeInteger, testData.longitudeInteger, testData.length));
+          got);
     }
   }
 }

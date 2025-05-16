@@ -200,7 +200,7 @@ public final class OpenLocationCode {
    * @param codeLength The requested number of digits.
    * @return The OLC for the location.
    */
-  static String encodeIntegers(long lat, long lng, int codeLength) {
+  private static String encodeIntegers(long lat, long lng, int codeLength) {
     // Limit the maximum number of digits in the code.
     codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
     // Check that the code length requested is valid.
