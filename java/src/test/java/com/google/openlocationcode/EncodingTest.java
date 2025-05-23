@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,34 +63,49 @@ public class EncodingTest {
     double allowedErrorRate = 0.05;
     int failedEncodings = 0;
     for (TestData testData : testDataList) {
-      String got = OpenLocationCode.encode(testData.latitudeDegrees, testData.longitudeDegrees, testData.length);
+      String got =
+          OpenLocationCode.encode(
+              testData.latitudeDegrees, testData.longitudeDegrees, testData.length);
       if (got != testData.code) {
         failedEncodings++;
         System.out.printf(
-          "ENCODING DIFFERENCE: encode(%f,%f,%d) got %s, want %s\n",
-          testData.latitudeDegrees, testData.longitudeDegrees, testData.length, got, testData.code);
+            "ENCODING DIFFERENCE: encode(%f,%f,%d) got %s, want %s\n",
+            testData.latitudeDegrees,
+            testData.longitudeDegrees,
+            testData.length,
+            got,
+            testData.code);
       }
-      Assert.assertTrue(
-          String.format(
-              "Too many encoding errors (actual rate %f, allowed rate %f), see ENCODING DIFFERENCE lines",
-              failedEncodings / testDataList.size(), allowedErrorRate),
-          failedEncodings / testDataList.size() <= allowedErrorRate);
     }
+    double gotRate = (double) failedEncodings / (double) testDataList.size();
+    Assert.assertTrue(
+        String.format(
+            "Too many encoding errors (actual rate %f, allowed rate %f), see ENCODING DIFFERENCE"
+                + " lines",
+            gotRate, allowedErrorRate),
+        gotRate <= allowedErrorRate);
   }
 
   @Test
   public void testDegreesToIntegers() {
     for (TestData testData : testDataList) {
-      long[] got = OpenLocationCode.degreesToIntegers(testData.latitudeDegrees, testData.latitudeDegrees);
+      long[] got =
+          OpenLocationCode.degreesToIntegers(testData.latitudeDegrees, testData.latitudeDegrees);
       Assert.assertTrue(
           String.format(
               "degreesToIntegers(%f, %f) returned latitude %d, expected %d",
-              testData.latitudeDegrees, testData.longitudeDegrees, got[0], testData.latitudeInteger),
+              testData.latitudeDegrees,
+              testData.longitudeDegrees,
+              got[0],
+              testData.latitudeInteger),
           got[0] == testData.latitudeInteger || got[0] == testData.latitudeInteger - 1);
       Assert.assertTrue(
           String.format(
               "degreesToIntegers(%f, %f) returned longitude %d, expected %d",
-              testData.latitudeDegrees, testData.longitudeDegrees, got[1], testData.longitudeInteger),
+              testData.latitudeDegrees,
+              testData.longitudeDegrees,
+              got[1],
+              testData.longitudeInteger),
           got[1] == testData.longitudeInteger || got[1] == testData.longitudeInteger - 1);
     }
   }
@@ -104,7 +118,8 @@ public class EncodingTest {
               "Latitude %d, longitude %d and length %d were wrongly encoded.",
               testData.latitudeInteger, testData.longitudeInteger, testData.length),
           testData.code,
-          OpenLocationCode.encodeIntegers(testData.latitudeInteger, testData.longitudeInteger, testData.length));
+          OpenLocationCode.encodeIntegers(
+              testData.latitudeInteger, testData.longitudeInteger, testData.length));
     }
   }
 }
