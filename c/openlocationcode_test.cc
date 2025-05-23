@@ -141,18 +141,23 @@ TEST_P(TolerantEncodingChecks, EncodeDegrees) {
     // Encode the test location and make sure we get the expected code.
     OLC_Encode(&loc, tc.length, got_code, 18);
     if (tc.code.compare(got_code) != 0) {
-      failure_count ++;
-      printf("  ENCODING FAILURE: Got: '%s', expected: '%s'\n", got_code, tc.code.c_str());
+      failure_count++;
+      printf("  ENCODING FAILURE: Got: '%s', expected: '%s'\n", got_code,
+             tc.code.c_str());
     }
   }
-  double actual_failure_rate = double(failure_count) / test_params.test_data.size();
+  double actual_failure_rate =
+      double(failure_count) / test_params.test_data.size();
   EXPECT_LE(actual_failure_rate, test_params.allowed_failure_rate)
-      << "Failure rate " << actual_failure_rate << " exceeds allowed rate " << test_params.allowed_failure_rate;
+      << "Failure rate " << actual_failure_rate << " exceeds allowed rate "
+      << test_params.allowed_failure_rate;
 }
 
-// Allow a 5% error rate encoding from degree coordinates (because of floating point precision).
+// Allow a 5% error rate encoding from degree coordinates (because of floating
+// point precision).
 INSTANTIATE_TEST_SUITE_P(OLC_Tests, TolerantEncodingChecks,
-                         ::testing::Values(TolerantTestParams{0.05, GetEncodingDataFromCsv()}));
+                         ::testing::Values(TolerantTestParams{
+                             0.05, GetEncodingDataFromCsv()}));
 
 class EncodingChecks : public ::testing::TestWithParam<EncodingTestData> {};
 
