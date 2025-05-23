@@ -87,8 +87,9 @@ void OLC_LocationToIntegers(const OLC_LatLon* degrees,
   // Multiply degrees by precision. Use lround to explicitly round rather than
   // truncate, which causes issues when using values like 0.1 that do not have
   // precise floating point representations.
-  long long int lat = lround(degrees->lat * kGridLatPrecisionInverse);
-  long long int lon = lround(degrees->lon * kGridLonPrecisionInverse);
+  long long int lat = floorl(degrees->lat * kGridLatPrecisionInverse);
+  long long int lon = floorl(degrees->lon * kGridLonPrecisionInverse);
+
   // Convert latitude to positive range (0..2*degrees*precision) and clip.
   lat += OLC_kLatMaxDegrees * kGridLatPrecisionInverse;
   if (lat < 0) {
