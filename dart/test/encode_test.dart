@@ -19,19 +19,71 @@ import 'package:test/test.dart';
 import 'utils.dart';
 
 // code,lat,lng,latLo,lngLo,latHi,lngHi
-void checkEncodeDecode(String csvLine) {
+void checkEncodeDegrees(String csvLine) {
   var elements = csvLine.split(',');
   num lat = double.parse(elements[0]);
   num lng = double.parse(elements[1]);
-  int len = int.parse(elements[2]);
-  var want = elements[3];
+  int len = int.parse(elements[4]);
+  var want = elements[5];
   var got = olc.encode(lat, lng, codeLength: len);
   expect(got, equals(want));
 }
 
+void checkEncodeIntegers(String csvLine) {
+  var elements = csvLine.split(',');
+  int lat = int.parse(elements[2]);
+  int lng = int.parse(elements[3]);
+  int len = int.parse(elements[4]);
+  var want = elements[5];
+  var got = olc.encodeIntegers(lat, lng, len);
+  expect(got, equals(want));
+}
+
+void checkLocationToIntegers(String csvLine) {
+  var elements = csvLine.split(',');
+  num latDegrees = double.parse(elements[0]);
+  num lngDegrees = double.parse(elements[1]);
+  int latInteger = int.parse(elements[2]);
+  int lngInteger = int.parse(elements[3]);
+  var got = olc.locationToIntegers(latDegrees, lngDegrees);
+  // Due to floating point precision limitations, we may get values 1 less than expected.
+  expect(got[0], lessThanOrEqualTo(latInteger));
+  expect(got[0] + 1, greaterThanOrEqualTo(latInteger));
+  expect(got[1], lessThanOrEqualTo(lngInteger));
+  expect(got[1] + 1, greaterThanOrEqualTo(lngInteger));
+}
+
 void main() {
-  test('Check encode decode', () {
-    csvLinesFromFile('encoding.csv').forEach(checkEncodeDecode);
+  // Encoding from degrees permits a small percentage of errors.
+  // This is due to floating point precision limitations.
+  test('Check encode from degrees', () {
+    // The proportion of tests that we will accept generating a different code.
+    // This should not be significantly different from any other implementation.
+    num allowedErrRate = 0.05;
+    int errors = 0;
+    int tests = 0;
+    csvLinesFromFile('encoding.csv').forEach((csvLine) {
+      tests++;
+      var elements = csvLine.split(',');
+      num lat = double.parse(elements[0]);
+      num lng = double.parse(elements[1]);
+      int len = int.parse(elements[4]);
+      var want = elements[5];
+      var got = olc.encode(lat, lng, codeLength: len);
+      if (got != want) {
+        print("ENCODING DIFFERENCE: Got '$got', expected '$want'");
+        errors++;
+      }
+    });
+    expect(errors / tests, lessThanOrEqualTo(allowedErrRate));
+  });
+
+  test('Check encode from integers', () {
+    csvLinesFromFile('encoding.csv').forEach(checkEncodeIntegers);
+  });
+
+  test('Check conversion of degrees to integers', () {
+    csvLinesFromFile('encoding.csv').forEach(checkLocationToIntegers);
   });
 
   test('MaxCodeLength', () {

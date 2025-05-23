@@ -254,11 +254,6 @@ bool isFull(String code) {
 /// * [codeLength]: The number of significant digits in the output code, not
 /// including any separator characters.
 String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
-  if (codeLength < minDigitCount ||
-      (codeLength < pairCodeLength && codeLength.isOdd)) {
-    throw ArgumentError('Invalid Open Location Code length: $codeLength');
-  }
-  codeLength = min(maxDigitCount, codeLength);
   var integers = locationToIntegers(latitude, longitude);
   return encodeIntegers(integers[0], integers[1], codeLength);
 }
@@ -269,7 +264,7 @@ List<int> locationToIntegers(num latitude, num longitude) {
   // Convert latitude into a positive integer clipped into the range 0-(just
   // under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
   // returned code can also be decoded.
-  var latVal = (latitude * finalLatPrecision).round().toInt();
+  var latVal = (latitude * finalLatPrecision).floor().toInt();
   latVal += latitudeMax * finalLatPrecision;
   if (latVal < 0) {
     latVal = 0;
@@ -278,7 +273,7 @@ List<int> locationToIntegers(num latitude, num longitude) {
   }
   // Convert longitude into a positive integer and normalise it into the range
   // 0-360*8.192e6.
-  var lngVal = (longitude * finalLngPrecision).round().toInt();
+  var lngVal = (longitude * finalLngPrecision).floor().toInt();
   lngVal += longitudeMax * finalLngPrecision;
   if (lngVal < 0) {
     // Dart's % operator differs from other languages in that it returns the
@@ -293,6 +288,11 @@ List<int> locationToIntegers(num latitude, num longitude) {
 
 /// Encode a location into an Open Location Code.
 String encodeIntegers(int latVal, int lngVal, int codeLength) {
+  if (codeLength < minDigitCount ||
+      (codeLength < pairCodeLength && codeLength.isOdd)) {
+    throw ArgumentError('Invalid Open Location Code length: $codeLength');
+  }
+  codeLength = min(maxDigitCount, codeLength);
   List<String> code = List<String>.filled(maxDigitCount + 1, '');
   code[separatorPosition] = separator;
 
