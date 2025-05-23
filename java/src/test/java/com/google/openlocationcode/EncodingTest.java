@@ -74,7 +74,7 @@ public class EncodingTest {
       Assert.assertTrue(
           String.format(
               "Too many encoding errors (actual rate %f, allowed rate %f), see ENCODING DIFFERENCE lines"),
-          failedEncodings / testDataList.size() <= allowedErrorRate,);
+          failedEncodings / testDataList.size() <= allowedErrorRate);
     }
   }
 
@@ -92,7 +92,6 @@ public class EncodingTest {
               "degreesToIntegers(%f, %f) returned longitude %d, expected %d",
               testData.latitudeDegrees, testData.longitudeDegrees, got[1], testData.longitudeInteger),
           got[1] == testData.longitudeInteger || got[1] == testData.longitudeInteger - 1);
-    }
     }
   }
 
