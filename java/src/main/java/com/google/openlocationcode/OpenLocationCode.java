@@ -188,13 +188,6 @@ public final class OpenLocationCode {
    * @throws IllegalArgumentException if the code length is not valid.
    */
   public OpenLocationCode(double latitude, double longitude, int codeLength) {
-    // Limit the maximum number of digits in the code.
-    codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
-    // Check that the code length requested is valid.
-    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < MIN_DIGIT_COUNT) {
-      throw new IllegalArgumentException("Illegal code length " + codeLength);
-    }
-
     // Compute the code.
     long[] integers = degreesToIntegers(latitude, longitude);
     this.code = encodeIntegers(integers[0], integers[1], codeLength);
@@ -207,8 +200,16 @@ public final class OpenLocationCode {
    * @param lng The longitude as a positive integer.
    * @param codeLength The requested number of digits.
    * @return The OLC for the location.
+   * @throws IllegalArgumentException if the code length is not valid.
    */
-  private static String encodeIntegers(long lat, long lng, int codeLength) {
+  static String encodeIntegers(long lat, long lng, int codeLength) {
+    // Limit the maximum number of digits in the code.
+    codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
+    // Check that the code length requested is valid.
+    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < MIN_DIGIT_COUNT) {
+      throw new IllegalArgumentException("Illegal code length " + codeLength);
+    }
+
     // Store the code - we build it in reverse and reorder it afterwards.
     StringBuilder revCodeBuilder = new StringBuilder();
     // Compute the grid part of the code if necessary.
@@ -663,9 +664,9 @@ public final class OpenLocationCode {
    * @param longitude The longitude in decimal degrees.
    * @return A list of [latitude, longitude] in clipped, normalised integer values.
    */
-  private static long[] degreesToIntegers(double latitude, double longitude) {
-    long lat = (long) roundAwayFromZero(latitude * LAT_INTEGER_MULTIPLIER);
-    long lng = (long) roundAwayFromZero(longitude * LNG_INTEGER_MULTIPLIER);
+  static long[] degreesToIntegers(double latitude, double longitude) {
+    long lat = (long) Math.floor(latitude * LAT_INTEGER_MULTIPLIER);
+    long lng = (long) Math.floor(longitude * LNG_INTEGER_MULTIPLIER);
 
     // Clip and normalise values.
     lat += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
@@ -683,20 +684,6 @@ public final class OpenLocationCode {
       lng = lng % (2 * LONGITUDE_MAX * LNG_INTEGER_MULTIPLIER);
     }
     return new long[] {lat, lng};
-  }
-
-  /**
-   * Round numbers like C does. This implements rounding away from zero (see
-   * https://en.wikipedia.org/wiki/Rounding).
-   *
-   * @param num A number to round.
-   * @return The rounded value.
-   */
-  private static Long roundAwayFromZero(double num) {
-    if (num >= 0) {
-      return Math.round(num);
-    }
-    return -1 * Math.round(Math.abs(num));
   }
 
   private static double clipLatitude(double latitude) {
