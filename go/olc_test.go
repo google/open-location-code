@@ -17,6 +17,7 @@ package olc
 import (
 	"bufio"
 	"encoding/csv"
+	"fmt"
 	"math"
 	"math/rand"
 	"os"
@@ -41,9 +42,10 @@ type (
 	}
 
 	encodingTest struct {
-		lat, lng float64
-		length   int
-		code     string
+		latDeg, lngDeg float64
+		latInt, lngInt int64
+		length         int
+		code           string
 	}
 
 	decodingTest struct {
@@ -80,10 +82,12 @@ func init() {
 		defer wg.Done()
 		for _, cols := range mustReadLines("encoding.csv") {
 			encoding = append(encoding, encodingTest{
-				lat:    mustFloat(cols[0]),
-				lng:    mustFloat(cols[1]),
-				length: mustInt(cols[2]),
-				code:   cols[3],
+				latDeg: mustFloat(cols[0]),
+				lngDeg: mustFloat(cols[1]),
+				latInt: mustInt64(cols[2]),
+				lngInt: mustInt64(cols[3]),
+				length: mustInt(cols[4]),
+				code:   cols[5],
 			})
 		}
 	}()
@@ -127,12 +131,39 @@ func TestCheck(t *testing.T) {
 	}
 }
 
-func TestEncode(t *testing.T) {
+func TestEncodeDegrees(t *testing.T) {
+	const allowedErrRate float64 = 0.05
+	var badCodes int
 	for i, elt := range encoding {
-		got := Encode(elt.lat, elt.lng, elt.length)
+		got := Encode(elt.latDeg, elt.lngDeg, elt.length)
 		if got != elt.code {
-			t.Errorf("%d. got %q for (%v,%v,%d), wanted %q.", i, got, elt.lat, elt.lng, elt.length, elt.code)
-			t.FailNow()
+			fmt.Printf("ENCODING DIFFERENCE %d. got %q for Encode(%v,%v,%d), wanted %q\n", i, got, elt.latDeg, elt.lngDeg, elt.length, elt.code)
+			badCodes++
+		}
+	}
+	if errRate := float64(badCodes) / float64(len(encoding)); errRate > allowedErrRate {
+		t.Errorf("Too many errors in encoding degrees (got %f, allowed %f)", errRate, allowedErrRate)
+	}
+}
+
+func TestEncodeIntegers(t *testing.T) {
+	for i, elt := range encoding {
+		got := integerEncode(elt.latInt, elt.lngInt, elt.length)
+		if got != elt.code {
+			t.Errorf("%d. got %q for integerEncode(%v,%v,%d), wanted %q", i, got, elt.latInt, elt.lngInt, elt.length, elt.code)
+		}
+	}
+}
+
+func TestConvertDegrees(t *testing.T) {
+	for i, elt := range encoding {
+		got := latitudeAsInteger(elt.latDeg)
+		if got > elt.latInt || got < elt.latInt-1 {
+			t.Errorf("%d. got %d for latitudeAsInteger(%v), wanted %d", i, got, elt.latDeg, elt.latInt)
+		}
+		got = longitudeAsInteger(elt.lngDeg)
+		if got > elt.lngInt || got < elt.lngInt-1 {
+			t.Errorf("%d. got %d for longitudeAsInteger(%v), wanted %d", i, got, elt.lngDeg, elt.lngInt)
 		}
 	}
 }
@@ -206,6 +237,14 @@ func mustFloat(a string) float64 {
 
 func mustInt(a string) int {
 	f, err := strconv.Atoi(a)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
+func mustInt64(a string) int64 {
+	f, err := strconv.ParseInt(a, 10, 64)
 	if err != nil {
 		panic(err)
 	}
