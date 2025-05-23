@@ -362,17 +362,6 @@ exports.isFull = isFull;
       specified.
  */
 function encode(latitude, longitude, codeLength) {
-  if (typeof codeLength == 'undefined') {
-    codeLength = PAIR_CODE_LENGTH;
-  }
-  if (
-    codeLength < MIN_CODE_LEN ||
-    (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)
-  ) {
-    throw new Error('IllegalArgumentException: Invalid Plus Code length');
-  }
-  codeLength = Math.min(codeLength, MAX_CODE_LEN);
-
   const locationIntegers = _locationToIntegers(latitude, longitude);
 
   return _encodeIntegers(locationIntegers[0], locationIntegers[1], codeLength);
@@ -395,14 +384,14 @@ exports.encode = encode;
  * @return {Array<number>} A tuple of the latitude integer and longitude integer.
  */
 function _locationToIntegers(latitude, longitude) {
-  var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION);
+  var latVal = Math.floor(latitude * FINAL_LAT_PRECISION);
   latVal += LATITUDE_MAX * FINAL_LAT_PRECISION;
   if (latVal < 0) {
     latVal = 0;
   } else if (latVal >= 2 * LATITUDE_MAX * FINAL_LAT_PRECISION) {
     latVal = 2 * LATITUDE_MAX * FINAL_LAT_PRECISION - 1;
   }
-  var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION);
+  var lngVal = Math.floor(longitude * FINAL_LNG_PRECISION);
   lngVal += LONGITUDE_MAX * FINAL_LNG_PRECISION;
   if (lngVal < 0) {
     lngVal =
@@ -428,6 +417,17 @@ exports._locationToIntegers = _locationToIntegers;
       specified.
  */
 function _encodeIntegers(latInt, lngInt, codeLength) {
+  if (typeof codeLength == 'undefined') {
+    codeLength = PAIR_CODE_LENGTH;
+  }
+  if (
+    codeLength < MIN_CODE_LEN ||
+    (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)
+  ) {
+    throw new Error('IllegalArgumentException: Invalid Plus Code length');
+  }
+  codeLength = Math.min(codeLength, MAX_CODE_LEN);
+
   // Javascript strings are immutable and it doesn't have a native
   // StringBuilder, so we'll use an array.
   const code = new Array(MAX_CODE_LEN + 1);
@@ -693,20 +693,6 @@ function shorten(code, latitude, longitude) {
   return code;
 }
 exports.shorten = shorten;
-
-/**
- * Round numbers like C does. This implements rounding away from zero (see
- * https://en.wikipedia.org/wiki/Rounding).
- *
- * @param {number} num A number to round.
- * @return {number} The rounded value usn
- */
-function roundAwayFromZero(num) {
-  if (num >= 0) {
-    return Math.round(num);
-  }
-  return -1 * Math.round(Math.abs(num));
-}
 
 /**
   Clip a latitude into the range -90 to 90.

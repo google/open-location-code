@@ -67,21 +67,92 @@ testSuite({
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.send(DECODING_TEST_FILE, 'GET');
   },
-  testEncode: function() {
+  testEncodeDegrees: function() {
+    const xhrIo_ = new XhrIo();
+    xhrIo_.listenOnce(EventType.COMPLETE, () => {
+      // Allow a 5% error rate encoding from degree coordinates (because of floating
+      // point precision).
+      const allowedErrorRate = 0.05;
+      var errors = 0;
+      const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
+      for (var i = 0; i < lines.length; i++) {
+        const fields = lines[i].split(',');
+        const latDegrees = parseFloat(fields[0]);
+        const lngDegrees = parseFloat(fields[1]);
+        const length = parseInt(fields[4], 10);
+        const code = fields[5];
+
+        const got = OpenLocationCode.encode(latDegrees, lngDegrees, length);
+        // Did we get the same code?
+        if (code != got) {
+          console.warn(
+              'ENCODING DIFFERENCE: Expected code ' + code +', got ' + got
+          );
+          errors++;
+        }
+        asyncTestCase.continueTesting();
+      }
+      console.info('testEncodeDegrees error rate is ' + (errors / lines.length));
+      assertTrue(
+          'testEncodeDegrees: too many errors ' + errors / lines.length,
+          (errors / lines.length) < allowedErrorRate
+      );
+    });
+    asyncTestCase.waitForAsync('Waiting for xhr to respond');
+    xhrIo_.send(ENCODING_TEST_FILE, 'GET');
+  },
+  testLocationToIntegers: function() {
     const xhrIo_ = new XhrIo();
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
       for (var i = 0; i < lines.length; i++) {
         const fields = lines[i].split(',');
-        const lat = parseFloat(fields[0]);
-        const lng = parseFloat(fields[1]);
-        const length = parseInt(fields[2], 10);
-        const code = fields[3];
+        const latDegrees = parseFloat(fields[0]);
+        const lngDegrees = parseFloat(fields[1]);
+        const latIntegers = parseInt(fields[2], 10);
+        const lngIntegers = parseInt(fields[3], 10);
 
-        const gotCode = OpenLocationCode.encode(lat, lng, length);
+        const got = OpenLocationCode._locationToIntegers(
+            latDegrees,
+            lngDegrees
+        );
+        // Due to floating point precision limitations, we may get values 1 less
+        // than expected.
+        assertTrue(
+            'testLocationToIntegers: expected latitude ' + latIntegers + ', got ' + got[0],
+            got[0] == latIntegers || got[0] == latIntegers - 1
+        );
+        assertTrue(
+            'testLocationToIntegers: expected longitude ' + lngIntegers + ', got ' + got[1],
+            got[1] == lngIntegers || got[1] == lngIntegers - 1
+        );
+        asyncTestCase.continueTesting();
+      }
+    });
+    asyncTestCase.waitForAsync('Waiting for xhr to respond');
+    xhrIo_.send(ENCODING_TEST_FILE, 'GET');
+  },
+  testEncodeIntegers: function() {
+    const xhrIo_ = new XhrIo();
+    xhrIo_.listenOnce(EventType.COMPLETE, () => {
+      const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
+      for (var i = 0; i < lines.length; i++) {
+        const fields = lines[i].split(',');
+        const latIntegers = parseInt(fields[2], 10);
+        const lngIntegers = parseInt(fields[3], 10);
+        const length = parseInt(fields[4], 10);
+        const code = fields[5];
+
+        const got = OpenLocationCode._encodeIntegers(
+            latIntegers,
+            lngIntegers,
+            length
+        );
         // Did we get the same code?
-        assertEquals('testEncode ' + 1, code, gotCode);
-
+        assertEquals(
+            'testEncodeIntegers: expected code ' + code + ', got ' + got,
+            code, got
+        );
         asyncTestCase.continueTesting();
       }
     });
