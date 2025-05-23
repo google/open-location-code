@@ -202,7 +202,7 @@ public final class OpenLocationCode {
    * @return The OLC for the location.
    * @throws IllegalArgumentException if the code length is not valid.
    */
-   static String encodeIntegers(long lat, long lng, int codeLength) {
+  static String encodeIntegers(long lat, long lng, int codeLength) {
     // Limit the maximum number of digits in the code.
     codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
     // Check that the code length requested is valid.
