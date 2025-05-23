@@ -1,14 +1,14 @@
 // Include the C library into this C++ test file.
 extern "C" {
-  #include "src/olc.h"
+#include "src/olc.h"
 }
 
-#include <chrono>
-#include <cstring>
-#include <cmath>
-#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <chrono>
+#include <cmath>
+#include <cstring>
+#include <fstream>
 #include <string>
 
 #include "gtest/gtest.h"
@@ -72,14 +72,12 @@ std::vector<DecodingTestData> GetDecodingDataFromCsv() {
 
 TEST_P(DecodingChecks, Decode) {
   DecodingTestData test_data = GetParam();
-  OLC_CodeArea expected_area =
-      OLC_CodeArea{
-        OLC_LatLon{test_data.lo_lat_deg, test_data.lo_lng_deg},
-        OLC_LatLon{test_data.hi_lat_deg, test_data.hi_lng_deg},
-        test_data.length};
-  OLC_LatLon expected_center = OLC_LatLon{
-    (test_data.lo_lat_deg + test_data.hi_lat_deg)/2,
-    (test_data.lo_lng_deg + test_data.hi_lng_deg)/2};
+  OLC_CodeArea expected_area = OLC_CodeArea{
+      OLC_LatLon{test_data.lo_lat_deg, test_data.lo_lng_deg},
+      OLC_LatLon{test_data.hi_lat_deg, test_data.hi_lng_deg}, test_data.length};
+  OLC_LatLon expected_center =
+      OLC_LatLon{(test_data.lo_lat_deg + test_data.hi_lat_deg) / 2,
+                 (test_data.lo_lng_deg + test_data.hi_lng_deg) / 2};
   OLC_CodeArea got_area;
   OLC_LatLon got_center;
   OLC_Decode(test_data.code.c_str(), 0, &got_area);
@@ -99,11 +97,11 @@ INSTANTIATE_TEST_SUITE_P(OLC_Tests, DecodingChecks,
 struct EncodingTestData {
   double lat_deg;
   double lng_deg;
+  long long int lat_int;
+  long long int lng_int;
   size_t length;
   std::string code;
 };
-
-class EncodingChecks : public ::testing::TestWithParam<EncodingTestData> {};
 
 const std::string kEncodingTestsFile = "test_data/encoding.csv";
 
@@ -115,20 +113,70 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
     EncodingTestData test_data = {};
     test_data.lat_deg = strtod(csv_records[i][0].c_str(), nullptr);
     test_data.lng_deg = strtod(csv_records[i][1].c_str(), nullptr);
-    test_data.length = atoi(csv_records[i][2].c_str());
-    test_data.code = csv_records[i][3];
+    test_data.lat_int = strtoll(csv_records[i][2].c_str(), nullptr, 10);
+    test_data.lng_int = strtoll(csv_records[i][3].c_str(), nullptr, 10);
+    test_data.length = atoi(csv_records[i][4].c_str());
+    test_data.code = csv_records[i][5];
     data_results.push_back(test_data);
   }
   return data_results;
 }
 
-TEST_P(EncodingChecks, Encode) {
+// TolerantTestParams runs a test with the
+struct TolerantTestParams {
+  double allowed_failure_rate;
+  std::vector<EncodingTestData> test_data;
+};
+
+class TolerantEncodingChecks
+    : public ::testing::TestWithParam<TolerantTestParams> {};
+
+TEST_P(TolerantEncodingChecks, EncodeDegrees) {
+  const TolerantTestParams& test_params = GetParam();
+  int failure_count = 0;
+
+  for (EncodingTestData tc : test_params.test_data) {
+    OLC_LatLon loc = OLC_LatLon{tc.lat_deg, tc.lng_deg};
+    char got_code[18];
+    // Encode the test location and make sure we get the expected code.
+    OLC_Encode(&loc, tc.length, got_code, 18);
+    if (tc.code.compare(got_code) != 0) {
+      failure_count ++;
+      printf("  ENCODING FAILURE: Got: '%s', expected: '%s'\n", got_code, tc.code.c_str());
+    }
+  }
+  double actual_failure_rate = double(failure_count) / test_params.test_data.size();
+  EXPECT_LE(actual_failure_rate, test_params.allowed_failure_rate)
+      << "Failure rate " << actual_failure_rate << " exceeds allowed rate " << test_params.allowed_failure_rate;
+}
+
+// Allow a 5% error rate encoding from degree coordinates (because of floating point precision).
+INSTANTIATE_TEST_SUITE_P(OLC_Tests, TolerantEncodingChecks,
+                         ::testing::Values(TolerantTestParams{0.05, GetEncodingDataFromCsv()}));
+
+class EncodingChecks : public ::testing::TestWithParam<EncodingTestData> {};
+
+TEST_P(EncodingChecks, OLC_EncodeIntegers) {
   EncodingTestData test_data = GetParam();
-  OLC_LatLon loc = OLC_LatLon{test_data.lat_deg, test_data.lng_deg};
+  OLC_LatLonIntegers loc =
+      OLC_LatLonIntegers{test_data.lat_int, test_data.lng_int};
   char got_code[18];
   // Encode the test location and make sure we get the expected code.
-  OLC_Encode(&loc, test_data.length, got_code, 18);
+  OLC_EncodeIntegers(&loc, test_data.length, got_code, 18);
   EXPECT_EQ(test_data.code, got_code);
+}
+
+TEST_P(EncodingChecks, OLC_LocationToIntegers) {
+  EncodingTestData test_data = GetParam();
+  OLC_LatLon loc = OLC_LatLon{test_data.lat_deg, test_data.lng_deg};
+  OLC_LatLonIntegers got;
+  OLC_LocationToIntegers(&loc, &got);
+  // Due to floating point precision limitations, we may get values 1 less than
+  // expected.
+  EXPECT_LE(got.lat, test_data.lat_int);
+  EXPECT_GE(got.lat + 1, test_data.lat_int);
+  EXPECT_LE(got.lon, test_data.lng_int);
+  EXPECT_GE(got.lon + 1, test_data.lng_int);
 }
 
 INSTANTIATE_TEST_SUITE_P(OLC_Tests, EncodingChecks,
@@ -211,7 +259,8 @@ TEST_P(ShortCodeChecks, ShortCode) {
   // Now extend the code using the reference location and check.
   if (test_data.test_type == "B" || test_data.test_type == "R") {
     char got[18];
-    OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got, 18);
+    OLC_RecoverNearest(test_data.short_code.c_str(), 0, &reference_loc, got,
+                       18);
     EXPECT_EQ(test_data.full_code, got);
   }
 }
