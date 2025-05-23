@@ -66,7 +66,7 @@ public class EncodingTest {
       String got =
           OpenLocationCode.encode(
               testData.latitudeDegrees, testData.longitudeDegrees, testData.length);
-      if (got != testData.code) {
+      if (!testData.code.equals(got)) {
         failedEncodings++;
         System.out.printf(
             "ENCODING DIFFERENCE: encode(%f,%f,%d) got %s, want %s\n",
@@ -90,7 +90,7 @@ public class EncodingTest {
   public void testDegreesToIntegers() {
     for (TestData testData : testDataList) {
       long[] got =
-          OpenLocationCode.degreesToIntegers(testData.latitudeDegrees, testData.latitudeDegrees);
+          OpenLocationCode.degreesToIntegers(testData.latitudeDegrees, testData.longitudeDegrees);
       Assert.assertTrue(
           String.format(
               "degreesToIntegers(%f, %f) returned latitude %d, expected %d",
