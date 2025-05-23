@@ -31,7 +31,7 @@ public class EncodingTest {
 
     public TestData(String line) {
       String[] parts = line.split(",");
-      if (parts.length != 4) {
+      if (parts.length != 6) {
         throw new IllegalArgumentException("Wrong format of testing data.");
       }
       this.latitudeDegrees = Double.parseDouble(parts[0]);
