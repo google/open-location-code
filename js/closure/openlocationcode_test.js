@@ -85,16 +85,17 @@ testSuite({
         const got = OpenLocationCode.encode(latDegrees, lngDegrees, length);
         // Did we get the same code?
         if (code != got) {
-          console.log(
+          console.warn(
             'ENCODING DIFFERENCE: Expected code ' + code +', got ' + got
           );
           errors++;
         }
         asyncTestCase.continueTesting();
       }
+      console.info('testEncodeDegrees error rate is ' + (errors / lines.length));
       assertTrue(
         'testEncodeDegrees: too many errors ' + errors / lines.length,
-        errors / lines.length < allowedErrorRate
+        (errors / lines.length) < allowedErrorRate
       );
     });
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
@@ -118,11 +119,11 @@ testSuite({
         // Due to floating point precision limitations, we may get values 1 less
         // than expected.
         assertTrue(
-          'testEncodeIntegers: expected latitude ' + latIntegers + ', got ' + got[0],
+          'testLocationToIntegers: expected latitude ' + latIntegers + ', got ' + got[0],
           got[0] == latIntegers || got[0] == latIntegers - 1
         );
         assertTrue(
-          'testEncodeIntegers: expected longitude ' + lngIntegers + ', got ' + got[1],
+          'testLocationToIntegers: expected longitude ' + lngIntegers + ', got ' + got[1],
           got[1] == lngIntegers || got[1] == lngIntegers - 1
         );
         asyncTestCase.continueTesting();
@@ -139,8 +140,8 @@ testSuite({
         const fields = lines[i].split(',');
         const latIntegers = parseInt(fields[2], 10);
         const lngIntegers = parseInt(fields[3], 10);
-        const length = parseInt(fields[2], 10);
-        const code = fields[3];
+        const length = parseInt(fields[4], 10);
+        const code = fields[5];
 
         const got = OpenLocationCode._encodeIntegers(
           latIntegers,
