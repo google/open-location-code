@@ -384,14 +384,14 @@ exports.encode = encode;
  * @return {Array<number>} A tuple of the latitude integer and longitude integer.
  */
 function _locationToIntegers(latitude, longitude) {
-  var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION);
+  var latVal = Math.floor(latitude * FINAL_LAT_PRECISION);
   latVal += LATITUDE_MAX * FINAL_LAT_PRECISION;
   if (latVal < 0) {
     latVal = 0;
   } else if (latVal >= 2 * LATITUDE_MAX * FINAL_LAT_PRECISION) {
     latVal = 2 * LATITUDE_MAX * FINAL_LAT_PRECISION - 1;
   }
-  var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION);
+  var lngVal = Math.floor(longitude * FINAL_LNG_PRECISION);
   lngVal += LONGITUDE_MAX * FINAL_LNG_PRECISION;
   if (lngVal < 0) {
     lngVal =
@@ -693,20 +693,6 @@ function shorten(code, latitude, longitude) {
   return code;
 }
 exports.shorten = shorten;
-
-/**
- * Round numbers like C does. This implements rounding away from zero (see
- * https://en.wikipedia.org/wiki/Rounding).
- *
- * @param {number} num A number to round.
- * @return {number} The rounded value usn
- */
-function roundAwayFromZero(num) {
-  if (num >= 0) {
-    return Math.round(num);
-  }
-  return -1 * Math.round(Math.abs(num));
-}
 
 /**
   Clip a latitude into the range -90 to 90.
