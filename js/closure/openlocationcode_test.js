@@ -79,8 +79,8 @@ testSuite({
         const fields = lines[i].split(',');
         const latDegrees = parseFloat(fields[0]);
         const lngDegrees = parseFloat(fields[1]);
-        const length = parseInt(fields[2], 10);
-        const code = fields[3];
+        const length = parseInt(fields[4], 10);
+        const code = fields[5];
 
         const got = OpenLocationCode.encode(latDegrees, lngDegrees, length);
         // Did we get the same code?
