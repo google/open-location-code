@@ -49,7 +49,7 @@ const int kPositionLUT['X' - 'C' + 1] = {8,  -1, -1, 9,  10, 11, -1, 12,
                                          -1, -1, -1, 17, 18, 19};
 
 int64_t latitudeToInteger(double latitude) {
-  int64_t lat = round(latitude * kGridLatPrecisionInverse);
+  int64_t lat = floor(latitude * kGridLatPrecisionInverse);
   lat += kLatitudeMaxDegrees * kGridLatPrecisionInverse;
   if (lat < 0) {
     lat = 0;
@@ -60,7 +60,7 @@ int64_t latitudeToInteger(double latitude) {
 }
 
 int64_t longitudeToInteger(double longitude) {
-  int64_t lng = round(longitude * kGridLngPrecisionInverse);
+  int64_t lng = floor(longitude * kGridLngPrecisionInverse);
   lng += kLongitudeMaxDegrees * kGridLngPrecisionInverse;
   if (lng <= 0) {
     lng = lng % (2 * kLongitudeMaxDegrees * kGridLngPrecisionInverse) +

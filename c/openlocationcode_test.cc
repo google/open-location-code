@@ -122,7 +122,7 @@ std::vector<EncodingTestData> GetEncodingDataFromCsv() {
   return data_results;
 }
 
-// TolerantTestParams runs a test with the
+// TolerantTestParams runs a test with a permitted failure rate.
 struct TolerantTestParams {
   double allowed_failure_rate;
   std::vector<EncodingTestData> test_data;
