@@ -73,7 +73,8 @@ public class EncodingTest {
       }
       Assert.assertTrue(
           String.format(
-              "Too many encoding errors (actual rate %f, allowed rate %f), see ENCODING DIFFERENCE lines"),
+              "Too many encoding errors (actual rate %f, allowed rate %f), see ENCODING DIFFERENCE lines",
+              failedEncodings / testDataList.size(), allowedErrorRate),
           failedEncodings / testDataList.size() <= allowedErrorRate);
     }
   }
