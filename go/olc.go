@@ -232,7 +232,7 @@ func normalizeLng(value float64) float64 {
 // latitudeAsInteger converts a latitude in degrees into the integer representation.
 // It will be clipped into the degree range -90<=x<90 (actually 0-180*2.5e7-1).
 func latitudeAsInteger(latDegrees float64) int64 {
-	latVal := int64(math.Round(latDegrees * finalLatPrecision))
+	latVal := int64(math.Floor(latDegrees * finalLatPrecision))
 	latVal += latMax * finalLatPrecision
 	if latVal < 0 {
 		latVal = 0
@@ -245,7 +245,7 @@ func latitudeAsInteger(latDegrees float64) int64 {
 // longitudeAsInteger converts a longitude in degrees into the integer representation.
 // It will be normalised into the degree range -180<=x<180 (actually 0-360*8.192e6).
 func longitudeAsInteger(lngDegrees float64) int64 {
-	lngVal := int64(math.Round(lngDegrees * finalLngPrecision))
+	lngVal := int64(math.Floor(lngDegrees * finalLngPrecision))
 	lngVal += lngMax * finalLngPrecision
 	if lngVal <= 0 {
 		lngVal = lngVal%(2*lngMax*finalLngPrecision) + 2*lngMax*finalLngPrecision

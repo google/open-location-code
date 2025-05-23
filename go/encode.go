@@ -42,13 +42,13 @@ func Encode(lat, lng float64, codeLen int) string {
 	// This allows us to use only integer operations, so avoiding any accumulation of floating point representation errors.
 	latVal := latitudeAsInteger(lat)
 	lngVal := longitudeAsInteger(lng)
-	// Clip the code length to legal values.
-	codeLen = clipCodeLen(codeLen)
 	// Call the integer based encoding method.
 	return integerEncode(latVal, lngVal, codeLen)
 }
 
 func integerEncode(latVal, lngVal int64, codeLen int) string {
+	// Clip the code length to legal values.
+	codeLen = clipCodeLen(codeLen)
 	// Use a char array so we can build it up from the end digits, without having to keep reallocating strings.
 	// Prime it with padding and separator.
 	var code []byte = []byte("00000000+0012345")
