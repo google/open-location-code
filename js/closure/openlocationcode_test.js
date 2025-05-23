@@ -108,8 +108,8 @@ testSuite({
         const fields = lines[i].split(',');
         const latDegrees = parseFloat(fields[0]);
         const lngDegrees = parseFloat(fields[1]);
-        const latIntegers = parseInt(fields[2]);
-        const lngIntegers = parseInt(fields[3]);
+        const latIntegers = parseInt(fields[2], 10);
+        const lngIntegers = parseInt(fields[3], 10);
 
         const got = OpenLocationCode._locationToIntegers(
           latDegrees,
@@ -137,8 +137,8 @@ testSuite({
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
       for (var i = 0; i < lines.length; i++) {
         const fields = lines[i].split(',');
-        const latIntegers = parseInt(fields[2]);
-        const lngIntegers = parseInt(fields[3]);
+        const latIntegers = parseInt(fields[2], 10);
+        const lngIntegers = parseInt(fields[3], 10);
         const length = parseInt(fields[2], 10);
         const code = fields[3];
 
@@ -149,7 +149,8 @@ testSuite({
         );
         // Did we get the same code?
         assertEquals(
-          'testEncodeIntegers: expected code ' + code + ', got ' + got
+          'testEncodeIntegers: expected code ' + code + ', got ' + got,
+          code, got
         );
         asyncTestCase.continueTesting();
       }
