@@ -42,12 +42,58 @@ class PlusCodesTest < Test::Unit::TestCase
   end
 
   def test_encode
+    # Allow a 5% error rate encoding from degree coordinates (because of floating point precision).
+    allowedErrorRate = 0.05
+    errors = 0
+    tests = 0
+    read_csv_lines('encoding.csv').each do |line|
+      next if line.empty?
+
+      tests += 1
+      cols = line.split(',')
+      lat_degrees = cols[0].to_f
+      lng_degrees = cols[1].to_f
+      code_length = cols[4].to_i
+      want = cols[5]
+
+      code = @olc.encode(lat_degrees, lng_degrees, code_length)
+      if want != code
+        errors += 1
+        puts "ENCODING DIFFERENCE: want #{want}, got #{code}"
+      end
+    end
+    assert_compare(errors.to_f / tests.to_f, "<=", allowedErrorRate)
+  end
+
+  def test_location_to_integers
     read_csv_lines('encoding.csv').each do |line|
       next if line.empty?
 
       cols = line.split(',')
-      code = @olc.encode(cols[0].to_f, cols[1].to_f, cols[2].to_i)
-      assert_equal(cols[3], code)
+      lat_degrees = cols[0].to_f
+      lng_degrees = cols[1].to_f
+      lat_integer = cols[2].to_i
+      lng_integer = cols[3].to_i
+
+      got_lat, got_lng = @olc.location_to_integers(lat_degrees, lng_degrees)
+      # Due to floating point precision limitations, we may get values 1 less than expected.
+      assert_include([lat_integer - 1, lat_integer], got_lat)
+      assert_include([lng_integer - 1, lng_integer], got_lng)
+    end
+  end
+
+  def test_encode_integers
+    read_csv_lines('encoding.csv').each do |line|
+      next if line.empty?
+
+      cols = line.split(',')
+      lat_integer = cols[2].to_i
+      lng_integer = cols[3].to_i
+      code_length = cols[4].to_i
+      want = cols[5]
+
+      code = @olc.encode_integers(lat_integer, lng_integer, code_length)
+      assert_equal(want, code)
     end
   end
 

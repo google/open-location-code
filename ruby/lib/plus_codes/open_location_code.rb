@@ -44,14 +44,14 @@ module PlusCodes
     # @return [Array<Integer, Integer>] with the latitude and longitude integer
     # values.
     def location_to_integers(latitude, longitude)
-      lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).round
+      lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).floor
       lat_val += 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
       if lat_val.negative?
         lat_val = 0
       elsif lat_val >= 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
         lat_val = 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION - 1
       end
-      lng_val = (longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION).round
+      lng_val = (longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION).floor
       lng_val += 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
       if lng_val.negative?
         # Ruby's % operator differs from other languages in that it returns
@@ -72,11 +72,6 @@ module PlusCodes
     # excludes the separator
     # @return [String] a plus+codes
     def encode(latitude, longitude, code_length = PAIR_CODE_LENGTH)
-      if invalid_length?(code_length)
-        raise ArgumentError, 'Invalid Open Location Code(Plus+Codes) length'
-      end
-
-      code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
       lat_val, lng_val = location_to_integers(latitude, longitude)
       encode_integers(lat_val, lng_val, code_length)
     end
@@ -91,6 +86,10 @@ module PlusCodes
     # excludes the separator
     # @return [String] a plus+codes
     def encode_integers(lat_val, lng_val, code_length = PAIR_CODE_LENGTH)
+      if invalid_length?(code_length)
+        raise ArgumentError, 'Invalid Open Location Code(Plus+Codes) length'
+      end
+      code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
       # Initialise the code using an Array. Array.join is more efficient that
       # string addition.
       code = Array.new(MAX_CODE_LENGTH + 1, '')
