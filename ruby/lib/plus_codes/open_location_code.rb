@@ -89,6 +89,7 @@ module PlusCodes
       if invalid_length?(code_length)
         raise ArgumentError, 'Invalid Open Location Code(Plus+Codes) length'
       end
+
       code_length = MAX_CODE_LENGTH if code_length > MAX_CODE_LENGTH
       # Initialise the code using an Array. Array.join is more efficient that
       # string addition.
