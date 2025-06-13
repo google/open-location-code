@@ -45,12 +45,14 @@ module PlusCodes
     # values.
     def location_to_integers(latitude, longitude)
       lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).floor
+      lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).floor
       lat_val += 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
       if lat_val.negative?
         lat_val = 0
       elsif lat_val >= 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
         lat_val = 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION - 1
       end
+      lng_val = (longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION).floor
       lng_val = (longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION).floor
       lng_val += 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
       if lng_val.negative?

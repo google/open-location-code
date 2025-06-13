@@ -42,8 +42,9 @@ class PlusCodesTest < Test::Unit::TestCase
   end
 
   def test_encode
-    # Allow a 5% error rate encoding from degree coordinates (because of floating point precision).
-    allowedErrorRate = 0.05
+    # Allow a 5% error rate encoding from degree coordinates (because of
+    # floating point precision).
+    allowed_error_rate = 0.05
     errors = 0
     tests = 0
     read_csv_lines('encoding.csv').each do |line|
@@ -62,7 +63,7 @@ class PlusCodesTest < Test::Unit::TestCase
         puts "ENCODING DIFFERENCE: want #{want}, got #{code}"
       end
     end
-    assert_compare(errors.to_f / tests.to_f, "<=", allowedErrorRate)
+    assert_compare(errors.to_f / tests, '<=', allowed_error_rate)
   end
 
   def test_location_to_integers
@@ -76,7 +77,8 @@ class PlusCodesTest < Test::Unit::TestCase
       lng_integer = cols[3].to_i
 
       got_lat, got_lng = @olc.location_to_integers(lat_degrees, lng_degrees)
-      # Due to floating point precision limitations, we may get values 1 less than expected.
+      # Due to floating point precision limitations, we may get values 1 less
+      # than expected.
       assert_include([lat_integer - 1, lat_integer], got_lat)
       assert_include([lng_integer - 1, lng_integer], got_lng)
     end
