@@ -102,7 +102,7 @@ pub fn is_full(code: &str) -> bool {
 pub fn point_to_integers(pt: Point<f64>) -> (i64, i64) {
     let (lng, lat) = pt.x_y();
 
-    let mut lat_val = (lat * LAT_INTEGER_MULTIPLIER as f64).round() as i64;
+    let mut lat_val = (lat * LAT_INTEGER_MULTIPLIER as f64).floor() as i64;
     lat_val += LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER;
     if lat_val < 0 {
         lat_val = 0
@@ -110,7 +110,7 @@ pub fn point_to_integers(pt: Point<f64>) -> (i64, i64) {
         lat_val = 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER - 1;
     }
 
-    let mut lng_val = (lng * LNG_INTEGER_MULTIPLIER as f64).round() as i64;
+    let mut lng_val = (lng * LNG_INTEGER_MULTIPLIER as f64).floor() as i64;
     lng_val += LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER;
     if lng_val < 0 {
         lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)
@@ -131,15 +131,15 @@ pub fn point_to_integers(pt: Point<f64>) -> (i64, i64) {
 /// 11 or 12 are probably the limit of useful codes.
 pub fn encode(pt: Point<f64>, code_length: usize) -> String {
     let (lat_val, lng_val) = point_to_integers(pt);
-    let trimmed_code_length = min(max(code_length, MIN_CODE_LENGTH), MAX_CODE_LENGTH);
 
-    encode_integers(lat_val, lng_val, trimmed_code_length)
+    encode_integers(lat_val, lng_val, code_length)
 }
 
 /// Encode an integer location into an Open Location Code.
 ///
 /// This function is only exposed for testing and should not be called directly.
-pub fn encode_integers(mut lat_val: i64, mut lng_val: i64, code_length: usize) -> String {
+pub fn encode_integers(mut lat_val: i64, mut lng_val: i64, code_length_raw: usize) -> String {
+    let code_length = min(max(code_length_raw, MIN_CODE_LENGTH), MAX_CODE_LENGTH);
     // Compute the code digits. This largely ignores the requested length - it
     // generates either a 10 digit code, or a 15 digit code, and then truncates
     // it to the requested length.

@@ -4,7 +4,10 @@ use std::time::Instant;
 
 use csv_reader::CSVReader;
 use geo::Point;
-use open_location_code::{decode, encode, is_full, is_short, is_valid, recover_nearest, shorten};
+use open_location_code::{
+    decode, encode, encode_integers, is_full, is_short, is_valid, point_to_integers,
+    recover_nearest, shorten,
+};
 use rand::random_range;
 
 /// CSVReader is written to swallow errors; as such, we might "pass" tests because we didn't
@@ -59,6 +62,9 @@ fn decode_test() {
 #[test]
 fn encode_test() {
     let mut tested = 0;
+    let mut errors = 0;
+    // Allow a small proportion of errors due to floating point.
+    let allowed_error_rate = 0.05;
     for line in CSVReader::new("encoding.csv") {
         if line.chars().count() == 0 {
             continue;
@@ -66,11 +72,77 @@ fn encode_test() {
         let cols: Vec<&str> = line.split(',').collect();
         let lat = cols[0].parse::<f64>().unwrap();
         let lng = cols[1].parse::<f64>().unwrap();
-        let len = cols[2].parse::<usize>().unwrap();
-        let code = cols[3];
+        let len = cols[4].parse::<usize>().unwrap();
+        let code = cols[5];
+
+        let got = encode(Point::new(lng, lat), len);
+        if got != code {
+            errors += 1;
+            println!(
+                "encode(Point::new({}, {}), {}) want {}, got {}",
+                lng, lat, len, code, got
+            );
+        }
+
+        tested += 1;
+    }
+    assert!(
+        errors as f32 / tested as f32 <= allowed_error_rate,
+        "too many encoding errors ({})",
+        errors
+    );
+    assert!(tested > 0);
+}
+
+#[test]
+fn point_to_integers_test() {
+    let mut tested = 0;
+    for line in CSVReader::new("encoding.csv") {
+        if line.chars().count() == 0 {
+            continue;
+        }
+        let cols: Vec<&str> = line.split(',').collect();
+        let lat_deg = cols[0].parse::<f64>().unwrap();
+        let lng_deg = cols[1].parse::<f64>().unwrap();
+        let lat_int = cols[2].parse::<i64>().unwrap();
+        let lng_int = cols[3].parse::<i64>().unwrap();
+
+        let (got_lat, got_lng) = point_to_integers(Point::new(lng_deg, lat_deg));
+        assert!(
+            got_lat >= lat_int - 1 && got_lat <= lat_int,
+            "converting lat={}, want={}, got={}",
+            lat_deg,
+            lat_int,
+            got_lat
+        );
+        assert!(
+            got_lng >= lng_int - 1 && got_lng <= lng_int,
+            "converting lng={}, want={}, got={}",
+            lng_deg,
+            lng_int,
+            got_lng
+        );
+
+        tested += 1;
+    }
+    assert!(tested > 0);
+}
+
+#[test]
+fn encode_integers_test() {
+    let mut tested = 0;
+    for line in CSVReader::new("encoding.csv") {
+        if line.chars().count() == 0 {
+            continue;
+        }
+        let cols: Vec<&str> = line.split(',').collect();
+        let lat = cols[2].parse::<i64>().unwrap();
+        let lng = cols[3].parse::<i64>().unwrap();
+        let len = cols[4].parse::<usize>().unwrap();
+        let code = cols[5];
 
         assert_eq!(
-            encode(Point::new(lng, lat), len),
+            encode_integers(lat, lng, len),
             code,
             "encoding lat={},lng={},len={}",
             lat,
