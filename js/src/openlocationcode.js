@@ -312,18 +312,6 @@
       longitude, codeLength) {
     latitude = Number(latitude);
     longitude = Number(longitude);
-    if (typeof codeLength == 'undefined') {
-      codeLength = OpenLocationCode.CODE_PRECISION_NORMAL;
-    } else {
-      codeLength = Math.min(MAX_DIGIT_COUNT_, Number(codeLength));
-    }
-    if (isNaN(latitude) || isNaN(longitude) || isNaN(codeLength)) {
-      throw new Error('ValueError: Parameters are not numbers');
-    }
-    if (codeLength < MIN_DIGIT_COUNT_ ||
-        (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
-      throw new Error('IllegalArgumentException: Invalid Open Location Code length');
-    }
 
     const locationIntegers = locationToIntegers(latitude, longitude);
 
@@ -345,15 +333,15 @@
    * @param {number} longitude
    * @return {Array<number>} A tuple of the latitude integer and longitude integer.
    */
-  var locationToIntegers = function(latitude, longitude) {
-    var latVal = roundAwayFromZero(latitude * FINAL_LAT_PRECISION_);
+  var locationToIntegers = OpenLocationCode.locationToIntegers = function(latitude, longitude) {
+    var latVal = Math.floor(latitude * FINAL_LAT_PRECISION_);
     latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
     if (latVal < 0) {
       latVal = 0;
     } else if (latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) {
       latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
     }
-    var lngVal = roundAwayFromZero(longitude * FINAL_LNG_PRECISION_);
+    var lngVal = Math.floor(longitude * FINAL_LNG_PRECISION_);
     lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
     if (lngVal < 0) {
       lngVal =
@@ -376,8 +364,21 @@
    *     code, not including any separator characters.
    * @return {string} A code of the specified length or the default length if not
    *     specified.
+   * @throws {Exception} if any of the input values are not numbers.
    */
-  var encodeIntegers = function(latInt, lngInt, codeLength) {
+  var encodeIntegers = OpenLocationCode.encodeIntegers = function(latInt, lngInt, codeLength) {
+    if (typeof codeLength == 'undefined') {
+      codeLength = OpenLocationCode.CODE_PRECISION_NORMAL;
+    } else {
+      codeLength = Math.min(MAX_DIGIT_COUNT_, Number(codeLength));
+    }
+    if (isNaN(latInt) || isNaN(lngInt) || isNaN(codeLength)) {
+      throw new Error('ValueError: Parameters are not numbers');
+    }
+    if (codeLength < MIN_DIGIT_COUNT_ ||
+        (codeLength < PAIR_CODE_LENGTH_ && codeLength % 2 == 1)) {
+      throw new Error('IllegalArgumentException: Invalid Open Location Code length');
+    }
     // Javascript strings are immutable and it doesn't have a native
     // StringBuilder, so we'll use an array.
     const code = new Array(MAX_DIGIT_COUNT_ + 1);
@@ -624,20 +625,6 @@
       }
     }
     return code;
-  };
-
-  /**
-   * Round numbers like C does. This implements rounding away from zero (see
-   * https://en.wikipedia.org/wiki/Rounding).
-   *
-   * @param {number} num A number to round.
-   * @return {number} The rounded value.
-   */
-  var roundAwayFromZero = function(num) {
-    if (num >= 0) {
-      return Math.round(num);
-    }
-    return -1 * Math.round(Math.abs(num));
   };
 
   /**
