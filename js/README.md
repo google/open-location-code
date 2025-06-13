@@ -34,6 +34,8 @@ Execute the tests with `npm test`. This will install the
 dependencies, run `eslint` and then run the tests as long as there were no
 eslint errors.
 
+Note: Run `checks.sh` first to build the JSON files in `test/`.
+
 Unit tests are automatically run on pull and push requests and visible at
 <https://github.com/google/open-location-code/actions>.
 

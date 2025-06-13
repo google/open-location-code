@@ -1,64 +1,136 @@
 describe("Open Location Code", function() {
   var precision = 1e-10;
 
-  it("Encoding Tests", function() {
-    jasmine.getFixtures().fixturesPath = 'base/';
-    var encTests = JSON.parse(jasmine.getFixtures().read("encoding.json"));
-    expect(encTests.length).toBeGreaterThan(1);
-    for (var i = 0; i < encTests.length; i++) {
-      var test = encTests[i];
-      var code = OpenLocationCode.encode(test[0], test[1], test[2]);
-      // Did we get the same code?
-      expect(code).toBe(test[3]);
+  jasmine.getFixtures().fixturesPath = "base/";
+
+  const encodingTests = JSON.parse(jasmine.getFixtures().read("encoding.json"));
+  it("has encoding tests", function() {
+    expect(encodingTests.length).toBeGreaterThan(1);
+  });
+
+  const decodingTests = JSON.parse(jasmine.getFixtures().read("decoding.json"));
+  it("has decoding tests", function() {
+    expect(decodingTests.length).toBeGreaterThan(1);
+  });
+
+  const validityTests = JSON.parse(jasmine.getFixtures().read("validityTests.json"));
+  it("has validity tests", function() {
+    expect(validityTests.length).toBeGreaterThan(1);
+  });
+
+  const shortenTests = JSON.parse(jasmine.getFixtures().read("shortCodeTests.json"));
+  it("has shorten tests", function() {
+    expect(shortenTests.length).toBeGreaterThan(1);
+  });
+
+  describe("locationToIntegers Tests", function() {
+    for (let i = 0; i < encodingTests.length; i++) {
+      const test = encodingTests[i];
+      const lat = test[0];
+      const lng = test[1];
+      const wantLat = test[2];
+      const wantLng = test[3];
+      const got = OpenLocationCode.locationToIntegers(lat, lng);
+      // Due to floating point precision limitations, we may get values 1 less
+      // than expected.
+      it("converting latitude " + lat + " to integer, want " + wantLat + ", got " + got[0], function() {
+        expect(got[0] == wantLat || got[0] == wantLat - 1).toBe(true);
+      });
+      it("converting longitude " + lng + " to integer, want " + wantLng + ", got " + got[1], function() {
+        expect(got[1] == wantLng || got[1] == wantLng - 1).toBe(true);
+      });
     }
   });
 
-  it("Decoding Tests", function() {
-    jasmine.getFixtures().fixturesPath = 'base/';
-    var encTests = JSON.parse(jasmine.getFixtures().read("decoding.json"));
-    expect(encTests.length).toBeGreaterThan(1);
-    for (var i = 0; i < encTests.length; i++) {
-      var test = encTests[i];
-      var area = OpenLocationCode.decode(test[0]);
-      // Did we get the same values?
-      expect(area.codeLength).toBe(test[1]);
-      expect(area.latitudeLo).toBeCloseTo(test[2], precision, test[0]);
-      expect(area.longitudeLo).toBeCloseTo(test[3], precision, test[0]);
-      expect(area.latitudeHi).toBeCloseTo(test[4], precision, test[0]);
-      expect(area.longitudeHi).toBeCloseTo(test[5], precision, test[0]);
+  describe("encode (degrees) Tests", function() {
+    // Allow a 5% error rate encoding from degree coordinates (because of floating
+    // point precision).
+    const allowedErrorRate = 0.05;
+    let errors = 0;
+    for (let i = 0; i < encodingTests.length; i++) {
+      const test = encodingTests[i];
+      const lat = test[0];
+      const lng = test[1];
+      const codeLength = test[4];
+      const want = test[5];
+      const got = OpenLocationCode.encode(lat, lng, codeLength);
+      if (got !== want) {
+        console.log('ENCODING DIFFERENCE: Expected code ' + want +', got ' + got);
+        errors ++;
+      }
+    }
+    it("Encoding degrees error rate too high", function() {
+      expect(errors / encodingTests.length).toBeLessThan(allowedErrorRate);
+    });
+  });
+
+  describe("encodeIntegers Tests", function() {
+    for (let i = 0; i < encodingTests.length; i++) {
+      const test = encodingTests[i];
+      const lat = test[2];
+      const lng = test[3];
+      const codeLength = test[4];
+      const want = test[5];
+      it("Encoding integers " + lat + "," + lng + " with length " + codeLength, function() {
+        const got = OpenLocationCode.encodeIntegers(lat, lng, codeLength);
+        expect(got).toBe(want);
+      });
     }
   });
 
-  it("Validity Tests", function() {
-    jasmine.getFixtures().fixturesPath = 'base/';
-    var encTests = JSON.parse(jasmine.getFixtures().read("validityTests.json"));
-    expect(encTests.length).toBeGreaterThan(1);
-    for (var i = 0; i < encTests.length; i++) {
-      var test = encTests[i];
-      expect(OpenLocationCode.isValid(test[0])).toBe(test[1] === 'true', test[0]);
-      expect(OpenLocationCode.isShort(test[0])).toBe(test[2] === 'true', test[0]);
-      expect(OpenLocationCode.isFull(test[0])).toBe(test[3] === 'true', test[0]);
+  describe("Decoding Tests", function() {
+    for (let i = 0; i < decodingTests.length; i++) {
+      const test = decodingTests[i];
+      const area = OpenLocationCode.decode(test[0]);
+      it("Decoding code " + test[0] + ", checking codelength", function() {
+        expect(area.codeLength).toBe(test[1]);
+      })
+      it("Decoding code " + test[0] + ", checking latitudeLo", function() {
+        expect(area.latitudeLo).toBeCloseTo(test[2], precision, test[0]);
+      })
+      it("Decoding code " + test[0] + ", checking longitudeLo", function() {
+        expect(area.longitudeLo).toBeCloseTo(test[3], precision, test[0]);
+      })
+      it("Decoding code " + test[0] + ", checking latitudeHi", function() {
+        expect(area.latitudeHi).toBeCloseTo(test[4], precision, test[0]);
+      })
+      it("Decoding code " + test[0] + ", checking longitudeHi", function() {
+        expect(area.longitudeHi).toBeCloseTo(test[5], precision, test[0]);
+      })
     }
   });
 
-  it("Short Code Tests", function() {
-    jasmine.getFixtures().fixturesPath = 'base/';
-    var encTests = JSON.parse(jasmine.getFixtures().read("shortCodeTests.json"));
-    expect(encTests.length).toBeGreaterThan(1);
-    for (var i = 0; i < encTests.length; i++) {
-      var test = encTests[i];
+  describe("Validity Tests", function() {
+    for (let i = 0; i < validityTests.length; i++) {
+      const test = validityTests[i];
+      it("isValid(" + test[0] + ")", function() {
+        expect(OpenLocationCode.isValid(test[0])).toBe(test[1] === "true", test[0]);
+      });
+      it("isShort(" + test[0] + ")", function() {
+        expect(OpenLocationCode.isShort(test[0])).toBe(test[2] === "true", test[0]);
+      });
+      it("isFull(" + test[0] + ")", function() {
+        expect(OpenLocationCode.isFull(test[0])).toBe(test[3] === "true", test[0]);
+      });
+    }
+  });
+
+  describe("Short Code Tests", function() {
+    for (let i = 0; i < shortenTests.length; i++) {
+      const test = shortenTests[i];
       if (test[4] == "B" || test[4] == "S") {
         // Shorten the full length code.
-        var shorten = OpenLocationCode.shorten(
-            test[0], test[1], test[2]);
-        // Confirm we got what we expected.
-        expect(shorten).toBe(test[3], test[0]);
+        it("shorten(" + test[0] + ", " + test[1] + ", " + test[2], function() {
+          const got = OpenLocationCode.shorten(test[0], test[1], test[2]);
+          expect(got).toBe(test[3], test[0]);
+        });
       }
       if (test[4] == "B" || test[4] == "R") {
         // Now try expanding the shortened code.
-        var expanded = OpenLocationCode.recoverNearest(
-            test[3], test[1], test[2]);
-        expect(expanded).toBe(test[0]);
+        it("recoverNearest(" + test[3] + ", " + test[1] + ", " + test[2], function() {
+          const got = OpenLocationCode.recoverNearest(test[3], test[1], test[2]);
+          expect(got).toBe(test[0]);
+        });
       }
     }
   });
@@ -73,7 +145,7 @@ describe("Open Location Code", function() {
       lng = Math.round(lng * Math.pow(10, decimals)) / Math.pow(10, decimals);
       var length = 2 + Math.round(Math.random() * 13);
       if (length < 10 && length % 2 === 1) {
-       length += 1;
+        length += 1;
       }
       input.push([lat, lng, length]);
     }
@@ -97,7 +169,7 @@ describe("Open Location Code", function() {
       lng = Math.round(lng * Math.pow(10, decimals)) / Math.pow(10, decimals);
       var length = 2 + Math.round(Math.random() * 13);
       if (length < 10 && length % 2 === 1) {
-       length += 1;
+        length += 1;
       }
       input.push(OpenLocationCode.encode(lat, lng, length));
     }
