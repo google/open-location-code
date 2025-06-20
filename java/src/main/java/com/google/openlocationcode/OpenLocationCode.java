@@ -14,6 +14,7 @@
 
 package com.google.openlocationcode;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -172,11 +173,11 @@ public final class OpenLocationCode {
    * @throws IllegalArgumentException when the passed code is not valid.
    */
   public OpenLocationCode(String code) {
-    if (!isValidCode(code.toUpperCase())) {
+    this.code = toValidCode(code);
+    if (this.code == null) {
       throw new IllegalArgumentException(
           "The provided code '" + code + "' is not a valid Open Location Code.");
     }
-    this.code = code.toUpperCase();
   }
 
   /**
@@ -551,34 +552,44 @@ public final class OpenLocationCode {
    * @return True if it is a valid full or short code.
    */
   public static boolean isValidCode(String code) {
+    return toValidCode(code) != null;
+  }
+
+  /**
+   * Normalizes Open Location, or returns `null` if the code is not valid.
+   *
+   * @param code The code to check and normalize.
+   * @return Normalized code if it is a valid full or short code, null otherwise.
+   */
+  private static String toValidCode(String code) {
     if (code == null || code.length() < 2) {
-      return false;
+      return null;
     }
-    code = code.toUpperCase();
+    code = code.toUpperCase(Locale.ROOT);
 
     // There must be exactly one separator.
     int separatorPosition = code.indexOf(SEPARATOR);
     if (separatorPosition == -1) {
-      return false;
+      return null;
     }
     if (separatorPosition != code.lastIndexOf(SEPARATOR)) {
-      return false;
+      return null;
     }
     // There must be an even number of at most 8 characters before the separator.
     if (separatorPosition % 2 != 0 || separatorPosition > SEPARATOR_POSITION) {
-      return false;
+      return null;
     }
 
     // Check first two characters: only some values from the alphabet are permitted.
     if (separatorPosition == SEPARATOR_POSITION) {
       // First latitude character can only have first 9 values.
       if (CODE_ALPHABET.indexOf(code.charAt(0)) > 8) {
-        return false;
+        return null;
       }
 
       // First longitude character can only have first 18 values.
       if (CODE_ALPHABET.indexOf(code.charAt(1)) > 17) {
-        return false;
+        return null;
       }
     }
 
@@ -587,22 +598,22 @@ public final class OpenLocationCode {
     for (int i = 0; i < separatorPosition; i++) {
       if (CODE_ALPHABET.indexOf(code.charAt(i)) == -1 && code.charAt(i) != PADDING_CHARACTER) {
         // Invalid character.
-        return false;
+        return null;
       }
       if (paddingStarted) {
         // Once padding starts, there must not be anything but padding.
         if (code.charAt(i) != PADDING_CHARACTER) {
-          return false;
+          return null;
         }
       } else if (code.charAt(i) == PADDING_CHARACTER) {
         paddingStarted = true;
         // Short codes cannot have padding
         if (separatorPosition < SEPARATOR_POSITION) {
-          return false;
+          return null;
         }
         // Padding can start on even character: 2, 4 or 6.
         if (i != 2 && i != 4 && i != 6) {
-          return false;
+          return null;
         }
       }
     }
@@ -610,20 +621,20 @@ public final class OpenLocationCode {
     // Check the characters after the separator.
     if (code.length() > separatorPosition + 1) {
       if (paddingStarted) {
-        return false;
+        return null;
       }
       // Only one character after separator is forbidden.
       if (code.length() == separatorPosition + 2) {
-        return false;
+        return null;
       }
       for (int i = separatorPosition + 1; i < code.length(); i++) {
         if (CODE_ALPHABET.indexOf(code.charAt(i)) == -1) {
-          return false;
+          return null;
         }
       }
     }
 
-    return true;
+    return code;
   }
 
   /**
