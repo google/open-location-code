@@ -388,7 +388,7 @@ Private Function latitudeToInteger(ByVal latitude As Double) AS Double
   ' Convert latitude into a positive integer clipped into the range 0-(just
   ' under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
   ' returned code can also be decoded.
-  lat = Round(latitude * FINAL_LAT_PRECISION_)
+  lat = Int(latitude * FINAL_LAT_PRECISION_)
   lat = lat + LATITUDE_MAX_ * FINAL_LAT_PRECISION_
   If lat < 0 Then
     lat = 0
@@ -403,10 +403,10 @@ End Function
 Private Function longitudeToInteger(ByVal longitude As Double) AS Double
   Dim lng As Double
   ' Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-  lng = Round(longitude * FINAL_LNG_PRECISION_)
+  lng = Int(longitude * FINAL_LNG_PRECISION_)
   lng = lng + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
   If lng < 0 Then
-    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_)) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
+    lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_))
   ElseIf lng >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_ Then
     lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_))
   EndIf
