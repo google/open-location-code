@@ -120,6 +120,13 @@ steps (this example uses LibreOffice):
    That's it. Save the file. You can now use the functions above in your
    spreadsheet!
 
+## Running Tests
+
+If possible, run the `update_tests.sh` script, then paste the contents of the file `OLCTests.bas` into the end of your macros.
+
+Then you should be able to run the function `TEST_All`.
+This will run all the tests, and output either error messages or a message confirming success.
+
 ## Reporting Issues
 
 If the self tests fail, copy the error message or take a
