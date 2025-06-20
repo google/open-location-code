@@ -119,11 +119,11 @@ DECLARE
     FINAL_LAT_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
     latVal decimal := 0;
 BEGIN
-    latVal := round(latitude * FINAL_LAT_PRECISION_);
+    latVal := floor(latitude * FINAL_LAT_PRECISION_);
     latVal := latVal + LATITUDE_MAX_ * FINAL_LAT_PRECISION_;
     IF (latVal < 0) THEN
         latVal := 0;
-    ELSIF (latVal > 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) THEN
+    ELSIF (latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_) THEN
         latVal := 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1;
     END IF;
     RETURN latVal;
@@ -155,11 +155,11 @@ DECLARE
     FINAL_LNG_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
     lngVal decimal := 0;
 BEGIN
-    lngVal := round(longitude * FINAL_LNG_PRECISION_);
+    lngVal := floor(longitude * FINAL_LNG_PRECISION_);
     lngVal := lngVal + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
-    IF (lngVal < 0) THEN
+    IF (lngVal <= 0) THEN
         lngVal := lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) + 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_;
-    ELSIF (lngVal > 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) THEN
+    ELSIF (lngVal >= 2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_) THEN
         lngVal :=  lngVal % (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_);
     END IF;
     RETURN lngVal;
@@ -396,6 +396,7 @@ DECLARE
     PADDING_CHARACTER_ text := '0';
     CODE_ALPHABET_ text := '23456789CFGHJMPQRVWX';
     ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
+    MIN_DIGIT_COUNT_ int := 2;
     MAX_DIGIT_COUNT_ int := 15;
     PAIR_CODE_LENGTH_ int := 10;
     GRID_CODE_LENGTH_ int := MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_;
@@ -407,6 +408,13 @@ DECLARE
     ndx smallint;
     i_ smallint;
 BEGIN
+    IF ((codeLength < MIN_DIGIT_COUNT_) OR ((codeLength < PAIR_CODE_LENGTH_) AND (codeLength % 2 = 1))) THEN
+        RAISE EXCEPTION 'Invalid Open Location Code length - %', codeLength
+        USING HINT = 'The Open Location Code length must be 2, 4, 6, 8, 10, 11, 12, 13, 14, or 15.';
+    END IF;
+
+    codeLength := LEAST(codeLength, MAX_DIGIT_COUNT_);
+
     IF (codeLength > PAIR_CODE_LENGTH_) THEN
         i_ := 0;
         WHILE (i_ < (MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_)) LOOP
@@ -461,37 +469,9 @@ RETURNS text
     IMMUTABLE
 AS $BODY$
 DECLARE
-    SEPARATOR_ text := '+';
-    SEPARATOR_POSITION_ int := 8;
-    PADDING_CHARACTER_ text := '0';
-    CODE_ALPHABET_ text := '23456789CFGHJMPQRVWX';
-    ENCODING_BASE_ int := char_length(CODE_ALPHABET_);
-    LATITUDE_MAX_ int := 90;
-    LONGITUDE_MAX_ int := 180;
-    MIN_DIGIT_COUNT_ int := 2;
-    MAX_DIGIT_COUNT_ int := 15;
-    PAIR_CODE_LENGTH_ int := 10;
-    PAIR_PRECISION_ decimal := power(ENCODING_BASE_, 3);
-    GRID_CODE_LENGTH_ int := MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_;
-    GRID_COLUMNS_ int := 4;
-    GRID_ROWS_ int := 5;
-    FINAL_LAT_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_ROWS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
-    FINAL_LNG_PRECISION_ decimal := PAIR_PRECISION_ * power(GRID_COLUMNS_, MAX_DIGIT_COUNT_ - PAIR_CODE_LENGTH_);
-    code text := '';
     latVal decimal := 0;
     lngVal decimal := 0;
-    latDigit smallint;
-    lngDigit smallint;
-    ndx smallint;
-    i_ smallint;
 BEGIN
-    IF ((codeLength < MIN_DIGIT_COUNT_) OR ((codeLength < PAIR_CODE_LENGTH_) AND (codeLength % 2 = 1))) THEN
-        RAISE EXCEPTION 'Invalid Open Location Code length - %', codeLength
-        USING HINT = 'The Open Location Code length must be 2, 4, 6, 8, 10, 11, 12, 13, 14, or 15.';
-    END IF;
-
-    codeLength := LEAST(codeLength, MAX_DIGIT_COUNT_);
-
     latVal := pluscode_latitudeToInteger(latitude);
     lngVal := pluscode_longitudeToInteger(longitude);
 

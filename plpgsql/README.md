@@ -20,11 +20,18 @@ Start a [PostgreSQL Docker](https://hub.docker.com/_/postgres) image and copy th
     docker run --name pgtest -e POSTGRES_PASSWORD=postgres -d -p 5433:5432 postgres
     ```
 
+1. Re-generate the encoding SQL test script using the current CSV data:
+
+   ```shell
+   ./update_encoding_tests.sh ../test_data/encoding.csv
+   ```
+
 1. Copy the Open Location Code files to the container and change the permissions to allow the `postgres` user to read them:
 
     ```shell
     docker cp pluscode_functions.sql pgtest:/pluscode_functions.sql
     docker cp tests_script_l.sql pgtest:/tests_script_l.sql
+    docker cp test_encoding.sql pgtest:/tests_script_l.sql
     sudo docker exec pgtest chmod a+r *.sql
     ```
 
@@ -34,11 +41,14 @@ Start a [PostgreSQL Docker](https://hub.docker.com/_/postgres) image and copy th
     docker exec -u postgres pgtest psql postgres postgres -f ./pluscode_functions.sql
     ```
 
-1. Execute tests script
+1. Execute the test SQL scripts:
 
     ```shell
     docker exec -u postgres pgtest psql postgres postgres -f ./tests_script_l.sql
+    docker exec -u postgres pgtest psql postgres postgres -f ./test_encoding.sql
     ```
+
+    Test failures (in the encoding functions) will result in exceptions.
 
 ## Functions
 
