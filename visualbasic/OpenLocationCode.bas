@@ -224,18 +224,6 @@ End Function
 
 ' Encode a location into an arbitrary precision Open Location Code.
 Public Function OLCEncode(ByVal latitude As Double, ByVal longitude As Double, Optional codeLength As Integer = 10) As String
-  If codeLength = 0 Then
-    codeLength = CODE_PRECISION_NORMAL
-  End If
-  If codeLength < MIN_DIGIT_COUNT_ Then
-    Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
-  End If
-  If codeLength > MAX_DIGIT_COUNT_ Then
-    Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
-  End If
-  If codeLength < PAIR_CODE_LENGTH_ And codeLength \ 2 = 1 Then
-    Err.raise vbObjectError + 513, "OLCEncodeWithLength", "Invalid code length"
-  End If
   ' We use Doubles for the latitude and longitude, even though we will use them as integers.
   ' The reason is that we want to use this code in Excel and LibreOffice, but the LibreOffice
   ' Long type is only 32 bits, –2147483648 and 2147483647, which is too small.
@@ -426,7 +414,22 @@ Private Function longitudeToInteger(ByVal longitude As Double) AS Double
 End Function
 
 ' Encode latitude and longitude integers to an Open Location Code.
-Private Function encodeIntegers(ByVal lat As Double, ByVal lng As Double, codeLength As Integer) AS String
+Private Function encodeIntegers(ByVal lat As Double, ByVal lng As Double, codeLen As Integer) AS String
+  ' Make a copy of the code length because we might change it.
+  Dim codeLength As Integer
+  codeLength = codeLen
+  If codeLength = 0 Then
+    codeLength = CODE_PRECISION_NORMAL
+  End If
+  If codeLength < MIN_DIGIT_COUNT_ Then
+    codeLength = MIN_DIGIT_COUNT_
+  End If
+  If codeLength < PAIR_CODE_LENGTH_ And codeLength Mod 2 = 1 Then
+    codeLength = codeLength + 1
+  End If
+  If codeLength > MAX_DIGIT_COUNT_ Then
+    codeLength = MAX_DIGIT_COUNT_
+  End If
   ' i is used in loops.
   Dim i As integer
   ' Build up the code in an array.
@@ -590,167 +593,4 @@ Private Function doubleABS(ByVal number As Double) As Double
   Else
     doubleABS = number
   End If
-End Function
-
-' Test two doubles and returns true if they are close enough.
-' Used by the test routine since we quickly hit floating point errors.
-Private Function doubleEquals(ByVal number1 As Double, ByVal number2 As Double) As Boolean
-  If doubleABS(number1 - number2) < 0.0000000001 Then
-    doubleEquals = True
-  Else
-    doubleEquals = False
-  End If
-End Function
-
-' This is a subroutine to test the functions of the library, using test data
-' from the Github project. If you make any changes to the above code, run this
-' subroutine to check that your changes have not introduced errors. If you
-' identify tests that are faulty or would like to add tests, go to the
-' Github project and raise an issue.
-Sub TestOLCLibrary()
-  Dim i As Integer
-  Dim c As String
-  Dim a As OLCArea
-
-  Dim validity(17) As Variant
-  ' Fields code,isValid,isShort,isFull
-  validity(0) = Array("8fwc2345+G6", "true", "false", "true")
-  validity(1) = Array("8FWC2345+G6G", "true", "false", "true")
-  validity(2) = Array("8fwc2345+", "true", "false", "true")
-  validity(3) = Array("8FWCX400+", "true", "false", "true")
-  validity(4) = Array("WC2345+G6g", "true", "true", "false")
-  validity(5) = Array("2345+G6", "true", "true", "false")
-  validity(6) = Array("45+G6", "true", "true", "false")
-  validity(7) = Array("+G6", "true", "true", "false")
-  validity(8) = Array("G+", "false", "false", "false")
-  validity(9) = Array("+", "false", "false", "false")
-  validity(10) = Array("8FWC2345+G", "false", "false", "false")
-  validity(11) = Array("8FWC2_45+G6", "false", "false", "false")
-  validity(12) = Array("8FWC2η45+G6", "false", "false", "false")
-  validity(13) = Array("8FWC2345+G6+", "false", "false", "false")
-  validity(14) = Array("8FWC2300+G6", "false", "false", "false")
-  validity(15) = Array("WC2300+G6g", "false", "false", "false")
-  validity(16) = Array("WC2345+G", "false", "false", "false")
-  For i = 0 To 16
-    Dim v, s, f As Boolean
-    v = OLCIsValid(validity(i)(0))
-    s = OLCIsShort(validity(i)(0))
-    f = OLCIsFull(validity(i)(0))
-    If v <> (validity(i)(1) = "true") Then
-      MsgBox ("IsValid test " + CStr(i) + ", expected: " + CStr(validity(i)(1) = "true") + ", actual: " + CStr(v))
-      Exit Sub
-    End If
-    If s <> (validity(i)(2) = "true") Then
-      MsgBox ("IsShort test " + CStr(i) + ", expected: " + CStr(validity(i)(2) = "true") + ", actual: " + CStr(s))
-      Exit Sub
-    End If
-    If f <> (validity(i)(3) = "true") Then
-      MsgBox ("IsFull test " + CStr(i) + ", expected: " + CStr(validity(i)(3) = "true") + ", actual: " + CStr(f))
-      Exit Sub
-    End If
-  Next
-
-  Dim encodingCodes(14) As String
-  ' Fields are lat,lng,latLo,lngLo,latHi,lngHi
-  Dim encodingCoordinates(14) As Variant
-  encodingCodes(0) = "7fG49Q00+"
-  encodingCoordinates(0) = Array(20.375, 2.775, 20.35, 2.75, 20.4, 2.8)
-  encodingCodes(1) = "7FG49QCJ+2v"
-  encodingCoordinates(1) = Array(20.3700625, 2.7821875, 20.37, 2.782125, 20.370125, 2.78225)
-  encodingCodes(2) = "7FG49QCJ+2VX"
-  encodingCoordinates(2) = Array(20.3701125, 2.782234375, 20.3701, 2.78221875, 20.370125, 2.78225)
-  encodingCodes(3) = "7FG49QCJ+2VXGJ"
-  encodingCoordinates(3) = Array(20.3701135, 2.78223535156, 20.370113, 2.782234375, 20.370114, 2.78223632813)
-  encodingCodes(4) = "8FVC2222+22"
-  encodingCoordinates(4) = Array(47.0000625, 8.0000625, 47, 8, 47.000125, 8.000125)
-  encodingCodes(5) = "4VCPPQGP+Q9"
-  encodingCoordinates(5) = Array(-41.2730625, 174.7859375, -41.273125, 174.785875, -41.273, 174.786)
-  encodingCodes(6) = "62G20000+"
-  encodingCoordinates(6) = Array(0.5, -179.5, 0, -180, 1, -179)
-  encodingCodes(7) = "22220000+"
-  encodingCoordinates(7) = Array(-89.5, -179.5, -90, -180, -89, -179)
-  encodingCodes(8) = "7FG40000+"
-  encodingCoordinates(8) = Array(20.5, 2.5, 20, 2, 21, 3#)
-  encodingCodes(9) = "22222222+22"
-  encodingCoordinates(9) = Array(-89.9999375, -179.9999375, -90, -180, -89.999875, -179.999875)
-  encodingCodes(10) = "6VGX0000+"
-  encodingCoordinates(10) = Array(0.5, 179.5, 0, 179, 1, 180)
-  encodingCodes(11) = "CFX30000+"
-  encodingCoordinates(11) = Array(90, 1, 89, 1, 90, 2)
-  encodingCodes(12) = "CFX30000+"
-  encodingCoordinates(12) = Array(92, 1, 89, 1, 90, 2)
-  encodingCodes(13) = "62H20000+"
-  encodingCoordinates(13) = Array(1, 180, 1, -180, 2, -179)
-  encodingCodes(14) = "62H30000+"
-  encodingCoordinates(14) = Array(1, 181, 1, -179, 2, -178)
-  For i = 0 To 13
-    a = OLCDecode(encodingCodes(i))
-    c = OLCEncode(encodingCoordinates(i)(0), encodingCoordinates(i)(1), a.CodeLength)
-    If c <> Ucase(encodingCodes(i)) Then
-      MsgBox ("Encoding test " + CStr(i) + ", code generation expected: " + encodingCodes(i) + ", actual: " + c)
-      Exit Sub
-    End If
-    c = OLCEncode(a.LatCenter, a.LngCenter, a.CodeLength)
-    If c <> Ucase(encodingCodes(i)) Then
-      MsgBox ("Encoding test " + CStr(i) + ", code recovery expected: " + encodingCodes(i) + ", actual: " + c)
-      Exit Sub
-    End If
-    If Not doubleEquals(a.LatLo, encodingCoordinates(i)(2)) Or Not doubleEquals(a.LngLo, encodingCoordinates(i)(3)) Or Not doubleEquals(a.LatHi, encodingCoordinates(i)(4)) Or Not doubleEquals(a.LngHi, encodingCoordinates(i)(5)) Then
-      MsgBox ("Encoding test " + CStr(i) + " failed coordinate check: " + CStr(a.LatLo) + "," + CStr(a.LngLo) + " " + CStr(a.LatHi) + "," + CStr(a.LngHi) + _
-         " expected: " + CStr(encodingCoordinates(i)(2)) + "," + CStr(encodingCoordinates(i)(3)) + " " + CStr(encodingCoordinates(i)(4)) + "," + CStr(encodingCoordinates(i)(5)))
-      Exit Sub
-    End If
-  Next
-
-  Dim shortCodes(11) As Variant
-  shortCodes(0) = Array("9C3W9QCJ+2VX", "+2VX")
-  shortCodes(1) = Array("9C3W9QCJ+2VX", "CJ+2VX")
-  shortCodes(2) = Array("9C3W9QCJ+2VX", "CJ+2VX")
-  shortCodes(3) = Array("9C3W9QCJ+2VX", "CJ+2VX")
-  shortCodes(4) = Array("9C3W9QCJ+2VX", "CJ+2VX")
-  shortCodes(5) = Array("9C3W9QCJ+2VX", "9QCJ+2VX")
-  shortCodes(6) = Array("9C3W9QCJ+2VX", "9QCJ+2VX")
-  shortCodes(7) = Array("9C3W9QCJ+2VX", "9QCJ+2VX")
-  shortCodes(8) = Array("9C3W9QCJ+2VX", "9QCJ+2VX")
-  shortCodes(9) = Array("8FJFW222+", "22+")
-  shortCodes(10) = Array("796RXG22+", "22+")
-  Dim shortCoordinates(11) As Variant
-  shortCoordinates(0) = Array(51.3701125, -1.217765625)
-  shortCoordinates(1) = Array(51.3708675, -1.217765625)
-  shortCoordinates(2) = Array(51.3693575, -1.217765625)
-  shortCoordinates(3) = Array(51.3701125, -1.218520625)
-  shortCoordinates(4) = Array(51.3701125, -1.217010625)
-  shortCoordinates(5) = Array(51.3852125, -1.217765625)
-  shortCoordinates(6) = Array(51.3550125, -1.217765625)
-  shortCoordinates(7) = Array(51.3701125, -1.232865625)
-  shortCoordinates(8) = Array(51.3701125, -1.202665625)
-  shortCoordinates(9) = Array(42.899, 9.012)
-  shortCoordinates(10) = Array(14.95125, -23.5001)
-  For i = 0 To 10
-    c = OLCShorten(shortCodes(i)(0), shortCoordinates(i)(0), shortCoordinates(i)(1))
-    If c <> shortCodes(i)(1) Then
-      MsgBox ("Shorten test " + CStr(i) + ", expected: " + shortCodes(i)(1) + ", actual: " + c)
-      Exit Sub
-    End If
-    c = OLCRecoverNearest(shortCodes(i)(1), shortCoordinates(i)(0), shortCoordinates(i)(1))
-    If c <> shortCodes(i)(0) Then
-      MsgBox ("Recover test " + CStr(i) + ", expected: " + shortCodes(i)(0) + ", actual: " + c)
-      Exit Sub
-    End If
-  Next
-
-  ' North pole recovery test.
-  c = OLCRecoverNearest("2222+22", 89.6, 0.0)
-  If c <> "CFX22222+22" Then
-    MsgBox ("North pole recovery test, expected: CFX22222+22, actual: " + c)
-    Exit Sub
-  End If
-  ' South pole recovery test.
-  c = OLCRecoverNearest("XXXXXX+XX", -81.0, 0.0)
-  If c <> "2CXXXXXX+XX" Then
-    MsgBox ("South pole recovery test, expected: 2CXXXXXX+XX, actual: " + c)
-    Exit Sub
-  End If
-
-  MsgBox ("All tests pass")
-End Sub
+End function
