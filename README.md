@@ -74,7 +74,7 @@ Rather than a large city size feature to generate the reference location, it is
 better to use smaller, neighbourhood features, that will not have as much
 variation in their geocode results.
 
-Guidelines for shortening codes are in the [wiki](Documentation/Specification/Short_Code_Guidance.md).
+Guidelines for shortening codes are in the [wiki](Documentation/Specification/specification.md#generating-short-codes).
 
 Recovering shortened codes works by providing the short code and a reference
 location. This does not need to be the same as the location used to shorten the
