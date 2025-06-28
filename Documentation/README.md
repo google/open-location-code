@@ -12,8 +12,8 @@ The wiki is where you can find out information about using the software, the cod
 
 * [Open Location Code Overview](Specification/olc_definition.adoc)
 * [Open Location Code Specification](Specification/specification.md)
-* [Guidance for Shortening Codes](Specification/Short_Code_Guidance.md)
-* [Open Location Code Reference API](Specification/API.md)
+* [Guidance for Shortening Codes](Specification/specification.md#generating-short-codes)
+* [Open Location Code Reference API](Specification/specification.md#api-requirements)
 * [Plus Codes and Open Location Code Naming Guidelines](Specification/Naming_Guidelines.md)
 
 ### Technical
