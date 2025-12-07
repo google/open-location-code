@@ -13,7 +13,13 @@ if [ $? -eq 0 ]; then
   exit 0
 fi
 
-# Format the files in place.
-echo -e "\e[34mPython files have formatting errors -formatting in place\e[30m"
-python -m yapf --in-place *py
+if [ -z "$GITHUB_WORKFLOW" ]; then
+  # Not running on CI, so format the files in place.
+  echo -e "\e[34mPython files have formatting errors -formatting in place\e[30m"
+  python -m yapf --in-place *py
+else
+  echo -e "\e[31mPython files have formatting errors\e[30m"
+  echo -e "\e[31mThese must be corrected using format_check.sh\e[30m"
+  echo "$DIFF"
+fi
 exit 1

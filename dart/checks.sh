@@ -22,16 +22,27 @@ RETURN=0
 for FILE in `find * | egrep "\.dart$"`; do
   FORMATTED=`$DART_FMT_CMD --set-exit-if-changed --fix "$FILE"`
   if [ $? -ne 0 ]; then
-    # Running locally, we can just format the file. Use colour codes.
-    echo -e "\e[1;34m"
-    $DART_FMT_CMD --fix --overwrite $FILE
-    echo -e "\e[0m"
+    if [ -z "$GITHUB_WORKFLOW" ]; then
+      # Running locally, we can just format the file. Use colour codes.
+      echo -e "\e[1;34m"
+      $DART_FMT_CMD --fix --overwrite $FILE
+      echo -e "\e[0m"
+    else
+      # On CI, show the diff.
+      DIFF=`echo "$FORMATTED" | diff $FILE -`
+      echo -e "\e[1;31mFile has formatting errors: $FILE\e[0m"
+      echo "$DIFF"
+      RETURN=1
+    fi
   fi
   ANALYSIS=`$DART_ANALYZER_CMD "$FILE"`
   echo "$ANALYSIS" | grep "No issues found" >/dev/null
   if [ $? -ne 0 ]; then
     echo -e "\e[1;31mStatic analysis problems: $FILE\e[0m"
     echo "$ANALYSIS"
+    if [ -n "$GITHUB_WORKFLOW" ]; then
+      RETURN=1
+    fi
   fi
 done
 
