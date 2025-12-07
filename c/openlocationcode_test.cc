@@ -176,12 +176,8 @@ TEST_P(EncodingChecks, OLC_LocationToIntegers) {
   OLC_LatLon loc = OLC_LatLon{test_data.lat_deg, test_data.lng_deg};
   OLC_LatLonIntegers got;
   OLC_LocationToIntegers(&loc, &got);
-  // Due to floating point precision limitations, we may get values 1 less than
-  // expected.
-  EXPECT_LE(got.lat, test_data.lat_int);
-  EXPECT_GE(got.lat + 1, test_data.lat_int);
-  EXPECT_LE(got.lon, test_data.lng_int);
-  EXPECT_GE(got.lon + 1, test_data.lng_int);
+  EXPECT_EQ(test_data.lat_int, got.lat);
+  EXPECT_EQ(test_data.lng_int, got.lon);
 }
 
 INSTANTIATE_TEST_SUITE_P(OLC_Tests, EncodingChecks,

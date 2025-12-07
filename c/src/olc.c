@@ -82,13 +82,25 @@ int OLC_IsFull(const char* code, size_t size) {
   return is_full(&info);
 }
 
+// Apply floor after multiplying by precision, with correction for
+// floating-point errors. Due to floating-point representation, multiplying
+// a value like 129.7 by 8192000 may produce 1062502399.9999999 instead of the
+// exact 1062502400. A simple floor() would incorrectly return 1062502399.
+// This function detects and corrects such cases.
+static long long int corrected_floor(double value, long long int precision) {
+  long long int n = (long long int)floorl(value * (double)precision);
+  // Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+  if ((double)(n + 1) / (double)precision <= value) {
+    return n + 1;
+  }
+  return n;
+}
+
 void OLC_LocationToIntegers(const OLC_LatLon* degrees,
                             OLC_LatLonIntegers* integers) {
-  // Multiply degrees by precision. Use lround to explicitly round rather than
-  // truncate, which causes issues when using values like 0.1 that do not have
-  // precise floating point representations.
-  long long int lat = floorl(degrees->lat * kGridLatPrecisionInverse);
-  long long int lon = floorl(degrees->lon * kGridLonPrecisionInverse);
+  // Multiply degrees by precision with correction for floating-point errors.
+  long long int lat = corrected_floor(degrees->lat, kGridLatPrecisionInverse);
+  long long int lon = corrected_floor(degrees->lon, kGridLonPrecisionInverse);
 
   // Convert latitude to positive range (0..2*degrees*precision) and clip.
   lat += OLC_kLatMaxDegrees * kGridLatPrecisionInverse;

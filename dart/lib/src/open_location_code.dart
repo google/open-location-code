@@ -258,13 +258,27 @@ String encode(num latitude, num longitude, {int codeLength = pairCodeLength}) {
   return encodeIntegers(integers[0], integers[1], codeLength);
 }
 
+// Apply floor after multiplying by precision, with correction for
+// floating-point errors. Due to floating-point representation, multiplying
+// a value like 129.7 by 8192000 may produce 1062502399.9999999 instead of
+// the exact 1062502400. A simple floor() would incorrectly return 1062502399.
+// This function detects and corrects such cases.
+int _correctedFloor(num value, int precision) {
+  var n = (value * precision).floor().toInt();
+  // Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+  if ((n + 1) / precision <= value) {
+    return n + 1;
+  }
+  return n;
+}
+
 // Convert latitude and longitude in degrees to the integer values needed for
 // reliable conversions.
 List<int> locationToIntegers(num latitude, num longitude) {
   // Convert latitude into a positive integer clipped into the range 0-(just
   // under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
   // returned code can also be decoded.
-  var latVal = (latitude * finalLatPrecision).floor().toInt();
+  var latVal = _correctedFloor(latitude, finalLatPrecision);
   latVal += latitudeMax * finalLatPrecision;
   if (latVal < 0) {
     latVal = 0;
@@ -273,7 +287,7 @@ List<int> locationToIntegers(num latitude, num longitude) {
   }
   // Convert longitude into a positive integer and normalise it into the range
   // 0-360*8.192e6.
-  var lngVal = (longitude * finalLngPrecision).floor().toInt();
+  var lngVal = _correctedFloor(longitude, finalLngPrecision);
   lngVal += longitudeMax * finalLngPrecision;
   if (lngVal < 0) {
     // Dart's % operator differs from other languages in that it returns the

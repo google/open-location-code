@@ -17,7 +17,6 @@ package olc
 import (
 	"bufio"
 	"encoding/csv"
-	"fmt"
 	"math"
 	"math/rand"
 	"os"
@@ -132,17 +131,11 @@ func TestCheck(t *testing.T) {
 }
 
 func TestEncodeDegrees(t *testing.T) {
-	const allowedErrRate float64 = 0.05
-	var badCodes int
 	for i, elt := range encoding {
 		got := Encode(elt.latDeg, elt.lngDeg, elt.length)
 		if got != elt.code {
-			fmt.Printf("ENCODING DIFFERENCE %d. got %q for Encode(%v,%v,%d), wanted %q\n", i, got, elt.latDeg, elt.lngDeg, elt.length, elt.code)
-			badCodes++
+			t.Errorf("%d. got %q for Encode(%v,%v,%d), wanted %q", i, got, elt.latDeg, elt.lngDeg, elt.length, elt.code)
 		}
-	}
-	if errRate := float64(badCodes) / float64(len(encoding)); errRate > allowedErrRate {
-		t.Errorf("Too many errors in encoding degrees (got %f, allowed %f)", errRate, allowedErrRate)
 	}
 }
 
@@ -158,11 +151,11 @@ func TestEncodeIntegers(t *testing.T) {
 func TestConvertDegrees(t *testing.T) {
 	for i, elt := range encoding {
 		got := latitudeAsInteger(elt.latDeg)
-		if got > elt.latInt || got < elt.latInt-1 {
+		if got != elt.latInt {
 			t.Errorf("%d. got %d for latitudeAsInteger(%v), wanted %d", i, got, elt.latDeg, elt.latInt)
 		}
 		got = longitudeAsInteger(elt.lngDeg)
-		if got > elt.lngInt || got < elt.lngInt-1 {
+		if got != elt.lngInt {
 			t.Errorf("%d. got %d for longitudeAsInteger(%v), wanted %d", i, got, elt.lngDeg, elt.lngInt)
 		}
 	}

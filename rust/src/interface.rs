@@ -96,13 +96,30 @@ pub fn is_full(code: &str) -> bool {
     is_valid(code) && !is_short(code)
 }
 
+/// Apply floor after multiplying by precision, with correction for
+/// floating-point errors.
+///
+/// Due to floating-point representation, multiplying a value like 129.7 by
+/// 8192000 may produce 1062502399.9999999 instead of the exact 1062502400.
+/// A simple floor() would incorrectly return 1062502399. This function
+/// detects and corrects such cases.
+fn corrected_floor(value: f64, precision: i64) -> i64 {
+    let n = (value * precision as f64).floor() as i64;
+    // Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+    if (n + 1) as f64 / precision as f64 <= value {
+        n + 1
+    } else {
+        n
+    }
+}
+
 /// Convert a latitude and longitude in degrees to integer values.
 ///
 /// This function is only exposed for testing and should not be called directly.
 pub fn point_to_integers(pt: Point<f64>) -> (i64, i64) {
     let (lng, lat) = pt.x_y();
 
-    let mut lat_val = (lat * LAT_INTEGER_MULTIPLIER as f64).floor() as i64;
+    let mut lat_val = corrected_floor(lat, LAT_INTEGER_MULTIPLIER);
     lat_val += LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER;
     if lat_val < 0 {
         lat_val = 0
@@ -110,7 +127,7 @@ pub fn point_to_integers(pt: Point<f64>) -> (i64, i64) {
         lat_val = 2 * LATITUDE_MAX as i64 * LAT_INTEGER_MULTIPLIER - 1;
     }
 
-    let mut lng_val = (lng * LNG_INTEGER_MULTIPLIER as f64).floor() as i64;
+    let mut lng_val = corrected_floor(lng, LNG_INTEGER_MULTIPLIER);
     lng_val += LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER;
     if lng_val < 0 {
         lng_val = lng_val % (2 * LONGITUDE_MAX as i64 * LNG_INTEGER_MULTIPLIER)

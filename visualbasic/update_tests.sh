@@ -38,7 +38,6 @@ function addEncodingTests() {
     cat <<EOF >>"$VBA_TEST"
 
 ' Check the degrees to integer conversions.
-' Due to floating point precision limitations, we may get values 1 less than expected.
 Sub TEST_IntegerConversion()
     Dim encodingTests As Variant
     Dim i As Integer
@@ -49,19 +48,19 @@ Sub TEST_IntegerConversion()
 
     encodingTests = loadEncodingTestCSV()
 
-    For i = 0 To ${TEST_CASE_MAX_INDEX}
+    For i = 0 To \${TEST_CASE_MAX_INDEX}
         tc = encodingTests(i)
         degrees = tc(0)
         want_integer = tc(2)
         got_integer = latitudeToInteger(degrees)
-        If got_integer < want_integer - 1 Or got_integer > want_integer Then
+        If got_integer <> want_integer Then
             MsgBox ("Encoding test " + CStr(i) + ": latitudeToInteger(" + CStr(degrees) + "): got " + CStr(got_integer) + ", want " + CStr(want_integer))
             Exit Sub
         End If
         degrees = tc(1)
         want_integer = tc(3)
         got_integer = longitudeToInteger(degrees)
-        If got_integer < want_integer - 1 Or got_integer > want_integer Then
+        If got_integer <> want_integer Then
             MsgBox ("Encoding test " + CStr(i) + ": longitudeToInteger(" + CStr(degrees) + "): got " + CStr(got_integer) + ", want " + CStr(want_integer))
             Exit Sub
         End If

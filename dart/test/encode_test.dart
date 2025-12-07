@@ -46,36 +46,21 @@ void checkLocationToIntegers(String csvLine) {
   int latInteger = int.parse(elements[2]);
   int lngInteger = int.parse(elements[3]);
   var got = olc.locationToIntegers(latDegrees, lngDegrees);
-  // Due to floating point precision limitations, we may get values 1 less than expected.
-  expect(got[0], lessThanOrEqualTo(latInteger));
-  expect(got[0] + 1, greaterThanOrEqualTo(latInteger));
-  expect(got[1], lessThanOrEqualTo(lngInteger));
-  expect(got[1] + 1, greaterThanOrEqualTo(lngInteger));
+  expect(got[0], equals(latInteger));
+  expect(got[1], equals(lngInteger));
 }
 
 void main() {
-  // Encoding from degrees permits a small percentage of errors.
-  // This is due to floating point precision limitations.
   test('Check encode from degrees', () {
-    // The proportion of tests that we will accept generating a different code.
-    // This should not be significantly different from any other implementation.
-    num allowedErrRate = 0.05;
-    int errors = 0;
-    int tests = 0;
     csvLinesFromFile('encoding.csv').forEach((csvLine) {
-      tests++;
       var elements = csvLine.split(',');
       num lat = double.parse(elements[0]);
       num lng = double.parse(elements[1]);
       int len = int.parse(elements[4]);
       var want = elements[5];
       var got = olc.encode(lat, lng, codeLength: len);
-      if (got != want) {
-        print("ENCODING DIFFERENCE: Got '$got', expected '$want'");
-        errors++;
-      }
+      expect(got, equals(want));
     });
-    expect(errors / tests, lessThanOrEqualTo(allowedErrRate));
   });
 
   test('Check encode from integers', () {

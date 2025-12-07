@@ -61,30 +61,21 @@ public class EncodingTest {
 
   @Test
   public void testEncodeFromDegrees() {
-    double allowedErrorRate = 0.05;
-    int failedEncodings = 0;
     for (TestData testData : testDataList) {
       String got =
           OpenLocationCode.encode(
               testData.latitudeDegrees, testData.longitudeDegrees, testData.length);
-      if (!testData.code.equals(got)) {
-        failedEncodings++;
-        System.out.printf(
-            "ENCODING DIFFERENCE: encode(%f,%f,%d) got %s, want %s\n",
-            testData.latitudeDegrees,
-            testData.longitudeDegrees,
-            testData.length,
-            got,
-            testData.code);
-      }
+      Assert.assertEquals(
+          String.format(
+              "encode(%f,%f,%d) want %s, got %s",
+              testData.latitudeDegrees,
+              testData.longitudeDegrees,
+              testData.length,
+              testData.code,
+              got),
+          testData.code,
+          got);
     }
-    double gotRate = (double) failedEncodings / (double) testDataList.size();
-    Assert.assertTrue(
-        String.format(
-            "Too many encoding errors (actual rate %f, allowed rate %f), see ENCODING DIFFERENCE"
-                + " lines",
-            gotRate, allowedErrorRate),
-        gotRate <= allowedErrorRate);
   }
 
   @Test
@@ -92,22 +83,24 @@ public class EncodingTest {
     for (TestData testData : testDataList) {
       long[] got =
           OpenLocationCode.degreesToIntegers(testData.latitudeDegrees, testData.longitudeDegrees);
-      Assert.assertTrue(
+      Assert.assertEquals(
           String.format(
-              "degreesToIntegers(%f, %f) returned latitude %d, expected %d",
+              "degreesToIntegers(%f, %f) latitude: want %d, got %d",
               testData.latitudeDegrees,
               testData.longitudeDegrees,
-              got[0],
-              testData.latitudeInteger),
-          got[0] == testData.latitudeInteger || got[0] == testData.latitudeInteger - 1);
-      Assert.assertTrue(
+              testData.latitudeInteger,
+              got[0]),
+          testData.latitudeInteger,
+          got[0]);
+      Assert.assertEquals(
           String.format(
-              "degreesToIntegers(%f, %f) returned longitude %d, expected %d",
+              "degreesToIntegers(%f, %f) longitude: want %d, got %d",
               testData.latitudeDegrees,
               testData.longitudeDegrees,
-              got[1],
-              testData.longitudeInteger),
-          got[1] == testData.longitudeInteger || got[1] == testData.longitudeInteger - 1);
+              testData.longitudeInteger,
+              got[1]),
+          testData.longitudeInteger,
+          got[1]);
     }
   }
 

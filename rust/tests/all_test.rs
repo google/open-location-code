@@ -62,9 +62,6 @@ fn decode_test() {
 #[test]
 fn encode_test() {
     let mut tested = 0;
-    let mut errors = 0;
-    // Allow a small proportion of errors due to floating point.
-    let allowed_error_rate = 0.05;
     for line in CSVReader::new("encoding.csv") {
         if line.chars().count() == 0 {
             continue;
@@ -76,21 +73,14 @@ fn encode_test() {
         let code = cols[5];
 
         let got = encode(Point::new(lng, lat), len);
-        if got != code {
-            errors += 1;
-            println!(
-                "encode(Point::new({}, {}), {}) want {}, got {}",
-                lng, lat, len, code, got
-            );
-        }
+        assert_eq!(
+            got, code,
+            "encode(Point::new({}, {}), {}) want {}, got {}",
+            lng, lat, len, code, got
+        );
 
         tested += 1;
     }
-    assert!(
-        errors as f32 / tested as f32 <= allowed_error_rate,
-        "too many encoding errors ({})",
-        errors
-    );
     assert!(tested > 0);
 }
 
@@ -108,15 +98,15 @@ fn point_to_integers_test() {
         let lng_int = cols[3].parse::<i64>().unwrap();
 
         let (got_lat, got_lng) = point_to_integers(Point::new(lng_deg, lat_deg));
-        assert!(
-            got_lat >= lat_int - 1 && got_lat <= lat_int,
+        assert_eq!(
+            got_lat, lat_int,
             "converting lat={}, want={}, got={}",
             lat_deg,
             lat_int,
             got_lat
         );
-        assert!(
-            got_lng >= lng_int - 1 && got_lng <= lng_int,
+        assert_eq!(
+            got_lng, lng_int,
             "converting lng={}, want={}, got={}",
             lng_deg,
             lng_int,

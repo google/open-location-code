@@ -657,6 +657,26 @@ public final class OpenLocationCode {
   // Private static methods.
 
   /**
+   * Apply floor after multiplying by precision, with correction for floating-point errors.
+   *
+   * <p>Due to floating-point representation, multiplying a value like 129.7 by 8192000 may produce
+   * 1062502399.9999999 instead of the exact 1062502400. A simple floor() would incorrectly return
+   * 1062502399. This function detects and corrects such cases.
+   *
+   * @param value The value to multiply and floor.
+   * @param precision The precision multiplier.
+   * @return The corrected floor result.
+   */
+  private static long correctedFloor(double value, long precision) {
+    long n = (long) Math.floor(value * (double) precision);
+    // Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+    if ((double) (n + 1) / (double) precision <= value) {
+      return n + 1;
+    }
+    return n;
+  }
+
+  /**
    * Convert latitude and longitude in degrees into the integer values needed for reliable encoding.
    * (To avoid floating point precision errors.)
    *
@@ -665,8 +685,8 @@ public final class OpenLocationCode {
    * @return A list of [latitude, longitude] in clipped, normalised integer values.
    */
   static long[] degreesToIntegers(double latitude, double longitude) {
-    long lat = (long) Math.floor(latitude * LAT_INTEGER_MULTIPLIER);
-    long lng = (long) Math.floor(longitude * LNG_INTEGER_MULTIPLIER);
+    long lat = correctedFloor(latitude, LAT_INTEGER_MULTIPLIER);
+    long lng = correctedFloor(longitude, LNG_INTEGER_MULTIPLIER);
 
     // Clip and normalise values.
     lat += LATITUDE_MAX * LAT_INTEGER_MULTIPLIER;
