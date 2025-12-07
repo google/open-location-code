@@ -35,6 +35,21 @@ module PlusCodes
       valid?(code) && !short?(code)
     end
 
+    # Apply floor after multiplying by precision, with correction for
+    # floating-point errors. Due to floating-point representation, multiplying
+    # a value like 129.7 by 8192000 may produce 1062502399.9999999 instead of
+    # the exact 1062502400. A simple floor() would incorrectly return
+    # 1062502399. This function detects and corrects such cases.
+    def corrected_floor(value, precision)
+      n = (value * precision).floor
+      # Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+      if (n + 1).to_f / precision <= value
+        n + 1
+      else
+        n
+      end
+    end
+
     # Convert a latitude and longitude in degrees to integer values.
     #
     # This function is exposed for testing and should not be called directly.
@@ -44,14 +59,14 @@ module PlusCodes
     # @return [Array<Integer, Integer>] with the latitude and longitude integer
     # values.
     def location_to_integers(latitude, longitude)
-      lat_val = (latitude * PAIR_CODE_PRECISION * LAT_GRID_PRECISION).floor
+      lat_val = corrected_floor(latitude, PAIR_CODE_PRECISION * LAT_GRID_PRECISION)
       lat_val += 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
       if lat_val.negative?
         lat_val = 0
       elsif lat_val >= 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION
         lat_val = 2 * 90 * PAIR_CODE_PRECISION * LAT_GRID_PRECISION - 1
       end
-      lng_val = (longitude * PAIR_CODE_PRECISION * LNG_GRID_PRECISION).floor
+      lng_val = corrected_floor(longitude, PAIR_CODE_PRECISION * LNG_GRID_PRECISION)
       lng_val += 180 * PAIR_CODE_PRECISION * LNG_GRID_PRECISION
       if lng_val.negative?
         # Ruby's % operator differs from other languages in that it returns

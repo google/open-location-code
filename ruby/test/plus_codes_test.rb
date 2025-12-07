@@ -77,10 +77,8 @@ class PlusCodesTest < Test::Unit::TestCase
       lng_integer = cols[3].to_i
 
       got_lat, got_lng = @olc.location_to_integers(lat_degrees, lng_degrees)
-      # Due to floating point precision limitations, we may get values 1 less
-      # than expected.
-      assert_include([lat_integer - 1, lat_integer], got_lat)
-      assert_include([lng_integer - 1, lng_integer], got_lng)
+      assert_equal(lat_integer, got_lat)
+      assert_equal(lng_integer, got_lng)
     end
   end
 

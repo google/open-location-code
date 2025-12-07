@@ -229,10 +229,24 @@ func normalizeLng(value float64) float64 {
 	return normalize(value, lngMax)
 }
 
+// correctedFloor applies floor after multiplying by precision, with correction
+// for floating-point errors. Due to floating-point representation, multiplying
+// a value like 129.7 by 8192000 may produce 1062502399.9999999 instead of the
+// exact 1062502400. A simple floor() would incorrectly return 1062502399.
+// This function detects and corrects such cases.
+func correctedFloor(value float64, precision int64) int64 {
+	n := int64(math.Floor(value * float64(precision)))
+	// Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+	if float64(n+1)/float64(precision) <= value {
+		return n + 1
+	}
+	return n
+}
+
 // latitudeAsInteger converts a latitude in degrees into the integer representation.
 // It will be clipped into the degree range -90<=x<90 (actually 0-180*2.5e7-1).
 func latitudeAsInteger(latDegrees float64) int64 {
-	latVal := int64(math.Floor(latDegrees * finalLatPrecision))
+	latVal := correctedFloor(latDegrees, finalLatPrecision)
 	latVal += latMax * finalLatPrecision
 	if latVal < 0 {
 		latVal = 0
@@ -245,7 +259,7 @@ func latitudeAsInteger(latDegrees float64) int64 {
 // longitudeAsInteger converts a longitude in degrees into the integer representation.
 // It will be normalised into the degree range -180<=x<180 (actually 0-360*8.192e6).
 func longitudeAsInteger(lngDegrees float64) int64 {
-	lngVal := int64(math.Floor(lngDegrees * finalLngPrecision))
+	lngVal := correctedFloor(lngDegrees, finalLngPrecision)
 	lngVal += lngMax * finalLngPrecision
 	if lngVal <= 0 {
 		lngVal = lngVal%(2*lngMax*finalLngPrecision) + 2*lngMax*finalLngPrecision

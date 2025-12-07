@@ -28,19 +28,19 @@ const testSuite = goog.require('goog.testing.testSuite');
 goog.require('goog.testing.asserts');
 
 const /** @const {string} */ DECODING_TEST_FILE =
-    '/filez/_main/test_data/decoding.csv';
+  '/filez/_main/test_data/decoding.csv';
 const /** @const {string} */ ENCODING_TEST_FILE =
-    '/filez/_main/test_data/encoding.csv';
+  '/filez/_main/test_data/encoding.csv';
 const /** @const {string} */ SHORT_CODE_TEST_FILE =
-    '/filez/_main/test_data/shortCodeTests.csv';
+  '/filez/_main/test_data/shortCodeTests.csv';
 const /** @const {string} */ VALIDITY_TEST_FILE =
-    '/filez/_main/test_data/validityTests.csv';
+  '/filez/_main/test_data/validityTests.csv';
 
 // Initialise the async test framework.
 const /** @const {!AsyncTestCase} */ asyncTestCase = AsyncTestCase.createAndInstall();
 
 testSuite({
-  testDecode: function() {
+  testDecode: function () {
     const xhrIo_ = new XhrIo();
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
@@ -67,13 +67,9 @@ testSuite({
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.send(DECODING_TEST_FILE, 'GET');
   },
-  testEncodeDegrees: function() {
+  testEncodeDegrees: function () {
     const xhrIo_ = new XhrIo();
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
-      // Allow a 5% error rate encoding from degree coordinates (because of floating
-      // point precision).
-      const allowedErrorRate = 0.05;
-      var errors = 0;
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
       for (var i = 0; i < lines.length; i++) {
         const fields = lines[i].split(',');
@@ -83,25 +79,18 @@ testSuite({
         const code = fields[5];
 
         const got = OpenLocationCode.encode(latDegrees, lngDegrees, length);
-        // Did we get the same code?
-        if (code != got) {
-          console.warn(
-              'ENCODING DIFFERENCE: Expected code ' + code +', got ' + got
-          );
-          errors++;
-        }
+        assertEquals(
+          'encode(' + latDegrees + ', ' + lngDegrees + ', ' + length + ')',
+          code,
+          got
+        );
         asyncTestCase.continueTesting();
       }
-      console.info('testEncodeDegrees error rate is ' + (errors / lines.length));
-      assertTrue(
-          'testEncodeDegrees: too many errors ' + errors / lines.length,
-          (errors / lines.length) < allowedErrorRate
-      );
     });
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.send(ENCODING_TEST_FILE, 'GET');
   },
-  testLocationToIntegers: function() {
+  testLocationToIntegers: function () {
     const xhrIo_ = new XhrIo();
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
@@ -113,18 +102,18 @@ testSuite({
         const lngIntegers = parseInt(fields[3], 10);
 
         const got = OpenLocationCode._locationToIntegers(
-            latDegrees,
-            lngDegrees
+          latDegrees,
+          lngDegrees
         );
-        // Due to floating point precision limitations, we may get values 1 less
-        // than expected.
-        assertTrue(
-            'testLocationToIntegers: expected latitude ' + latIntegers + ', got ' + got[0],
-            got[0] == latIntegers || got[0] == latIntegers - 1
+        assertEquals(
+          'locationToIntegers latitude for ' + latDegrees,
+          latIntegers,
+          got[0]
         );
-        assertTrue(
-            'testLocationToIntegers: expected longitude ' + lngIntegers + ', got ' + got[1],
-            got[1] == lngIntegers || got[1] == lngIntegers - 1
+        assertEquals(
+          'locationToIntegers longitude for ' + lngDegrees,
+          lngIntegers,
+          got[1]
         );
         asyncTestCase.continueTesting();
       }
@@ -132,7 +121,7 @@ testSuite({
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.send(ENCODING_TEST_FILE, 'GET');
   },
-  testEncodeIntegers: function() {
+  testEncodeIntegers: function () {
     const xhrIo_ = new XhrIo();
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
@@ -144,14 +133,14 @@ testSuite({
         const code = fields[5];
 
         const got = OpenLocationCode._encodeIntegers(
-            latIntegers,
-            lngIntegers,
-            length
+          latIntegers,
+          lngIntegers,
+          length
         );
         // Did we get the same code?
         assertEquals(
-            'testEncodeIntegers: expected code ' + code + ', got ' + got,
-            code, got
+          'testEncodeIntegers: expected code ' + code + ', got ' + got,
+          code, got
         );
         asyncTestCase.continueTesting();
       }
@@ -159,7 +148,7 @@ testSuite({
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.send(ENCODING_TEST_FILE, 'GET');
   },
-  testShortCodes: function() {
+  testShortCodes: function () {
     const xhrIo_ = new XhrIo();
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
@@ -186,12 +175,12 @@ testSuite({
     });
     xhrIo_.send(SHORT_CODE_TEST_FILE, 'GET');
   },
-  testRecoveryNearPoles: function() {
+  testRecoveryNearPoles: function () {
     assertEquals('2CXXXXXX+XX', OpenLocationCode.recoverNearest('XXXXXX+XX', -81.0, 0.0));
     assertEquals('CFX22222+22', OpenLocationCode.recoverNearest('2222+22', 89.6, 0.0));
     assertEquals('CFX22222+22', OpenLocationCode.recoverNearest('2222+22', 89.6, 0.0));
   },
-  testValidity: function() {
+  testValidity: function () {
     const xhrIo_ = new XhrIo();
     xhrIo_.listenOnce(EventType.COMPLETE, () => {
       const lines = xhrIo_.getResponseText().match(/^[^#].+/gm);
@@ -212,7 +201,7 @@ testSuite({
     asyncTestCase.waitForAsync('Waiting for xhr to respond');
     xhrIo_.send(VALIDITY_TEST_FILE, 'GET');
   },
-  testBenchmarks: function() {
+  testBenchmarks: function () {
     var input = [];
     for (var i = 0; i < 100000; i++) {
       var lat = Math.random() * 180 - 90;
@@ -232,9 +221,9 @@ testSuite({
     }
     var durationMillis = Date.now() - startMillis;
     console.info(
-        'Encoding: ' + input.length + ', total ' + durationMillis * 1000 +
-        ' usecs, average duration ' +
-        ((durationMillis * 1000) / input.length) + ' usecs');
+      'Encoding: ' + input.length + ', total ' + durationMillis * 1000 +
+      ' usecs, average duration ' +
+      ((durationMillis * 1000) / input.length) + ' usecs');
 
     startMillis = Date.now();
     for (var i = 0; i < input.length; i++) {
@@ -242,8 +231,8 @@ testSuite({
     }
     durationMillis = Date.now() - startMillis;
     console.info(
-        'Decoding: ' + input.length + ', total ' + durationMillis * 1000 +
-        ' usecs, average duration ' +
-        ((durationMillis * 1000) / input.length) + ' usecs');
+      'Decoding: ' + input.length + ', total ' + durationMillis * 1000 +
+      ' usecs, average duration ' +
+      ((durationMillis * 1000) / input.length) + ' usecs');
   },
 });

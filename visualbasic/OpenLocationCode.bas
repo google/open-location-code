@@ -380,6 +380,22 @@ Private Function normalizeLongitude(ByVal longitude As Double) As Double
   normalizeLongitude = lng
 End Function
 
+' Apply floor after multiplying by precision, with correction for floating-point
+' errors. Due to floating-point representation, multiplying a value like 129.7
+' by 8192000 may produce 1062502399.9999999 instead of the exact 1062502400.
+' A simple Int() would incorrectly return 1062502399. This function detects and
+' corrects such cases.
+Private Function correctedFloor(ByVal value As Double, ByVal precision As Double) AS Double
+  Dim n As Double
+  n = Int(value * precision)
+  ' Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+  If (n + 1) / precision <= value Then
+    correctedFloor = n + 1
+  Else
+    correctedFloor = n
+  End If
+End Function
+
 ' Convert a latitude in degrees to the integer representation.
 ' (We return a Double, because VB as used in LibreOffice only uses 32-bit Longs.)
 Private Function latitudeToInteger(ByVal latitude As Double) AS Double
@@ -388,7 +404,7 @@ Private Function latitudeToInteger(ByVal latitude As Double) AS Double
   ' Convert latitude into a positive integer clipped into the range 0-(just
   ' under 180*2.5e7). Latitude 90 needs to be adjusted to be just less, so the
   ' returned code can also be decoded.
-  lat = Int(latitude * FINAL_LAT_PRECISION_)
+  lat = correctedFloor(latitude, FINAL_LAT_PRECISION_)
   lat = lat + LATITUDE_MAX_ * FINAL_LAT_PRECISION_
   If lat < 0 Then
     lat = 0
@@ -403,7 +419,7 @@ End Function
 Private Function longitudeToInteger(ByVal longitude As Double) AS Double
   Dim lng As Double
   ' Convert longitude into a positive integer and normalise it into the range 0-360*8.192e6.
-  lng = Int(longitude * FINAL_LNG_PRECISION_)
+  lng = correctedFloor(longitude, FINAL_LNG_PRECISION_)
   lng = lng + LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
   If lng < 0 Then
     lng = doubleMod(lng, (2 * LONGITUDE_MAX_ * FINAL_LNG_PRECISION_))

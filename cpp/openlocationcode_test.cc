@@ -210,13 +210,9 @@ TEST_P(EncodingChecks, OLC_EncodeIntegers) {
 TEST_P(EncodingChecks, OLC_LocationToIntegers) {
   EncodingTestData test_data = GetParam();
   int64_t got_lat = internal::latitudeToInteger(test_data.lat_deg);
-  // Due to floating point precision limitations, we may get values 1 less than
-  // expected.
-  EXPECT_LE(got_lat, test_data.lat_int);
-  EXPECT_GE(got_lat + 1, test_data.lat_int);
+  EXPECT_EQ(test_data.lat_int, got_lat);
   int64_t got_lng = internal::longitudeToInteger(test_data.lng_deg);
-  EXPECT_LE(got_lng, test_data.lng_int);
-  EXPECT_GE(got_lng + 1, test_data.lng_int);
+  EXPECT_EQ(test_data.lng_int, got_lng);
 }
 
 INSTANTIATE_TEST_CASE_P(OLC_Tests, EncodingChecks,

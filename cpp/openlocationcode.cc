@@ -48,8 +48,22 @@ const int kPositionLUT['X' - 'C' + 1] = {8,  -1, -1, 9,  10, 11, -1, 12,
                                          -1, -1, 13, -1, -1, 14, 15, 16,
                                          -1, -1, -1, 17, 18, 19};
 
+// Apply floor after multiplying by precision, with correction for
+// floating-point errors. Due to floating-point representation, multiplying
+// a value like 129.7 by 8192000 may produce 1062502399.9999999 instead of the
+// exact 1062502400. A simple floor() would incorrectly return 1062502399.
+// This function detects and corrects such cases.
+int64_t correctedFloor(double value, int64_t precision) {
+  int64_t n = static_cast<int64_t>(floor(value * static_cast<double>(precision)));
+  // Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+  if (static_cast<double>(n + 1) / static_cast<double>(precision) <= value) {
+    return n + 1;
+  }
+  return n;
+}
+
 int64_t latitudeToInteger(double latitude) {
-  int64_t lat = floor(latitude * kGridLatPrecisionInverse);
+  int64_t lat = correctedFloor(latitude, kGridLatPrecisionInverse);
   lat += kLatitudeMaxDegrees * kGridLatPrecisionInverse;
   if (lat < 0) {
     lat = 0;
@@ -60,7 +74,7 @@ int64_t latitudeToInteger(double latitude) {
 }
 
 int64_t longitudeToInteger(double longitude) {
-  int64_t lng = floor(longitude * kGridLngPrecisionInverse);
+  int64_t lng = correctedFloor(longitude, kGridLngPrecisionInverse);
   lng += kLongitudeMaxDegrees * kGridLngPrecisionInverse;
   if (lng <= 0) {
     lng = lng % (2 * kLongitudeMaxDegrees * kGridLngPrecisionInverse) +

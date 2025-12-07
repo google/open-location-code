@@ -115,29 +115,22 @@ class TestEncoding(unittest.TestCase):
     def test_converting_degrees(self):
         for td in self.testdata:
             got = olc.locationToIntegers(td['lat'], td['lng'])
-            # Due to floating point precision limitations, we may get values 1 less than expected.
-            self.assertTrue(
-                td['latInt'] - 1 <= got[0] <= td['latInt'],
+            self.assertEqual(
+                td['latInt'], got[0],
                 f'Latitude conversion {td["lat"]}: want {td["latInt"]} got {got[0]}'
             )
-            self.assertTrue(
-                td['lngInt'] - 1 <= got[1] <= td['lngInt'],
+            self.assertEqual(
+                td['lngInt'], got[1],
                 f'Longitude conversion {td["lng"]}: want {td["lngInt"]} got {got[1]}'
             )
 
     def test_encoding_degrees(self):
-        # Allow a small proportion of errors due to floating point.
-        allowedErrorRate = 0.05
-        errors = 0
         for td in self.testdata:
             got = olc.encode(td['lat'], td['lng'], td['length'])
-            if got != td['code']:
-                print(
-                    f'olc.encode({td["lat"]}, {td["lng"]}, {td["length"]}) want {td["code"]}, got {got}'
-                )
-                errors += 1
-        self.assertLessEqual(errors / len(self.testdata), allowedErrorRate,
-                             "olc.encode error rate too high")
+            self.assertEqual(
+                td['code'], got,
+                f'olc.encode({td["lat"]}, {td["lng"]}, {td["length"]}) want {td["code"]}, got {got}'
+            )
 
     def test_encoding_integers(self):
         for td in self.testdata:

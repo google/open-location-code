@@ -227,6 +227,23 @@ def isFull(code):
     return True
 
 
+def _correctedFloor(value, precision):
+    """
+    Apply floor after multiplying by precision, with correction for
+    floating-point errors.
+
+    Due to floating-point representation, multiplying a value like 129.7 by
+    8192000 may produce 1062502399.9999999 instead of the exact 1062502400.
+    A simple floor() would incorrectly return 1062502399. This function
+    detects and corrects such cases.
+    """
+    n = int(math.floor(value * precision))
+    # Check if (n + 1) / precision <= value. If so, n + 1 is the correct floor.
+    if (n + 1) / precision <= value:
+        return n + 1
+    return n
+
+
 def locationToIntegers(latitude, longitude):
     """
     Convert location in degrees into the integer representations.
@@ -240,14 +257,14 @@ def locationToIntegers(latitude, longitude):
     Return:
       A tuple of the [latitude, longitude] values as integers.
     """
-    latVal = int(math.floor(latitude * FINAL_LAT_PRECISION_))
+    latVal = _correctedFloor(latitude, FINAL_LAT_PRECISION_)
     latVal += LATITUDE_MAX_ * FINAL_LAT_PRECISION_
     if latVal < 0:
         latVal = 0
     elif latVal >= 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_:
         latVal = 2 * LATITUDE_MAX_ * FINAL_LAT_PRECISION_ - 1
 
-    lngVal = int(math.floor(longitude * FINAL_LNG_PRECISION_))
+    lngVal = _correctedFloor(longitude, FINAL_LNG_PRECISION_)
     lngVal += LONGITUDE_MAX_ * FINAL_LNG_PRECISION_
     if lngVal < 0:
         # Python's % operator differs from other languages in that it returns
