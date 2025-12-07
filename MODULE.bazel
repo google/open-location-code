@@ -3,7 +3,7 @@ module(
     version = "1.0",
 )
 
-# bazel-skylib required by #@io_bazel_rules_closure.
+# bazel-skylib required by rules_closure.
 # https://github.com/bazelbuild/bazel-skylib
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 
@@ -11,3 +11,6 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 # https://github.com/google/googletest
 bazel_dep(name = "googletest", version = "1.15.2")
 
+# rules_closure for js/closure tests.
+# https://github.com/bazelbuild/rules_closure
+bazel_dep(name = "rules_closure", version = "0.15.0")
