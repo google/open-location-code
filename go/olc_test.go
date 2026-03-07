@@ -131,6 +131,36 @@ func TestCheck(t *testing.T) {
 	}
 }
 
+func TestCheckShort(t *testing.T) {
+	for i, elt := range validity {
+		err := CheckShort(elt.code)
+		got := err == nil
+		if got != elt.isShort {
+			t.Errorf("%d. %q validity is %t (err=%v), wanted %t.", i, elt.code, got, err, elt.isShort)
+		}
+	}
+}
+
+func TestCheckFull(t *testing.T) {
+	for i, elt := range validity {
+		err := CheckFull(elt.code)
+		got := err == nil
+		if got != elt.isFull {
+			t.Errorf("%d. %q validity is %t (err=%v), wanted %t.", i, elt.code, got, err, elt.isFull)
+		}
+	}
+}
+
+func TestDecodeValidity(t *testing.T) {
+	for i, elt := range validity {
+		_, err := Decode(elt.code)
+		got := err == nil
+		if got != elt.isFull {
+			t.Errorf("%d. %q validity is %t (err=%v), wanted %t.", i, elt.code, got, err, elt.isValid)
+		}
+	}
+}
+
 func TestEncodeDegrees(t *testing.T) {
 	const allowedErrRate float64 = 0.05
 	var badCodes int

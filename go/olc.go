@@ -167,9 +167,6 @@ func CheckFull(code string) error {
 	if firstLat := strings.IndexByte(Alphabet, upper(code[0])) * int(encBase); firstLat >= latMax*2 {
 		return errors.New("latitude outside range")
 	}
-	if len(code) == 1 {
-		return nil
-	}
 	if firstLong := strings.IndexByte(Alphabet, upper(code[1])) * int(encBase); firstLong >= lngMax*2 {
 		return errors.New("longitude outside range")
 	}
