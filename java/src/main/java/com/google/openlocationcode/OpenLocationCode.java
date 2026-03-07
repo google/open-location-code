@@ -205,8 +205,12 @@ public final class OpenLocationCode {
   static String encodeIntegers(long lat, long lng, int codeLength) {
     // Limit the maximum number of digits in the code.
     codeLength = Math.min(codeLength, MAX_DIGIT_COUNT);
+    // Automatically increase code length if odd and below pair code length.
+    if ((codeLength < PAIR_CODE_LENGTH) && codeLength % 2 == 1) {
+      codeLength += 1;
+    }
     // Check that the code length requested is valid.
-    if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1 || codeLength < MIN_DIGIT_COUNT) {
+    if (codeLength < MIN_DIGIT_COUNT) {
       throw new IllegalArgumentException("Illegal code length " + codeLength);
     }
 
@@ -359,6 +363,15 @@ public final class OpenLocationCode {
    * @return True if it is a full code.
    */
   public boolean isFull() {
+    // First latitude character can only have first 9 values.
+    if (CODE_ALPHABET.indexOf(code.charAt(0)) > 8) {
+      return false;
+    }
+
+    // First longitude character can only have first 18 values.
+    if (CODE_ALPHABET.indexOf(code.charAt(1)) > 17) {
+      return false;
+    }
     return code.indexOf(SEPARATOR) == SEPARATOR_POSITION;
   }
 
@@ -567,19 +580,6 @@ public final class OpenLocationCode {
     // There must be an even number of at most 8 characters before the separator.
     if (separatorPosition % 2 != 0 || separatorPosition > SEPARATOR_POSITION) {
       return false;
-    }
-
-    // Check first two characters: only some values from the alphabet are permitted.
-    if (separatorPosition == SEPARATOR_POSITION) {
-      // First latitude character can only have first 9 values.
-      if (CODE_ALPHABET.indexOf(code.charAt(0)) > 8) {
-        return false;
-      }
-
-      // First longitude character can only have first 18 values.
-      if (CODE_ALPHABET.indexOf(code.charAt(1)) > 17) {
-        return false;
-      }
     }
 
     // Check the characters before the separator.
