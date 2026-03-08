@@ -188,18 +188,19 @@ func upper(b byte) byte {
 // The code is truncated to the first 15 digits, as Decode won't use more,
 // to avoid underflow errors.
 func StripCode(code string) string {
-	code = strings.Map(
-		func(r rune) rune {
-			if r == Separator || r == Padding {
-				return -1
-			}
-			return rune(upper(byte(r)))
-		},
-		code)
-	if len(code) > maxCodeLen {
-		return code[:maxCodeLen]
+	result := make([]byte, maxCodeLen)
+	pos := 0
+	for _, r := range code {
+		if r == Separator || r == Padding {
+			continue
+		}
+		result[pos] = upper(byte(r))
+		pos++
+		if pos >= maxCodeLen {
+			break
+		}
 	}
-	return code
+	return string(result[:pos])
 }
 
 // Because the OLC codes are an area, they can't start at 180 degrees, because they would then have something > 180 as their upper bound.
