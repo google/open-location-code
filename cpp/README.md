@@ -32,5 +32,5 @@ Code must be formatted using `clang-format`, and this will be checked in the
 tests. You can format your code using the script:
 
 ```
-sh clang_check.sh
+bash clang_check.sh
 ```

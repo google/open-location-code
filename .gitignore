@@ -11,6 +11,8 @@ MODULE.bazel.lock
 **/target/
 # Ignore intelliJ auto generated dir
 **/.idea/
+# Ignore CLion/bazel auto generated dir
+**/.clwb/
 # Ignore iml extensions files
 **/*.iml
 # Ignore visual studio auto generated dir
