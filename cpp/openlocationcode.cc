@@ -78,6 +78,10 @@ std::string encodeIntegers(int64_t lat_val, int64_t lng_val,
   // Add the separator character.
   code[internal::kSeparatorPosition] = internal::kSeparator;
 
+  // Limit the maximum number of digits in the code.
+  code_length = std::min(code_length, internal::kMaximumDigitCount);
+  // Ensure the length is valid.
+  code_length = std::max(code_length, internal::kMinimumDigitCount);
   // Compute the grid part of the code if necessary.
   if (code_length > internal::kPairCodeLength) {
     for (size_t i = internal::kGridCodeLength; i >= 1; i--) {
@@ -89,6 +93,9 @@ std::string encodeIntegers(int64_t lat_val, int64_t lng_val,
       lng_val /= internal::kGridColumns;
     }
   } else {
+    if (code_length % 2 == 1) {
+      code_length++;
+    }
     lat_val /= pow(internal::kGridRows, internal::kGridCodeLength);
     lng_val /= pow(internal::kGridColumns, internal::kGridCodeLength);
   }
@@ -193,13 +200,6 @@ std::string clean_code_chars(const std::string &code) {
 }  // anonymous namespace
 
 std::string Encode(const LatLng &location, size_t code_length) {
-  // Limit the maximum number of digits in the code.
-  code_length = std::min(code_length, internal::kMaximumDigitCount);
-  // Ensure the length is valid.
-  code_length = std::max(code_length, internal::kMinimumDigitCount);
-  if (code_length < internal::kPairCodeLength && code_length % 2 == 1) {
-    code_length = code_length + 1;
-  }
   // Convert latitude and longitude into integer values.
   int64_t lat_val = internal::latitudeToInteger(location.latitude);
   int64_t lng_val = internal::longitudeToInteger(location.longitude);

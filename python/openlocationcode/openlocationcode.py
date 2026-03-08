@@ -287,8 +287,10 @@ def encodeIntegers(latVal, lngVal, codeLength):
     This function is exposed for testing purposes and should not be called
     directly.
     """
-    if codeLength < MIN_DIGIT_COUNT_ or (codeLength < PAIR_CODE_LENGTH_ and
-                                         codeLength % 2 == 1):
+    if codeLength < PAIR_CODE_LENGTH_ and codeLength % 2 == 1:
+        # Automatically increment short lengths to be even.
+        codeLength+=1
+    if codeLength < MIN_DIGIT_COUNT_:
         raise ValueError('Invalid Open Location Code length - ' +
                          str(codeLength))
     codeLength = min(codeLength, MAX_DIGIT_COUNT_)

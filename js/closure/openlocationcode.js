@@ -420,10 +420,11 @@ function _encodeIntegers(latInt, lngInt, codeLength) {
   if (typeof codeLength == 'undefined') {
     codeLength = PAIR_CODE_LENGTH;
   }
-  if (
-    codeLength < MIN_CODE_LEN ||
-    (codeLength < PAIR_CODE_LENGTH && codeLength % 2 == 1)
-  ) {
+  // Increment length if short and not even.
+  if (codeLength < PAIR_CODE_LENGTH && codeLength % 2 === 1) {
+    codeLength++;
+  }
+  if (codeLength < MIN_CODE_LEN) {
     throw new Error('IllegalArgumentException: Invalid Plus Code length');
   }
   codeLength = Math.min(codeLength, MAX_CODE_LEN);
