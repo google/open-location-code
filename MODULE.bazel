@@ -13,6 +13,8 @@ bazel_dep(name = "googletest", version = "1.15.2")
 
 bazel_dep(name = "rules_rust", version = "0.58.0")
 
+bazel_dep(name = "protobuf", version = "27.0", repo_name = "com_google_protobuf")
+
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
     edition = "2024",
@@ -33,4 +35,3 @@ crate.annotation(
     rustc_flags = ["-Zunstable-options"],
 )
 use_repo(crate, "crates")
-
