@@ -5,13 +5,13 @@ module(
 
 # bazel-skylib required by #@io_bazel_rules_closure.
 # https://github.com/bazelbuild/bazel-skylib
-bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "bazel_skylib", version = "1.8.2")
 
 # googletest required by c/BUILD.
 # https://github.com/google/googletest
 bazel_dep(name = "googletest", version = "1.15.2")
 
-bazel_dep(name = "rules_rust", version = "0.58.0")
+bazel_dep(name = "rules_rust", version = "0.69.0")
 
 bazel_dep(name = "protobuf", version = "27.0", repo_name = "com_google_protobuf")
 
