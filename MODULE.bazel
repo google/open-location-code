@@ -11,3 +11,26 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 # https://github.com/google/googletest
 bazel_dep(name = "googletest", version = "1.15.2")
 
+bazel_dep(name = "rules_rust", version = "0.58.0")
+
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2024",
+    versions = ["1.85.0"],
+)
+use_repo(rust, "rust_toolchains")
+
+register_toolchains("@rust_toolchains//:all")
+
+crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//rust:Cargo.lock",
+    manifests = ["//rust:Cargo.toml"],
+)
+crate.annotation(
+    crate = "open-location-code",
+    rustc_flags = ["-Zunstable-options"],
+)
+use_repo(crate, "crates")
+

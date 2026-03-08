@@ -19,7 +19,7 @@ use rand::random_range;
 #[test]
 fn is_valid_test() {
     let mut tested = 0;
-    for line in CSVReader::new("validityTests.csv") {
+    for line in CSVReader::new("validityTests.csv").unwrap() {
         let cols: Vec<&str> = line.split(',').collect();
         let code = cols[0];
         let _valid = cols[1] == "true";
@@ -38,7 +38,7 @@ fn is_valid_test() {
 #[test]
 fn decode_test() {
     let mut tested = 0;
-    for line in CSVReader::new("decoding.csv") {
+    for line in CSVReader::new("decoding.csv").unwrap() {
         let cols: Vec<&str> = line.split(',').collect();
         let code = cols[0];
         let len = cols[1].parse::<usize>().unwrap();
@@ -65,7 +65,7 @@ fn encode_test() {
     let mut errors = 0;
     // Allow a small proportion of errors due to floating point.
     let allowed_error_rate = 0.05;
-    for line in CSVReader::new("encoding.csv") {
+    for line in CSVReader::new("encoding.csv").unwrap() {
         if line.chars().count() == 0 {
             continue;
         }
@@ -97,7 +97,7 @@ fn encode_test() {
 #[test]
 fn point_to_integers_test() {
     let mut tested = 0;
-    for line in CSVReader::new("encoding.csv") {
+    for line in CSVReader::new("encoding.csv").unwrap() {
         if line.chars().count() == 0 {
             continue;
         }
@@ -131,7 +131,7 @@ fn point_to_integers_test() {
 #[test]
 fn encode_integers_test() {
     let mut tested = 0;
-    for line in CSVReader::new("encoding.csv") {
+    for line in CSVReader::new("encoding.csv").unwrap() {
         if line.chars().count() == 0 {
             continue;
         }
@@ -158,7 +158,7 @@ fn encode_integers_test() {
 #[test]
 fn shorten_recovery_test() {
     let mut tested = 0;
-    for line in CSVReader::new("shortCodeTests.csv") {
+    for line in CSVReader::new("shortCodeTests.csv").unwrap() {
         let cols: Vec<&str> = line.split(',').collect();
         let full_code = cols[0];
         let lat = cols[1].parse::<f64>().unwrap();
