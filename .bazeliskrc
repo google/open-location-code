@@ -3,3 +3,5 @@
 # Set the version of Bazel to use.
 # TODO: #642 -- Update once the JS bazelbuild/rules_closure supports bazel modules.
 USE_BAZEL_VERSION=7.4.1
+# Use lld linker for rust since gold is deprecated and has known bugs.
+build --linkopt=-fuse-ld=lld
