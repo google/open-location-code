@@ -1,8 +1,7 @@
 #include "openlocationcode.h"
 
-#include <float.h>
-
 #include <algorithm>
+#include <cfloat>
 #include <cmath>
 #include <cstdint>
 
@@ -29,7 +28,7 @@ const size_t kInitialExponent = floor(log(360) / log(kEncodingBase));
 const double kGridSizeDegrees =
     1 / pow(kEncodingBase, kPairCodeLength / 2 - (kInitialExponent + 1));
 // Inverse (1/) of the precision of the final pair digits in degrees. (20^3)
-const size_t kPairPrecisionInverse = 8000;
+const int64_t kPairPrecisionInverse = 8000;
 // Inverse (1/) of the precision of the final grid digits in degrees.
 // (Latitude and longitude are different.)
 const int64_t kGridLatPrecisionInverse =
