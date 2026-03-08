@@ -21,8 +21,4 @@ crate.from_cargo(
     cargo_lockfile = "//rust:Cargo.lock",
     manifests = ["//rust:Cargo.toml"],
 )
-crate.annotation(
-    crate = "open-location-code",
-    rustc_flags = ["-Zunstable-options"],
-)
 use_repo(crate, "crates")
