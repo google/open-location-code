@@ -122,7 +122,7 @@ For example, 8FVC9G8F+6W has the center 47.365562,8.524813. The following table 
 | 47.373313,8.537562 | 0.008           | 0.013            | 0.025            | 8F+6W                    |
 | 47.339563,8.556687 | 0.026           | 0.032            | 0.064            | 9G8F+6W                  |
 | 47.985187,8.440688 | 0.620           | 0.084            | 1.239            | VC9G8F+6W                |
-| 38.800562,-9.064937| 0.620           | 8.565            | 17.590           | 8FVC9G8F+6W              |
+| 38.800562,-9.064937| 8.565           | 17.590           | 35.180           | 8FVC9G8F+6W              |
 
 Note: A code that has been shortened will not necessarily have the same initial four digits as the reference location.
 
