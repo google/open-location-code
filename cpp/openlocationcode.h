@@ -19,9 +19,15 @@ namespace openlocationcode {
 // rectangle that encloses the coordinates. The accuracy of the code is
 // controlled by the code length.
 //
-// Returns an Open Location Code with code_length significant digits. The string
-// returned may be one character longer if it includes a separator character
-// for formatting.
+// Returns a full Open Location Code. code_length specifies the number of
+// significant digits, excluding the '+' separator and any '0' padding.
+// Requested lengths are clamped to 2 through 15, with odd lengths below 10
+// rounded up.
+//
+// The returned string always includes '+' after eight characters. Codes with
+// fewer than eight significant digits are padded with '0' before the separator,
+// giving a returned length of nine characters. Otherwise, the returned length
+// is the number of significant digits plus one.
 std::string Encode(const LatLng &location, size_t code_length);
 
 // Encodes a pair of coordinates and return an Open Location Code representing a
